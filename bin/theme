@@ -1064,10 +1064,6 @@ main() {
       ;;
     upgrade|update)
       echo "Upgrading theme..."
-      if ! git -C "$THEME_APP_DIR" remote get-url origin &>/dev/null; then
-        echo "No remote configured. Run: git -C $THEME_APP_DIR remote add origin <url>"
-        exit 1
-      fi
       if git -C "$THEME_APP_DIR" pull --quiet; then
         echo "✓ theme upgraded successfully"
       else
