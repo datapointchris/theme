@@ -83,6 +83,7 @@ usage() {
   rejected             List all rejected themes
   unreject             Restore a rejected theme (fzf picker with history)
   verify               Check theme system is working
+  upgrade              Update theme to latest version (git pull)
   generate-previews    Pre-generate all preview images
   clear-cache          Clear preview cache
 EOF
@@ -138,6 +139,7 @@ Commands
   rejected             List all rejected themes
   unreject             Restore a rejected theme (fzf picker with history)
   verify               Check theme system is working
+  upgrade              Update theme to latest version (git pull)
   generate-previews    Pre-generate all preview images
   clear-cache          Clear preview cache
 
@@ -1059,6 +1061,19 @@ main() {
       ;;
     verify)
       verify_system
+      ;;
+    upgrade|update)
+      echo "Upgrading theme..."
+      if ! git -C "$THEME_APP_DIR" remote get-url origin &>/dev/null; then
+        echo "No remote configured. Run: git -C ~/tools/theme remote add origin <url>"
+        exit 1
+      fi
+      if git -C "$THEME_APP_DIR" pull --quiet; then
+        echo "✓ theme upgraded successfully"
+      else
+        echo "✗ theme upgrade failed" >&2
+        exit 1
+      fi
       ;;
     generate-previews)
       generate_all_previews
