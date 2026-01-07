@@ -486,8 +486,15 @@ apply_wallpaper() {
   fi
 
   local wallpaper_dir="$HOME/.local/share/theme"
-  local wallpaper_file="$wallpaper_dir/wallpaper.png"
   mkdir -p "$wallpaper_dir"
+
+  # Use unique filename to bypass macOS wallpaper cache
+  local timestamp
+  timestamp=$(date +%s)
+  local wallpaper_file="$wallpaper_dir/wallpaper-${timestamp}.png"
+
+  # Clean up old wallpaper files
+  find "$wallpaper_dir" -name 'wallpaper-*.png' -mmin +1 -delete 2>/dev/null || true
 
   # Pick random style
   local styles=("plasma" "geometric" "hexagons" "circles" "swirl" "spotlight" "sphere" "spheres")
@@ -501,11 +508,14 @@ apply_wallpaper() {
     local generator_script
     generator_script="$(dirname "${BASH_SOURCE[0]}")/generators/wallpaper.sh"
     [[ ! -f "$generator_script" ]] && return 1
-    bash "$generator_script" "$lib_path/theme.yml" "$wallpaper_file" "$style" 1920 1080 2>/dev/null || return 1
+    bash "$generator_script" "$lib_path/theme.yml" "$wallpaper_file" "$style" 1920 1080 >/dev/null 2>&1 || return 1
   fi
 
-  # Set as desktop wallpaper on macOS
-  osascript -e "tell application \"System Events\" to tell every desktop to set picture to \"$wallpaper_file\"" 2>/dev/null || return 1
+  # Set as desktop wallpaper on macOS using Finder (more reliable than System Events)
+  osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$wallpaper_file\"" 2>/dev/null || return 1
+
+  # Output the selected style for status display
+  echo "$style"
   return 0
 }
 
@@ -729,9 +739,10 @@ apply_theme_to_apps() {
 
   # Wallpaper (macOS only)
   if [[ "$platform" == "macos" ]]; then
-    if apply_wallpaper "$theme" 2>/dev/null; then
+    local wallpaper_style
+    if wallpaper_style=$(apply_wallpaper "$theme" 2>/dev/null); then
       applied+=("wallpaper")
-      _print_app_status "wallpaper" "true"
+      _print_app_status "wallpaper ($wallpaper_style)" "true"
     else
       skipped+=("wallpaper")
       _print_app_status "wallpaper" "false"
