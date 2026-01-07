@@ -335,6 +335,146 @@ apply_borders() {
   return 0
 }
 
+#==============================================================================
+# OPACITY MANAGEMENT
+#==============================================================================
+
+# Opacity config directories (separate from main config, included via config-file directive)
+GHOSTTY_OPACITY_DIR="$HOME/.config/ghostty/opacity"
+GHOSTTY_OPACITY_FILE="$GHOSTTY_OPACITY_DIR/current.conf"
+KITTY_OPACITY_DIR="$HOME/.config/kitty/opacity"
+KITTY_OPACITY_FILE="$KITTY_OPACITY_DIR/current.conf"
+WINDOWS_TERMINAL_OPACITY_FILE="$HOME/.config/windows-terminal/opacity.json"
+TMUX_OPACITY_FILE="$HOME/.config/tmux/opacity.conf"
+
+# Get current opacity from ghostty opacity config
+get_ghostty_opacity() {
+  if [[ -f "$GHOSTTY_OPACITY_FILE" ]]; then
+    grep -E "^background-opacity\s*=" "$GHOSTTY_OPACITY_FILE" 2>/dev/null | sed 's/.*=\s*//' | tr -d ' ' || echo "1.0"
+  else
+    echo "1.0"
+  fi
+}
+
+# Set ghostty opacity
+set_ghostty_opacity() {
+  local opacity="$1"
+  mkdir -p "$GHOSTTY_OPACITY_DIR"
+  echo "background-opacity = $opacity" > "$GHOSTTY_OPACITY_FILE"
+}
+
+# Get current opacity from kitty opacity config
+get_kitty_opacity() {
+  if [[ -f "$KITTY_OPACITY_FILE" ]]; then
+    grep -E "^background_opacity\s+" "$KITTY_OPACITY_FILE" 2>/dev/null | awk '{print $2}' || echo "1.0"
+  else
+    echo "1.0"
+  fi
+}
+
+# Set kitty opacity
+set_kitty_opacity() {
+  local opacity="$1"
+  mkdir -p "$KITTY_OPACITY_DIR"
+  echo "background_opacity $opacity" > "$KITTY_OPACITY_FILE"
+}
+
+# Get current opacity from windows terminal opacity config
+get_windows_terminal_opacity() {
+  if [[ -f "$WINDOWS_TERMINAL_OPACITY_FILE" ]]; then
+    local pct
+    pct=$(jq -r '.opacity // 100' "$WINDOWS_TERMINAL_OPACITY_FILE" 2>/dev/null)
+    awk "BEGIN {printf \"%.2f\", $pct / 100}"
+  else
+    echo "1.0"
+  fi
+}
+
+# Set windows terminal opacity (stores as 0-100 integer)
+set_windows_terminal_opacity() {
+  local opacity="$1"
+  local pct
+  pct=$(awk "BEGIN {printf \"%.0f\", $opacity * 100}")
+  mkdir -p "$(dirname "$WINDOWS_TERMINAL_OPACITY_FILE")"
+  echo "{\"opacity\": $pct}" > "$WINDOWS_TERMINAL_OPACITY_FILE"
+}
+
+# Set tmux opacity (uses 'default' bg when < 1.0, otherwise uses theme bg)
+set_tmux_opacity() {
+  local opacity="$1"
+  local tmux_dir
+  tmux_dir="$(dirname "$TMUX_OPACITY_FILE")"
+  mkdir -p "$tmux_dir"
+
+  if awk "BEGIN {exit !($opacity < 1.0)}"; then
+    # Transparent - use default background
+    cat > "$TMUX_OPACITY_FILE" << 'EOF'
+# Transparent background (inherits from terminal)
+set -g window-style 'bg=default'
+set -g window-active-style 'bg=default'
+EOF
+  else
+    # Opaque - use theme background (empty file, theme controls bg)
+    cat > "$TMUX_OPACITY_FILE" << 'EOF'
+# Opaque background (uses theme colors)
+# No overrides needed - theme controls background
+EOF
+  fi
+
+  # Reload tmux if running
+  if command -v tmux &>/dev/null && tmux list-sessions &>/dev/null; then
+    tmux source-file "$TMUX_OPACITY_FILE" 2>/dev/null || true
+  fi
+}
+
+# Get current opacity (from first available terminal)
+get_current_opacity() {
+  local opacity
+
+  if [[ -f "$GHOSTTY_OPACITY_FILE" ]]; then
+    opacity=$(get_ghostty_opacity)
+  elif [[ -f "$KITTY_OPACITY_FILE" ]]; then
+    opacity=$(get_kitty_opacity)
+  elif [[ -f "$WINDOWS_TERMINAL_OPACITY_FILE" ]]; then
+    opacity=$(get_windows_terminal_opacity)
+  else
+    opacity="1.0"
+  fi
+
+  echo "$opacity"
+}
+
+# Change opacity by delta (e.g., 0.05 or -0.05)
+change_opacity() {
+  local delta="$1"
+  local current
+  current=$(get_current_opacity)
+
+  # Calculate new opacity using awk for floating point
+  local new_opacity
+  new_opacity=$(awk "BEGIN {printf \"%.2f\", $current + $delta}")
+
+  # Clamp between 0.5 and 1.0
+  if awk "BEGIN {exit !($new_opacity < 0.5)}"; then
+    new_opacity="0.50"
+  elif awk "BEGIN {exit !($new_opacity > 1.0)}"; then
+    new_opacity="1.00"
+  fi
+
+  # Apply to all terminals
+  local applied=()
+
+  set_ghostty_opacity "$new_opacity" && applied+=("ghostty")
+  set_kitty_opacity "$new_opacity" && applied+=("kitty")
+  set_windows_terminal_opacity "$new_opacity" && applied+=("windows-terminal")
+  set_tmux_opacity "$new_opacity" && applied+=("tmux")
+
+  echo "$current → $new_opacity (${applied[*]})"
+}
+
+# Wallpaper cache directory
+WALLPAPER_CACHE_DIR="${WALLPAPER_CACHE_DIR:-$HOME/.cache/theme/wallpapers}"
+
 # Apply wallpaper (macOS)
 apply_wallpaper() {
   local theme="$1"
@@ -349,23 +489,23 @@ apply_wallpaper() {
   local wallpaper_file="$wallpaper_dir/wallpaper.png"
   mkdir -p "$wallpaper_dir"
 
-  # Pick random style (plasma removed - too slow at 4K)
-  local styles=("geometric" "hexagons" "circles")
+  # Pick random style
+  local styles=("plasma" "geometric" "hexagons" "circles" "swirl" "spotlight" "sphere" "spheres")
   local style="${styles[$((RANDOM % ${#styles[@]}))]}"
+  local cache_file="$WALLPAPER_CACHE_DIR/$theme/${style}.png"
 
-  # Generate wallpaper
-  local generator_script
-  generator_script="$(dirname "${BASH_SOURCE[0]}")/generators/wallpaper.sh"
-
-  if [[ ! -f "$generator_script" ]]; then
-    return 1
+  if [[ -f "$cache_file" ]]; then
+    cp "$cache_file" "$wallpaper_file"
+  else
+    # Generate on-the-fly
+    local generator_script
+    generator_script="$(dirname "${BASH_SOURCE[0]}")/generators/wallpaper.sh"
+    [[ ! -f "$generator_script" ]] && return 1
+    bash "$generator_script" "$lib_path/theme.yml" "$wallpaper_file" "$style" 1920 1080 2>/dev/null || return 1
   fi
-
-  bash "$generator_script" "$lib_path/theme.yml" "$wallpaper_file" "$style" 3840 2160 2>/dev/null || return 1
 
   # Set as desktop wallpaper on macOS
   osascript -e "tell application \"System Events\" to tell every desktop to set picture to \"$wallpaper_file\"" 2>/dev/null || return 1
-
   return 0
 }
 

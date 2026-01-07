@@ -85,8 +85,13 @@ usage() {
   unreject             Restore a rejected theme (fzf picker with history)
   verify               Check theme system is working
   upgrade              Update theme to latest version (git pull)
+  opacity              Show current background opacity
+  opacity-up           Increase opacity by 5%
+  opacity-down         Decrease opacity by 5%
   generate-previews    Pre-generate all preview images
+  generate-wallpapers  Pre-generate all wallpapers (instant switching)
   clear-cache          Clear preview cache
+  clear-wallpaper-cache  Clear wallpaper cache
   sync init            Initialize sync (creates gist)
   sync status          Show sync status
   sync push            Manual push to remote
@@ -148,9 +153,14 @@ Commands
   unreject             Restore a rejected theme (fzf picker with history)
   verify               Check theme system is working
   upgrade              Update theme to latest version (git pull)
+  opacity              Show current background opacity
+  opacity-up           Increase opacity by 5%
+  opacity-down         Decrease opacity by 5%
   sync                 Manage GitHub Gist synchronization
   generate-previews    Pre-generate all preview images
+  generate-wallpapers  Pre-generate all wallpapers (instant switching)
   clear-cache          Clear preview cache
+  clear-wallpaper-cache  Clear wallpaper cache
 
 Sync Commands
 -------------
@@ -1056,6 +1066,84 @@ generate_all_previews() {
 }
 
 #==============================================================================
+# WALLPAPER CACHE
+#==============================================================================
+
+generate_all_wallpapers() {
+  echo "Pre-generating all theme wallpapers..."
+  echo "This will take a while but makes theme switching instant."
+  echo ""
+
+  if ! command -v magick &>/dev/null; then
+    echo "Error: ImageMagick not found. Install with: brew install imagemagick"
+    exit 1
+  fi
+
+  local styles=("plasma" "geometric" "hexagons" "circles")
+  local generator_script="$THEME_APP_DIR/lib/generators/wallpaper.sh"
+
+  if [[ ! -f "$generator_script" ]]; then
+    echo "Error: Wallpaper generator not found"
+    exit 1
+  fi
+
+  local themes
+  themes=$(list_themes)
+  local total
+  total=$(echo "$themes" | wc -l | xargs)
+  local current=0
+
+  while IFS= read -r theme; do
+    current=$((current + 1))
+    local lib_path
+    lib_path=$(get_library_path "$theme")
+
+    if [[ -z "$lib_path" ]] || [[ ! -f "$lib_path/theme.yml" ]]; then
+      printf "[%d/%d] %s - skipped (no theme.yml)\n" "$current" "$total" "$theme"
+      continue
+    fi
+
+    printf "[%d/%d] %s\n" "$current" "$total" "$theme"
+
+    local cache_dir="$WALLPAPER_CACHE_DIR/$theme"
+    mkdir -p "$cache_dir"
+
+    for style in "${styles[@]}"; do
+      local cache_file="$cache_dir/${style}.png"
+
+      if [[ -f "$cache_file" ]]; then
+        printf "  %-10s ✓ exists\n" "$style"
+        continue
+      fi
+
+      if bash "$generator_script" "$lib_path/theme.yml" "$cache_file" "$style" 1920 1080 2>/dev/null; then
+        printf "  %-10s ✓ generated\n" "$style"
+      else
+        printf "  %-10s ✗ failed\n" "$style"
+      fi
+    done
+  done <<<"$themes"
+
+  echo ""
+  echo "✓ All wallpapers generated!"
+  echo "  Cache location: $WALLPAPER_CACHE_DIR"
+  local size
+  size=$(du -sh "$WALLPAPER_CACHE_DIR" 2>/dev/null | cut -f1)
+  echo "  Cache size: $size"
+}
+
+clear_wallpaper_cache() {
+  if [[ -d "$WALLPAPER_CACHE_DIR" ]]; then
+    local size
+    size=$(du -sh "$WALLPAPER_CACHE_DIR" 2>/dev/null | cut -f1)
+    rm -rf "$WALLPAPER_CACHE_DIR"
+    echo "✓ Cleared wallpaper cache ($size)"
+  else
+    echo "Wallpaper cache is empty"
+  fi
+}
+
+#==============================================================================
 # MAIN
 #==============================================================================
 
@@ -1132,11 +1220,34 @@ main() {
       git -C "$THEME_APP_DIR" log --format="  • %s" "${before_commit}..${after_commit}"
     fi
     ;;
+  opacity)
+    echo "Background opacity: $(get_current_opacity)"
+    ;;
+  opacity-up)
+    if result=$(change_opacity 0.05); then
+      echo "Opacity: $result"
+      echo ""
+      echo "Restart terminal to see changes."
+    fi
+    ;;
+  opacity-down)
+    if result=$(change_opacity -0.05); then
+      echo "Opacity: $result"
+      echo ""
+      echo "Restart terminal to see changes."
+    fi
+    ;;
   generate-previews)
     generate_all_previews
     ;;
+  generate-wallpapers)
+    generate_all_wallpapers
+    ;;
   clear-cache)
     clear_preview_cache
+    ;;
+  clear-wallpaper-cache)
+    clear_wallpaper_cache
     ;;
   sync)
     case "${2:-status}" in
