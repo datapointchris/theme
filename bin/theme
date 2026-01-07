@@ -1079,7 +1079,7 @@ generate_all_wallpapers() {
     exit 1
   fi
 
-  local styles=("plasma" "geometric" "hexagons" "circles")
+  local styles=("plasma" "geometric" "hexagons" "circles" "swirl" "spotlight" "sphere" "spheres")
   local generator_script="$THEME_APP_DIR/lib/generators/wallpaper.sh"
 
   if [[ ! -f "$generator_script" ]]; then
