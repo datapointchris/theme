@@ -249,6 +249,16 @@ list_tracked_themes() {
   get_history | jq -r 'group_by(.theme) | .[].theme' | sort -u
 }
 
+get_all_apply_counts() {
+  get_history | jq -r '
+    map(select(.action == "apply")) |
+    group_by(.theme) |
+    map({theme: .[0].theme, count: length}) |
+    .[] |
+    "\(.theme)\t\(.count)"
+  '
+}
+
 validate_history_file() {
   if [[ ! -f "$THEME_HISTORY_FILE" ]]; then
     return 0

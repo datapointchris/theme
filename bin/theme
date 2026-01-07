@@ -301,10 +301,37 @@ apply_random() {
     exit 1
   fi
 
-  local random_theme="${themes[$RANDOM % ${#themes[@]}]}"
+  # Get apply counts for all themes
+  declare -A apply_counts
+  while IFS=$'\t' read -r theme count; do
+    apply_counts["$theme"]=$count
+  done < <(get_all_apply_counts)
+
+  # Find minimum apply count among available themes
+  local min_count=999999
+  for theme in "${themes[@]}"; do
+    local count="${apply_counts[$theme]:-0}"
+    if [[ $count -lt $min_count ]]; then
+      min_count=$count
+    fi
+  done
+
+  # Get all themes with minimum apply count
+  local least_used=()
+  for theme in "${themes[@]}"; do
+    local count="${apply_counts[$theme]:-0}"
+    if [[ $count -eq $min_count ]]; then
+      least_used+=("$theme")
+    fi
+  done
+
+  # Pick randomly from least-used themes
+  local random_theme="${least_used[$RANDOM % ${#least_used[@]}]}"
+
   local display_info
   display_info=$(get_theme_display_info "$random_theme")
-  echo "Randomly selected: $display_info"
+  echo "🎲 Randomly selected: $display_info"
+  echo "   (${#least_used[@]} themes with $min_count applies)"
   echo ""
   apply_theme "$random_theme"
 }
