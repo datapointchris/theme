@@ -328,7 +328,7 @@ apply_borders() {
   if pgrep -x "borders" &>/dev/null; then
     pkill -x "borders" 2>/dev/null || true
     sleep 0.5
-    "$HOME/.config/borders/bordersrc" &
+    "$HOME/.config/borders/bordersrc" >/dev/null 2>&1 &
     disown
   fi
 
@@ -349,8 +349,8 @@ apply_wallpaper() {
   local wallpaper_file="$wallpaper_dir/wallpaper.png"
   mkdir -p "$wallpaper_dir"
 
-  # Pick random style
-  local styles=("plasma" "geometric" "hexagons" "circles")
+  # Pick random style (plasma removed - too slow at 4K)
+  local styles=("geometric" "hexagons" "circles")
   local style="${styles[$((RANDOM % ${#styles[@]}))]}"
 
   # Generate wallpaper
