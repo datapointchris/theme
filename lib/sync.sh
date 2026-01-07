@@ -26,7 +26,9 @@ _sync_check_gh() {
   return 0
 }
 
+# Check if sync is enabled (disabled in dev mode)
 is_sync_enabled() {
+  [[ "${THEME_ENV:-}" == "development" ]] && return 1
   [[ -f "$THEME_SYNC_STATE_FILE" ]] && \
     jq -e '.enabled == true' "$THEME_SYNC_STATE_FILE" &>/dev/null
 }
@@ -101,6 +103,11 @@ _sync_merge_histories() {
 }
 
 sync_init() {
+  if [[ "${THEME_ENV:-}" == "development" ]]; then
+    echo "✗ Sync is disabled in dev mode" >&2
+    return 1
+  fi
+
   echo "Initializing theme sync..."
 
   if ! _sync_check_gh; then
@@ -214,6 +221,14 @@ sync_status() {
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
 
+  if [[ "${THEME_ENV:-}" == "development" ]]; then
+    echo "Status: Disabled (dev mode)"
+    echo ""
+    echo "Sync is disabled in development mode to prevent"
+    echo "test data from polluting production history."
+    return
+  fi
+
   if [[ ! -f "$THEME_SYNC_STATE_FILE" ]]; then
     echo "Status: Not initialized"
     echo ""
@@ -286,6 +301,7 @@ sync_on() {
 
 sync_after_action() {
   if is_sync_enabled; then
+    echo "✓ Synced via GitHub Gist"
     sync_push &>/dev/null &
     disown 2>/dev/null || true
   fi
@@ -294,5 +310,6 @@ sync_after_action() {
 sync_before_read() {
   if is_sync_enabled; then
     sync_pull &>/dev/null || true
+    echo "✓ Synced via GitHub Gist"
   fi
 }
