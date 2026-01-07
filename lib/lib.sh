@@ -536,6 +536,16 @@ apply_theme_to_apps() {
   local applied=()
   local skipped=()
 
+  _print_app_status() {
+    local app="$1"
+    local success="$2"
+    if [[ "$success" == "true" ]]; then
+      echo "  ✓ $app" >&2
+    else
+      echo "  ✗ $app (error)" >&2
+    fi
+  }
+
   # Check if theme exists in library
   local lib_path
   lib_path=$(get_library_path "$theme")
@@ -548,8 +558,10 @@ apply_theme_to_apps() {
   if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]]; then
     if apply_ghostty "$theme" 2>/dev/null; then
       applied+=("ghostty")
+      _print_app_status "ghostty" "true"
     else
       skipped+=("ghostty")
+      _print_app_status "ghostty" "false"
     fi
   fi
 
@@ -557,8 +569,10 @@ apply_theme_to_apps() {
   if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]]; then
     if apply_kitty "$theme" 2>/dev/null; then
       applied+=("kitty")
+      _print_app_status "kitty" "true"
     else
       skipped+=("kitty")
+      _print_app_status "kitty" "false"
     fi
   fi
 
@@ -566,8 +580,10 @@ apply_theme_to_apps() {
   if [[ "$platform" == "macos" ]]; then
     if apply_borders "$theme" 2>/dev/null; then
       applied+=("borders")
+      _print_app_status "borders" "true"
     else
       skipped+=("borders")
+      _print_app_status "borders" "false"
     fi
   fi
 
@@ -575,55 +591,71 @@ apply_theme_to_apps() {
   if [[ "$platform" == "macos" ]]; then
     if apply_wallpaper "$theme" 2>/dev/null; then
       applied+=("wallpaper")
+      _print_app_status "wallpaper" "true"
     else
       skipped+=("wallpaper")
+      _print_app_status "wallpaper" "false"
     fi
   fi
 
   # Tmux (all platforms)
   if apply_tmux "$theme" 2>/dev/null; then
     applied+=("tmux")
+    _print_app_status "tmux" "true"
   else
     skipped+=("tmux")
+    _print_app_status "tmux" "false"
   fi
 
   # Btop (all platforms)
   if apply_btop "$theme" 2>/dev/null; then
     applied+=("btop")
+    _print_app_status "btop" "true"
   else
     skipped+=("btop")
+    _print_app_status "btop" "false"
   fi
 
   # Hyprland (Arch only)
   if [[ "$platform" == "arch" ]]; then
     if apply_hyprland "$theme" 2>/dev/null; then
       applied+=("hyprland")
+      _print_app_status "hyprland" "true"
     else
       skipped+=("hyprland")
+      _print_app_status "hyprland" "false"
     fi
 
     if apply_waybar "$theme" 2>/dev/null; then
       applied+=("waybar")
+      _print_app_status "waybar" "true"
     else
       skipped+=("waybar")
+      _print_app_status "waybar" "false"
     fi
 
     if apply_hyprlock "$theme" 2>/dev/null; then
       applied+=("hyprlock")
+      _print_app_status "hyprlock" "true"
     else
       skipped+=("hyprlock")
+      _print_app_status "hyprlock" "false"
     fi
 
     if apply_dunst "$theme" 2>/dev/null; then
       applied+=("dunst")
+      _print_app_status "dunst" "true"
     else
       skipped+=("dunst")
+      _print_app_status "dunst" "false"
     fi
 
     if apply_rofi "$theme" 2>/dev/null; then
       applied+=("rofi")
+      _print_app_status "rofi" "true"
     else
       skipped+=("rofi")
+      _print_app_status "rofi" "false"
     fi
   fi
 
@@ -631,8 +663,10 @@ apply_theme_to_apps() {
   if [[ "$platform" == "wsl" ]]; then
     if apply_windows_terminal "$theme" 2>/dev/null; then
       applied+=("windows-terminal")
+      _print_app_status "windows-terminal" "true"
     else
       skipped+=("windows-terminal")
+      _print_app_status "windows-terminal" "false"
     fi
   fi
 
