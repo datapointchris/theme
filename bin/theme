@@ -87,6 +87,12 @@ usage() {
   upgrade              Update theme to latest version (git pull)
   generate-previews    Pre-generate all preview images
   clear-cache          Clear preview cache
+  sync init            Initialize sync (creates gist)
+  sync status          Show sync status
+  sync push            Manual push to remote
+  sync pull            Manual pull from remote
+  sync on              Enable sync
+  sync off             Disable sync
 EOF
 
     print_section "Examples" "yellow"
@@ -110,11 +116,12 @@ EOF
 
     print_section "Data Storage" "green"
     cat <<'EOF'
-  History:  apps/common/theme/data/history-{platform}.jsonl
-  Rejected: apps/common/theme/data/rejected-themes.json
+  ~/.local/state/theme/
+  ├── history.jsonl      # Usage history (synced via gist)
+  ├── current            # Current theme ID
+  └── sync-state.json    # Sync configuration
 
-  Per-platform history files eliminate git merge conflicts.
-  View locations: theme log
+  Sync with: theme sync init
 EOF
 
   else
@@ -141,8 +148,18 @@ Commands
   unreject             Restore a rejected theme (fzf picker with history)
   verify               Check theme system is working
   upgrade              Update theme to latest version (git pull)
+  sync                 Manage GitHub Gist synchronization
   generate-previews    Pre-generate all preview images
   clear-cache          Clear preview cache
+
+Sync Commands
+-------------
+  sync init            Initialize sync (creates gist)
+  sync status          Show sync status
+  sync push            Manual push to remote
+  sync pull            Manual pull from remote
+  sync on              Enable sync
+  sync off             Disable sync
 
 Examples
 --------
@@ -155,11 +172,12 @@ Examples
 
 Data Storage
 ------------
-  History:  apps/common/theme/data/history-{platform}.jsonl
-  Rejected: apps/common/theme/data/rejected-themes.json
+  ~/.local/state/theme/
+  ├── history.jsonl      # Usage history (synced via gist)
+  ├── current            # Current theme ID
+  └── sync-state.json    # Sync configuration
 
-  Per-platform history files eliminate git merge conflicts.
-  View locations: theme log
+  Sync with: theme sync init
 EOF
   fi
 }
@@ -314,7 +332,7 @@ change_theme() {
 
   local preview_script="/tmp/theme-fzf-preview-$$.sh"
   local preview_log="/tmp/theme-preview-debug.log"
-  cat > "$preview_script" <<PREVIEW_EOF
+  cat >"$preview_script" <<PREVIEW_EOF
 #!/bin/bash
 exec 2>>"$preview_log"
 echo "=== Preview for: \$1 ===" >>"$preview_log"
@@ -543,10 +561,10 @@ unreject_theme_interactive() {
     local display_info
     display_info=$(get_theme_display_info "$theme_id")
     theme_list+="${display_info}"$'\t'"${theme_id}"$'\n'
-  done <<< "$theme_ids"
+  done <<<"$theme_ids"
 
   local preview_script="/tmp/theme-unreject-preview-$$.sh"
-  cat > "$preview_script" <<'PREVIEW_EOF'
+  cat >"$preview_script" <<'PREVIEW_EOF'
 #!/bin/bash
 theme="$1"
 THEME_APP_DIR="$2"
@@ -562,12 +580,12 @@ echo "REJECTION INFO:"
 echo "───────────────────────────────────────────────────"
 rejection_info=$(get_rejected_theme_info "$theme")
 if [[ -n "$rejection_info" ]] && [[ "$rejection_info" != "{}" ]]; then
-  rejected_date=$(echo "$rejection_info" | jq -r '.rejected_date // "unknown"')
-  reason=$(echo "$rejection_info" | jq -r '.reason // "No reason"')
-  platforms=$(echo "$rejection_info" | jq -r '.platforms | join(", ") // "unknown"')
+  rejected_date=$(echo "$rejection_info" | jq -r '.ts // "unknown"')
+  reason=$(echo "$rejection_info" | jq -r '.message // "No reason"')
+  machine=$(echo "$rejection_info" | jq -r '.machine // .platform // "unknown"')
   echo "  Date: $rejected_date"
   echo "  Reason: $reason"
-  echo "  Platforms: $platforms"
+  echo "  Machine: $machine"
 else
   echo "  No rejection info found"
 fi
@@ -580,15 +598,15 @@ if [[ -n "$history" ]]; then
   echo "$history" | while IFS= read -r line; do
     ts=$(echo "$line" | jq -r '.ts')
     action=$(echo "$line" | jq -r '.action')
-    platform=$(echo "$line" | jq -r '.platform')
+    machine=$(echo "$line" | jq -r '.machine // .platform')
     message=$(echo "$line" | jq -r '.message // empty')
 
     date_part="${ts:0:10}"
 
     if [[ -n "$message" ]]; then
-      printf "  %s | %-8s | %s | %s\n" "$date_part" "$action" "$platform" "$message"
+      printf "  %s | %-8s | %s | %s\n" "$date_part" "$action" "$machine" "$message"
     else
-      printf "  %s | %-8s | %s\n" "$date_part" "$action" "$platform"
+      printf "  %s | %-8s | %s\n" "$date_part" "$action" "$machine"
     fi
   done
 else
@@ -683,7 +701,7 @@ show_rankings() {
     printf "    Last used: %s\n" "$last_used"
     [[ -n "$platforms" ]] && printf "    Platforms: %s\n" "$platforms"
     echo ""
-  done <<< "$rankings"
+  done <<<"$rankings"
 }
 
 show_log() {
@@ -701,28 +719,22 @@ show_log() {
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
 
-  echo "Data files:"
-  for file in "$THEME_DATA_DIR"/history-*.jsonl; do
-    if [[ -f "$file" ]]; then
-      local platform=$(basename "$file" .jsonl | sed 's/history-//')
-      local count=$(wc -l < "$file" | xargs)
-      printf "  history-%s: %s (%d entries)\n" "$platform" "$file" "$count"
-    fi
-  done
-  if [[ -f "$THEME_DATA_DIR/rejected-themes.json" ]]; then
-    local rejected_count=$(jq 'keys | length' "$THEME_DATA_DIR/rejected-themes.json")
-    printf "  rejected:   %s (%d themes)\n" "$THEME_DATA_DIR/rejected-themes.json" "$rejected_count"
+  echo "Data file: $THEME_HISTORY_FILE"
+  if [[ -f "$THEME_HISTORY_FILE" ]]; then
+    local count
+    count=$(wc -l <"$THEME_HISTORY_FILE" | xargs)
+    echo "  $count entries"
   fi
   echo ""
 
   if command -v bat &>/dev/null; then
     echo "$history" | jq -r '
-      "\(.ts) | \(.platform) | \(.action) | \(.theme)" +
+      "\(.ts) | \(.machine // .platform) | \(.action) | \(.theme)" +
       (if .message then " | \(.message)" else "" end)
     ' | bat --plain --language=log --theme=base16
   else
     echo "$history" | jq -r '
-      "\(.ts) | \(.platform) | \(.action) | \(.theme)" +
+      "\(.ts) | \(.machine // .platform) | \(.action) | \(.theme)" +
       (if .message then " | \(.message)" else "" end)
     '
   fi
@@ -809,7 +821,7 @@ verify_system() {
   fi
 
   # Check yq
-  if command -v yq &> /dev/null; then
+  if command -v yq &>/dev/null; then
     echo "  yq: installed"
   else
     echo "  ERROR: yq not installed"
@@ -1008,7 +1020,7 @@ generate_all_previews() {
     else
       echo "  ✗ Failed"
     fi
-  done <<< "$themes"
+  done <<<"$themes"
 
   echo ""
   echo "✓ All previews generated!"
@@ -1022,126 +1034,126 @@ generate_all_previews() {
 
 main() {
   case "${1:-}" in
-    change)
-      change_theme
-      ;;
-    preview)
-      show_preview "${2:-}"
-      ;;
-    current)
-      show_current
-      ;;
-    list|ls)
-      show_list
-      ;;
-    apply)
-      apply_theme "${2:-}"
-      ;;
-    random|rand)
-      apply_random
-      ;;
-    like)
-      mark_liked "${@:2}"
-      ;;
-    dislike)
-      mark_disliked "${@:2}"
-      ;;
-    note)
-      add_note "${@:2}"
-      ;;
-    rank|ranks|ranking)
-      show_rankings
-      ;;
-    log|history)
-      show_log
-      ;;
-    info)
-      show_info "${2:-}"
-      ;;
-    reject)
-      mark_rejected "${@:2}"
-      ;;
-    rejected)
-      show_rejected
-      ;;
-    unreject)
-      unreject_theme_interactive
-      ;;
-    verify)
-      verify_system
-      ;;
-    upgrade|update)
-      local before_commit after_commit
-      before_commit=$(git -C "$THEME_APP_DIR" rev-parse HEAD)
+  change)
+    change_theme
+    ;;
+  preview)
+    show_preview "${2:-}"
+    ;;
+  current)
+    show_current
+    ;;
+  list | ls)
+    show_list
+    ;;
+  apply)
+    apply_theme "${2:-}"
+    ;;
+  random | rand)
+    apply_random
+    ;;
+  like)
+    mark_liked "${@:2}"
+    ;;
+  dislike)
+    mark_disliked "${@:2}"
+    ;;
+  note)
+    add_note "${@:2}"
+    ;;
+  rank | ranks | ranking)
+    show_rankings
+    ;;
+  log | history)
+    show_log
+    ;;
+  info)
+    show_info "${2:-}"
+    ;;
+  reject)
+    mark_rejected "${@:2}"
+    ;;
+  rejected)
+    show_rejected
+    ;;
+  unreject)
+    unreject_theme_interactive
+    ;;
+  verify)
+    verify_system
+    ;;
+  upgrade | update)
+    local before_commit after_commit
+    before_commit=$(git -C "$THEME_APP_DIR" rev-parse HEAD)
 
-      if ! git -C "$THEME_APP_DIR" pull --quiet; then
-        echo "✗ theme upgrade failed" >&2
+    if ! git -C "$THEME_APP_DIR" pull --quiet; then
+      echo "✗ theme upgrade failed" >&2
+      exit 1
+    fi
+
+    after_commit=$(git -C "$THEME_APP_DIR" rev-parse HEAD)
+
+    if [[ "$before_commit" == "$after_commit" ]]; then
+      echo "✓ theme is already up to date"
+    else
+      local before_desc after_desc
+      before_desc=$(git -C "$THEME_APP_DIR" describe --tags --always "$before_commit" 2>/dev/null || echo "${before_commit:0:7}")
+      after_desc=$(git -C "$THEME_APP_DIR" describe --tags --always "$after_commit" 2>/dev/null || echo "${after_commit:0:7}")
+      echo "✓ theme upgraded from $before_desc to $after_desc"
+      echo ""
+      echo "Changes:"
+      git -C "$THEME_APP_DIR" log --format="  • %s" "${before_commit}..${after_commit}"
+    fi
+    ;;
+  generate-previews)
+    generate_all_previews
+    ;;
+  clear-cache)
+    clear_preview_cache
+    ;;
+  sync)
+    case "${2:-status}" in
+    init)
+      sync_init
+      ;;
+    status)
+      sync_status
+      ;;
+    push)
+      if sync_push; then
+        echo "✓ Pushed to remote"
+      else
+        echo "✗ Push failed" >&2
         exit 1
       fi
-
-      after_commit=$(git -C "$THEME_APP_DIR" rev-parse HEAD)
-
-      if [[ "$before_commit" == "$after_commit" ]]; then
-        echo "✓ theme is already up to date"
+      ;;
+    pull)
+      if sync_pull; then
+        echo "✓ Pulled from remote"
       else
-        local before_desc after_desc
-        before_desc=$(git -C "$THEME_APP_DIR" describe --tags --always "$before_commit" 2>/dev/null || echo "${before_commit:0:7}")
-        after_desc=$(git -C "$THEME_APP_DIR" describe --tags --always "$after_commit" 2>/dev/null || echo "${after_commit:0:7}")
-        echo "✓ theme upgraded from $before_desc to $after_desc"
-        echo ""
-        echo "Changes:"
-        git -C "$THEME_APP_DIR" log --format="  • %s" "${before_commit}..${after_commit}"
+        echo "✗ Pull failed" >&2
+        exit 1
       fi
       ;;
-    generate-previews)
-      generate_all_previews
+    off)
+      sync_off
       ;;
-    clear-cache)
-      clear_preview_cache
-      ;;
-    sync)
-      case "${2:-status}" in
-        init)
-          sync_init
-          ;;
-        status)
-          sync_status
-          ;;
-        push)
-          if sync_push; then
-            echo "✓ Pushed to remote"
-          else
-            echo "✗ Push failed" >&2
-            exit 1
-          fi
-          ;;
-        pull)
-          if sync_pull; then
-            echo "✓ Pulled from remote"
-          else
-            echo "✗ Pull failed" >&2
-            exit 1
-          fi
-          ;;
-        off)
-          sync_off
-          ;;
-        on)
-          sync_on
-          ;;
-        *)
-          echo "Usage: theme sync <init|status|push|pull|on|off>"
-          exit 1
-          ;;
-      esac
-      ;;
-    help|--help|-h)
-      usage
+    on)
+      sync_on
       ;;
     *)
-      usage
+      echo "Usage: theme sync <init|status|push|pull|on|off>"
       exit 1
       ;;
+    esac
+    ;;
+  help | --help | -h)
+    usage
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
   esac
 }
 
