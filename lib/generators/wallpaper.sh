@@ -7,7 +7,10 @@
 #   geometric  - Random geometric shapes
 #   hexagons   - Honeycomb pattern
 #   circles    - Overlapping circles
-#   demo       - All styles in a 2x2 grid with labels
+#   swirl      - Vortex gradient
+#   spotlight  - Soft centered glow
+#   sphere     - Single centered 3D sphere
+#   spheres    - Multiple 3D spheres
 #
 # Requires: ImageMagick (magick command)
 
@@ -19,7 +22,7 @@ source "$SCRIPT_DIR/../theme.sh"
 if [[ $# -lt 2 ]]; then
   echo "Usage: $0 <theme.yml> <output-file> [style] [width] [height]"
   echo ""
-  echo "Styles: plasma, geometric, hexagons, circles, demo"
+  echo "Styles: plasma, geometric, hexagons, circles, swirl, spotlight, sphere, spheres"
   echo "Default: plasma at 3840x2160"
   exit 1
 fi
@@ -155,50 +158,57 @@ generate_circles() {
   eval "magick -size '${width}x${height}' xc:'${BASE00}' $draw_commands '$output_file'"
 }
 
-generate_demo() {
-  # Generate all styles in a 2x2 grid with labels
-  local tmp_dir="/tmp/wallpaper_demo_$$"
-  local final_output="$output_file"
-  mkdir -p "$tmp_dir"
-
-  # Calculate tile size (2 columns, 2 rows)
-  local tile_w=$((width / 2))
-  local tile_h=$((height / 2))
-
-  # Save original dimensions and generate each style at tile size
-  local orig_width="$width"
-  local orig_height="$height"
-  width="$tile_w"
-  height="$tile_h"
-
-  local styles=("plasma" "geometric" "hexagons" "circles")
-
-  for style_name in "${styles[@]}"; do
-    local tile_file="$tmp_dir/${style_name}.png"
-    output_file="$tile_file"
-    "generate_${style_name}"
-
-    # Add label to tile
-    magick "$tile_file" \
-      -gravity South \
-      -fill "$BASE05" -font "Helvetica-Bold" -pointsize 48 \
-      -annotate +0+20 "$style_name" \
-      "$tile_file"
-  done
-
-  # Restore original dimensions and output file
-  width="$orig_width"
-  height="$orig_height"
-  output_file="$final_output"
-
-  # Combine into 2x2 grid
-  magick montage \
-    "$tmp_dir/plasma.png" "$tmp_dir/geometric.png" \
-    "$tmp_dir/hexagons.png" "$tmp_dir/circles.png" \
-    -tile 2x2 -geometry "${tile_w}x${tile_h}+0+0" \
+generate_swirl() {
+  # Vortex gradient using two accent colors
+  magick -size "${width}x${height}" \
+    \( gradient:"${BASE00}-${BASE0D}" \) \
+    \( gradient:"${BASE00}-${BASE0E}" -rotate 90 \) \
+    -compose multiply -composite \
+    -swirl 180 \
     "$output_file"
+}
 
-  rm -rf "$tmp_dir"
+generate_spotlight() {
+  # Soft centered glow
+  magick -size "${width}x${height}" xc:"${BASE00}" \
+    \( -size 800x800 radial-gradient:"${BASE0D}90-none" \) \
+    -gravity center -compose over -composite \
+    -blur 0x20 \
+    "$output_file"
+}
+
+generate_sphere() {
+  # Single centered 3D sphere
+  magick -size "${width}x${height}" xc:"${BASE00}" \
+    \( -size 600x600 radial-gradient:"${BASE0D}-transparent" \) \
+    -gravity center -compose over -composite \
+    "$output_file"
+}
+
+generate_spheres() {
+  # Multiple 3D spheres distributed across screen
+  magick -size "${width}x${height}" xc:"${BASE00}" \
+    \( -size 320x320 radial-gradient:"${BASE0D}-transparent" \) -gravity center -geometry -650-350 -compose over -composite \
+    \( -size 280x280 radial-gradient:"${BASE0E}-transparent" \) -gravity center -geometry -350-400 -compose over -composite \
+    \( -size 250x250 radial-gradient:"${BASE0C}-transparent" \) -gravity center -geometry -50-320 -compose over -composite \
+    \( -size 300x300 radial-gradient:"${BASE0D}-transparent" \) -gravity center -geometry +300-380 -compose over -composite \
+    \( -size 260x260 radial-gradient:"${BASE0E}-transparent" \) -gravity center -geometry +600-300 -compose over -composite \
+    \( -size 350x350 radial-gradient:"${BASE0C}-transparent" \) -gravity center -geometry -700-50 -compose over -composite \
+    \( -size 290x290 radial-gradient:"${BASE0D}-transparent" \) -gravity center -geometry -400+50 -compose over -composite \
+    \( -size 270x270 radial-gradient:"${BASE0E}-transparent" \) -gravity center -geometry -100-50 -compose over -composite \
+    \( -size 330x330 radial-gradient:"${BASE0C}-transparent" \) -gravity center -geometry +200+0 -compose over -composite \
+    \( -size 240x240 radial-gradient:"${BASE0D}-transparent" \) -gravity center -geometry +550-50 -compose over -composite \
+    \( -size 310x310 radial-gradient:"${BASE0E}-transparent" \) -gravity center -geometry +750+100 -compose over -composite \
+    \( -size 280x280 radial-gradient:"${BASE0C}-transparent" \) -gravity center -geometry -600+250 -compose over -composite \
+    \( -size 260x260 radial-gradient:"${BASE0D}-transparent" \) -gravity center -geometry -300+300 -compose over -composite \
+    \( -size 300x300 radial-gradient:"${BASE0E}-transparent" \) -gravity center -geometry +50+250 -compose over -composite \
+    \( -size 250x250 radial-gradient:"${BASE0C}-transparent" \) -gravity center -geometry +400+300 -compose over -composite \
+    \( -size 290x290 radial-gradient:"${BASE0D}-transparent" \) -gravity center -geometry +700+350 -compose over -composite \
+    \( -size 270x270 radial-gradient:"${BASE0E}-transparent" \) -gravity center -geometry -500+400 -compose over -composite \
+    \( -size 320x320 radial-gradient:"${BASE0C}-transparent" \) -gravity center -geometry -150+380 -compose over -composite \
+    \( -size 240x240 radial-gradient:"${BASE0D}-transparent" \) -gravity center -geometry +250+420 -compose over -composite \
+    \( -size 280x280 radial-gradient:"${BASE0E}-transparent" \) -gravity center -geometry +550+400 -compose over -composite \
+    "$output_file"
 }
 
 # Generate based on style
@@ -215,12 +225,21 @@ case "$style" in
   circles)
     generate_circles
     ;;
-  demo)
-    generate_demo
+  swirl)
+    generate_swirl
+    ;;
+  spotlight)
+    generate_spotlight
+    ;;
+  sphere)
+    generate_sphere
+    ;;
+  spheres)
+    generate_spheres
     ;;
   *)
     echo "Unknown style: $style"
-    echo "Valid styles: plasma, geometric, hexagons, circles, demo"
+    echo "Valid styles: plasma, geometric, hexagons, circles, swirl, spotlight, sphere, spheres"
     exit 1
     ;;
 esac
