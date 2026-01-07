@@ -7,9 +7,16 @@ set -euo pipefail
 THEME_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 THEME_APP_DIR="$(cd "$THEME_LIB_DIR/.." && pwd)"
 
+# Dev mode: use THEME_ENV=development (set via direnv in ~/tools/theme/.envrc)
+if [[ "${THEME_ENV:-}" == "development" ]]; then
+  THEME_STATE_DIR="$THEME_APP_DIR/.dev-data"
+else
+  THEME_STATE_DIR="$HOME/.local/state/theme"
+fi
+
 # Configuration - themes/ is the single source of truth
 THEMES_DIR="$THEME_APP_DIR/themes"
-CURRENT_THEME_FILE="$HOME/.local/share/theme/current"
+CURRENT_THEME_FILE="$THEME_STATE_DIR/current"
 
 #==============================================================================
 # THEME ACCESS - scans themes/ directory

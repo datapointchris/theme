@@ -21,6 +21,7 @@ fi
 
 source "$THEME_APP_DIR/lib/lib.sh"
 source "$THEME_APP_DIR/lib/storage.sh"
+source "$THEME_APP_DIR/lib/sync.sh"
 
 # Rename original functions and create filtered versions
 eval "$(declare -f list_themes | sed '1s/list_themes/list_themes_unfiltered/')"
@@ -168,6 +169,7 @@ EOF
 #==============================================================================
 
 show_current() {
+  sync_before_read
   local current
   current=$(get_current_theme)
 
@@ -266,6 +268,7 @@ apply_theme() {
 
   # Log the action
   log_action "apply" "$canonical"
+  sync_after_action
 
   echo ""
   echo "Theme applied."
@@ -389,6 +392,7 @@ mark_liked() {
   display_info=$(get_theme_display_info "$theme")
 
   log_action "like" "$theme" "$message"
+  sync_after_action
   echo "Liked: $display_info"
   [[ -n "$message" ]] && echo "  Reason: $message"
 }
@@ -407,6 +411,7 @@ mark_disliked() {
   display_info=$(get_theme_display_info "$theme")
 
   log_action "dislike" "$theme" "$message"
+  sync_after_action
   echo "Disliked: $display_info"
   [[ -n "$message" ]] && echo "  Reason: $message"
 }
@@ -431,6 +436,7 @@ add_note() {
   display_info=$(get_theme_display_info "$theme")
 
   log_action "note" "$theme" "$message"
+  sync_after_action
   echo "Added note to: $display_info"
   echo "  Note: $message"
 }
@@ -455,7 +461,7 @@ mark_rejected() {
   display_info=$(get_theme_display_info "$theme")
 
   reject_theme "$theme" "$reason"
-  log_action "reject" "$theme" "$reason"
+  sync_after_action
   echo "Marked as rejected: $display_info"
   echo "  Reason: $reason"
   echo ""
@@ -625,7 +631,7 @@ PREVIEW_EOF
     display_info=$(echo "$selected" | cut -f1)
 
     unreject_theme "$theme_id"
-    log_action "unreject" "$theme_id"
+    sync_after_action
     echo "Unrejected: $display_info"
     echo ""
     echo "This theme is now available in the theme list again."
@@ -633,6 +639,7 @@ PREVIEW_EOF
 }
 
 show_rankings() {
+  sync_before_read
   local rankings
   rankings=$(get_rankings)
 
@@ -680,6 +687,7 @@ show_rankings() {
 }
 
 show_log() {
+  sync_before_read
   local history
   history=$(get_history_raw)
 
@@ -1063,12 +1071,26 @@ main() {
       verify_system
       ;;
     upgrade|update)
-      echo "Upgrading theme..."
-      if git -C "$THEME_APP_DIR" pull --quiet; then
-        echo "✓ theme upgraded successfully"
-      else
+      local before_commit after_commit
+      before_commit=$(git -C "$THEME_APP_DIR" rev-parse HEAD)
+
+      if ! git -C "$THEME_APP_DIR" pull --quiet; then
         echo "✗ theme upgrade failed" >&2
         exit 1
+      fi
+
+      after_commit=$(git -C "$THEME_APP_DIR" rev-parse HEAD)
+
+      if [[ "$before_commit" == "$after_commit" ]]; then
+        echo "✓ theme is already up to date"
+      else
+        local before_desc after_desc
+        before_desc=$(git -C "$THEME_APP_DIR" describe --tags --always "$before_commit" 2>/dev/null || echo "${before_commit:0:7}")
+        after_desc=$(git -C "$THEME_APP_DIR" describe --tags --always "$after_commit" 2>/dev/null || echo "${after_commit:0:7}")
+        echo "✓ theme upgraded from $before_desc to $after_desc"
+        echo ""
+        echo "Changes:"
+        git -C "$THEME_APP_DIR" log --format="  • %s" "${before_commit}..${after_commit}"
       fi
       ;;
     generate-previews)
@@ -1076,6 +1098,42 @@ main() {
       ;;
     clear-cache)
       clear_preview_cache
+      ;;
+    sync)
+      case "${2:-status}" in
+        init)
+          sync_init
+          ;;
+        status)
+          sync_status
+          ;;
+        push)
+          if sync_push; then
+            echo "✓ Pushed to remote"
+          else
+            echo "✗ Push failed" >&2
+            exit 1
+          fi
+          ;;
+        pull)
+          if sync_pull; then
+            echo "✓ Pulled from remote"
+          else
+            echo "✗ Pull failed" >&2
+            exit 1
+          fi
+          ;;
+        off)
+          sync_off
+          ;;
+        on)
+          sync_on
+          ;;
+        *)
+          echo "Usage: theme sync <init|status|push|pull|on|off>"
+          exit 1
+          ;;
+      esac
       ;;
     help|--help|-h)
       usage

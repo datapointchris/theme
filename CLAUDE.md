@@ -28,9 +28,15 @@ apps/common/theme/
 │   ├── rose-pine-darker/   # With generated neovim/
 │   ├── kanagawa/           # Terminal configs only (uses plugin for Neovim)
 │   └── .../
-├── data/               # Theme usage history (per-platform JSONL files)
+├── scripts/            # Migration and utility scripts
+├── install.sh          # Installation script
 ├── analysis/           # Research documentation
 └── screenshots/        # Theme preview screenshots
+
+# Data locations (XDG-compliant):
+# ~/.local/state/theme/history.jsonl   - Unified history (synced via gist)
+# ~/.local/state/theme/current         - Current theme ID
+# ~/.local/state/theme/sync-state.json - Sync configuration
 ```
 
 ## Theme Categories
@@ -121,6 +127,9 @@ theme apply gruvbox-dark-hard    # Apply by id
 theme current                    # Show current theme
 theme like "great contrast"      # Rate current theme
 theme reject "too bright"        # Remove from rotation
+theme sync init                  # Initialize GitHub Gist sync
+theme sync status                # Show sync status
+theme upgrade                    # Update to latest version
 ```
 
 ### Creating a New Theme
@@ -177,17 +186,20 @@ The `colorscheme-manager.lua` plugin:
 - Dynamically loads generated colorschemes from `themes/*/neovim/` directories
 - Builds display name mapping from theme.yml meta fields
 - Filters rejected themes from the picker
-- Watches `~/.local/share/theme/current` for changes (auto-updates when `theme apply` runs)
+- Watches `~/.local/state/theme/current` for changes (auto-updates when `theme apply` runs)
 
 ## Files Reference
 
 | File | Purpose |
 |------|---------|
-| `bin/theme` | Theme CLI (apply, list, like/dislike, reject) |
+| `bin/theme` | Theme CLI (apply, list, like/dislike, reject, sync) |
 | `lib/lib.sh` | Core functions (get_theme_display_info, apply_theme_to_apps) |
+| `lib/storage.sh` | Unified JSONL history with machine context |
+| `lib/sync.sh` | GitHub Gist synchronization |
 | `lib/theme.sh` | Loads theme.yml into shell variables for generators |
-| `lib/storage.sh` | History and rejected themes storage |
 | `lib/neovim_generator.py` | Generates Neovim colorscheme from theme.yml |
+| `install.sh` | Installation script for fresh installs |
+| `scripts/migrate-history.sh` | One-time migration from old format |
 | `lib/generators/ghostty.sh` | Ghostty terminal colors |
 | `lib/generators/kitty.sh` | Kitty terminal colors |
 | `lib/generators/tmux.sh` | tmux status bar theme |

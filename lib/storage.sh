@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
-# Theme storage layer - JSONL-based tracking
-# Per-platform history files to avoid git merge conflicts
+# Theme storage layer - unified JSONL history with machine context
+# Single history file synced across machines via gist
 
-# Data directory - stored in ~/.config/theme (symlinked to dotfiles for git tracking)
-THEME_DATA_DIR="$HOME/.config/theme"
+set -euo pipefail
 
-#==============================================================================
-# PLATFORM DETECTION
-#==============================================================================
+_STORAGE_APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Dev mode: use THEME_ENV=development (set via direnv in ~/tools/theme/.envrc)
+if [[ "${THEME_ENV:-}" == "development" ]]; then
+  THEME_STATE_DIR="$_STORAGE_APP_DIR/.dev-data"
+else
+  THEME_STATE_DIR="$HOME/.local/state/theme"
+fi
+THEME_HISTORY_FILE="$THEME_STATE_DIR/history.jsonl"
 
 detect_platform() {
   if [[ -n "${PLATFORM:-}" ]]; then
@@ -29,9 +34,13 @@ detect_platform() {
   fi
 }
 
-#==============================================================================
-# CORE STORAGE OPERATIONS
-#==============================================================================
+_storage_get_machine_id() {
+  local platform
+  platform=$(detect_platform)
+  local hostname
+  hostname=$(hostname -s 2>/dev/null || echo "unknown")
+  echo "${platform}-${hostname}"
+}
 
 log_action() {
   local action="$1"
@@ -43,52 +52,51 @@ log_action() {
     return 1
   fi
 
+  mkdir -p "$THEME_STATE_DIR"
+
+  local timestamp
+  timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   local platform
   platform=$(detect_platform)
-  local timestamp
-  timestamp=$(date -u -Iseconds 2>/dev/null || date -u +%Y-%m-%dT%H:%M:%SZ)
-
-  local history_file="$THEME_DATA_DIR/history-${platform}.jsonl"
-  mkdir -p "$THEME_DATA_DIR"
+  local machine
+  machine=$(_storage_get_machine_id)
 
   local record
   if [[ -n "$message" ]]; then
     record=$(jq -nc \
       --arg ts "$timestamp" \
-      --arg plat "$platform" \
+      --arg platform "$platform" \
+      --arg machine "$machine" \
       --arg theme "$theme" \
       --arg act "$action" \
       --arg msg "$message" \
-      '{ts:$ts, platform:$plat, theme:$theme, action:$act, message:$msg}')
+      '{ts: $ts, platform: $platform, machine: $machine, theme: $theme, action: $act, message: $msg}')
   else
     record=$(jq -nc \
       --arg ts "$timestamp" \
-      --arg plat "$platform" \
+      --arg platform "$platform" \
+      --arg machine "$machine" \
       --arg theme "$theme" \
       --arg act "$action" \
-      '{ts:$ts, platform:$plat, theme:$theme, action:$act}')
+      '{ts: $ts, platform: $platform, machine: $machine, theme: $theme, action: $act}')
   fi
 
-  echo "$record" >> "$history_file"
+  echo "$record" >> "$THEME_HISTORY_FILE"
 }
 
 get_history() {
-  if compgen -G "$THEME_DATA_DIR/history-*.jsonl" > /dev/null; then
-    cat "$THEME_DATA_DIR"/history-*.jsonl 2>/dev/null | jq -s 'sort_by(.ts)'
+  if [[ -f "$THEME_HISTORY_FILE" ]]; then
+    jq -s 'sort_by(.ts)' "$THEME_HISTORY_FILE"
   else
     echo "[]"
   fi
 }
 
 get_history_raw() {
-  if compgen -G "$THEME_DATA_DIR/history-*.jsonl" > /dev/null; then
-    cat "$THEME_DATA_DIR"/history-*.jsonl 2>/dev/null | jq -c '.' | sort
+  if [[ -f "$THEME_HISTORY_FILE" ]]; then
+    jq -c '.' "$THEME_HISTORY_FILE" | sort
   fi
 }
-
-#==============================================================================
-# QUERY FUNCTIONS
-#==============================================================================
 
 get_theme_stats() {
   local theme="$1"
@@ -109,7 +117,8 @@ get_theme_stats() {
       applies: map(select(.action == "apply")) | length,
       score: (map(select(.action == "like")) | length) - (map(select(.action == "dislike")) | length),
       last_used: map(select(.action == "apply")) | max_by(.ts) | .ts // "never",
-      platforms: [.[].platform] | unique
+      platforms: [.[].platform] | unique,
+      machines: [.[].machine // "unknown"] | unique
     }
   '
 }
@@ -178,10 +187,6 @@ get_rankings() {
   '
 }
 
-#==============================================================================
-# FILTER FUNCTIONS
-#==============================================================================
-
 filter_by_theme() {
   local theme="$1"
   get_history | jq --arg theme "$theme" 'map(select(.theme == $theme))'
@@ -196,10 +201,6 @@ filter_by_platform() {
   local platform="$1"
   get_history | jq --arg platform "$platform" 'map(select(.platform == $platform))'
 }
-
-#==============================================================================
-# ANALYSIS FUNCTIONS
-#==============================================================================
 
 get_most_liked_themes() {
   local limit="${1:-10}"
@@ -236,10 +237,6 @@ get_theme_notes() {
   '
 }
 
-#==============================================================================
-# UTILITY FUNCTIONS
-#==============================================================================
-
 count_total_actions() {
   get_history | jq 'length'
 }
@@ -252,34 +249,17 @@ list_tracked_themes() {
   get_history | jq -r 'group_by(.theme) | .[].theme' | sort -u
 }
 
-#==============================================================================
-# VALIDATION
-#==============================================================================
+validate_history_file() {
+  if [[ ! -f "$THEME_HISTORY_FILE" ]]; then
+    return 0
+  fi
 
-validate_history_files() {
-  local valid=true
+  if ! jq -e '.' "$THEME_HISTORY_FILE" >/dev/null 2>&1; then
+    echo "Invalid JSON in: $THEME_HISTORY_FILE" >&2
+    return 1
+  fi
 
-  for file in "$THEME_DATA_DIR"/history-*.jsonl; do
-    [[ -f "$file" ]] || continue
-
-    if ! jq -e '.' "$file" >/dev/null 2>&1; then
-      echo "Invalid JSON in: $file" >&2
-      valid=false
-    fi
-  done
-
-  $valid
-}
-
-#==============================================================================
-# REJECTED THEMES TRACKING
-#==============================================================================
-
-# Per-machine rejected themes file to avoid merge conflicts
-get_rejected_themes_file() {
-  local platform
-  platform=$(detect_platform)
-  echo "$THEME_DATA_DIR/rejected-themes-${platform}.json"
+  return 0
 }
 
 reject_theme() {
@@ -291,66 +271,7 @@ reject_theme() {
     return 1
   fi
 
-  local platform
-  platform=$(detect_platform)
-  local timestamp
-  timestamp=$(date -u -Iseconds 2>/dev/null || date -u +%Y-%m-%dT%H:%M:%SZ)
-  local rejected_file
-  rejected_file=$(get_rejected_themes_file)
-
-  if [[ ! -f "$rejected_file" ]]; then
-    echo "{}" > "$rejected_file"
-  fi
-
-  local temp_file="${rejected_file}.tmp"
-  jq --arg theme "$theme" \
-     --arg reason "$reason" \
-     --arg platform "$platform" \
-     --arg ts "$timestamp" \
-     '.[$theme] = {
-       "rejected_date": $ts,
-       "reason": $reason,
-       "platforms": ((.[$theme].platforms // []) + [$platform] | unique)
-     }' "$rejected_file" > "$temp_file"
-
-  mv "$temp_file" "$rejected_file"
-}
-
-is_theme_rejected() {
-  local theme="$1"
-  local rejected_file
-  rejected_file=$(get_rejected_themes_file)
-
-  if [[ ! -f "$rejected_file" ]]; then
-    return 1
-  fi
-
-  jq -e --arg theme "$theme" '.[$theme] != null' "$rejected_file" >/dev/null 2>&1
-}
-
-get_rejected_theme_info() {
-  local theme="$1"
-  local rejected_file
-  rejected_file=$(get_rejected_themes_file)
-
-  if [[ ! -f "$rejected_file" ]]; then
-    echo "{}"
-    return
-  fi
-
-  jq --arg theme "$theme" '.[$theme] // {}' "$rejected_file"
-}
-
-list_rejected_themes() {
-  local rejected_file
-  rejected_file=$(get_rejected_themes_file)
-
-  if [[ ! -f "$rejected_file" ]]; then
-    echo "[]"
-    return
-  fi
-
-  jq -c 'to_entries | map({theme: .key, rejected_date: .value.rejected_date, reason: .value.reason, platforms: .value.platforms | join(",")}) | sort_by(.rejected_date) | reverse | .[]' "$rejected_file"
+  log_action "reject" "$theme" "$reason"
 }
 
 unreject_theme() {
@@ -361,39 +282,73 @@ unreject_theme() {
     return 1
   fi
 
-  local rejected_file
-  rejected_file=$(get_rejected_themes_file)
-
-  if [[ ! -f "$rejected_file" ]]; then
-    return 0
-  fi
-
-  local temp_file="${rejected_file}.tmp"
-  jq --arg theme "$theme" 'del(.[$theme])' "$rejected_file" > "$temp_file"
-  mv "$temp_file" "$rejected_file"
+  log_action "unreject" "$theme"
 }
 
-#==============================================================================
-# INITIALIZATION
-#==============================================================================
+is_theme_rejected() {
+  local theme="$1"
+
+  if [[ ! -f "$THEME_HISTORY_FILE" ]]; then
+    return 1
+  fi
+
+  local last_action
+  last_action=$(jq -s -r --arg theme "$theme" '
+    map(select(.theme == $theme and (.action == "reject" or .action == "unreject"))) |
+    sort_by(.ts) | last | .action // "none"
+  ' "$THEME_HISTORY_FILE")
+
+  [[ "$last_action" == "reject" ]]
+}
+
+get_rejected_theme_info() {
+  local theme="$1"
+
+  if [[ ! -f "$THEME_HISTORY_FILE" ]]; then
+    echo "{}"
+    return
+  fi
+
+  jq -s --arg theme "$theme" '
+    map(select(.theme == $theme and .action == "reject")) |
+    sort_by(.ts) | last // {}
+  ' "$THEME_HISTORY_FILE"
+}
+
+list_rejected_themes() {
+  if [[ ! -f "$THEME_HISTORY_FILE" ]]; then
+    return
+  fi
+
+  jq -s -c '
+    group_by(.theme) |
+    map(
+      . as $actions |
+      ($actions | map(select(.action == "reject" or .action == "unreject")) | sort_by(.ts) | last) as $last |
+      if $last.action == "reject" then
+        {
+          theme: .[0].theme,
+          rejected_date: $last.ts,
+          reason: $last.message,
+          platforms: [$actions[].platform] | unique | join(",")
+        }
+      else
+        null
+      end
+    ) |
+    map(select(. != null)) |
+    sort_by(.rejected_date) | reverse |
+    .[]
+  ' "$THEME_HISTORY_FILE"
+}
 
 init_storage() {
-  if [[ ! -d "$THEME_DATA_DIR" ]]; then
-    mkdir -p "$THEME_DATA_DIR"
+  if [[ ! -d "$THEME_STATE_DIR" ]]; then
+    mkdir -p "$THEME_STATE_DIR"
   fi
 
-  local platform
-  platform=$(detect_platform)
-  local history_file="$THEME_DATA_DIR/history-${platform}.jsonl"
-
-  if [[ ! -f "$history_file" ]]; then
-    touch "$history_file"
-  fi
-
-  local rejected_file
-  rejected_file=$(get_rejected_themes_file)
-  if [[ ! -f "$rejected_file" ]]; then
-    echo "{}" > "$rejected_file"
+  if [[ ! -f "$THEME_HISTORY_FILE" ]]; then
+    touch "$THEME_HISTORY_FILE"
   fi
 }
 
