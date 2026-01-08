@@ -1,0 +1,9 @@
+# Planning documents - ephemeral, not committed
+.planning/**
+
+# Auto-generated noise directories (gitignored)
+debug/**
+file-history/**
+plans/**
+shell-snapshots/**
+sessions/**
