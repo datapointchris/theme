@@ -472,6 +472,34 @@ change_opacity() {
   echo "$current → $new_opacity (${applied[*]})"
 }
 
+# Set opacity to an absolute value (0-100)
+set_opacity() {
+  local value="$1"
+
+  # Validate input is a number between 0 and 100
+  if ! [[ "$value" =~ ^[0-9]+$ ]] || [[ "$value" -lt 0 ]] || [[ "$value" -gt 100 ]]; then
+    echo "Error: opacity must be a number between 0 and 100" >&2
+    return 1
+  fi
+
+  local current
+  current=$(get_current_opacity)
+
+  # Convert 0-100 to 0.00-1.00
+  local new_opacity
+  new_opacity=$(awk "BEGIN {printf \"%.2f\", $value / 100}")
+
+  # Apply to all terminals
+  local applied=()
+
+  set_ghostty_opacity "$new_opacity" && applied+=("ghostty")
+  set_kitty_opacity "$new_opacity" && applied+=("kitty")
+  set_windows_terminal_opacity "$new_opacity" && applied+=("windows-terminal")
+  set_tmux_opacity "$new_opacity" && applied+=("tmux")
+
+  echo "$current → $new_opacity (${applied[*]})"
+}
+
 # Wallpaper cache directory
 WALLPAPER_CACHE_DIR="${WALLPAPER_CACHE_DIR:-$HOME/.cache/theme/wallpapers}"
 

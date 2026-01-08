@@ -86,8 +86,9 @@ usage() {
   verify               Check theme system is working
   upgrade              Update theme to latest version (git pull)
   opacity              Show current background opacity
-  opacity-up           Increase opacity by 5%
-  opacity-down         Decrease opacity by 5%
+  opacity <0-100>      Set opacity to specific value (e.g., 90 = 0.90)
+  opacity up           Increase opacity by 5%
+  opacity down         Decrease opacity by 5%
   generate-previews    Pre-generate all preview images
   generate-wallpapers  Pre-generate all wallpapers (instant switching)
   wallpaper                    Show current wallpaper
@@ -176,8 +177,9 @@ Commands
   verify               Check theme system is working
   upgrade              Update theme to latest version (git pull)
   opacity              Show current background opacity
-  opacity-up           Increase opacity by 5%
-  opacity-down         Decrease opacity by 5%
+  opacity <0-100>      Set opacity to specific value (e.g., 90 = 0.90)
+  opacity up           Increase opacity by 5%
+  opacity down         Decrease opacity by 5%
   sync                 Manage GitHub Gist synchronization
   generate-previews    Pre-generate all preview images
   generate-wallpapers  Pre-generate all wallpapers (instant switching)
@@ -1282,21 +1284,32 @@ main() {
     fi
     ;;
   opacity)
-    echo "Background opacity: $(get_current_opacity)"
-    ;;
-  opacity-up)
-    if result=$(change_opacity 0.05); then
-      echo "Opacity: $result"
-      echo ""
-      echo "Restart terminal to see changes."
-    fi
-    ;;
-  opacity-down)
-    if result=$(change_opacity -0.05); then
-      echo "Opacity: $result"
-      echo ""
-      echo "Restart terminal to see changes."
-    fi
+    case "${2:-}" in
+      "")
+        echo "Background opacity: $(get_current_opacity)"
+        ;;
+      up)
+        if result=$(change_opacity 0.05); then
+          echo "Opacity: $result"
+          echo ""
+          echo "Restart terminal to see changes."
+        fi
+        ;;
+      down)
+        if result=$(change_opacity -0.05); then
+          echo "Opacity: $result"
+          echo ""
+          echo "Restart terminal to see changes."
+        fi
+        ;;
+      *)
+        if result=$(set_opacity "$2"); then
+          echo "Opacity: $result"
+          echo ""
+          echo "Restart terminal to see changes."
+        fi
+        ;;
+    esac
     ;;
   generate-previews)
     generate_all_previews
