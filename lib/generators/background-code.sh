@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Generate code screenshot wallpapers using silicon
-# Usage: wallpaper-code.sh <theme.yml> <output-file> [language]
+# Generate code screenshot backgrounds using silicon
+# Usage: background-code.sh <theme.yml> <output-file> [language]
 #
 # Creates syntax-highlighted code screenshots with theme background.
 # Requires: silicon (brew install silicon)

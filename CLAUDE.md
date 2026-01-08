@@ -15,7 +15,7 @@ apps/common/theme/
 │   │   ├── ghostty.sh, kitty.sh     # Terminal emulators
 │   │   ├── tmux.sh, btop.sh         # Terminal apps
 │   │   ├── borders.sh               # JankyBorders (macOS)
-│   │   ├── wallpaper.sh             # Themed wallpapers (macOS)
+│   │   ├── background.sh            # Themed backgrounds (macOS)
 │   │   ├── hyprland.sh, hyprlock.sh # Hyprland WM (Arch)
 │   │   ├── waybar.sh, rofi.sh       # Desktop apps (Arch)
 │   │   ├── dunst.sh, mako.sh        # Notification daemons
@@ -205,7 +205,7 @@ The `colorscheme-manager.lua` plugin:
 | `lib/generators/tmux.sh` | tmux status bar theme |
 | `lib/generators/btop.sh` | btop system monitor theme |
 | `lib/generators/borders.sh` | JankyBorders window highlights (macOS) |
-| `lib/generators/wallpaper.sh` | Themed wallpaper generator (macOS) |
+| `lib/generators/background.sh` | Themed background generator (macOS) |
 | `lib/generators/hyprland.sh` | Hyprland WM colors (Arch) |
 | `lib/generators/waybar.sh` | Waybar status bar (Arch) |
 | `lib/generators/rofi.sh` | Rofi launcher (Arch) |

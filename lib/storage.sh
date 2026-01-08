@@ -363,16 +363,16 @@ init_storage() {
 }
 
 #==============================================================================
-# WALLPAPER HISTORY - per-theme preferences and usage tracking
+# BACKGROUND HISTORY - per-theme preferences and usage tracking
 #==============================================================================
 
-WALLPAPER_HISTORY_FILE="$THEME_STATE_DIR/wallpaper-history.jsonl"
+BACKGROUND_HISTORY_FILE="$THEME_STATE_DIR/background-history.jsonl"
 
-# Log a wallpaper action with comprehensive context
+# Log a background action with comprehensive context
 # Actions: apply, like, dislike, reject, unreject, note
-log_wallpaper_action() {
+log_background_action() {
   local action="$1"
-  local wallpaper="${2:-}"
+  local background="${2:-}"
   local theme="${3:-}"
   local message="${4:-}"
 
@@ -403,58 +403,58 @@ log_wallpaper_action() {
       --arg platform "$platform" \
       --arg machine "$machine" \
       --arg theme "$theme" \
-      --arg wallpaper "$wallpaper" \
+      --arg background "$background" \
       --arg act "$action" \
       --arg msg "$message" \
-      '{ts: $ts, platform: $platform, machine: $machine, theme: $theme, wallpaper: $wallpaper, action: $act, message: $msg}')
+      '{ts: $ts, platform: $platform, machine: $machine, theme: $theme, background: $background, action: $act, message: $msg}')
   else
     record=$(jq -nc \
       --arg ts "$timestamp" \
       --arg platform "$platform" \
       --arg machine "$machine" \
       --arg theme "$theme" \
-      --arg wallpaper "$wallpaper" \
+      --arg background "$background" \
       --arg act "$action" \
-      '{ts: $ts, platform: $platform, machine: $machine, theme: $theme, wallpaper: $wallpaper, action: $act}')
+      '{ts: $ts, platform: $platform, machine: $machine, theme: $theme, background: $background, action: $act}')
   fi
 
-  echo "$record" >> "$WALLPAPER_HISTORY_FILE"
+  echo "$record" >> "$BACKGROUND_HISTORY_FILE"
 }
 
-# Get all wallpaper history as sorted JSON array
-get_wallpaper_history() {
-  if [[ -f "$WALLPAPER_HISTORY_FILE" ]]; then
-    jq -s 'sort_by(.ts)' "$WALLPAPER_HISTORY_FILE"
+# Get all background history as sorted JSON array
+get_background_history() {
+  if [[ -f "$BACKGROUND_HISTORY_FILE" ]]; then
+    jq -s 'sort_by(.ts)' "$BACKGROUND_HISTORY_FILE"
   else
     echo "[]"
   fi
 }
 
-# Get wallpaper history for a specific theme
-get_wallpaper_history_for_theme() {
+# Get background history for a specific theme
+get_background_history_for_theme() {
   local theme="$1"
-  get_wallpaper_history | jq --arg theme "$theme" 'map(select(.theme == $theme))'
+  get_background_history | jq --arg theme "$theme" 'map(select(.theme == $theme))'
 }
 
-# Get stats for a specific wallpaper (optionally filtered by theme)
-get_wallpaper_stats() {
-  local wallpaper="$1"
+# Get stats for a specific background (optionally filtered by theme)
+get_background_stats() {
+  local background="$1"
   local theme="${2:-}"
 
-  if [[ -z "$wallpaper" ]]; then
-    echo "Error: wallpaper ID required" >&2
+  if [[ -z "$background" ]]; then
+    echo "Error: background ID required" >&2
     return 1
   fi
 
-  local filter='.wallpaper == $wallpaper'
+  local filter='.background == $background'
   if [[ -n "$theme" ]]; then
     filter="$filter and .theme == \$theme"
   fi
 
-  get_wallpaper_history | jq --arg wallpaper "$wallpaper" --arg theme "$theme" "
+  get_background_history | jq --arg background "$background" --arg theme "$theme" "
     map(select($filter)) |
     {
-      wallpaper: \$wallpaper,
+      background: \$background,
       theme: (if \$theme != \"\" then \$theme else \"all\" end),
       total_actions: length,
       likes: map(select(.action == \"like\")) | length,
@@ -469,41 +469,41 @@ get_wallpaper_stats() {
   "
 }
 
-# Check if wallpaper is rejected for a specific theme
-is_wallpaper_rejected() {
-  local wallpaper="$1"
+# Check if background is rejected for a specific theme
+is_background_rejected() {
+  local background="$1"
   local theme="$2"
 
-  if [[ ! -f "$WALLPAPER_HISTORY_FILE" ]]; then
+  if [[ ! -f "$BACKGROUND_HISTORY_FILE" ]]; then
     return 1
   fi
 
   local last_action
-  last_action=$(jq -s -r --arg wallpaper "$wallpaper" --arg theme "$theme" '
-    map(select(.wallpaper == $wallpaper and .theme == $theme and (.action == "reject" or .action == "unreject"))) |
+  last_action=$(jq -s -r --arg background "$background" --arg theme "$theme" '
+    map(select(.background == $background and .theme == $theme and (.action == "reject" or .action == "unreject"))) |
     sort_by(.ts) | last | .action // "none"
-  ' "$WALLPAPER_HISTORY_FILE")
+  ' "$BACKGROUND_HISTORY_FILE")
 
   [[ "$last_action" == "reject" ]]
 }
 
-# List rejected wallpapers for a theme
-list_rejected_wallpapers() {
+# List rejected backgrounds for a theme
+list_rejected_backgrounds() {
   local theme="$1"
 
-  if [[ ! -f "$WALLPAPER_HISTORY_FILE" ]]; then
+  if [[ ! -f "$BACKGROUND_HISTORY_FILE" ]]; then
     return
   fi
 
   jq -s -c --arg theme "$theme" '
     map(select(.theme == $theme)) |
-    group_by(.wallpaper) |
+    group_by(.background) |
     map(
       . as $actions |
       ($actions | map(select(.action == "reject" or .action == "unreject")) | sort_by(.ts) | last) as $last |
       if $last.action == "reject" then
         {
-          wallpaper: .[0].wallpaper,
+          background: .[0].background,
           theme: $theme,
           rejected_date: $last.ts,
           reason: $last.message,
@@ -516,11 +516,11 @@ list_rejected_wallpapers() {
     map(select(. != null)) |
     sort_by(.rejected_date) | reverse |
     .[]
-  ' "$WALLPAPER_HISTORY_FILE"
+  ' "$BACKGROUND_HISTORY_FILE"
 }
 
-# Get wallpaper rankings for a theme (or global)
-get_wallpaper_rankings() {
+# Get background rankings for a theme (or global)
+get_background_rankings() {
   local theme="${1:-}"
 
   local filter='true'
@@ -528,11 +528,11 @@ get_wallpaper_rankings() {
     filter='.theme == $theme'
   fi
 
-  get_wallpaper_history | jq -c --arg theme "$theme" "
+  get_background_history | jq -c --arg theme "$theme" "
     map(select($filter)) |
-    group_by(.wallpaper) |
+    group_by(.background) |
     map({
-      wallpaper: .[0].wallpaper,
+      background: .[0].background,
       likes: map(select(.action == \"like\")) | length,
       dislikes: map(select(.action == \"dislike\")) | length,
       score: (map(select(.action == \"like\")) | length) - (map(select(.action == \"dislike\")) | length),
@@ -545,8 +545,8 @@ get_wallpaper_rankings() {
   "
 }
 
-# Get apply counts for all wallpapers (for weighted selection)
-get_wallpaper_apply_counts() {
+# Get apply counts for all backgrounds (for weighted selection)
+get_background_apply_counts() {
   local theme="${1:-}"
 
   local filter='true'
@@ -554,17 +554,17 @@ get_wallpaper_apply_counts() {
     filter='.theme == $theme'
   fi
 
-  get_wallpaper_history | jq -r --arg theme "$theme" "
+  get_background_history | jq -r --arg theme "$theme" "
     map(select(.action == \"apply\" and ($filter))) |
-    group_by(.wallpaper) |
-    map({wallpaper: .[0].wallpaper, count: length}) |
+    group_by(.background) |
+    map({background: .[0].background, count: length}) |
     .[] |
-    \"\(.wallpaper)\t\(.count)\"
+    \"\(.background)\t\(.count)\"
   "
 }
 
-# Get recent wallpaper history entries
-get_recent_wallpapers() {
+# Get recent background history entries
+get_recent_backgrounds() {
   local limit="${1:-10}"
   local theme="${2:-}"
 
@@ -573,49 +573,49 @@ get_recent_wallpapers() {
     filter='.theme == $theme'
   fi
 
-  get_wallpaper_history | jq --arg limit "$limit" --arg theme "$theme" "
+  get_background_history | jq --arg limit "$limit" --arg theme "$theme" "
     map(select(.action == \"apply\" and ($filter))) |
     sort_by(.ts) | reverse |
     limit(\$limit | tonumber; .[])
   "
 }
 
-# Get list of rejected wallpapers for a theme (newline-separated IDs)
-get_rejected_wallpaper_ids() {
+# Get list of rejected backgrounds for a theme (newline-separated IDs)
+get_rejected_background_ids() {
   local theme="$1"
 
-  if [[ ! -f "$WALLPAPER_HISTORY_FILE" ]]; then
+  if [[ ! -f "$BACKGROUND_HISTORY_FILE" ]]; then
     return
   fi
 
   jq -s -r --arg theme "$theme" '
     map(select(.theme == $theme)) |
-    group_by(.wallpaper) |
+    group_by(.background) |
     map(
       (. | map(select(.action == "reject" or .action == "unreject")) | sort_by(.ts) | last) as $last |
-      if $last.action == "reject" then .[0].wallpaper else null end
+      if $last.action == "reject" then .[0].background else null end
     ) |
     map(select(. != null)) |
     .[]
-  ' "$WALLPAPER_HISTORY_FILE"
+  ' "$BACKGROUND_HISTORY_FILE"
 }
 
-# Compute weights for wallpaper selection based on history
-# Returns JSON object: {"wallpaper_id": weight, ...}
+# Compute weights for background selection based on history
+# Returns JSON object: {"background_id": weight, ...}
 # Weighting: liked=2.0, neutral=1.0, disliked=0.5, recently used=lower
-compute_wallpaper_weights() {
+compute_background_weights() {
   local theme="$1"
 
-  if [[ ! -f "$WALLPAPER_HISTORY_FILE" ]]; then
+  if [[ ! -f "$BACKGROUND_HISTORY_FILE" ]]; then
     echo "{}"
     return
   fi
 
   jq -s --arg theme "$theme" '
     map(select(.theme == $theme)) |
-    group_by(.wallpaper) |
+    group_by(.background) |
     map(
-      .[0].wallpaper as $wp |
+      .[0].background as $bg |
       (map(select(.action == "like")) | length) as $likes |
       (map(select(.action == "dislike")) | length) as $dislikes |
       (map(select(.action == "apply")) | length) as $applies |
@@ -632,10 +632,10 @@ compute_wallpaper_weights() {
       # More applies = slightly lower weight to encourage variety
       . * (1.0 / (1.0 + ($applies * 0.1))) |
 
-      {key: $wp, value: .}
+      {key: $bg, value: .}
     ) |
     from_entries
-  ' "$WALLPAPER_HISTORY_FILE"
+  ' "$BACKGROUND_HISTORY_FILE"
 }
 
 init_storage

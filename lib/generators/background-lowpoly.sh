@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Generate low-poly Delaunay triangulated wallpapers using triangle
-# Usage: wallpaper-lowpoly.sh <theme.yml> <source-image> <output-file>
+# Generate low-poly Delaunay triangulated backgrounds using triangle
+# Usage: background-lowpoly.sh <theme.yml> <source-image> <output-file>
 #
 # Converts images to low-poly triangulated art with theme background.
 # Requires: triangle (go install github.com/esimov/triangle/v2/cmd/triangle@latest)

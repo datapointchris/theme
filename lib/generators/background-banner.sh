@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Generate ASCII text banner wallpapers using figlet + ImageMagick
-# Usage: wallpaper-banner.sh <theme.yml> <output-file> [text]
+# Generate ASCII text banner backgrounds using figlet + ImageMagick
+# Usage: background-banner.sh <theme.yml> <output-file> [text]
 #
 # Creates ASCII art text banner with theme colors.
 # Requires: figlet, ImageMagick (magick)

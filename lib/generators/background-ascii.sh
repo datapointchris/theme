@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Generate themed ASCII art wallpapers using ascii-image-converter
-# Usage: wallpaper-ascii.sh <theme.yml> <source-image> <output-file>
+# Generate themed ASCII art backgrounds using ascii-image-converter
+# Usage: background-ascii.sh <theme.yml> <source-image> <output-file>
 #
 # Converts images to ASCII art with theme-colored background.
 # Requires: ascii-image-converter (brew install TheZoraiz/ascii-image-converter/ascii-image-converter)

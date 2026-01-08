@@ -500,48 +500,48 @@ set_opacity() {
   echo "$current → $new_opacity (${applied[*]})"
 }
 
-# Wallpaper cache directory
-WALLPAPER_CACHE_DIR="${WALLPAPER_CACHE_DIR:-$HOME/.cache/theme/wallpapers}"
+# Background cache directory
+BACKGROUND_CACHE_DIR="${BACKGROUND_CACHE_DIR:-$HOME/.cache/theme/backgrounds}"
 
-# Wallpaper sources config file (path references, not copies)
-WALLPAPER_SOURCES_FILE="${WALLPAPER_SOURCES_FILE:-$HOME/.config/theme/wallpaper-sources.conf}"
+# Background sources config file (path references, not copies)
+BACKGROUND_SOURCES_FILE="${BACKGROUND_SOURCES_FILE:-$HOME/.config/theme/background-sources.conf}"
 
-# Current wallpaper tracking
-WALLPAPER_CURRENT_FILE="$THEME_STATE_DIR/wallpaper-current"
+# Current background tracking
+BACKGROUND_CURRENT_FILE="$THEME_STATE_DIR/background-current"
 
-# Mode setting (which wallpaper types to include in rotation)
-WALLPAPER_MODE_FILE="${WALLPAPER_MODE_FILE:-$HOME/.config/theme/wallpaper-mode}"
+# Mode setting (which background types to include in rotation)
+BACKGROUND_MODE_FILE="${BACKGROUND_MODE_FILE:-$HOME/.config/theme/background-mode}"
 
 # All available generated styles (no source image needed)
-WALLPAPER_GENERATED_STYLES=("plasma" "geometric" "hexagons" "circles" "swirl" "spotlight" "sphere" "spheres" "code" "banner")
+BACKGROUND_GENERATED_STYLES=("plasma" "geometric" "hexagons" "circles" "swirl" "spotlight" "sphere" "spheres" "code" "banner")
 
 # Source-based transform types (need source images like recolor)
-WALLPAPER_SOURCE_TYPES=("recolor" "ascii" "lowpoly")
+BACKGROUND_SOURCE_TYPES=("recolor" "ascii" "lowpoly")
 
 #==============================================================================
-# WALLPAPER MODE MANAGEMENT
+# BACKGROUND MODE MANAGEMENT
 #==============================================================================
 
-# List all available wallpaper modes/styles
-list_available_wallpaper_modes() {
-  for style in "${WALLPAPER_GENERATED_STYLES[@]}"; do
+# List all available background modes/styles
+list_available_background_modes() {
+  for style in "${BACKGROUND_GENERATED_STYLES[@]}"; do
     echo "generated:$style"
   done
-  for type in "${WALLPAPER_SOURCE_TYPES[@]}"; do
+  for type in "${BACKGROUND_SOURCE_TYPES[@]}"; do
     echo "$type"
   done
 }
 
-# Get current wallpaper mode settings
+# Get current background mode settings
 # Returns: list of enabled modes, one per line, or "all" if not set
-get_wallpaper_mode() {
-  if [[ ! -f "$WALLPAPER_MODE_FILE" ]]; then
+get_background_mode() {
+  if [[ ! -f "$BACKGROUND_MODE_FILE" ]]; then
     echo "all"
     return
   fi
 
   local content
-  content=$(cat "$WALLPAPER_MODE_FILE")
+  content=$(cat "$BACKGROUND_MODE_FILE")
 
   if [[ -z "$content" ]]; then
     echo "all"
@@ -551,28 +551,28 @@ get_wallpaper_mode() {
   echo "$content"
 }
 
-# Set wallpaper mode to specific types
+# Set background mode to specific types
 # Args: type1 [type2 ...]
 # Special values: "all" enables everything
-set_wallpaper_mode() {
-  mkdir -p "$(dirname "$WALLPAPER_MODE_FILE")"
+set_background_mode() {
+  mkdir -p "$(dirname "$BACKGROUND_MODE_FILE")"
 
   if [[ "$1" == "all" ]]; then
-    echo "all" > "$WALLPAPER_MODE_FILE"
+    echo "all" > "$BACKGROUND_MODE_FILE"
     return
   fi
 
-  : > "$WALLPAPER_MODE_FILE"
+  : > "$BACKGROUND_MODE_FILE"
   for mode in "$@"; do
-    echo "$mode" >> "$WALLPAPER_MODE_FILE"
+    echo "$mode" >> "$BACKGROUND_MODE_FILE"
   done
 }
 
 # Add a mode to current settings
-add_wallpaper_mode() {
+add_background_mode() {
   local mode="$1"
   local current
-  current=$(get_wallpaper_mode)
+  current=$(get_background_mode)
 
   if [[ "$current" == "all" ]]; then
     echo "Already set to 'all' - all modes enabled"
@@ -584,23 +584,23 @@ add_wallpaper_mode() {
     return
   fi
 
-  mkdir -p "$(dirname "$WALLPAPER_MODE_FILE")"
-  echo "$mode" >> "$WALLPAPER_MODE_FILE"
+  mkdir -p "$(dirname "$BACKGROUND_MODE_FILE")"
+  echo "$mode" >> "$BACKGROUND_MODE_FILE"
   echo "Added: $mode"
 }
 
 # Remove a mode from current settings
-remove_wallpaper_mode() {
+remove_background_mode() {
   local mode="$1"
   local current
-  current=$(get_wallpaper_mode)
+  current=$(get_background_mode)
 
   if [[ "$current" == "all" ]]; then
     # Switch from "all" to explicit list minus the removed mode
-    : > "$WALLPAPER_MODE_FILE"
+    : > "$BACKGROUND_MODE_FILE"
     while IFS= read -r available; do
-      [[ "$available" != "$mode" ]] && echo "$available" >> "$WALLPAPER_MODE_FILE"
-    done < <(list_available_wallpaper_modes)
+      [[ "$available" != "$mode" ]] && echo "$available" >> "$BACKGROUND_MODE_FILE"
+    done < <(list_available_background_modes)
     echo "Removed: $mode (expanded from 'all')"
     return
   fi
@@ -610,29 +610,29 @@ remove_wallpaper_mode() {
     return
   fi
 
-  { grep -vxF "$mode" "$WALLPAPER_MODE_FILE" || true; } > "${WALLPAPER_MODE_FILE}.tmp"
-  mv "${WALLPAPER_MODE_FILE}.tmp" "$WALLPAPER_MODE_FILE"
+  { grep -vxF "$mode" "$BACKGROUND_MODE_FILE" || true; } > "${BACKGROUND_MODE_FILE}.tmp"
+  mv "${BACKGROUND_MODE_FILE}.tmp" "$BACKGROUND_MODE_FILE"
   echo "Removed: $mode"
 }
 
-# Check if a wallpaper type is enabled by current mode
-# Args: wallpaper_id (e.g., "generated:plasma" or "recolor:/path/to/file.jpg")
+# Check if a background type is enabled by current mode
+# Args: background_id (e.g., "generated:plasma" or "recolor:/path/to/file.jpg")
 # Returns: 0 if enabled, 1 if not
-is_wallpaper_type_enabled() {
-  local wallpaper_id="$1"
+is_background_type_enabled() {
+  local background_id="$1"
   local current_mode
-  current_mode=$(get_wallpaper_mode)
+  current_mode=$(get_background_mode)
 
   if [[ "$current_mode" == "all" ]]; then
     return 0
   fi
 
-  local wp_type="${wallpaper_id%%:*}"
-  local wp_value="${wallpaper_id#*:}"
+  local bg_type="${background_id%%:*}"
+  local bg_value="${background_id#*:}"
 
-  if [[ "$wp_type" == "generated" ]]; then
+  if [[ "$bg_type" == "generated" ]]; then
     # Check exact match (generated:plasma) or category match (generated)
-    if echo "$current_mode" | grep -qxF "generated:$wp_value"; then
+    if echo "$current_mode" | grep -qxF "generated:$bg_value"; then
       return 0
     fi
     if echo "$current_mode" | grep -qxF "generated"; then
@@ -640,7 +640,7 @@ is_wallpaper_type_enabled() {
     fi
   else
     # Source-based types: recolor, ascii, lowpoly
-    if echo "$current_mode" | grep -qxF "$wp_type"; then
+    if echo "$current_mode" | grep -qxF "$bg_type"; then
       return 0
     fi
   fi
@@ -652,7 +652,7 @@ is_wallpaper_type_enabled() {
 is_source_type_enabled() {
   local type="$1"
   local current_mode
-  current_mode=$(get_wallpaper_mode)
+  current_mode=$(get_background_mode)
 
   [[ "$current_mode" == "all" ]] && return 0
   echo "$current_mode" | grep -qxF "$type"
@@ -661,21 +661,21 @@ is_source_type_enabled() {
 # Get list of enabled generated styles based on current mode
 get_enabled_generated_styles() {
   local current_mode
-  current_mode=$(get_wallpaper_mode)
+  current_mode=$(get_background_mode)
 
   if [[ "$current_mode" == "all" ]]; then
-    printf '%s\n' "${WALLPAPER_GENERATED_STYLES[@]}"
+    printf '%s\n' "${BACKGROUND_GENERATED_STYLES[@]}"
     return
   fi
 
   # Check for category "generated" (all generated styles)
   if echo "$current_mode" | grep -qxF "generated"; then
-    printf '%s\n' "${WALLPAPER_GENERATED_STYLES[@]}"
+    printf '%s\n' "${BACKGROUND_GENERATED_STYLES[@]}"
     return
   fi
 
   # Check individual generated:style entries
-  for style in "${WALLPAPER_GENERATED_STYLES[@]}"; do
+  for style in "${BACKGROUND_GENERATED_STYLES[@]}"; do
     if echo "$current_mode" | grep -qxF "generated:$style"; then
       echo "$style"
     fi
@@ -685,19 +685,19 @@ get_enabled_generated_styles() {
 # Check if recolor mode is enabled
 is_recolor_enabled() {
   local current_mode
-  current_mode=$(get_wallpaper_mode)
+  current_mode=$(get_background_mode)
 
   [[ "$current_mode" == "all" ]] && return 0
   echo "$current_mode" | grep -qxF "recolor"
 }
 
 #==============================================================================
-# WALLPAPER SOURCE MANAGEMENT (path-based, no copying)
+# BACKGROUND SOURCE MANAGEMENT (path-based, no copying)
 #==============================================================================
 
-# Add a source path (file or directory) for wallpaper recoloring
-# Stores path reference in wallpaper-sources.conf (no copying)
-add_wallpaper_source() {
+# Add a source path (file or directory) for background recoloring
+# Stores path reference in background-sources.conf (no copying)
+add_background_source() {
   local source_path="$1"
 
   if [[ ! -e "$source_path" ]]; then
@@ -709,7 +709,7 @@ add_wallpaper_source() {
   local abs_path
   abs_path=$(cd "$(dirname "$source_path")" && pwd)/$(basename "$source_path")
 
-  mkdir -p "$(dirname "$WALLPAPER_SOURCES_FILE")"
+  mkdir -p "$(dirname "$BACKGROUND_SOURCES_FILE")"
 
   if [[ -d "$abs_path" ]]; then
     # Directory source
@@ -717,7 +717,7 @@ add_wallpaper_source() {
     local entry="${prefix}${abs_path}"
 
     # Check if already exists
-    if [[ -f "$WALLPAPER_SOURCES_FILE" ]] && grep -qF "$entry" "$WALLPAPER_SOURCES_FILE" 2>/dev/null; then
+    if [[ -f "$BACKGROUND_SOURCES_FILE" ]] && grep -qF "$entry" "$BACKGROUND_SOURCES_FILE" 2>/dev/null; then
       echo "Directory already added: $abs_path"
       return 0
     fi
@@ -726,7 +726,7 @@ add_wallpaper_source() {
     local count
     count=$(find "$abs_path" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) 2>/dev/null | wc -l | xargs)
 
-    echo "$entry" >> "$WALLPAPER_SOURCES_FILE"
+    echo "$entry" >> "$BACKGROUND_SOURCES_FILE"
     echo "Added directory: $abs_path ($count images)"
   else
     # Single file
@@ -740,27 +740,27 @@ add_wallpaper_source() {
     local entry="file:${abs_path}"
 
     # Check if already exists
-    if [[ -f "$WALLPAPER_SOURCES_FILE" ]] && grep -qF "$entry" "$WALLPAPER_SOURCES_FILE" 2>/dev/null; then
+    if [[ -f "$BACKGROUND_SOURCES_FILE" ]] && grep -qF "$entry" "$BACKGROUND_SOURCES_FILE" 2>/dev/null; then
       echo "File already added: $abs_path"
       return 0
     fi
 
-    echo "$entry" >> "$WALLPAPER_SOURCES_FILE"
+    echo "$entry" >> "$BACKGROUND_SOURCES_FILE"
     echo "Added file: $abs_path"
   fi
 }
 
-# List configured wallpaper sources (the config entries, not expanded images)
-list_wallpaper_source_entries() {
-  if [[ ! -f "$WALLPAPER_SOURCES_FILE" ]]; then
+# List configured background sources (the config entries, not expanded images)
+list_background_source_entries() {
+  if [[ ! -f "$BACKGROUND_SOURCES_FILE" ]]; then
     return 0
   fi
-  cat "$WALLPAPER_SOURCES_FILE"
+  cat "$BACKGROUND_SOURCES_FILE"
 }
 
 # Expand all sources to actual image files (scans directories at runtime)
-get_all_wallpaper_images() {
-  if [[ ! -f "$WALLPAPER_SOURCES_FILE" ]]; then
+get_all_background_images() {
+  if [[ ! -f "$BACKGROUND_SOURCES_FILE" ]]; then
     return 0
   fi
 
@@ -783,32 +783,32 @@ get_all_wallpaper_images() {
         fi
         ;;
     esac
-  done < "$WALLPAPER_SOURCES_FILE"
+  done < "$BACKGROUND_SOURCES_FILE"
 }
 
-# Remove a wallpaper source entry
-remove_wallpaper_source() {
+# Remove a background source entry
+remove_background_source() {
   local input="$1"
 
-  if [[ ! -f "$WALLPAPER_SOURCES_FILE" ]]; then
+  if [[ ! -f "$BACKGROUND_SOURCES_FILE" ]]; then
     echo "Error: No sources configured" >&2
     return 1
   fi
 
   # Try exact match first (with prefix)
-  if grep -qF "$input" "$WALLPAPER_SOURCES_FILE" 2>/dev/null; then
-    { grep -vF "$input" "$WALLPAPER_SOURCES_FILE" || true; } > "${WALLPAPER_SOURCES_FILE}.tmp"
-    mv "${WALLPAPER_SOURCES_FILE}.tmp" "$WALLPAPER_SOURCES_FILE"
+  if grep -qF "$input" "$BACKGROUND_SOURCES_FILE" 2>/dev/null; then
+    { grep -vF "$input" "$BACKGROUND_SOURCES_FILE" || true; } > "${BACKGROUND_SOURCES_FILE}.tmp"
+    mv "${BACKGROUND_SOURCES_FILE}.tmp" "$BACKGROUND_SOURCES_FILE"
     echo "Removed: $input"
     return 0
   fi
 
   # Try matching path without prefix
   local match
-  match=$(grep -E "(file:|dir:).*${input}" "$WALLPAPER_SOURCES_FILE" 2>/dev/null | head -1 || true)
+  match=$(grep -E "(file:|dir:).*${input}" "$BACKGROUND_SOURCES_FILE" 2>/dev/null | head -1 || true)
   if [[ -n "$match" ]]; then
-    { grep -vF "$match" "$WALLPAPER_SOURCES_FILE" || true; } > "${WALLPAPER_SOURCES_FILE}.tmp"
-    mv "${WALLPAPER_SOURCES_FILE}.tmp" "$WALLPAPER_SOURCES_FILE"
+    { grep -vF "$match" "$BACKGROUND_SOURCES_FILE" || true; } > "${BACKGROUND_SOURCES_FILE}.tmp"
+    mv "${BACKGROUND_SOURCES_FILE}.tmp" "$BACKGROUND_SOURCES_FILE"
     echo "Removed: $match"
     return 0
   fi
@@ -818,8 +818,8 @@ remove_wallpaper_source() {
 }
 
 # Verify all source paths exist and are readable
-verify_wallpaper_sources() {
-  if [[ ! -f "$WALLPAPER_SOURCES_FILE" ]]; then
+verify_background_sources() {
+  if [[ ! -f "$BACKGROUND_SOURCES_FILE" ]]; then
     echo "No sources configured."
     return 0
   fi
@@ -860,7 +860,7 @@ verify_wallpaper_sources() {
         broken=$((broken + 1))
         ;;
     esac
-  done < "$WALLPAPER_SOURCES_FILE"
+  done < "$BACKGROUND_SOURCES_FILE"
 
   echo ""
   echo "Valid: $valid, Broken: $broken"
@@ -868,14 +868,14 @@ verify_wallpaper_sources() {
 }
 
 # Remove broken source entries
-clean_wallpaper_sources() {
-  if [[ ! -f "$WALLPAPER_SOURCES_FILE" ]]; then
+clean_background_sources() {
+  if [[ ! -f "$BACKGROUND_SOURCES_FILE" ]]; then
     echo "No sources configured."
     return 0
   fi
 
   local cleaned=0
-  local temp_file="${WALLPAPER_SOURCES_FILE}.tmp"
+  local temp_file="${BACKGROUND_SOURCES_FILE}.tmp"
   : > "$temp_file"
 
   while IFS= read -r entry; do
@@ -904,20 +904,20 @@ clean_wallpaper_sources() {
     esac
 
     [[ "$keep" == "true" ]] && echo "$entry" >> "$temp_file"
-  done < "$WALLPAPER_SOURCES_FILE"
+  done < "$BACKGROUND_SOURCES_FILE"
 
-  mv "$temp_file" "$WALLPAPER_SOURCES_FILE"
+  mv "$temp_file" "$BACKGROUND_SOURCES_FILE"
   echo ""
   echo "Cleaned $cleaned broken entries."
 }
 
 # Get a random source image (scans directories at runtime)
-get_random_wallpaper_source() {
+get_random_background_source() {
   local images=()
 
   while IFS= read -r img; do
     [[ -n "$img" ]] && images+=("$img")
-  done < <(get_all_wallpaper_images)
+  done < <(get_all_background_images)
 
   if [[ ${#images[@]} -eq 0 ]]; then
     return 1
@@ -926,23 +926,23 @@ get_random_wallpaper_source() {
   echo "${images[$((RANDOM % ${#images[@]}))]}"
 }
 
-# Get current wallpaper info
-get_current_wallpaper() {
-  if [[ -f "$WALLPAPER_CURRENT_FILE" ]]; then
-    cat "$WALLPAPER_CURRENT_FILE"
+# Get current background info
+get_current_background() {
+  if [[ -f "$BACKGROUND_CURRENT_FILE" ]]; then
+    cat "$BACKGROUND_CURRENT_FILE"
   fi
 }
 
-# Set current wallpaper
-set_current_wallpaper() {
-  local wallpaper_id="$1"
-  mkdir -p "$(dirname "$WALLPAPER_CURRENT_FILE")"
-  echo "$wallpaper_id" > "$WALLPAPER_CURRENT_FILE"
+# Set current background
+set_current_background() {
+  local background_id="$1"
+  mkdir -p "$(dirname "$BACKGROUND_CURRENT_FILE")"
+  echo "$background_id" > "$BACKGROUND_CURRENT_FILE"
 }
 
-# Apply wallpaper (macOS)
-# Returns: wallpaper_id (e.g., "generated:plasma" or "recolor:/path/to/image.jpg")
-apply_wallpaper() {
+# Apply background (macOS)
+# Returns: background_id (e.g., "generated:plasma" or "recolor:/path/to/image.jpg")
+apply_background() {
   local theme="$1"
   local lib_path
   lib_path=$(get_library_path "$theme")
@@ -951,18 +951,18 @@ apply_wallpaper() {
     return 1
   fi
 
-  local wallpaper_dir="$HOME/.local/share/theme"
-  mkdir -p "$wallpaper_dir"
+  local background_dir="$HOME/.local/share/theme"
+  mkdir -p "$background_dir"
 
-  # Use unique filename to bypass macOS wallpaper cache
+  # Use unique filename to bypass macOS background cache
   local timestamp
   timestamp=$(date +%s)
-  local wallpaper_file="$wallpaper_dir/wallpaper-${timestamp}.png"
+  local background_file="$background_dir/background-${timestamp}.png"
 
-  # Clean up old wallpaper files
-  find "$wallpaper_dir" -name 'wallpaper-*.png' -mmin +1 -delete 2>/dev/null || true
+  # Clean up old background files
+  find "$background_dir" -name 'background-*.png' -mmin +1 -delete 2>/dev/null || true
 
-  # Build list of available wallpapers based on mode settings
+  # Build list of available backgrounds based on mode settings
   local available=()
   local generators_dir
   generators_dir="$(dirname "${BASH_SOURCE[0]}")/generators"
@@ -973,113 +973,113 @@ apply_wallpaper() {
   done < <(get_enabled_generated_styles)
 
   # Add source-based types if enabled and source images exist
-  for source_type in "${WALLPAPER_SOURCE_TYPES[@]}"; do
+  for source_type in "${BACKGROUND_SOURCE_TYPES[@]}"; do
     if is_source_type_enabled "$source_type"; then
       while IFS= read -r img; do
         [[ -n "$img" ]] && available+=("${source_type}:$img")
-      done < <(get_all_wallpaper_images)
+      done < <(get_all_background_images)
     fi
   done
 
   if [[ ${#available[@]} -eq 0 ]]; then
-    echo "Error: No wallpapers available (check mode settings)" >&2
+    echo "Error: No backgrounds available (check mode settings)" >&2
     return 1
   fi
 
   # Pick random from available
   local selected="${available[$((RANDOM % ${#available[@]}))]}"
-  local wp_type="${selected%%:*}"
-  local wp_value="${selected#*:}"
-  local wallpaper_id=""
+  local bg_type="${selected%%:*}"
+  local bg_value="${selected#*:}"
+  local background_id=""
 
-  case "$wp_type" in
+  case "$bg_type" in
     generated)
       # Check for special generators first
-      case "$wp_value" in
+      case "$bg_value" in
         code)
-          local code_gen="$generators_dir/wallpaper-code.sh"
+          local code_gen="$generators_dir/background-code.sh"
           if [[ -f "$code_gen" ]]; then
-            bash "$code_gen" "$lib_path/theme.yml" "$wallpaper_file" >/dev/null 2>&1 || return 1
+            bash "$code_gen" "$lib_path/theme.yml" "$background_file" >/dev/null 2>&1 || return 1
           else
             return 1
           fi
           ;;
         banner)
-          local banner_gen="$generators_dir/wallpaper-banner.sh"
+          local banner_gen="$generators_dir/background-banner.sh"
           if [[ -f "$banner_gen" ]]; then
-            bash "$banner_gen" "$lib_path/theme.yml" "$wallpaper_file" >/dev/null 2>&1 || return 1
+            bash "$banner_gen" "$lib_path/theme.yml" "$background_file" >/dev/null 2>&1 || return 1
           else
             return 1
           fi
           ;;
         *)
           # Standard ImageMagick styles
-          local cache_file="$WALLPAPER_CACHE_DIR/$theme/${wp_value}.png"
+          local cache_file="$BACKGROUND_CACHE_DIR/$theme/${bg_value}.png"
           if [[ -f "$cache_file" ]]; then
-            cp "$cache_file" "$wallpaper_file"
+            cp "$cache_file" "$background_file"
           else
-            local generator_script="$generators_dir/wallpaper.sh"
+            local generator_script="$generators_dir/background.sh"
             [[ ! -f "$generator_script" ]] && return 1
-            bash "$generator_script" "$lib_path/theme.yml" "$wallpaper_file" "$wp_value" 1920 1080 >/dev/null 2>&1 || return 1
+            bash "$generator_script" "$lib_path/theme.yml" "$background_file" "$bg_value" 1920 1080 >/dev/null 2>&1 || return 1
           fi
           ;;
       esac
-      wallpaper_id="generated:$wp_value"
+      background_id="generated:$bg_value"
       ;;
     recolor)
-      local gowall_gen="$generators_dir/wallpaper-gowall.sh"
+      local gowall_gen="$generators_dir/background-gowall.sh"
       if [[ -f "$gowall_gen" ]]; then
-        bash "$gowall_gen" "$lib_path/theme.yml" "$wp_value" "$wallpaper_file" >/dev/null 2>&1 || return 1
-        wallpaper_id="recolor:$wp_value"
+        bash "$gowall_gen" "$lib_path/theme.yml" "$bg_value" "$background_file" >/dev/null 2>&1 || return 1
+        background_id="recolor:$bg_value"
       else
         return 1
       fi
       ;;
     ascii)
-      local ascii_gen="$generators_dir/wallpaper-ascii.sh"
+      local ascii_gen="$generators_dir/background-ascii.sh"
       if [[ -f "$ascii_gen" ]]; then
-        bash "$ascii_gen" "$lib_path/theme.yml" "$wp_value" "$wallpaper_file" >/dev/null 2>&1 || return 1
-        wallpaper_id="ascii:$wp_value"
+        bash "$ascii_gen" "$lib_path/theme.yml" "$bg_value" "$background_file" >/dev/null 2>&1 || return 1
+        background_id="ascii:$bg_value"
       else
         return 1
       fi
       ;;
     lowpoly)
-      local lowpoly_gen="$generators_dir/wallpaper-lowpoly.sh"
+      local lowpoly_gen="$generators_dir/background-lowpoly.sh"
       if [[ -f "$lowpoly_gen" ]]; then
-        bash "$lowpoly_gen" "$lib_path/theme.yml" "$wp_value" "$wallpaper_file" >/dev/null 2>&1 || return 1
-        wallpaper_id="lowpoly:$wp_value"
+        bash "$lowpoly_gen" "$lib_path/theme.yml" "$bg_value" "$background_file" >/dev/null 2>&1 || return 1
+        background_id="lowpoly:$bg_value"
       else
         return 1
       fi
       ;;
     *)
-      echo "Error: Unknown wallpaper type: $wp_type" >&2
+      echo "Error: Unknown background type: $bg_type" >&2
       return 1
       ;;
   esac
 
-  # Set as desktop wallpaper on macOS using Finder (more reliable than System Events)
-  osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$wallpaper_file\"" 2>/dev/null || return 1
+  # Set as desktop background on macOS using Finder (more reliable than System Events)
+  osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$background_file\"" 2>/dev/null || return 1
 
-  # Track current wallpaper
-  set_current_wallpaper "$wallpaper_id"
+  # Track current background
+  set_current_background "$background_id"
 
   # Output the selected style for status display
-  if [[ "$wp_type" == "generated" ]]; then
-    echo "$wp_value"
+  if [[ "$bg_type" == "generated" ]]; then
+    echo "$bg_value"
   else
-    echo "$wp_type ($(basename "$wp_value"))"
+    echo "$bg_type ($(basename "$bg_value"))"
   fi
   return 0
 }
 
-# Rotate wallpaper without changing theme (macOS)
-# Selects a different wallpaper than current, applies it
+# Rotate background without changing theme (macOS)
+# Selects a different background than current, applies it
 # Args: [rejected_list] [weights_json]
-#   rejected_list: newline-separated list of rejected wallpaper IDs
-#   weights_json: JSON object mapping wallpaper ID to weight (default 1.0)
-rotate_wallpaper() {
+#   rejected_list: newline-separated list of rejected background IDs
+#   weights_json: JSON object mapping background ID to weight (default 1.0)
+rotate_background() {
   local rejected_list="${1:-}"
   local weights_json="${2:-}"
 
@@ -1099,24 +1099,24 @@ rotate_wallpaper() {
     return 1
   fi
 
-  local wallpaper_dir="$HOME/.local/share/theme"
-  mkdir -p "$wallpaper_dir"
+  local background_dir="$HOME/.local/share/theme"
+  mkdir -p "$background_dir"
 
   local timestamp
   timestamp=$(date +%s)
-  local wallpaper_file="$wallpaper_dir/wallpaper-${timestamp}.png"
+  local background_file="$background_dir/background-${timestamp}.png"
 
-  find "$wallpaper_dir" -name 'wallpaper-*.png' -mmin +1 -delete 2>/dev/null || true
+  find "$background_dir" -name 'background-*.png' -mmin +1 -delete 2>/dev/null || true
 
-  # Build list of available wallpapers, excluding current and rejected
-  local current_wallpaper
-  current_wallpaper=$(get_current_wallpaper)
+  # Build list of available backgrounds, excluding current and rejected
+  local current_background
+  current_background=$(get_current_background)
 
   # Convert rejected list to associative array for O(1) lookup
   declare -A rejected_map
   if [[ -n "$rejected_list" ]]; then
-    while IFS= read -r wp; do
-      [[ -n "$wp" ]] && rejected_map["$wp"]=1
+    while IFS= read -r bg; do
+      [[ -n "$bg" ]] && rejected_map["$bg"]=1
     done <<< "$rejected_list"
   fi
 
@@ -1126,39 +1126,39 @@ rotate_wallpaper() {
   # Add enabled generated styles (respects mode setting)
   while IFS= read -r style; do
     [[ -z "$style" ]] && continue
-    local wp_id="generated:$style"
+    local bg_id="generated:$style"
     # Skip current and rejected
-    [[ "$wp_id" == "$current_wallpaper" ]] && continue
-    [[ -n "${rejected_map[$wp_id]:-}" ]] && continue
-    available+=("$wp_id")
+    [[ "$bg_id" == "$current_background" ]] && continue
+    [[ -n "${rejected_map[$bg_id]:-}" ]] && continue
+    available+=("$bg_id")
     # Get weight from JSON or default to 1
     local weight=1
     if [[ -n "$weights_json" ]]; then
-      weight=$(echo "$weights_json" | jq -r --arg wp "$wp_id" '.[$wp] // 1')
+      weight=$(echo "$weights_json" | jq -r --arg bg "$bg_id" '.[$bg] // 1')
     fi
     weights+=("$weight")
   done < <(get_enabled_generated_styles)
 
   # Add source-based types if enabled and source images exist
-  for source_type in "${WALLPAPER_SOURCE_TYPES[@]}"; do
+  for source_type in "${BACKGROUND_SOURCE_TYPES[@]}"; do
     if is_source_type_enabled "$source_type"; then
       while IFS= read -r img; do
         [[ -z "$img" ]] && continue
-        local wp_id="${source_type}:$img"
-        [[ "$wp_id" == "$current_wallpaper" ]] && continue
-        [[ -n "${rejected_map[$wp_id]:-}" ]] && continue
-        available+=("$wp_id")
+        local bg_id="${source_type}:$img"
+        [[ "$bg_id" == "$current_background" ]] && continue
+        [[ -n "${rejected_map[$bg_id]:-}" ]] && continue
+        available+=("$bg_id")
         local weight=1
         if [[ -n "$weights_json" ]]; then
-          weight=$(echo "$weights_json" | jq -r --arg wp "$wp_id" '.[$wp] // 1')
+          weight=$(echo "$weights_json" | jq -r --arg bg "$bg_id" '.[$bg] // 1')
         fi
         weights+=("$weight")
-      done < <(get_all_wallpaper_images)
+      done < <(get_all_background_images)
     fi
   done
 
   if [[ ${#available[@]} -eq 0 ]]; then
-    echo "Error: No alternative wallpapers available" >&2
+    echo "Error: No alternative backgrounds available" >&2
     return 1
   fi
 
@@ -1184,83 +1184,83 @@ rotate_wallpaper() {
   # Fallback if something went wrong with weighting
   [[ -z "$selected" ]] && selected="${available[0]}"
 
-  local wp_type="${selected%%:*}"
-  local wp_value="${selected#*:}"
+  local bg_type="${selected%%:*}"
+  local bg_value="${selected#*:}"
   local generators_dir
   generators_dir="$(dirname "${BASH_SOURCE[0]}")/generators"
 
-  case "$wp_type" in
+  case "$bg_type" in
     generated)
       # Check for special generators first
-      case "$wp_value" in
+      case "$bg_value" in
         code)
-          local code_gen="$generators_dir/wallpaper-code.sh"
+          local code_gen="$generators_dir/background-code.sh"
           if [[ -f "$code_gen" ]]; then
-            bash "$code_gen" "$lib_path/theme.yml" "$wallpaper_file" >/dev/null 2>&1 || return 1
+            bash "$code_gen" "$lib_path/theme.yml" "$background_file" >/dev/null 2>&1 || return 1
           else
             return 1
           fi
           ;;
         banner)
-          local banner_gen="$generators_dir/wallpaper-banner.sh"
+          local banner_gen="$generators_dir/background-banner.sh"
           if [[ -f "$banner_gen" ]]; then
-            bash "$banner_gen" "$lib_path/theme.yml" "$wallpaper_file" >/dev/null 2>&1 || return 1
+            bash "$banner_gen" "$lib_path/theme.yml" "$background_file" >/dev/null 2>&1 || return 1
           else
             return 1
           fi
           ;;
         *)
           # Standard ImageMagick styles
-          local cache_file="$WALLPAPER_CACHE_DIR/$theme/${wp_value}.png"
+          local cache_file="$BACKGROUND_CACHE_DIR/$theme/${bg_value}.png"
           if [[ -f "$cache_file" ]]; then
-            cp "$cache_file" "$wallpaper_file"
+            cp "$cache_file" "$background_file"
           else
-            local generator_script="$generators_dir/wallpaper.sh"
+            local generator_script="$generators_dir/background.sh"
             [[ ! -f "$generator_script" ]] && return 1
-            bash "$generator_script" "$lib_path/theme.yml" "$wallpaper_file" "$wp_value" 1920 1080 >/dev/null 2>&1 || return 1
+            bash "$generator_script" "$lib_path/theme.yml" "$background_file" "$bg_value" 1920 1080 >/dev/null 2>&1 || return 1
           fi
           ;;
       esac
       ;;
     recolor)
-      local gowall_gen="$generators_dir/wallpaper-gowall.sh"
+      local gowall_gen="$generators_dir/background-gowall.sh"
       if [[ -f "$gowall_gen" ]]; then
-        bash "$gowall_gen" "$lib_path/theme.yml" "$wp_value" "$wallpaper_file" >/dev/null 2>&1 || return 1
+        bash "$gowall_gen" "$lib_path/theme.yml" "$bg_value" "$background_file" >/dev/null 2>&1 || return 1
       else
         return 1
       fi
       ;;
     ascii)
-      local ascii_gen="$generators_dir/wallpaper-ascii.sh"
+      local ascii_gen="$generators_dir/background-ascii.sh"
       if [[ -f "$ascii_gen" ]]; then
-        bash "$ascii_gen" "$lib_path/theme.yml" "$wp_value" "$wallpaper_file" >/dev/null 2>&1 || return 1
+        bash "$ascii_gen" "$lib_path/theme.yml" "$bg_value" "$background_file" >/dev/null 2>&1 || return 1
       else
         return 1
       fi
       ;;
     lowpoly)
-      local lowpoly_gen="$generators_dir/wallpaper-lowpoly.sh"
+      local lowpoly_gen="$generators_dir/background-lowpoly.sh"
       if [[ -f "$lowpoly_gen" ]]; then
-        bash "$lowpoly_gen" "$lib_path/theme.yml" "$wp_value" "$wallpaper_file" >/dev/null 2>&1 || return 1
+        bash "$lowpoly_gen" "$lib_path/theme.yml" "$bg_value" "$background_file" >/dev/null 2>&1 || return 1
       else
         return 1
       fi
       ;;
     *)
-      echo "Error: Unknown wallpaper type: $wp_type" >&2
+      echo "Error: Unknown background type: $bg_type" >&2
       return 1
       ;;
   esac
 
-  osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$wallpaper_file\"" 2>/dev/null || return 1
+  osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$background_file\"" 2>/dev/null || return 1
 
-  set_current_wallpaper "$selected"
+  set_current_background "$selected"
 
   # Output for display
-  if [[ "$wp_type" == "generated" ]]; then
-    echo "$wp_value"
+  if [[ "$bg_type" == "generated" ]]; then
+    echo "$bg_value"
   else
-    echo "$wp_type ($(basename "$wp_value"))"
+    echo "$bg_type ($(basename "$bg_value"))"
   fi
   return 0
 }
@@ -1483,17 +1483,17 @@ apply_theme_to_apps() {
     fi
   fi
 
-  # Wallpaper (macOS only)
-  local wallpaper_id=""
+  # Background (macOS only)
+  local background_id=""
   if [[ "$platform" == "macos" ]]; then
-    local wallpaper_style
-    if wallpaper_style=$(apply_wallpaper "$theme" 2>/dev/null); then
-      applied+=("wallpaper")
-      _print_app_status "wallpaper ($wallpaper_style)" "true"
-      wallpaper_id=$(get_current_wallpaper)
+    local background_style
+    if background_style=$(apply_background "$theme" 2>/dev/null); then
+      applied+=("background")
+      _print_app_status "background ($background_style)" "true"
+      background_id=$(get_current_background)
     else
-      skipped+=("wallpaper")
-      _print_app_status "wallpaper" "false"
+      skipped+=("background")
+      _print_app_status "background" "false"
     fi
   fi
 
@@ -1575,7 +1575,7 @@ apply_theme_to_apps() {
   # Return results
   echo "APPLIED:${applied[*]:-none}"
   echo "SKIPPED:${skipped[*]:-none}"
-  echo "WALLPAPER:${wallpaper_id:-none}"
+  echo "BACKGROUND:${background_id:-none}"
 }
 
 #==============================================================================

@@ -90,31 +90,31 @@ usage() {
   opacity up           Increase opacity by 5%
   opacity down         Decrease opacity by 5%
   generate-previews    Pre-generate all preview images
-  generate-wallpapers  Pre-generate all wallpapers (instant switching)
-  wallpaper                    Show current wallpaper
-  wallpaper rotate             Rotate to new wallpaper (keep theme)
-  wallpaper list               List all available wallpapers
-  wallpaper list --generated   List only generated styles
-  wallpaper list --recolor     List only recolor sources
-  wallpaper like [note]        Like current wallpaper (for this theme)
-  wallpaper dislike [note]     Dislike current wallpaper (for this theme)
-  wallpaper reject <reason>    Reject wallpaper for this theme
-  wallpaper history            Show wallpaper history
-  wallpaper rank               Show wallpaper rankings for current theme
-  wallpaper rank --global      Show global wallpaper rankings
-  wallpaper mode list          Show all available modes/styles
-  wallpaper mode current       Show currently enabled modes
-  wallpaper mode all           Enable all modes (default)
-  wallpaper mode <styles...>   Set exactly these styles
-  wallpaper mode +<style>      Add style to current
-  wallpaper mode -<style>      Remove style from current
-  wallpaper source add <path>  Add image/directory for recoloring
-  wallpaper source list        List configured sources
-  wallpaper source remove <id> Remove a source
-  wallpaper source verify      Check for broken source paths
-  wallpaper source clean       Remove broken source entries
-  clear-cache          Clear preview cache
-  clear-wallpaper-cache  Clear wallpaper cache
+  background                   Show current background
+  background rotate            Rotate to new background (keep theme)
+  background list              List all available backgrounds
+  background list --generated  List only generated styles
+  background list --recolor    List only recolor sources
+  background like [note]       Like current background (for this theme)
+  background dislike [note]    Dislike current background (for this theme)
+  background reject <reason>   Reject background for this theme
+  background history           Show background history
+  background rank              Show background rankings for current theme
+  background rank --global     Show global background rankings
+  background pre-generate      Pre-generate all backgrounds (instant switching)
+  background cache-clear       Clear background cache
+  background mode list         Show all available modes/styles
+  background mode current      Show currently enabled modes
+  background mode all          Enable all modes (default)
+  background mode <styles...>  Set exactly these styles
+  background mode +<style>     Add style to current
+  background mode -<style>     Remove style from current
+  background source add <path> Add image/directory for recoloring
+  background source list       List configured sources
+  background source remove <id> Remove a source
+  background source verify     Check for broken source paths
+  background source clean      Remove broken source entries
+  clear-cache                  Clear preview cache
   sync init            Initialize sync (creates gist)
   sync status          Show sync status
   sync push            Manual push to remote
@@ -182,40 +182,40 @@ Commands
   opacity down         Decrease opacity by 5%
   sync                 Manage GitHub Gist synchronization
   generate-previews    Pre-generate all preview images
-  generate-wallpapers  Pre-generate all wallpapers (instant switching)
-  wallpaper            Manage wallpapers
+  background           Manage backgrounds
   clear-cache          Clear preview cache
-  clear-wallpaper-cache  Clear wallpaper cache
 
-Wallpaper Commands
-------------------
-  wallpaper                       Show current wallpaper info
-  wallpaper rotate                Rotate to new wallpaper (keep theme)
-  wallpaper list                  List all available wallpapers
-  wallpaper list --generated      List only generated styles
-  wallpaper list --recolor        List only recolor sources
-  wallpaper like [note]           Like current wallpaper (for this theme)
-  wallpaper dislike [note]        Dislike current wallpaper (for this theme)
-  wallpaper reject <reason>       Reject wallpaper for this theme
-  wallpaper history               Show wallpaper history
-  wallpaper rank                  Show rankings for current theme
-  wallpaper rank --global         Show global wallpaper rankings
-  wallpaper mode list             Show all available modes/styles
-  wallpaper mode current          Show currently enabled modes
-  wallpaper mode all              Enable all modes (default)
-  wallpaper mode <styles...>      Set exactly these styles
-  wallpaper mode +<style>         Add style to current
-  wallpaper mode -<style>         Remove style from current
-  wallpaper source add <path>     Add image or directory for recoloring
-  wallpaper source list           List configured sources
-  wallpaper source remove <id>    Remove a source
-  wallpaper source verify         Check for broken source paths
-  wallpaper source clean          Remove broken source entries
+Background Commands
+-------------------
+  background                      Show current background info
+  background rotate               Rotate to new background (keep theme)
+  background list                 List all available backgrounds
+  background list --generated     List only generated styles
+  background list --recolor       List only recolor sources
+  background like [note]          Like current background (for this theme)
+  background dislike [note]       Dislike current background (for this theme)
+  background reject <reason>      Reject background for this theme
+  background history              Show background history
+  background rank                 Show rankings for current theme
+  background rank --global        Show global background rankings
+  background pre-generate         Pre-generate all backgrounds (instant switching)
+  background cache-clear          Clear background cache
+  background mode list            Show all available modes/styles
+  background mode current         Show currently enabled modes
+  background mode all             Enable all modes (default)
+  background mode <styles...>     Set exactly these styles
+  background mode +<style>        Add style to current
+  background mode -<style>        Remove style from current
+  background source add <path>    Add image or directory for recoloring
+  background source list          List configured sources
+  background source remove <id>   Remove a source
+  background source verify        Check for broken source paths
+  background source clean         Remove broken source entries
 
-  Preferences are per-theme: a wallpaper liked for Gruvbox may be
+  Preferences are per-theme: a background liked for Gruvbox may be
   rejected for Nord. Sources are stored as path references (not copied).
   gowall converts your images to match the current theme's color palette.
-  Mode settings control which wallpaper types are included in rotation.
+  Mode settings control which background types are included in rotation.
 
 Sync Commands
 -------------
@@ -345,8 +345,8 @@ apply_theme() {
 
   local applied
   applied=$(echo "$result" | grep "^APPLIED:" | cut -d: -f2)
-  local wallpaper_id
-  wallpaper_id=$(echo "$result" | grep "^WALLPAPER:" | cut -d: -f2-)
+  local background_id
+  background_id=$(echo "$result" | grep "^BACKGROUND:" | cut -d: -f2-)
 
   # Reload applicable apps
   reload_apps "$applied"
@@ -354,9 +354,9 @@ apply_theme() {
   # Log the theme action
   log_action "apply" "$canonical"
 
-  # Log the wallpaper action if one was applied
-  if [[ -n "$wallpaper_id" ]] && [[ "$wallpaper_id" != "none" ]]; then
-    log_wallpaper_action "apply" "$wallpaper_id" "$canonical"
+  # Log the background action if one was applied
+  if [[ -n "$background_id" ]] && [[ "$background_id" != "none" ]]; then
+    log_background_action "apply" "$background_id" "$canonical"
   fi
 
   sync_after_action
@@ -1129,11 +1129,11 @@ generate_all_previews() {
 }
 
 #==============================================================================
-# WALLPAPER CACHE
+# BACKGROUND CACHE
 #==============================================================================
 
-generate_all_wallpapers() {
-  echo "Pre-generating all theme wallpapers..."
+generate_all_backgrounds() {
+  echo "Pre-generating all theme backgrounds..."
   echo "This will take a while but makes theme switching instant."
   echo ""
 
@@ -1143,10 +1143,10 @@ generate_all_wallpapers() {
   fi
 
   local styles=("plasma" "geometric" "hexagons" "circles" "swirl" "spotlight" "sphere" "spheres")
-  local generator_script="$THEME_APP_DIR/lib/generators/wallpaper.sh"
+  local generator_script="$THEME_APP_DIR/lib/generators/background.sh"
 
   if [[ ! -f "$generator_script" ]]; then
-    echo "Error: Wallpaper generator not found"
+    echo "Error: Background generator not found"
     exit 1
   fi
 
@@ -1168,7 +1168,7 @@ generate_all_wallpapers() {
 
     printf "[%d/%d] %s\n" "$current" "$total" "$theme"
 
-    local cache_dir="$WALLPAPER_CACHE_DIR/$theme"
+    local cache_dir="$BACKGROUND_CACHE_DIR/$theme"
     mkdir -p "$cache_dir"
 
     for style in "${styles[@]}"; do
@@ -1188,21 +1188,21 @@ generate_all_wallpapers() {
   done <<<"$themes"
 
   echo ""
-  echo "✓ All wallpapers generated!"
-  echo "  Cache location: $WALLPAPER_CACHE_DIR"
+  echo "✓ All backgrounds generated!"
+  echo "  Cache location: $BACKGROUND_CACHE_DIR"
   local size
-  size=$(du -sh "$WALLPAPER_CACHE_DIR" 2>/dev/null | cut -f1)
+  size=$(du -sh "$BACKGROUND_CACHE_DIR" 2>/dev/null | cut -f1)
   echo "  Cache size: $size"
 }
 
-clear_wallpaper_cache() {
-  if [[ -d "$WALLPAPER_CACHE_DIR" ]]; then
+clear_background_cache() {
+  if [[ -d "$BACKGROUND_CACHE_DIR" ]]; then
     local size
-    size=$(du -sh "$WALLPAPER_CACHE_DIR" 2>/dev/null | cut -f1)
-    rm -rf "$WALLPAPER_CACHE_DIR"
-    echo "✓ Cleared wallpaper cache ($size)"
+    size=$(du -sh "$BACKGROUND_CACHE_DIR" 2>/dev/null | cut -f1)
+    rm -rf "$BACKGROUND_CACHE_DIR"
+    echo "✓ Cleared background cache ($size)"
   else
-    echo "Wallpaper cache is empty"
+    echo "Background cache is empty"
   fi
 }
 
@@ -1314,94 +1314,88 @@ main() {
   generate-previews)
     generate_all_previews
     ;;
-  generate-wallpapers)
-    generate_all_wallpapers
-    ;;
   clear-cache)
     clear_preview_cache
     ;;
-  clear-wallpaper-cache)
-    clear_wallpaper_cache
-    ;;
-  wallpaper)
+  background)
     case "${2:-}" in
     "")
-      # Show current wallpaper info
-      local current_wp current_theme
-      current_wp=$(get_current_wallpaper)
+      # Show current background info
+      local current_bg current_theme
+      current_bg=$(get_current_background)
       current_theme=$(get_current_theme)
 
-      if [[ -z "$current_wp" ]]; then
-        echo "No wallpaper tracked yet."
+      if [[ -z "$current_bg" ]]; then
+        echo "No background tracked yet."
         echo ""
-        echo "Apply a theme to set wallpaper: theme apply <name>"
+        echo "Apply a theme to set background: theme apply <name>"
       else
         echo ""
-        echo "Current Wallpaper"
+        echo "Current Background"
         echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        local wp_type="${current_wp%%:*}"
-        local wp_value="${current_wp#*:}"
-        echo "  Type: $wp_type"
-        if [[ "$wp_type" == "recolor" ]]; then
-          echo "  Source: $wp_value"
-          echo "  File: $(basename "$wp_value")"
+        local bg_type="${current_bg%%:*}"
+        local bg_value="${current_bg#*:}"
+        echo "  Type: $bg_type"
+        if [[ "$bg_type" == "recolor" ]]; then
+          echo "  Source: $bg_value"
+          echo "  File: $(basename "$bg_value")"
         else
-          echo "  Style: $wp_value"
+          echo "  Style: $bg_value"
         fi
         echo "  Theme: $current_theme"
         echo ""
-        echo "Rotate wallpaper: theme wallpaper rotate"
+        echo "Rotate background: theme background rotate"
       fi
       ;;
     rotate)
       local platform
       platform=$(detect_platform)
       if [[ "$platform" != "macos" ]]; then
-        echo "Error: Wallpaper rotation only supported on macOS" >&2
+        echo "Error: Background rotation only supported on macOS" >&2
         exit 1
       fi
 
-      echo "Rotating wallpaper..."
+      echo "Rotating background..."
 
       # Get current theme for filtering
       local current_theme
       current_theme=$(get_current_theme)
 
-      # Get rejected wallpapers and weights for this theme
+      # Get rejected backgrounds and weights for this theme
       local rejected_list weights_json
-      rejected_list=$(get_rejected_wallpaper_ids "$current_theme")
-      weights_json=$(compute_wallpaper_weights "$current_theme")
+      rejected_list=$(get_rejected_background_ids "$current_theme")
+      weights_json=$(compute_background_weights "$current_theme")
 
       local new_style
-      if new_style=$(rotate_wallpaper "$rejected_list" "$weights_json"); then
-        echo "  ✓ wallpaper ($new_style)"
-        # Log the wallpaper action
-        local wallpaper_id
-        wallpaper_id=$(get_current_wallpaper)
-        log_wallpaper_action "apply" "$wallpaper_id" "$current_theme"
+      if new_style=$(rotate_background "$rejected_list" "$weights_json"); then
+        echo "  ✓ background ($new_style)"
+        # Log the background action
+        local background_id
+        background_id=$(get_current_background)
+        log_background_action "apply" "$background_id" "$current_theme"
         sync_after_action
       else
-        echo "  ✗ wallpaper rotation failed" >&2
+        echo "  ✗ background rotation failed" >&2
         exit 1
       fi
       ;;
     list)
       local filter="${3:-}"
       echo ""
-      echo "Available Wallpapers"
+      echo "Available Backgrounds"
       echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
       echo ""
 
       local current_mode
-      current_mode=$(get_wallpaper_mode)
+      current_mode=$(get_background_mode)
       echo "Mode: $current_mode"
       echo ""
 
       if [[ "$filter" != "--recolor" ]]; then
         echo "Generated Styles:"
-        for style in "${WALLPAPER_GENERATED_STYLES[@]}"; do
+        for style in "${BACKGROUND_GENERATED_STYLES[@]}"; do
           local enabled=""
-          if is_wallpaper_type_enabled "generated:$style"; then
+          if is_background_type_enabled "generated:$style"; then
             enabled="✓"
           else
             enabled="✗"
@@ -1413,7 +1407,7 @@ main() {
 
       if [[ "$filter" != "--generated" ]]; then
         echo "Source Transforms:"
-        for source_type in "${WALLPAPER_SOURCE_TYPES[@]}"; do
+        for source_type in "${BACKGROUND_SOURCE_TYPES[@]}"; do
           local type_enabled=""
           if is_source_type_enabled "$source_type"; then
             type_enabled="✓"
@@ -1424,7 +1418,7 @@ main() {
         done
 
         local images
-        images=$(get_all_wallpaper_images)
+        images=$(get_all_background_images)
         if [[ -n "$images" ]]; then
           local img_count
           img_count=$(echo "$images" | wc -l | xargs)
@@ -1439,7 +1433,7 @@ main() {
         else
           echo ""
           echo "  No source images configured"
-          echo "  Add with: theme wallpaper source add <path>"
+          echo "  Add with: theme background source add <path>"
         fi
         echo ""
       fi
@@ -1447,23 +1441,23 @@ main() {
       local total_count
       total_count=$(get_enabled_generated_styles | wc -l | xargs)
       local img_count
-      img_count=$(get_all_wallpaper_images | wc -l | xargs)
-      for source_type in "${WALLPAPER_SOURCE_TYPES[@]}"; do
+      img_count=$(get_all_background_images | wc -l | xargs)
+      for source_type in "${BACKGROUND_SOURCE_TYPES[@]}"; do
         if is_source_type_enabled "$source_type"; then
           total_count=$((total_count + img_count))
         fi
       done
-      echo "Total enabled: $total_count wallpapers"
+      echo "Total enabled: $total_count backgrounds"
       ;;
     mode)
       case "${3:-}" in
       "" | list)
         echo ""
-        echo "Available Wallpaper Modes"
+        echo "Available Background Modes"
         echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         echo ""
         echo "Generated styles (no source image needed):"
-        for style in "${WALLPAPER_GENERATED_STYLES[@]}"; do
+        for style in "${BACKGROUND_GENERATED_STYLES[@]}"; do
           echo "  generated:$style"
         done
         echo ""
@@ -1477,18 +1471,18 @@ main() {
         echo "  all            - Everything (default)"
         echo ""
         echo "Examples:"
-        echo "  theme wallpaper mode all"
-        echo "  theme wallpaper mode generated:plasma generated:code recolor"
-        echo "  theme wallpaper mode +ascii"
-        echo "  theme wallpaper mode -lowpoly"
+        echo "  theme background mode all"
+        echo "  theme background mode generated:plasma generated:code recolor"
+        echo "  theme background mode +ascii"
+        echo "  theme background mode -lowpoly"
         ;;
       current)
         echo ""
-        echo "Current Wallpaper Mode"
+        echo "Current Background Mode"
         echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         echo ""
         local current_mode
-        current_mode=$(get_wallpaper_mode)
+        current_mode=$(get_background_mode)
         if [[ "$current_mode" == "all" ]]; then
           echo "Mode: all (everything enabled)"
         else
@@ -1499,20 +1493,20 @@ main() {
         fi
         ;;
       all)
-        set_wallpaper_mode "all"
+        set_background_mode "all"
         echo "Set mode: all (everything enabled)"
         ;;
       +*)
         local mode="${3:1}"  # Remove leading +
-        add_wallpaper_mode "$mode"
+        add_background_mode "$mode"
         ;;
       -*)
         local mode="${3:1}"  # Remove leading -
-        remove_wallpaper_mode "$mode"
+        remove_background_mode "$mode"
         ;;
       *)
         # Set specific modes
-        set_wallpaper_mode "${@:3}"
+        set_background_mode "${@:3}"
         echo "Set modes:"
         for mode in "${@:3}"; do
           echo "  - $mode"
@@ -1522,100 +1516,100 @@ main() {
       ;;
     like)
       local message="${*:3}"
-      local wallpaper_id current_theme
-      wallpaper_id=$(get_current_wallpaper)
+      local background_id current_theme
+      background_id=$(get_current_background)
       current_theme=$(get_current_theme)
 
-      if [[ -z "$wallpaper_id" ]]; then
-        echo "Error: No wallpaper currently set" >&2
+      if [[ -z "$background_id" ]]; then
+        echo "Error: No background currently set" >&2
         exit 1
       fi
 
-      log_wallpaper_action "like" "$wallpaper_id" "$current_theme" "$message"
+      log_background_action "like" "$background_id" "$current_theme" "$message"
       sync_after_action
 
-      local wp_type="${wallpaper_id%%:*}"
-      local wp_value="${wallpaper_id#*:}"
-      echo "Liked wallpaper for theme: $current_theme"
-      if [[ "$wp_type" == "recolor" ]]; then
-        echo "  Wallpaper: recolor ($(basename "$wp_value"))"
+      local bg_type="${background_id%%:*}"
+      local bg_value="${background_id#*:}"
+      echo "Liked background for theme: $current_theme"
+      if [[ "$bg_type" == "recolor" ]]; then
+        echo "  Background: recolor ($(basename "$bg_value"))"
       else
-        echo "  Wallpaper: $wp_value"
+        echo "  Background: $bg_value"
       fi
       [[ -n "$message" ]] && echo "  Note: $message"
       ;;
     dislike)
       local message="${*:3}"
-      local wallpaper_id current_theme
-      wallpaper_id=$(get_current_wallpaper)
+      local background_id current_theme
+      background_id=$(get_current_background)
       current_theme=$(get_current_theme)
 
-      if [[ -z "$wallpaper_id" ]]; then
-        echo "Error: No wallpaper currently set" >&2
+      if [[ -z "$background_id" ]]; then
+        echo "Error: No background currently set" >&2
         exit 1
       fi
 
-      log_wallpaper_action "dislike" "$wallpaper_id" "$current_theme" "$message"
+      log_background_action "dislike" "$background_id" "$current_theme" "$message"
       sync_after_action
 
-      local wp_type="${wallpaper_id%%:*}"
-      local wp_value="${wallpaper_id#*:}"
-      echo "Disliked wallpaper for theme: $current_theme"
-      if [[ "$wp_type" == "recolor" ]]; then
-        echo "  Wallpaper: recolor ($(basename "$wp_value"))"
+      local bg_type="${background_id%%:*}"
+      local bg_value="${background_id#*:}"
+      echo "Disliked background for theme: $current_theme"
+      if [[ "$bg_type" == "recolor" ]]; then
+        echo "  Background: recolor ($(basename "$bg_value"))"
       else
-        echo "  Wallpaper: $wp_value"
+        echo "  Background: $bg_value"
       fi
       [[ -n "$message" ]] && echo "  Note: $message"
       ;;
     reject)
       local message="${*:3}"
-      local wallpaper_id current_theme
-      wallpaper_id=$(get_current_wallpaper)
+      local background_id current_theme
+      background_id=$(get_current_background)
       current_theme=$(get_current_theme)
 
-      if [[ -z "$wallpaper_id" ]]; then
-        echo "Error: No wallpaper currently set" >&2
+      if [[ -z "$background_id" ]]; then
+        echo "Error: No background currently set" >&2
         exit 1
       fi
 
       if [[ -z "$message" ]]; then
         echo "Error: Rejection reason required" >&2
-        echo "Usage: theme wallpaper reject <reason>" >&2
+        echo "Usage: theme background reject <reason>" >&2
         exit 1
       fi
 
-      log_wallpaper_action "reject" "$wallpaper_id" "$current_theme" "$message"
+      log_background_action "reject" "$background_id" "$current_theme" "$message"
       sync_after_action
 
-      local wp_type="${wallpaper_id%%:*}"
-      local wp_value="${wallpaper_id#*:}"
-      echo "Rejected wallpaper for theme: $current_theme"
-      if [[ "$wp_type" == "recolor" ]]; then
-        echo "  Wallpaper: recolor ($(basename "$wp_value"))"
+      local bg_type="${background_id%%:*}"
+      local bg_value="${background_id#*:}"
+      echo "Rejected background for theme: $current_theme"
+      if [[ "$bg_type" == "recolor" ]]; then
+        echo "  Background: recolor ($(basename "$bg_value"))"
       else
-        echo "  Wallpaper: $wp_value"
+        echo "  Background: $bg_value"
       fi
       echo "  Reason: $message"
       echo ""
-      echo "This wallpaper will be skipped for this theme."
+      echo "This background will be skipped for this theme."
       ;;
     history)
       sync_before_read
       local history
-      history=$(get_wallpaper_history)
+      history=$(get_background_history)
 
       if [[ -z "$history" ]] || [[ "$history" == "[]" ]]; then
-        echo "No wallpaper history yet."
+        echo "No background history yet."
         return
       fi
 
       echo ""
-      echo "Wallpaper History"
+      echo "Background History"
       echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
       echo ""
 
-      echo "$history" | jq -r '.[] | "\(.ts) | \(.machine) | \(.theme) | \(.action) | \(.wallpaper)" + (if .message then " | \(.message)" else "" end)' | tail -20
+      echo "$history" | jq -r '.[] | "\(.ts) | \(.machine) | \(.theme) | \(.action) | \(.background)" + (if .message then " | \(.message)" else "" end)' | tail -20
       ;;
     rank)
       sync_before_read
@@ -1626,19 +1620,19 @@ main() {
       local rankings
       if [[ "$global_flag" == "--global" ]]; then
         echo ""
-        echo "Global Wallpaper Rankings"
+        echo "Global Background Rankings"
         echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        rankings=$(get_wallpaper_rankings)
+        rankings=$(get_background_rankings)
       else
         echo ""
-        echo "Wallpaper Rankings for: $current_theme"
+        echo "Background Rankings for: $current_theme"
         echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        rankings=$(get_wallpaper_rankings "$current_theme")
+        rankings=$(get_background_rankings "$current_theme")
       fi
 
       if [[ -z "$rankings" ]]; then
         echo ""
-        echo "No rankings yet. Apply and rate some wallpapers!"
+        echo "No rankings yet. Apply and rate some backgrounds!"
         return
       fi
 
@@ -1646,20 +1640,20 @@ main() {
       local rank=0
       while IFS= read -r line; do
         rank=$((rank + 1))
-        local wallpaper score likes dislikes applies
-        wallpaper=$(echo "$line" | jq -r '.wallpaper')
+        local background score likes dislikes applies
+        background=$(echo "$line" | jq -r '.background')
         score=$(echo "$line" | jq -r '.score')
         likes=$(echo "$line" | jq -r '.likes')
         dislikes=$(echo "$line" | jq -r '.dislikes')
         applies=$(echo "$line" | jq -r '.applies')
 
-        local wp_type="${wallpaper%%:*}"
-        local wp_value="${wallpaper#*:}"
+        local bg_type="${background%%:*}"
+        local bg_value="${background#*:}"
         local display_name
-        if [[ "$wp_type" == "recolor" ]]; then
-          display_name="recolor: $(basename "$wp_value")"
+        if [[ "$bg_type" == "recolor" ]]; then
+          display_name="recolor: $(basename "$bg_value")"
         else
-          display_name="$wallpaper"
+          display_name="$background"
         fi
 
         printf "%2d. %s\n" "$rank" "$display_name"
@@ -1667,28 +1661,34 @@ main() {
       done <<< "$rankings"
       echo ""
       ;;
+    pre-generate)
+      generate_all_backgrounds
+      ;;
+    cache-clear)
+      clear_background_cache
+      ;;
     source)
       case "${3:-list}" in
       add)
         if [[ -z "${4:-}" ]]; then
-          echo "Usage: theme wallpaper source add <path>" >&2
+          echo "Usage: theme background source add <path>" >&2
           exit 1
         fi
-        add_wallpaper_source "$4"
+        add_background_source "$4"
         ;;
       list)
         local entries
-        entries=$(list_wallpaper_source_entries)
+        entries=$(list_background_source_entries)
         if [[ -z "$entries" ]]; then
-          echo "No wallpaper sources configured."
+          echo "No background sources configured."
           echo ""
-          echo "Add sources with: theme wallpaper source add <path>"
+          echo "Add sources with: theme background source add <path>"
           echo "You can add individual files or entire directories."
           echo ""
           echo "Sources are stored as path references in:"
-          echo "  $WALLPAPER_SOURCES_FILE"
+          echo "  $BACKGROUND_SOURCES_FILE"
         else
-          echo "Wallpaper Sources"
+          echo "Background Sources"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           echo ""
           while IFS= read -r entry; do
@@ -1703,38 +1703,38 @@ main() {
             fi
           done <<< "$entries"
           echo ""
-          echo "Total images: $(get_all_wallpaper_images | wc -l | xargs)"
+          echo "Total images: $(get_all_background_images | wc -l | xargs)"
           echo ""
           echo "When 'recolor' style is selected, gowall converts these to match your theme."
         fi
         ;;
       remove)
         if [[ -z "${4:-}" ]]; then
-          echo "Usage: theme wallpaper source remove <path>" >&2
+          echo "Usage: theme background source remove <path>" >&2
           exit 1
         fi
-        remove_wallpaper_source "$4"
+        remove_background_source "$4"
         ;;
       verify)
-        echo "Verifying wallpaper sources..."
+        echo "Verifying background sources..."
         echo ""
-        verify_wallpaper_sources
+        verify_background_sources
         ;;
       clean)
-        echo "Cleaning broken wallpaper sources..."
+        echo "Cleaning broken background sources..."
         echo ""
-        clean_wallpaper_sources
+        clean_background_sources
         ;;
       *)
-        echo "Unknown wallpaper source command: ${3:-}"
-        echo "Usage: theme wallpaper source [add|list|remove|verify|clean]"
+        echo "Unknown background source command: ${3:-}"
+        echo "Usage: theme background source [add|list|remove|verify|clean]"
         exit 1
         ;;
       esac
       ;;
     *)
-      echo "Unknown wallpaper command: ${2:-}"
-      echo "Usage: theme wallpaper [rotate|source]"
+      echo "Unknown background command: ${2:-}"
+      echo "Usage: theme background [rotate|list|mode|like|dislike|reject|history|rank|pre-generate|cache-clear|source]"
       exit 1
       ;;
     esac

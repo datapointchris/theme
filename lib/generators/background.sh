@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Generate themed wallpapers from theme.yml
-# Usage: wallpaper.sh <theme.yml> <output-file> [style] [width] [height]
+# Generate themed backgrounds from theme.yml
+# Usage: background.sh <theme.yml> <output-file> [style] [width] [height]
 #
 # Styles:
 #   plasma     - Fractal plasma with theme colors (default)
