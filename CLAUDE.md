@@ -2,7 +2,11 @@
 
 ## Overview
 
-Unified theme generation system that creates consistent color configurations across terminal and desktop applications from a single `theme.yml` source file. Supports Ghostty, Kitty, tmux, btop, JankyBorders, Hyprland, Waybar, Rofi, Dunst, Windows Terminal, and more. Each theme in `themes/` provides app configs that match a corresponding Neovim colorscheme.
+Unified theme generation system that creates consistent color configurations
+across terminal and desktop applications from a single `theme.yml` source file.
+Supports Ghostty, Kitty, tmux, btop, JankyBorders, Hyprland, Waybar, Rofi,
+Dunst, Windows Terminal, and more. Each theme in `themes/` provides app configs
+that match a corresponding Neovim colorscheme.
 
 ## Directory Structure
 
@@ -54,15 +58,15 @@ These themes have generated Neovim colorschemes from theme.yml:
 
 These themes provide terminal configs that match original Neovim plugins:
 
-| Directory | display_name | neovim_colorscheme_name | plugin |
-|-----------|-------------|-------------------------|--------|
-| `gruvbox` | Gruvbox | `gruvbox` | ellisonleao/gruvbox.nvim |
-| `rose-pine` | Rose Pine | `rose-pine` | rose-pine/neovim |
-| `kanagawa` | Kanagawa | `kanagawa` | rebelot/kanagawa.nvim |
-| `nordic` | Nordic | `nordic` | AlexvZyl/nordic.nvim |
-| `terafox` | Terafox | `terafox` | EdenEast/nightfox.nvim |
-| `oceanic-next` | Oceanic Next | `OceanicNext` | mhartington/oceanic-next |
-| `github-dark-default` | GitHub Dark Default | `github_dark_default` | projekt0n/github-nvim-theme |
+- `gruvbox` - Gruvbox (`gruvbox`) - ellisonleao/gruvbox.nvim
+- `rose-pine` - Rose Pine (`rose-pine`) - rose-pine/neovim
+- `kanagawa` - Kanagawa (`kanagawa`) - rebelot/kanagawa.nvim
+- `nordic` - Nordic (`nordic`) - AlexvZyl/nordic.nvim
+- `terafox` - Terafox (`terafox`) - EdenEast/nightfox.nvim
+- `oceanic-next` - Oceanic Next (`OceanicNext`) -
+  mhartington/oceanic-next
+- `github-dark-default` - GitHub Dark Default (`github_dark_default`) -
+  projekt0n/github-nvim-theme
 
 ## Theme Files
 
@@ -127,9 +131,24 @@ theme apply gruvbox-dark-hard    # Apply by id
 theme current                    # Show current theme
 theme like "great contrast"      # Rate current theme
 theme reject "too bright"        # Remove from rotation
+theme upgrade                    # Update to latest version
+
+# Background management
+theme background                 # Show background usage
+theme background current         # Show current background
+theme background rotate          # Rotate to new background
+theme background mode set recolor generated:plasma  # Set modes
+theme background source add ~/Pictures/wallpapers   # Add source
+
+# Opacity
+theme opacity                    # Show opacity usage
+theme opacity current            # Show current opacity
+theme opacity set 90             # Set opacity to 90%
+
+# Sync
+theme sync                       # Show sync usage
 theme sync init                  # Initialize GitHub Gist sync
 theme sync status                # Show sync status
-theme upgrade                    # Update to latest version
 ```
 
 ### Creating a New Theme
@@ -168,16 +187,22 @@ If creating a new colorscheme (not using a plugin):
 1. Generate Neovim colorscheme:
 
    ```bash
-   uv run --with pyyaml python3 ~/dotfiles/apps/common/theme/lib/neovim_generator.py ~/dotfiles/apps/common/theme/themes/{id}
+   uv run --with pyyaml python3 \
+     ~/dotfiles/apps/common/theme/lib/neovim_generator.py \
+     ~/dotfiles/apps/common/theme/themes/{id}
    ```
 
-2. The colorscheme is auto-loaded by `colorscheme-manager.lua` which scans for `neovim/` directories
+2. The colorscheme is auto-loaded by `colorscheme-manager.lua` which scans
+   for `neovim/` directories
 
 ## Key Insights
 
-- **Same palette ≠ same result**: Hand-crafted Neovim plugins often look better than generated colorschemes
-- **Generated themes are rare**: Most themes work best with original Neovim plugin + generated terminal configs
-- **neovim_colorscheme_name may differ from id**: e.g., `oceanic-next` directory uses `OceanicNext` colorscheme
+- **Same palette ≠ same result**: Hand-crafted Neovim plugins often look
+  better than generated colorschemes
+- **Generated themes are rare**: Most themes work best with original Neovim
+  plugin + generated terminal configs
+- **neovim_colorscheme_name may differ from id**: e.g., `oceanic-next`
+  directory uses `OceanicNext` colorscheme
 
 ## Neovim Integration
 
@@ -186,7 +211,8 @@ The `colorscheme-manager.lua` plugin:
 - Dynamically loads generated colorschemes from `themes/*/neovim/` directories
 - Builds display name mapping from theme.yml meta fields
 - Filters rejected themes from the picker
-- Watches `~/.local/state/theme/current` for changes (auto-updates when `theme apply` runs)
+- Watches `~/.local/state/theme/current` for changes (auto-updates when
+  `theme apply` runs)
 
 ## Files Reference
 
