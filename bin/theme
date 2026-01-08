@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Theme management - unified cross-platform theming
 # Applies themes to terminal, tmux, fzf, shell, and more
+# shellcheck disable=SC1091
 
 set -euo pipefail
 
@@ -148,6 +149,281 @@ EOF
 }
 
 #==============================================================================
+# SUBCOMMAND USAGE FUNCTIONS
+#==============================================================================
+
+background_usage() {
+  if command -v print_section &>/dev/null; then
+    print_section "Background Management" "yellow"
+
+    print_section "Commands" "blue"
+    cat <<'EOF'
+  current              Show current background
+  rotate               Rotate to new background (keep theme)
+  list                 List all available backgrounds
+  like [note]          Like current background (for this theme)
+  dislike [note]       Dislike current background (for this theme)
+  reject <reason>      Reject background for this theme
+  history              Show background history
+  rank [--global]      Show background rankings
+  pre-generate         Pre-generate all backgrounds (instant switching)
+  cache-clear          Clear background cache
+EOF
+
+    print_section "Subcommands" "blue"
+    cat <<'EOF'
+  mode                 Manage background mode settings (run for usage)
+  source               Manage source images (run for usage)
+EOF
+
+    print_section "Examples" "yellow"
+    echo "  $(print_cyan "theme background current")           # Show current"
+    echo "  $(print_cyan "theme background rotate")            # New background"
+    echo "  $(print_cyan "theme background mode set recolor")  # Only recolor mode"
+    echo "  $(print_cyan "theme background source add ~/pics") # Add source images"
+
+  else
+    cat <<'EOF'
+Background Management
+=====================
+
+Commands
+--------
+  current              Show current background
+  rotate               Rotate to new background (keep theme)
+  list                 List all available backgrounds
+  like [note]          Like current background (for this theme)
+  dislike [note]       Dislike current background (for this theme)
+  reject <reason>      Reject background for this theme
+  history              Show background history
+  rank [--global]      Show background rankings
+  pre-generate         Pre-generate all backgrounds (instant switching)
+  cache-clear          Clear background cache
+
+Subcommands
+-----------
+  mode                 Manage background mode settings (run for usage)
+  source               Manage source images (run for usage)
+
+Examples
+--------
+  theme background current           # Show current
+  theme background rotate            # New background
+  theme background mode set recolor  # Only recolor mode
+  theme background source add ~/pics # Add source images
+EOF
+  fi
+}
+
+background_mode_usage() {
+  if command -v print_section &>/dev/null; then
+    print_section "Background Mode Settings" "yellow"
+
+    print_section "Commands" "blue"
+    cat <<'EOF'
+  current              Show currently enabled modes
+  list                 Show all available modes
+  set <modes...>       Set exact modes to use
+  add <mode>           Add mode to current set
+  remove <mode>        Remove mode from current set
+  all                  Enable all modes (default)
+EOF
+
+    print_section "Available Modes" "blue"
+    echo ""
+    echo "Generated styles (no source image needed):"
+    for style in "${BACKGROUND_GENERATED_STYLES[@]}"; do
+      echo "  generated:$style"
+    done
+    echo ""
+    echo "Source transforms (need source images):"
+    echo "  recolor        - Recolor images with gowall"
+    echo "  ascii          - Convert images to ASCII art"
+    echo "  lowpoly        - Convert images to low-poly triangles"
+    echo ""
+    echo "Shortcuts:"
+    echo "  generated      - All generated styles"
+    echo "  all            - Everything (default)"
+
+    print_section "Examples" "yellow"
+    echo "  $(print_cyan "theme background mode current")"
+    echo "  $(print_cyan "theme background mode set generated:plasma recolor")"
+    echo "  $(print_cyan "theme background mode add ascii")"
+    echo "  $(print_cyan "theme background mode remove lowpoly")"
+    echo "  $(print_cyan "theme background mode all")"
+
+  else
+    cat <<'EOF'
+Background Mode Settings
+========================
+
+Commands
+--------
+  current              Show currently enabled modes
+  list                 Show all available modes
+  set <modes...>       Set exact modes to use
+  add <mode>           Add mode to current set
+  remove <mode>        Remove mode from current set
+  all                  Enable all modes (default)
+
+Examples
+--------
+  theme background mode current
+  theme background mode set generated:plasma recolor
+  theme background mode add ascii
+  theme background mode remove lowpoly
+  theme background mode all
+EOF
+  fi
+}
+
+background_source_usage() {
+  if command -v print_section &>/dev/null; then
+    print_section "Background Source Images" "yellow"
+
+    print_section "Commands" "blue"
+    cat <<'EOF'
+  list                 List configured sources
+  add <path>           Add image or directory for recoloring
+  remove <path>        Remove a source
+  verify               Check for broken source paths
+  clean                Remove broken source entries
+EOF
+
+    print_section "About Sources" "blue"
+    echo "  Sources are path references (not copied). When using"
+    echo "  'recolor' mode, gowall converts images to match your"
+    echo "  current theme's color palette."
+
+    print_section "Examples" "yellow"
+    echo "  $(print_cyan "theme background source list")"
+    echo "  $(print_cyan "theme background source add ~/Pictures/wallpapers")"
+    echo "  $(print_cyan "theme background source add ~/photo.jpg")"
+    echo "  $(print_cyan "theme background source verify")"
+
+  else
+    cat <<'EOF'
+Background Source Images
+========================
+
+Commands
+--------
+  list                 List configured sources
+  add <path>           Add image or directory for recoloring
+  remove <path>        Remove a source
+  verify               Check for broken source paths
+  clean                Remove broken source entries
+
+About Sources
+-------------
+  Sources are path references (not copied). When using
+  'recolor' mode, gowall converts images to match your
+  current theme's color palette.
+
+Examples
+--------
+  theme background source list
+  theme background source add ~/Pictures/wallpapers
+  theme background source add ~/photo.jpg
+  theme background source verify
+EOF
+  fi
+}
+
+opacity_usage() {
+  if command -v print_section &>/dev/null; then
+    print_section "Opacity Management" "yellow"
+
+    print_section "Commands" "blue"
+    cat <<'EOF'
+  current              Show current opacity
+  set <0-100>          Set opacity to specific value
+  up                   Increase opacity by 5%
+  down                 Decrease opacity by 5%
+EOF
+
+    print_section "Notes" "blue"
+    echo "  Restart terminal to see changes."
+    echo "  Value 100 = fully opaque, 0 = fully transparent."
+
+    print_section "Examples" "yellow"
+    echo "  $(print_cyan "theme opacity current")    # Show current"
+    echo "  $(print_cyan "theme opacity set 90")     # Set to 90%"
+    echo "  $(print_cyan "theme opacity up")         # Increase 5%"
+    echo "  $(print_cyan "theme opacity down")       # Decrease 5%"
+
+  else
+    cat <<'EOF'
+Opacity Management
+==================
+
+Commands
+--------
+  current              Show current opacity
+  set <0-100>          Set opacity to specific value
+  up                   Increase opacity by 5%
+  down                 Decrease opacity by 5%
+
+Notes
+-----
+  Restart terminal to see changes.
+  Value 100 = fully opaque, 0 = fully transparent.
+
+Examples
+--------
+  theme opacity current    # Show current
+  theme opacity set 90     # Set to 90%
+  theme opacity up         # Increase 5%
+  theme opacity down       # Decrease 5%
+EOF
+  fi
+}
+
+sync_usage() {
+  if command -v print_section &>/dev/null; then
+    print_section "Sync Management" "yellow"
+
+    print_section "Commands" "blue"
+    cat <<'EOF'
+  status               Show sync status
+  init                 Initialize sync (creates GitHub Gist)
+  push                 Manual push to remote
+  pull                 Manual pull from remote
+  on                   Enable automatic sync
+  off                  Disable automatic sync
+EOF
+
+    print_section "Examples" "yellow"
+    echo "  $(print_cyan "theme sync status")   # Check sync state"
+    echo "  $(print_cyan "theme sync init")     # Set up sync"
+    echo "  $(print_cyan "theme sync push")     # Force push"
+    echo "  $(print_cyan "theme sync pull")     # Force pull"
+
+  else
+    cat <<'EOF'
+Sync Management
+===============
+
+Commands
+--------
+  status               Show sync status
+  init                 Initialize sync (creates GitHub Gist)
+  push                 Manual push to remote
+  pull                 Manual pull from remote
+  on                   Enable automatic sync
+  off                  Disable automatic sync
+
+Examples
+--------
+  theme sync status   # Check sync state
+  theme sync init     # Set up sync
+  theme sync push     # Force push
+  theme sync pull     # Force pull
+EOF
+  fi
+}
+
+#==============================================================================
 # THEME OPERATIONS
 #==============================================================================
 
@@ -173,11 +449,12 @@ show_current() {
   stats=$(get_theme_stats "$current" 2>/dev/null || echo "{}")
 
   if [[ -n "$stats" ]] && [[ "$stats" != "{}" ]] && [[ "$stats" != "null" ]]; then
-    local score=$(echo "$stats" | jq -r '.score // 0')
-    local likes=$(echo "$stats" | jq -r '.likes // 0')
-    local dislikes=$(echo "$stats" | jq -r '.dislikes // 0')
-    local notes=$(echo "$stats" | jq -r '.notes // 0')
-    local applies=$(echo "$stats" | jq -r '.applies // 0')
+    local score likes dislikes notes applies
+    score=$(echo "$stats" | jq -r '.score // 0')
+    likes=$(echo "$stats" | jq -r '.likes // 0')
+    dislikes=$(echo "$stats" | jq -r '.dislikes // 0')
+    notes=$(echo "$stats" | jq -r '.notes // 0')
+    applies=$(echo "$stats" | jq -r '.applies // 0')
 
     printf "Score: %+d (%d likes, %d dislikes)\n" "$score" "$likes" "$dislikes"
     printf "Notes: %d | Times applied: %d\n" "$notes" "$applies"
@@ -506,10 +783,11 @@ show_rejected() {
   local count=0
   while IFS= read -r line; do
     count=$((count + 1))
-    local theme=$(echo "$line" | jq -r '.theme')
-    local rejected_date=$(echo "$line" | jq -r '.rejected_date')
-    local reason=$(echo "$line" | jq -r '.reason')
-    local platforms=$(echo "$line" | jq -r '.platforms')
+    local theme rejected_date reason platforms
+    theme=$(echo "$line" | jq -r '.theme')
+    rejected_date=$(echo "$line" | jq -r '.rejected_date')
+    reason=$(echo "$line" | jq -r '.reason')
+    platforms=$(echo "$line" | jq -r '.platforms')
 
     local display_info
     display_info=$(get_theme_display_info "$theme")
@@ -673,13 +951,14 @@ show_rankings() {
   local rank=0
   while IFS= read -r line; do
     rank=$((rank + 1))
-    local theme=$(echo "$line" | jq -r '.theme')
-    local score=$(echo "$line" | jq -r '.score')
-    local likes=$(echo "$line" | jq -r '.likes')
-    local dislikes=$(echo "$line" | jq -r '.dislikes')
-    local last_used=$(echo "$line" | jq -r '.last_used')
-    local platforms=$(echo "$line" | jq -r '.platforms')
-    local usage_seconds=$(echo "$line" | jq -r '.usage_seconds // 0')
+    local theme score likes dislikes last_used platforms usage_seconds
+    theme=$(echo "$line" | jq -r '.theme')
+    score=$(echo "$line" | jq -r '.score')
+    likes=$(echo "$line" | jq -r '.likes')
+    dislikes=$(echo "$line" | jq -r '.dislikes')
+    last_used=$(echo "$line" | jq -r '.last_used')
+    platforms=$(echo "$line" | jq -r '.platforms')
+    usage_seconds=$(echo "$line" | jq -r '.usage_seconds // 0')
 
     local display_info
     display_info=$(get_theme_display_info "$theme")
@@ -772,11 +1051,12 @@ show_info() {
   echo ""
 
   echo "App Mappings:"
-  local ghostty=$(echo "$theme_data" | yq -r '.ghostty // "not available"')
-  local kitty=$(echo "$theme_data" | yq -r '.kitty // "not available"')
-  local neovim=$(echo "$theme_data" | yq -r '.neovim // "not available"')
-  local base16=$(echo "$theme_data" | yq -r '.base16 // "not available"')
-  local windows=$(echo "$theme_data" | yq -r '.windows_terminal // "not available"')
+  local ghostty kitty neovim base16 windows
+  ghostty=$(echo "$theme_data" | yq -r '.ghostty // "not available"')
+  kitty=$(echo "$theme_data" | yq -r '.kitty // "not available"')
+  neovim=$(echo "$theme_data" | yq -r '.neovim // "not available"')
+  base16=$(echo "$theme_data" | yq -r '.base16 // "not available"')
+  windows=$(echo "$theme_data" | yq -r '.windows_terminal // "not available"')
 
   echo "  Ghostty: $ghostty"
   echo "  Kitty: $kitty"
@@ -784,7 +1064,8 @@ show_info() {
   echo "  Base16: $base16"
   echo "  Windows Terminal: $windows"
 
-  local tags=$(echo "$theme_data" | yq -r '.tags | join(", ") // "none"')
+  local tags
+  tags=$(echo "$theme_data" | yq -r '.tags | join(", ") // "none"')
   echo ""
   echo "Tags: $tags"
 
@@ -792,10 +1073,11 @@ show_info() {
   stats=$(get_theme_stats "$canonical" 2>/dev/null || echo "{}")
 
   if [[ -n "$stats" ]] && [[ "$stats" != "{}" ]] && [[ "$stats" != "null" ]]; then
-    local score=$(echo "$stats" | jq -r '.score // 0')
-    local likes=$(echo "$stats" | jq -r '.likes // 0')
-    local dislikes=$(echo "$stats" | jq -r '.dislikes // 0')
-    local applies=$(echo "$stats" | jq -r '.applies // 0')
+    local score likes dislikes applies
+    score=$(echo "$stats" | jq -r '.score // 0')
+    likes=$(echo "$stats" | jq -r '.likes // 0')
+    dislikes=$(echo "$stats" | jq -r '.dislikes // 0')
+    applies=$(echo "$stats" | jq -r '.applies // 0')
 
     echo ""
     echo "Your Stats:"
@@ -1186,6 +1468,9 @@ main() {
   opacity)
     case "${2:-}" in
       "")
+        opacity_usage
+        ;;
+      current)
         echo "Background opacity: $(get_current_opacity)"
         ;;
       up)
@@ -1202,12 +1487,22 @@ main() {
           echo "Restart terminal to see changes."
         fi
         ;;
-      *)
-        if result=$(set_opacity "$2"); then
+      set)
+        if [[ -z "${3:-}" ]]; then
+          echo "Error: opacity value required" >&2
+          echo "Usage: theme opacity set <0-100>" >&2
+          exit 1
+        fi
+        if result=$(set_opacity "$3"); then
           echo "Opacity: $result"
           echo ""
           echo "Restart terminal to see changes."
         fi
+        ;;
+      *)
+        echo "Unknown opacity command: ${2:-}" >&2
+        echo "Usage: theme opacity [current|set|up|down]" >&2
+        exit 1
         ;;
     esac
     ;;
@@ -1220,6 +1515,9 @@ main() {
   background)
     case "${2:-}" in
     "")
+      background_usage
+      ;;
+    current)
       # Show current background info
       local current_bg current_theme
       current_bg=$(get_current_background)
@@ -1351,7 +1649,10 @@ main() {
       ;;
     mode)
       case "${3:-}" in
-      "" | list)
+      "")
+        background_mode_usage
+        ;;
+      list)
         echo ""
         echo "Available Background Modes"
         echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -1369,12 +1670,6 @@ main() {
         echo "Shortcuts:"
         echo "  generated      - All generated styles"
         echo "  all            - Everything (default)"
-        echo ""
-        echo "Examples:"
-        echo "  theme background mode all"
-        echo "  theme background mode generated:plasma generated:code recolor"
-        echo "  theme background mode +ascii"
-        echo "  theme background mode -lowpoly"
         ;;
       current)
         echo ""
@@ -1396,21 +1691,38 @@ main() {
         set_background_mode "all"
         echo "Set mode: all (everything enabled)"
         ;;
-      +*)
-        local mode="${3:1}"  # Remove leading +
-        add_background_mode "$mode"
+      add)
+        if [[ -z "${4:-}" ]]; then
+          echo "Error: mode name required" >&2
+          echo "Usage: theme background mode add <mode>" >&2
+          exit 1
+        fi
+        add_background_mode "$4"
         ;;
-      -*)
-        local mode="${3:1}"  # Remove leading -
-        remove_background_mode "$mode"
+      remove)
+        if [[ -z "${4:-}" ]]; then
+          echo "Error: mode name required" >&2
+          echo "Usage: theme background mode remove <mode>" >&2
+          exit 1
+        fi
+        remove_background_mode "$4"
         ;;
-      *)
-        # Set specific modes
-        set_background_mode "${@:3}"
+      set)
+        if [[ -z "${4:-}" ]]; then
+          echo "Error: at least one mode required" >&2
+          echo "Usage: theme background mode set <mode> [mode...]" >&2
+          exit 1
+        fi
+        set_background_mode "${@:4}"
         echo "Set modes:"
-        for mode in "${@:3}"; do
+        for mode in "${@:4}"; do
           echo "  - $mode"
         done
+        ;;
+      *)
+        echo "Unknown mode command: ${3:-}" >&2
+        echo "Usage: theme background mode [current|list|set|add|remove|all]" >&2
+        exit 1
         ;;
       esac
       ;;
@@ -1568,7 +1880,10 @@ main() {
       clear_background_cache
       ;;
     source)
-      case "${3:-list}" in
+      case "${3:-}" in
+      "")
+        background_source_usage
+        ;;
       add)
         if [[ -z "${4:-}" ]]; then
           echo "Usage: theme background source add <path>" >&2
@@ -1640,7 +1955,10 @@ main() {
     esac
     ;;
   sync)
-    case "${2:-status}" in
+    case "${2:-}" in
+    "")
+      sync_usage
+      ;;
     init)
       sync_init
       ;;
