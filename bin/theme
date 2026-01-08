@@ -90,6 +90,13 @@ usage() {
   opacity-down         Decrease opacity by 5%
   generate-previews    Pre-generate all preview images
   generate-wallpapers  Pre-generate all wallpapers (instant switching)
+  wallpaper                    Show current wallpaper
+  wallpaper rotate             Rotate to new wallpaper (keep theme)
+  wallpaper source add <path>  Add image/directory for recoloring
+  wallpaper source list        List configured sources
+  wallpaper source remove <id> Remove a source
+  wallpaper source verify      Check for broken source paths
+  wallpaper source clean       Remove broken source entries
   clear-cache          Clear preview cache
   clear-wallpaper-cache  Clear wallpaper cache
   sync init            Initialize sync (creates gist)
@@ -159,8 +166,23 @@ Commands
   sync                 Manage GitHub Gist synchronization
   generate-previews    Pre-generate all preview images
   generate-wallpapers  Pre-generate all wallpapers (instant switching)
+  wallpaper            Manage wallpapers
   clear-cache          Clear preview cache
   clear-wallpaper-cache  Clear wallpaper cache
+
+Wallpaper Commands
+------------------
+  wallpaper                       Show current wallpaper info
+  wallpaper rotate                Rotate to new wallpaper (keep theme)
+  wallpaper source add <path>     Add image or directory for recoloring
+  wallpaper source list           List configured sources
+  wallpaper source remove <id>    Remove a source
+  wallpaper source verify         Check for broken source paths
+  wallpaper source clean          Remove broken source entries
+
+  Sources are stored as path references (not copied).
+  When sources exist, "recolor" is added to the wallpaper style rotation.
+  gowall converts your images to match the current theme's color palette.
 
 Sync Commands
 -------------
@@ -1248,6 +1270,125 @@ main() {
     ;;
   clear-wallpaper-cache)
     clear_wallpaper_cache
+    ;;
+  wallpaper)
+    case "${2:-}" in
+    "")
+      # Show current wallpaper info
+      local current_wp current_theme
+      current_wp=$(get_current_wallpaper)
+      current_theme=$(get_current_theme)
+
+      if [[ -z "$current_wp" ]]; then
+        echo "No wallpaper tracked yet."
+        echo ""
+        echo "Apply a theme to set wallpaper: theme apply <name>"
+      else
+        echo ""
+        echo "Current Wallpaper"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        local wp_type="${current_wp%%:*}"
+        local wp_value="${current_wp#*:}"
+        echo "  Type: $wp_type"
+        if [[ "$wp_type" == "recolor" ]]; then
+          echo "  Source: $wp_value"
+          echo "  File: $(basename "$wp_value")"
+        else
+          echo "  Style: $wp_value"
+        fi
+        echo "  Theme: $current_theme"
+        echo ""
+        echo "Rotate wallpaper: theme wallpaper rotate"
+      fi
+      ;;
+    rotate)
+      local platform
+      platform=$(detect_platform)
+      if [[ "$platform" != "macos" ]]; then
+        echo "Error: Wallpaper rotation only supported on macOS" >&2
+        exit 1
+      fi
+
+      echo "Rotating wallpaper..."
+      local new_style
+      if new_style=$(rotate_wallpaper); then
+        echo "  ✓ wallpaper ($new_style)"
+      else
+        echo "  ✗ wallpaper rotation failed" >&2
+        exit 1
+      fi
+      ;;
+    source)
+      case "${3:-list}" in
+      add)
+        if [[ -z "${4:-}" ]]; then
+          echo "Usage: theme wallpaper source add <path>" >&2
+          exit 1
+        fi
+        add_wallpaper_source "$4"
+        ;;
+      list)
+        local entries
+        entries=$(list_wallpaper_source_entries)
+        if [[ -z "$entries" ]]; then
+          echo "No wallpaper sources configured."
+          echo ""
+          echo "Add sources with: theme wallpaper source add <path>"
+          echo "You can add individual files or entire directories."
+          echo ""
+          echo "Sources are stored as path references in:"
+          echo "  $WALLPAPER_SOURCES_FILE"
+        else
+          echo "Wallpaper Sources"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          while IFS= read -r entry; do
+            local type="${entry%%:*}"
+            local path="${entry#*:}"
+            if [[ "$type" == "dir" ]]; then
+              local count
+              count=$(find "$path" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) 2>/dev/null | wc -l | xargs)
+              echo "  [dir]  $path ($count images)"
+            else
+              echo "  [file] $path"
+            fi
+          done <<< "$entries"
+          echo ""
+          echo "Total images: $(get_all_wallpaper_images | wc -l | xargs)"
+          echo ""
+          echo "When 'recolor' style is selected, gowall converts these to match your theme."
+        fi
+        ;;
+      remove)
+        if [[ -z "${4:-}" ]]; then
+          echo "Usage: theme wallpaper source remove <path>" >&2
+          exit 1
+        fi
+        remove_wallpaper_source "$4"
+        ;;
+      verify)
+        echo "Verifying wallpaper sources..."
+        echo ""
+        verify_wallpaper_sources
+        ;;
+      clean)
+        echo "Cleaning broken wallpaper sources..."
+        echo ""
+        clean_wallpaper_sources
+        ;;
+      *)
+        echo "Unknown wallpaper source command: ${3:-}"
+        echo "Usage: theme wallpaper source [add|list|remove|verify|clean]"
+        exit 1
+        ;;
+      esac
+      ;;
+    *)
+      echo "Unknown wallpaper command: ${2:-}"
+      echo "Usage: theme wallpaper [rotate|source]"
+      exit 1
+      ;;
+    esac
     ;;
   sync)
     case "${2:-status}" in

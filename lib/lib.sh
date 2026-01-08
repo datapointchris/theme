@@ -475,7 +475,263 @@ change_opacity() {
 # Wallpaper cache directory
 WALLPAPER_CACHE_DIR="${WALLPAPER_CACHE_DIR:-$HOME/.cache/theme/wallpapers}"
 
+# Wallpaper sources config file (path references, not copies)
+WALLPAPER_SOURCES_FILE="${WALLPAPER_SOURCES_FILE:-$HOME/.config/theme/wallpaper-sources.conf}"
+
+# Current wallpaper tracking
+WALLPAPER_CURRENT_FILE="$THEME_STATE_DIR/wallpaper-current"
+
+#==============================================================================
+# WALLPAPER SOURCE MANAGEMENT (path-based, no copying)
+#==============================================================================
+
+# Add a source path (file or directory) for wallpaper recoloring
+# Stores path reference in wallpaper-sources.conf (no copying)
+add_wallpaper_source() {
+  local source_path="$1"
+
+  if [[ ! -e "$source_path" ]]; then
+    echo "Error: Path not found: $source_path" >&2
+    return 1
+  fi
+
+  # Get absolute path
+  local abs_path
+  abs_path=$(cd "$(dirname "$source_path")" && pwd)/$(basename "$source_path")
+
+  mkdir -p "$(dirname "$WALLPAPER_SOURCES_FILE")"
+
+  if [[ -d "$abs_path" ]]; then
+    # Directory source
+    local prefix="dir:"
+    local entry="${prefix}${abs_path}"
+
+    # Check if already exists
+    if [[ -f "$WALLPAPER_SOURCES_FILE" ]] && grep -qF "$entry" "$WALLPAPER_SOURCES_FILE" 2>/dev/null; then
+      echo "Directory already added: $abs_path"
+      return 0
+    fi
+
+    # Count images in directory
+    local count
+    count=$(find "$abs_path" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) 2>/dev/null | wc -l | xargs)
+
+    echo "$entry" >> "$WALLPAPER_SOURCES_FILE"
+    echo "Added directory: $abs_path ($count images)"
+  else
+    # Single file
+    local mime
+    mime=$(file --mime-type -b "$abs_path" 2>/dev/null || echo "")
+    if [[ ! "$mime" =~ ^image/ ]]; then
+      echo "Error: Not an image file: $abs_path" >&2
+      return 1
+    fi
+
+    local entry="file:${abs_path}"
+
+    # Check if already exists
+    if [[ -f "$WALLPAPER_SOURCES_FILE" ]] && grep -qF "$entry" "$WALLPAPER_SOURCES_FILE" 2>/dev/null; then
+      echo "File already added: $abs_path"
+      return 0
+    fi
+
+    echo "$entry" >> "$WALLPAPER_SOURCES_FILE"
+    echo "Added file: $abs_path"
+  fi
+}
+
+# List configured wallpaper sources (the config entries, not expanded images)
+list_wallpaper_source_entries() {
+  if [[ ! -f "$WALLPAPER_SOURCES_FILE" ]]; then
+    return 0
+  fi
+  cat "$WALLPAPER_SOURCES_FILE"
+}
+
+# Expand all sources to actual image files (scans directories at runtime)
+get_all_wallpaper_images() {
+  if [[ ! -f "$WALLPAPER_SOURCES_FILE" ]]; then
+    return 0
+  fi
+
+  while IFS= read -r entry; do
+    [[ -z "$entry" ]] && continue
+    [[ "$entry" =~ ^# ]] && continue
+
+    local type="${entry%%:*}"
+    local path="${entry#*:}"
+
+    case "$type" in
+      file)
+        if [[ -f "$path" ]] && [[ -r "$path" ]]; then
+          echo "$path"
+        fi
+        ;;
+      dir)
+        if [[ -d "$path" ]]; then
+          find "$path" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) 2>/dev/null
+        fi
+        ;;
+    esac
+  done < "$WALLPAPER_SOURCES_FILE"
+}
+
+# Remove a wallpaper source entry
+remove_wallpaper_source() {
+  local input="$1"
+
+  if [[ ! -f "$WALLPAPER_SOURCES_FILE" ]]; then
+    echo "Error: No sources configured" >&2
+    return 1
+  fi
+
+  # Try exact match first (with prefix)
+  if grep -qF "$input" "$WALLPAPER_SOURCES_FILE" 2>/dev/null; then
+    { grep -vF "$input" "$WALLPAPER_SOURCES_FILE" || true; } > "${WALLPAPER_SOURCES_FILE}.tmp"
+    mv "${WALLPAPER_SOURCES_FILE}.tmp" "$WALLPAPER_SOURCES_FILE"
+    echo "Removed: $input"
+    return 0
+  fi
+
+  # Try matching path without prefix
+  local match
+  match=$(grep -E "(file:|dir:).*${input}" "$WALLPAPER_SOURCES_FILE" 2>/dev/null | head -1 || true)
+  if [[ -n "$match" ]]; then
+    { grep -vF "$match" "$WALLPAPER_SOURCES_FILE" || true; } > "${WALLPAPER_SOURCES_FILE}.tmp"
+    mv "${WALLPAPER_SOURCES_FILE}.tmp" "$WALLPAPER_SOURCES_FILE"
+    echo "Removed: $match"
+    return 0
+  fi
+
+  echo "Error: Source not found: $input" >&2
+  return 1
+}
+
+# Verify all source paths exist and are readable
+verify_wallpaper_sources() {
+  if [[ ! -f "$WALLPAPER_SOURCES_FILE" ]]; then
+    echo "No sources configured."
+    return 0
+  fi
+
+  local valid=0
+  local broken=0
+
+  while IFS= read -r entry; do
+    [[ -z "$entry" ]] && continue
+    [[ "$entry" =~ ^# ]] && continue
+
+    local type="${entry%%:*}"
+    local path="${entry#*:}"
+
+    case "$type" in
+      file)
+        if [[ -f "$path" ]] && [[ -r "$path" ]]; then
+          echo "  ✓ $entry"
+          valid=$((valid + 1))
+        else
+          echo "  ✗ $entry (missing or unreadable)"
+          broken=$((broken + 1))
+        fi
+        ;;
+      dir)
+        if [[ -d "$path" ]]; then
+          local count
+          count=$(find "$path" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) 2>/dev/null | wc -l | xargs)
+          echo "  ✓ $entry ($count images)"
+          valid=$((valid + 1))
+        else
+          echo "  ✗ $entry (directory not found)"
+          broken=$((broken + 1))
+        fi
+        ;;
+      *)
+        echo "  ? $entry (unknown type)"
+        broken=$((broken + 1))
+        ;;
+    esac
+  done < "$WALLPAPER_SOURCES_FILE"
+
+  echo ""
+  echo "Valid: $valid, Broken: $broken"
+  [[ $broken -eq 0 ]]
+}
+
+# Remove broken source entries
+clean_wallpaper_sources() {
+  if [[ ! -f "$WALLPAPER_SOURCES_FILE" ]]; then
+    echo "No sources configured."
+    return 0
+  fi
+
+  local cleaned=0
+  local temp_file="${WALLPAPER_SOURCES_FILE}.tmp"
+  : > "$temp_file"
+
+  while IFS= read -r entry; do
+    [[ -z "$entry" ]] && continue
+    [[ "$entry" =~ ^# ]] && { echo "$entry" >> "$temp_file"; continue; }
+
+    local type="${entry%%:*}"
+    local path="${entry#*:}"
+    local keep=true
+
+    case "$type" in
+      file)
+        if [[ ! -f "$path" ]] || [[ ! -r "$path" ]]; then
+          echo "Removing: $entry (file missing)"
+          keep=false
+          cleaned=$((cleaned + 1))
+        fi
+        ;;
+      dir)
+        if [[ ! -d "$path" ]]; then
+          echo "Removing: $entry (directory missing)"
+          keep=false
+          cleaned=$((cleaned + 1))
+        fi
+        ;;
+    esac
+
+    [[ "$keep" == "true" ]] && echo "$entry" >> "$temp_file"
+  done < "$WALLPAPER_SOURCES_FILE"
+
+  mv "$temp_file" "$WALLPAPER_SOURCES_FILE"
+  echo ""
+  echo "Cleaned $cleaned broken entries."
+}
+
+# Get a random source image (scans directories at runtime)
+get_random_wallpaper_source() {
+  local images=()
+
+  while IFS= read -r img; do
+    [[ -n "$img" ]] && images+=("$img")
+  done < <(get_all_wallpaper_images)
+
+  if [[ ${#images[@]} -eq 0 ]]; then
+    return 1
+  fi
+
+  echo "${images[$((RANDOM % ${#images[@]}))]}"
+}
+
+# Get current wallpaper info
+get_current_wallpaper() {
+  if [[ -f "$WALLPAPER_CURRENT_FILE" ]]; then
+    cat "$WALLPAPER_CURRENT_FILE"
+  fi
+}
+
+# Set current wallpaper
+set_current_wallpaper() {
+  local wallpaper_id="$1"
+  mkdir -p "$(dirname "$WALLPAPER_CURRENT_FILE")"
+  echo "$wallpaper_id" > "$WALLPAPER_CURRENT_FILE"
+}
+
 # Apply wallpaper (macOS)
+# Returns: wallpaper_id (e.g., "generated:plasma" or "recolor:/path/to/image.jpg")
 apply_wallpaper() {
   local theme="$1"
   local lib_path
@@ -496,26 +752,140 @@ apply_wallpaper() {
   # Clean up old wallpaper files
   find "$wallpaper_dir" -name 'wallpaper-*.png' -mmin +1 -delete 2>/dev/null || true
 
-  # Pick random style
+  # Pick random style - include "recolor" if source images are available
   local styles=("plasma" "geometric" "hexagons" "circles" "swirl" "spotlight" "sphere" "spheres")
-  local style="${styles[$((RANDOM % ${#styles[@]}))]}"
-  local cache_file="$WALLPAPER_CACHE_DIR/$theme/${style}.png"
+  local source_image=""
+  if source_image=$(get_random_wallpaper_source 2>/dev/null) && [[ -n "$source_image" ]]; then
+    styles+=("recolor")
+  fi
 
-  if [[ -f "$cache_file" ]]; then
-    cp "$cache_file" "$wallpaper_file"
+  local style="${styles[$((RANDOM % ${#styles[@]}))]}"
+  local wallpaper_id=""
+
+  if [[ "$style" == "recolor" ]]; then
+    # Use gowall to recolor source image
+    local gowall_generator
+    gowall_generator="$(dirname "${BASH_SOURCE[0]}")/generators/wallpaper-gowall.sh"
+    if [[ -f "$gowall_generator" ]]; then
+      bash "$gowall_generator" "$lib_path/theme.yml" "$source_image" "$wallpaper_file" >/dev/null 2>&1 || return 1
+      wallpaper_id="recolor:$source_image"
+    else
+      return 1
+    fi
   else
-    # Generate on-the-fly
-    local generator_script
-    generator_script="$(dirname "${BASH_SOURCE[0]}")/generators/wallpaper.sh"
-    [[ ! -f "$generator_script" ]] && return 1
-    bash "$generator_script" "$lib_path/theme.yml" "$wallpaper_file" "$style" 1920 1080 >/dev/null 2>&1 || return 1
+    local cache_file="$WALLPAPER_CACHE_DIR/$theme/${style}.png"
+
+    if [[ -f "$cache_file" ]]; then
+      cp "$cache_file" "$wallpaper_file"
+    else
+      # Generate on-the-fly with ImageMagick
+      local generator_script
+      generator_script="$(dirname "${BASH_SOURCE[0]}")/generators/wallpaper.sh"
+      [[ ! -f "$generator_script" ]] && return 1
+      bash "$generator_script" "$lib_path/theme.yml" "$wallpaper_file" "$style" 1920 1080 >/dev/null 2>&1 || return 1
+    fi
+    wallpaper_id="generated:$style"
   fi
 
   # Set as desktop wallpaper on macOS using Finder (more reliable than System Events)
   osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$wallpaper_file\"" 2>/dev/null || return 1
 
+  # Track current wallpaper
+  set_current_wallpaper "$wallpaper_id"
+
   # Output the selected style for status display
   echo "$style"
+  return 0
+}
+
+# Rotate wallpaper without changing theme (macOS)
+# Selects a different wallpaper than current, applies it
+rotate_wallpaper() {
+  local theme
+  theme=$(get_current_theme)
+
+  if [[ -z "$theme" ]]; then
+    echo "Error: No theme currently applied" >&2
+    return 1
+  fi
+
+  local lib_path
+  lib_path=$(get_library_path "$theme")
+
+  if [[ -z "$lib_path" ]] || [[ ! -f "$lib_path/theme.yml" ]]; then
+    echo "Error: Theme not found: $theme" >&2
+    return 1
+  fi
+
+  local wallpaper_dir="$HOME/.local/share/theme"
+  mkdir -p "$wallpaper_dir"
+
+  local timestamp
+  timestamp=$(date +%s)
+  local wallpaper_file="$wallpaper_dir/wallpaper-${timestamp}.png"
+
+  find "$wallpaper_dir" -name 'wallpaper-*.png' -mmin +1 -delete 2>/dev/null || true
+
+  # Build list of available wallpapers, excluding current
+  local current_wallpaper
+  current_wallpaper=$(get_current_wallpaper)
+
+  local available=()
+  local styles=("plasma" "geometric" "hexagons" "circles" "swirl" "spotlight" "sphere" "spheres")
+
+  for style in "${styles[@]}"; do
+    local wp_id="generated:$style"
+    [[ "$wp_id" != "$current_wallpaper" ]] && available+=("$wp_id")
+  done
+
+  # Add recolor options if source images exist
+  while IFS= read -r img; do
+    [[ -z "$img" ]] && continue
+    local wp_id="recolor:$img"
+    [[ "$wp_id" != "$current_wallpaper" ]] && available+=("$wp_id")
+  done < <(get_all_wallpaper_images)
+
+  if [[ ${#available[@]} -eq 0 ]]; then
+    echo "Error: No alternative wallpapers available" >&2
+    return 1
+  fi
+
+  # Pick random from available
+  local selected="${available[$((RANDOM % ${#available[@]}))]}"
+  local wp_type="${selected%%:*}"
+  local wp_value="${selected#*:}"
+
+  if [[ "$wp_type" == "recolor" ]]; then
+    local gowall_generator
+    gowall_generator="$(dirname "${BASH_SOURCE[0]}")/generators/wallpaper-gowall.sh"
+    if [[ -f "$gowall_generator" ]]; then
+      bash "$gowall_generator" "$lib_path/theme.yml" "$wp_value" "$wallpaper_file" >/dev/null 2>&1 || return 1
+    else
+      return 1
+    fi
+  else
+    local cache_file="$WALLPAPER_CACHE_DIR/$theme/${wp_value}.png"
+
+    if [[ -f "$cache_file" ]]; then
+      cp "$cache_file" "$wallpaper_file"
+    else
+      local generator_script
+      generator_script="$(dirname "${BASH_SOURCE[0]}")/generators/wallpaper.sh"
+      [[ ! -f "$generator_script" ]] && return 1
+      bash "$generator_script" "$lib_path/theme.yml" "$wallpaper_file" "$wp_value" 1920 1080 >/dev/null 2>&1 || return 1
+    fi
+  fi
+
+  osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$wallpaper_file\"" 2>/dev/null || return 1
+
+  set_current_wallpaper "$selected"
+
+  # Output for display
+  if [[ "$wp_type" == "recolor" ]]; then
+    echo "recolor ($(basename "$wp_value"))"
+  else
+    echo "$wp_value"
+  fi
   return 0
 }
 
