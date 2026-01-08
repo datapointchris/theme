@@ -63,7 +63,7 @@ count_themes() {
 #==============================================================================
 
 usage() {
-  if command -v print_header &>/dev/null; then
+  if command -v print_section &>/dev/null; then
     print_section "Theme Management" "yellow"
 
     print_section "Commands" "blue"
@@ -85,72 +85,23 @@ usage() {
   unreject             Restore a rejected theme (fzf picker with history)
   verify               Check theme system is working
   upgrade              Update theme to latest version (git pull)
-  opacity              Show current background opacity
-  opacity <0-100>      Set opacity to specific value (e.g., 90 = 0.90)
-  opacity up           Increase opacity by 5%
-  opacity down         Decrease opacity by 5%
   generate-previews    Pre-generate all preview images
-  background                   Show current background
-  background rotate            Rotate to new background (keep theme)
-  background list              List all available backgrounds
-  background list --generated  List only generated styles
-  background list --recolor    List only recolor sources
-  background like [note]       Like current background (for this theme)
-  background dislike [note]    Dislike current background (for this theme)
-  background reject <reason>   Reject background for this theme
-  background history           Show background history
-  background rank              Show background rankings for current theme
-  background rank --global     Show global background rankings
-  background pre-generate      Pre-generate all backgrounds (instant switching)
-  background cache-clear       Clear background cache
-  background mode list         Show all available modes/styles
-  background mode current      Show currently enabled modes
-  background mode all          Enable all modes (default)
-  background mode <styles...>  Set exactly these styles
-  background mode +<style>     Add style to current
-  background mode -<style>     Remove style from current
-  background source add <path> Add image/directory for recoloring
-  background source list       List configured sources
-  background source remove <id> Remove a source
-  background source verify     Check for broken source paths
-  background source clean      Remove broken source entries
-  clear-cache                  Clear preview cache
-  sync init            Initialize sync (creates gist)
-  sync status          Show sync status
-  sync push            Manual push to remote
-  sync pull            Manual pull from remote
-  sync on              Enable sync
-  sync off             Disable sync
+  clear-cache          Clear preview cache
+EOF
+
+    print_section "Subcommands" "blue"
+    cat <<'EOF'
+  background           Manage backgrounds (run for usage)
+  opacity              Manage terminal opacity (run for usage)
+  sync                 Manage GitHub Gist synchronization (run for usage)
 EOF
 
     print_section "Examples" "yellow"
-    if command -v print_cyan &>/dev/null; then
-      echo "  $(print_cyan "theme change")                       # Interactive picker with preview"
-      echo "  $(print_cyan "theme list")                         # See available themes"
-      echo "  $(print_cyan "theme apply \"Rose Pine\"")            # Apply a theme"
-      echo "  $(print_cyan "theme like \"Great for night coding\"") # Like with reason"
-      echo "  $(print_cyan "theme random")                       # Try something new"
-      echo "  $(print_cyan "theme rank")                         # See rankings"
-    else
-      cat <<'EOF'
-  theme change                       # Interactive picker with preview
-  theme list                         # See available themes
-  theme apply "Rose Pine"            # Apply a theme
-  theme like "Great for night coding" # Like with reason
-  theme random                       # Try something new
-  theme rank                         # See rankings
-EOF
-    fi
-
-    print_section "Data Storage" "green"
-    cat <<'EOF'
-  ~/.local/state/theme/
-  ├── history.jsonl      # Usage history (synced via gist)
-  ├── current            # Current theme ID
-  └── sync-state.json    # Sync configuration
-
-  Sync with: theme sync init
-EOF
+    echo "  $(print_cyan "theme change")                       # Interactive picker with preview"
+    echo "  $(print_cyan "theme apply \"Rose Pine\"")            # Apply a theme"
+    echo "  $(print_cyan "theme background rotate")            # New background, same theme"
+    echo "  $(print_cyan "theme opacity set 90")               # Set opacity to 90%"
+    echo "  $(print_cyan "theme sync init")                    # Initialize sync"
 
   else
     cat <<'EOF'
@@ -176,73 +127,22 @@ Commands
   unreject             Restore a rejected theme (fzf picker with history)
   verify               Check theme system is working
   upgrade              Update theme to latest version (git pull)
-  opacity              Show current background opacity
-  opacity <0-100>      Set opacity to specific value (e.g., 90 = 0.90)
-  opacity up           Increase opacity by 5%
-  opacity down         Decrease opacity by 5%
-  sync                 Manage GitHub Gist synchronization
   generate-previews    Pre-generate all preview images
-  background           Manage backgrounds
   clear-cache          Clear preview cache
 
-Background Commands
--------------------
-  background                      Show current background info
-  background rotate               Rotate to new background (keep theme)
-  background list                 List all available backgrounds
-  background list --generated     List only generated styles
-  background list --recolor       List only recolor sources
-  background like [note]          Like current background (for this theme)
-  background dislike [note]       Dislike current background (for this theme)
-  background reject <reason>      Reject background for this theme
-  background history              Show background history
-  background rank                 Show rankings for current theme
-  background rank --global        Show global background rankings
-  background pre-generate         Pre-generate all backgrounds (instant switching)
-  background cache-clear          Clear background cache
-  background mode list            Show all available modes/styles
-  background mode current         Show currently enabled modes
-  background mode all             Enable all modes (default)
-  background mode <styles...>     Set exactly these styles
-  background mode +<style>        Add style to current
-  background mode -<style>        Remove style from current
-  background source add <path>    Add image or directory for recoloring
-  background source list          List configured sources
-  background source remove <id>   Remove a source
-  background source verify        Check for broken source paths
-  background source clean         Remove broken source entries
-
-  Preferences are per-theme: a background liked for Gruvbox may be
-  rejected for Nord. Sources are stored as path references (not copied).
-  gowall converts your images to match the current theme's color palette.
-  Mode settings control which background types are included in rotation.
-
-Sync Commands
--------------
-  sync init            Initialize sync (creates gist)
-  sync status          Show sync status
-  sync push            Manual push to remote
-  sync pull            Manual pull from remote
-  sync on              Enable sync
-  sync off             Disable sync
+Subcommands
+-----------
+  background           Manage backgrounds (run for usage)
+  opacity              Manage terminal opacity (run for usage)
+  sync                 Manage GitHub Gist synchronization (run for usage)
 
 Examples
 --------
-  theme change
-  theme list
-  theme apply "Rose Pine"
-  theme like "Great for night coding"
-  theme random
-  theme rank
-
-Data Storage
-------------
-  ~/.local/state/theme/
-  ├── history.jsonl      # Usage history (synced via gist)
-  ├── current            # Current theme ID
-  └── sync-state.json    # Sync configuration
-
-  Sync with: theme sync init
+  theme change                     # Interactive picker with preview
+  theme apply "Rose Pine"          # Apply a theme
+  theme background rotate          # New background, same theme
+  theme opacity set 90             # Set opacity to 90%
+  theme sync init                  # Initialize sync
 EOF
   fi
 }
