@@ -36,20 +36,27 @@ fi
 # Load theme colors
 eval "$(load_colors "$theme_file")"
 
+# Scale up source image to 4K for better quality
+scaled_image="/tmp/lowpoly_scaled_$$.png"
+magick "$source_image" -resize 3840x2160^ -gravity center -extent 3840x2160 "$scaled_image"
+
 # Generate low-poly version with theme background
 # -pts: number of points (more = more detail)
 # -bg: background color for transparent areas
 # -st: stroke width
 # -wf: wireframe mode (0=filled, 1=with stroke, 2=stroke only)
 triangle \
-  -in "$source_image" \
+  -in "$scaled_image" \
   -out "$output_file" \
   -bg "$BASE00" \
-  -pts 1500 \
+  -pts 2500 \
   -st 0.5 \
   -wf 1 \
   -bl 2 \
   2>/dev/null
+
+# Clean up
+rm -f "$scaled_image"
 
 # Verify output
 if [[ ! -f "$output_file" ]]; then
