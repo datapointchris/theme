@@ -1399,29 +1399,32 @@ main() {
       fi
 
       if [[ "$filter" != "--generated" ]]; then
-        echo "Recolor Sources:"
-        local recolor_enabled=""
-        if is_recolor_enabled; then
-          recolor_enabled="✓"
-        else
-          recolor_enabled="✗"
-        fi
-        echo "  [$recolor_enabled] recolor mode"
+        echo "Source Transforms:"
+        for source_type in "${WALLPAPER_SOURCE_TYPES[@]}"; do
+          local type_enabled=""
+          if is_source_type_enabled "$source_type"; then
+            type_enabled="✓"
+          else
+            type_enabled="✗"
+          fi
+          echo "  [$type_enabled] $source_type"
+        done
 
         local images
         images=$(get_all_wallpaper_images)
         if [[ -n "$images" ]]; then
-          local count
-          count=$(echo "$images" | wc -l | xargs)
-          echo "  $count source images available"
+          local img_count
+          img_count=$(echo "$images" | wc -l | xargs)
           echo ""
+          echo "  $img_count source images available:"
           echo "$images" | head -10 | while IFS= read -r img; do
             echo "    - $(basename "$img")"
           done
-          if [[ $count -gt 10 ]]; then
-            echo "    ... and $((count - 10)) more"
+          if [[ $img_count -gt 10 ]]; then
+            echo "    ... and $((img_count - 10)) more"
           fi
         else
+          echo ""
           echo "  No source images configured"
           echo "  Add with: theme wallpaper source add <path>"
         fi
@@ -1430,11 +1433,13 @@ main() {
 
       local total_count
       total_count=$(get_enabled_generated_styles | wc -l | xargs)
-      if is_recolor_enabled; then
-        local recolor_count
-        recolor_count=$(get_all_wallpaper_images | wc -l | xargs)
-        total_count=$((total_count + recolor_count))
-      fi
+      local img_count
+      img_count=$(get_all_wallpaper_images | wc -l | xargs)
+      for source_type in "${WALLPAPER_SOURCE_TYPES[@]}"; do
+        if is_source_type_enabled "$source_type"; then
+          total_count=$((total_count + img_count))
+        fi
+      done
       echo "Total enabled: $total_count wallpapers"
       ;;
     mode)
@@ -1444,21 +1449,25 @@ main() {
         echo "Available Wallpaper Modes"
         echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         echo ""
-        echo "Generated styles:"
+        echo "Generated styles (no source image needed):"
         for style in "${WALLPAPER_GENERATED_STYLES[@]}"; do
           echo "  generated:$style"
         done
         echo ""
-        echo "Other:"
-        echo "  recolor        - Recolor source images with gowall"
-        echo "  generated      - All generated styles (shortcut)"
+        echo "Source transforms (need source images):"
+        echo "  recolor        - Recolor images with gowall"
+        echo "  ascii          - Convert images to ASCII art"
+        echo "  lowpoly        - Convert images to low-poly triangles"
+        echo ""
+        echo "Shortcuts:"
+        echo "  generated      - All generated styles"
         echo "  all            - Everything (default)"
         echo ""
         echo "Examples:"
         echo "  theme wallpaper mode all"
-        echo "  theme wallpaper mode generated:plasma generated:spheres recolor"
-        echo "  theme wallpaper mode +generated:hexagons"
-        echo "  theme wallpaper mode -recolor"
+        echo "  theme wallpaper mode generated:plasma generated:code recolor"
+        echo "  theme wallpaper mode +ascii"
+        echo "  theme wallpaper mode -lowpoly"
         ;;
       current)
         echo ""

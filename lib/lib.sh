@@ -484,8 +484,11 @@ WALLPAPER_CURRENT_FILE="$THEME_STATE_DIR/wallpaper-current"
 # Mode setting (which wallpaper types to include in rotation)
 WALLPAPER_MODE_FILE="${WALLPAPER_MODE_FILE:-$HOME/.config/theme/wallpaper-mode}"
 
-# All available generated styles
-WALLPAPER_GENERATED_STYLES=("plasma" "geometric" "hexagons" "circles" "swirl" "spotlight" "sphere" "spheres")
+# All available generated styles (no source image needed)
+WALLPAPER_GENERATED_STYLES=("plasma" "geometric" "hexagons" "circles" "swirl" "spotlight" "sphere" "spheres" "code" "banner")
+
+# Source-based transform types (need source images like recolor)
+WALLPAPER_SOURCE_TYPES=("recolor" "ascii" "lowpoly")
 
 #==============================================================================
 # WALLPAPER MODE MANAGEMENT
@@ -496,7 +499,9 @@ list_available_wallpaper_modes() {
   for style in "${WALLPAPER_GENERATED_STYLES[@]}"; do
     echo "generated:$style"
   done
-  echo "recolor"
+  for type in "${WALLPAPER_SOURCE_TYPES[@]}"; do
+    echo "$type"
+  done
 }
 
 # Get current wallpaper mode settings
@@ -605,13 +610,24 @@ is_wallpaper_type_enabled() {
     if echo "$current_mode" | grep -qxF "generated"; then
       return 0
     fi
-  elif [[ "$wp_type" == "recolor" ]]; then
-    if echo "$current_mode" | grep -qxF "recolor"; then
+  else
+    # Source-based types: recolor, ascii, lowpoly
+    if echo "$current_mode" | grep -qxF "$wp_type"; then
       return 0
     fi
   fi
 
   return 1
+}
+
+# Check if a source-based type is enabled (recolor, ascii, lowpoly)
+is_source_type_enabled() {
+  local type="$1"
+  local current_mode
+  current_mode=$(get_wallpaper_mode)
+
+  [[ "$current_mode" == "all" ]] && return 0
+  echo "$current_mode" | grep -qxF "$type"
 }
 
 # Get list of enabled generated styles based on current mode
@@ -920,18 +936,22 @@ apply_wallpaper() {
 
   # Build list of available wallpapers based on mode settings
   local available=()
+  local generators_dir
+  generators_dir="$(dirname "${BASH_SOURCE[0]}")/generators"
 
   # Add enabled generated styles
   while IFS= read -r style; do
     [[ -n "$style" ]] && available+=("generated:$style")
   done < <(get_enabled_generated_styles)
 
-  # Add recolor options if enabled and source images exist
-  if is_recolor_enabled; then
-    while IFS= read -r img; do
-      [[ -n "$img" ]] && available+=("recolor:$img")
-    done < <(get_all_wallpaper_images)
-  fi
+  # Add source-based types if enabled and source images exist
+  for source_type in "${WALLPAPER_SOURCE_TYPES[@]}"; do
+    if is_source_type_enabled "$source_type"; then
+      while IFS= read -r img; do
+        [[ -n "$img" ]] && available+=("${source_type}:$img")
+      done < <(get_all_wallpaper_images)
+    fi
+  done
 
   if [[ ${#available[@]} -eq 0 ]]; then
     echo "Error: No wallpapers available (check mode settings)" >&2
@@ -944,30 +964,72 @@ apply_wallpaper() {
   local wp_value="${selected#*:}"
   local wallpaper_id=""
 
-  if [[ "$wp_type" == "recolor" ]]; then
-    # Use gowall to recolor source image
-    local gowall_generator
-    gowall_generator="$(dirname "${BASH_SOURCE[0]}")/generators/wallpaper-gowall.sh"
-    if [[ -f "$gowall_generator" ]]; then
-      bash "$gowall_generator" "$lib_path/theme.yml" "$wp_value" "$wallpaper_file" >/dev/null 2>&1 || return 1
-      wallpaper_id="recolor:$wp_value"
-    else
+  case "$wp_type" in
+    generated)
+      # Check for special generators first
+      case "$wp_value" in
+        code)
+          local code_gen="$generators_dir/wallpaper-code.sh"
+          if [[ -f "$code_gen" ]]; then
+            bash "$code_gen" "$lib_path/theme.yml" "$wallpaper_file" >/dev/null 2>&1 || return 1
+          else
+            return 1
+          fi
+          ;;
+        banner)
+          local banner_gen="$generators_dir/wallpaper-banner.sh"
+          if [[ -f "$banner_gen" ]]; then
+            bash "$banner_gen" "$lib_path/theme.yml" "$wallpaper_file" >/dev/null 2>&1 || return 1
+          else
+            return 1
+          fi
+          ;;
+        *)
+          # Standard ImageMagick styles
+          local cache_file="$WALLPAPER_CACHE_DIR/$theme/${wp_value}.png"
+          if [[ -f "$cache_file" ]]; then
+            cp "$cache_file" "$wallpaper_file"
+          else
+            local generator_script="$generators_dir/wallpaper.sh"
+            [[ ! -f "$generator_script" ]] && return 1
+            bash "$generator_script" "$lib_path/theme.yml" "$wallpaper_file" "$wp_value" 1920 1080 >/dev/null 2>&1 || return 1
+          fi
+          ;;
+      esac
+      wallpaper_id="generated:$wp_value"
+      ;;
+    recolor)
+      local gowall_gen="$generators_dir/wallpaper-gowall.sh"
+      if [[ -f "$gowall_gen" ]]; then
+        bash "$gowall_gen" "$lib_path/theme.yml" "$wp_value" "$wallpaper_file" >/dev/null 2>&1 || return 1
+        wallpaper_id="recolor:$wp_value"
+      else
+        return 1
+      fi
+      ;;
+    ascii)
+      local ascii_gen="$generators_dir/wallpaper-ascii.sh"
+      if [[ -f "$ascii_gen" ]]; then
+        bash "$ascii_gen" "$lib_path/theme.yml" "$wp_value" "$wallpaper_file" >/dev/null 2>&1 || return 1
+        wallpaper_id="ascii:$wp_value"
+      else
+        return 1
+      fi
+      ;;
+    lowpoly)
+      local lowpoly_gen="$generators_dir/wallpaper-lowpoly.sh"
+      if [[ -f "$lowpoly_gen" ]]; then
+        bash "$lowpoly_gen" "$lib_path/theme.yml" "$wp_value" "$wallpaper_file" >/dev/null 2>&1 || return 1
+        wallpaper_id="lowpoly:$wp_value"
+      else
+        return 1
+      fi
+      ;;
+    *)
+      echo "Error: Unknown wallpaper type: $wp_type" >&2
       return 1
-    fi
-  else
-    local cache_file="$WALLPAPER_CACHE_DIR/$theme/${wp_value}.png"
-
-    if [[ -f "$cache_file" ]]; then
-      cp "$cache_file" "$wallpaper_file"
-    else
-      # Generate on-the-fly with ImageMagick
-      local generator_script
-      generator_script="$(dirname "${BASH_SOURCE[0]}")/generators/wallpaper.sh"
-      [[ ! -f "$generator_script" ]] && return 1
-      bash "$generator_script" "$lib_path/theme.yml" "$wallpaper_file" "$wp_value" 1920 1080 >/dev/null 2>&1 || return 1
-    fi
-    wallpaper_id="generated:$wp_value"
-  fi
+      ;;
+  esac
 
   # Set as desktop wallpaper on macOS using Finder (more reliable than System Events)
   osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$wallpaper_file\"" 2>/dev/null || return 1
@@ -976,7 +1038,11 @@ apply_wallpaper() {
   set_current_wallpaper "$wallpaper_id"
 
   # Output the selected style for status display
-  echo "$style"
+  if [[ "$wp_type" == "generated" ]]; then
+    echo "$wp_value"
+  else
+    echo "$wp_type ($(basename "$wp_value"))"
+  fi
   return 0
 }
 
@@ -1045,21 +1111,23 @@ rotate_wallpaper() {
     weights+=("$weight")
   done < <(get_enabled_generated_styles)
 
-  # Add recolor options if enabled and source images exist
-  if is_recolor_enabled; then
-    while IFS= read -r img; do
-      [[ -z "$img" ]] && continue
-      local wp_id="recolor:$img"
-      [[ "$wp_id" == "$current_wallpaper" ]] && continue
-      [[ -n "${rejected_map[$wp_id]:-}" ]] && continue
-      available+=("$wp_id")
-      local weight=1
-      if [[ -n "$weights_json" ]]; then
-        weight=$(echo "$weights_json" | jq -r --arg wp "$wp_id" '.[$wp] // 1')
-      fi
-      weights+=("$weight")
-    done < <(get_all_wallpaper_images)
-  fi
+  # Add source-based types if enabled and source images exist
+  for source_type in "${WALLPAPER_SOURCE_TYPES[@]}"; do
+    if is_source_type_enabled "$source_type"; then
+      while IFS= read -r img; do
+        [[ -z "$img" ]] && continue
+        local wp_id="${source_type}:$img"
+        [[ "$wp_id" == "$current_wallpaper" ]] && continue
+        [[ -n "${rejected_map[$wp_id]:-}" ]] && continue
+        available+=("$wp_id")
+        local weight=1
+        if [[ -n "$weights_json" ]]; then
+          weight=$(echo "$weights_json" | jq -r --arg wp "$wp_id" '.[$wp] // 1')
+        fi
+        weights+=("$weight")
+      done < <(get_all_wallpaper_images)
+    fi
+  done
 
   if [[ ${#available[@]} -eq 0 ]]; then
     echo "Error: No alternative wallpapers available" >&2
@@ -1090,37 +1158,81 @@ rotate_wallpaper() {
 
   local wp_type="${selected%%:*}"
   local wp_value="${selected#*:}"
+  local generators_dir
+  generators_dir="$(dirname "${BASH_SOURCE[0]}")/generators"
 
-  if [[ "$wp_type" == "recolor" ]]; then
-    local gowall_generator
-    gowall_generator="$(dirname "${BASH_SOURCE[0]}")/generators/wallpaper-gowall.sh"
-    if [[ -f "$gowall_generator" ]]; then
-      bash "$gowall_generator" "$lib_path/theme.yml" "$wp_value" "$wallpaper_file" >/dev/null 2>&1 || return 1
-    else
+  case "$wp_type" in
+    generated)
+      # Check for special generators first
+      case "$wp_value" in
+        code)
+          local code_gen="$generators_dir/wallpaper-code.sh"
+          if [[ -f "$code_gen" ]]; then
+            bash "$code_gen" "$lib_path/theme.yml" "$wallpaper_file" >/dev/null 2>&1 || return 1
+          else
+            return 1
+          fi
+          ;;
+        banner)
+          local banner_gen="$generators_dir/wallpaper-banner.sh"
+          if [[ -f "$banner_gen" ]]; then
+            bash "$banner_gen" "$lib_path/theme.yml" "$wallpaper_file" >/dev/null 2>&1 || return 1
+          else
+            return 1
+          fi
+          ;;
+        *)
+          # Standard ImageMagick styles
+          local cache_file="$WALLPAPER_CACHE_DIR/$theme/${wp_value}.png"
+          if [[ -f "$cache_file" ]]; then
+            cp "$cache_file" "$wallpaper_file"
+          else
+            local generator_script="$generators_dir/wallpaper.sh"
+            [[ ! -f "$generator_script" ]] && return 1
+            bash "$generator_script" "$lib_path/theme.yml" "$wallpaper_file" "$wp_value" 1920 1080 >/dev/null 2>&1 || return 1
+          fi
+          ;;
+      esac
+      ;;
+    recolor)
+      local gowall_gen="$generators_dir/wallpaper-gowall.sh"
+      if [[ -f "$gowall_gen" ]]; then
+        bash "$gowall_gen" "$lib_path/theme.yml" "$wp_value" "$wallpaper_file" >/dev/null 2>&1 || return 1
+      else
+        return 1
+      fi
+      ;;
+    ascii)
+      local ascii_gen="$generators_dir/wallpaper-ascii.sh"
+      if [[ -f "$ascii_gen" ]]; then
+        bash "$ascii_gen" "$lib_path/theme.yml" "$wp_value" "$wallpaper_file" >/dev/null 2>&1 || return 1
+      else
+        return 1
+      fi
+      ;;
+    lowpoly)
+      local lowpoly_gen="$generators_dir/wallpaper-lowpoly.sh"
+      if [[ -f "$lowpoly_gen" ]]; then
+        bash "$lowpoly_gen" "$lib_path/theme.yml" "$wp_value" "$wallpaper_file" >/dev/null 2>&1 || return 1
+      else
+        return 1
+      fi
+      ;;
+    *)
+      echo "Error: Unknown wallpaper type: $wp_type" >&2
       return 1
-    fi
-  else
-    local cache_file="$WALLPAPER_CACHE_DIR/$theme/${wp_value}.png"
-
-    if [[ -f "$cache_file" ]]; then
-      cp "$cache_file" "$wallpaper_file"
-    else
-      local generator_script
-      generator_script="$(dirname "${BASH_SOURCE[0]}")/generators/wallpaper.sh"
-      [[ ! -f "$generator_script" ]] && return 1
-      bash "$generator_script" "$lib_path/theme.yml" "$wallpaper_file" "$wp_value" 1920 1080 >/dev/null 2>&1 || return 1
-    fi
-  fi
+      ;;
+  esac
 
   osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$wallpaper_file\"" 2>/dev/null || return 1
 
   set_current_wallpaper "$selected"
 
   # Output for display
-  if [[ "$wp_type" == "recolor" ]]; then
-    echo "recolor ($(basename "$wp_value"))"
-  else
+  if [[ "$wp_type" == "generated" ]]; then
     echo "$wp_value"
+  else
+    echo "$wp_type ($(basename "$wp_value"))"
   fi
   return 0
 }
