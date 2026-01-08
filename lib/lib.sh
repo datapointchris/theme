@@ -481,6 +481,172 @@ WALLPAPER_SOURCES_FILE="${WALLPAPER_SOURCES_FILE:-$HOME/.config/theme/wallpaper-
 # Current wallpaper tracking
 WALLPAPER_CURRENT_FILE="$THEME_STATE_DIR/wallpaper-current"
 
+# Mode setting (which wallpaper types to include in rotation)
+WALLPAPER_MODE_FILE="${WALLPAPER_MODE_FILE:-$HOME/.config/theme/wallpaper-mode}"
+
+# All available generated styles
+WALLPAPER_GENERATED_STYLES=("plasma" "geometric" "hexagons" "circles" "swirl" "spotlight" "sphere" "spheres")
+
+#==============================================================================
+# WALLPAPER MODE MANAGEMENT
+#==============================================================================
+
+# List all available wallpaper modes/styles
+list_available_wallpaper_modes() {
+  for style in "${WALLPAPER_GENERATED_STYLES[@]}"; do
+    echo "generated:$style"
+  done
+  echo "recolor"
+}
+
+# Get current wallpaper mode settings
+# Returns: list of enabled modes, one per line, or "all" if not set
+get_wallpaper_mode() {
+  if [[ ! -f "$WALLPAPER_MODE_FILE" ]]; then
+    echo "all"
+    return
+  fi
+
+  local content
+  content=$(cat "$WALLPAPER_MODE_FILE")
+
+  if [[ -z "$content" ]]; then
+    echo "all"
+    return
+  fi
+
+  echo "$content"
+}
+
+# Set wallpaper mode to specific types
+# Args: type1 [type2 ...]
+# Special values: "all" enables everything
+set_wallpaper_mode() {
+  mkdir -p "$(dirname "$WALLPAPER_MODE_FILE")"
+
+  if [[ "$1" == "all" ]]; then
+    echo "all" > "$WALLPAPER_MODE_FILE"
+    return
+  fi
+
+  : > "$WALLPAPER_MODE_FILE"
+  for mode in "$@"; do
+    echo "$mode" >> "$WALLPAPER_MODE_FILE"
+  done
+}
+
+# Add a mode to current settings
+add_wallpaper_mode() {
+  local mode="$1"
+  local current
+  current=$(get_wallpaper_mode)
+
+  if [[ "$current" == "all" ]]; then
+    echo "Already set to 'all' - all modes enabled"
+    return
+  fi
+
+  if echo "$current" | grep -qxF "$mode"; then
+    echo "Mode already enabled: $mode"
+    return
+  fi
+
+  mkdir -p "$(dirname "$WALLPAPER_MODE_FILE")"
+  echo "$mode" >> "$WALLPAPER_MODE_FILE"
+  echo "Added: $mode"
+}
+
+# Remove a mode from current settings
+remove_wallpaper_mode() {
+  local mode="$1"
+  local current
+  current=$(get_wallpaper_mode)
+
+  if [[ "$current" == "all" ]]; then
+    # Switch from "all" to explicit list minus the removed mode
+    : > "$WALLPAPER_MODE_FILE"
+    while IFS= read -r available; do
+      [[ "$available" != "$mode" ]] && echo "$available" >> "$WALLPAPER_MODE_FILE"
+    done < <(list_available_wallpaper_modes)
+    echo "Removed: $mode (expanded from 'all')"
+    return
+  fi
+
+  if ! echo "$current" | grep -qxF "$mode"; then
+    echo "Mode not enabled: $mode"
+    return
+  fi
+
+  { grep -vxF "$mode" "$WALLPAPER_MODE_FILE" || true; } > "${WALLPAPER_MODE_FILE}.tmp"
+  mv "${WALLPAPER_MODE_FILE}.tmp" "$WALLPAPER_MODE_FILE"
+  echo "Removed: $mode"
+}
+
+# Check if a wallpaper type is enabled by current mode
+# Args: wallpaper_id (e.g., "generated:plasma" or "recolor:/path/to/file.jpg")
+# Returns: 0 if enabled, 1 if not
+is_wallpaper_type_enabled() {
+  local wallpaper_id="$1"
+  local current_mode
+  current_mode=$(get_wallpaper_mode)
+
+  if [[ "$current_mode" == "all" ]]; then
+    return 0
+  fi
+
+  local wp_type="${wallpaper_id%%:*}"
+  local wp_value="${wallpaper_id#*:}"
+
+  if [[ "$wp_type" == "generated" ]]; then
+    # Check exact match (generated:plasma) or category match (generated)
+    if echo "$current_mode" | grep -qxF "generated:$wp_value"; then
+      return 0
+    fi
+    if echo "$current_mode" | grep -qxF "generated"; then
+      return 0
+    fi
+  elif [[ "$wp_type" == "recolor" ]]; then
+    if echo "$current_mode" | grep -qxF "recolor"; then
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+# Get list of enabled generated styles based on current mode
+get_enabled_generated_styles() {
+  local current_mode
+  current_mode=$(get_wallpaper_mode)
+
+  if [[ "$current_mode" == "all" ]]; then
+    printf '%s\n' "${WALLPAPER_GENERATED_STYLES[@]}"
+    return
+  fi
+
+  # Check for category "generated" (all generated styles)
+  if echo "$current_mode" | grep -qxF "generated"; then
+    printf '%s\n' "${WALLPAPER_GENERATED_STYLES[@]}"
+    return
+  fi
+
+  # Check individual generated:style entries
+  for style in "${WALLPAPER_GENERATED_STYLES[@]}"; do
+    if echo "$current_mode" | grep -qxF "generated:$style"; then
+      echo "$style"
+    fi
+  done
+}
+
+# Check if recolor mode is enabled
+is_recolor_enabled() {
+  local current_mode
+  current_mode=$(get_wallpaper_mode)
+
+  [[ "$current_mode" == "all" ]] && return 0
+  echo "$current_mode" | grep -qxF "recolor"
+}
+
 #==============================================================================
 # WALLPAPER SOURCE MANAGEMENT (path-based, no copying)
 #==============================================================================
@@ -752,28 +918,44 @@ apply_wallpaper() {
   # Clean up old wallpaper files
   find "$wallpaper_dir" -name 'wallpaper-*.png' -mmin +1 -delete 2>/dev/null || true
 
-  # Pick random style - include "recolor" if source images are available
-  local styles=("plasma" "geometric" "hexagons" "circles" "swirl" "spotlight" "sphere" "spheres")
-  local source_image=""
-  if source_image=$(get_random_wallpaper_source 2>/dev/null) && [[ -n "$source_image" ]]; then
-    styles+=("recolor")
+  # Build list of available wallpapers based on mode settings
+  local available=()
+
+  # Add enabled generated styles
+  while IFS= read -r style; do
+    [[ -n "$style" ]] && available+=("generated:$style")
+  done < <(get_enabled_generated_styles)
+
+  # Add recolor options if enabled and source images exist
+  if is_recolor_enabled; then
+    while IFS= read -r img; do
+      [[ -n "$img" ]] && available+=("recolor:$img")
+    done < <(get_all_wallpaper_images)
   fi
 
-  local style="${styles[$((RANDOM % ${#styles[@]}))]}"
+  if [[ ${#available[@]} -eq 0 ]]; then
+    echo "Error: No wallpapers available (check mode settings)" >&2
+    return 1
+  fi
+
+  # Pick random from available
+  local selected="${available[$((RANDOM % ${#available[@]}))]}"
+  local wp_type="${selected%%:*}"
+  local wp_value="${selected#*:}"
   local wallpaper_id=""
 
-  if [[ "$style" == "recolor" ]]; then
+  if [[ "$wp_type" == "recolor" ]]; then
     # Use gowall to recolor source image
     local gowall_generator
     gowall_generator="$(dirname "${BASH_SOURCE[0]}")/generators/wallpaper-gowall.sh"
     if [[ -f "$gowall_generator" ]]; then
-      bash "$gowall_generator" "$lib_path/theme.yml" "$source_image" "$wallpaper_file" >/dev/null 2>&1 || return 1
-      wallpaper_id="recolor:$source_image"
+      bash "$gowall_generator" "$lib_path/theme.yml" "$wp_value" "$wallpaper_file" >/dev/null 2>&1 || return 1
+      wallpaper_id="recolor:$wp_value"
     else
       return 1
     fi
   else
-    local cache_file="$WALLPAPER_CACHE_DIR/$theme/${style}.png"
+    local cache_file="$WALLPAPER_CACHE_DIR/$theme/${wp_value}.png"
 
     if [[ -f "$cache_file" ]]; then
       cp "$cache_file" "$wallpaper_file"
@@ -782,9 +964,9 @@ apply_wallpaper() {
       local generator_script
       generator_script="$(dirname "${BASH_SOURCE[0]}")/generators/wallpaper.sh"
       [[ ! -f "$generator_script" ]] && return 1
-      bash "$generator_script" "$lib_path/theme.yml" "$wallpaper_file" "$style" 1920 1080 >/dev/null 2>&1 || return 1
+      bash "$generator_script" "$lib_path/theme.yml" "$wallpaper_file" "$wp_value" 1920 1080 >/dev/null 2>&1 || return 1
     fi
-    wallpaper_id="generated:$style"
+    wallpaper_id="generated:$wp_value"
   fi
 
   # Set as desktop wallpaper on macOS using Finder (more reliable than System Events)
@@ -846,9 +1028,10 @@ rotate_wallpaper() {
 
   local available=()
   local weights=()
-  local styles=("plasma" "geometric" "hexagons" "circles" "swirl" "spotlight" "sphere" "spheres")
 
-  for style in "${styles[@]}"; do
+  # Add enabled generated styles (respects mode setting)
+  while IFS= read -r style; do
+    [[ -z "$style" ]] && continue
     local wp_id="generated:$style"
     # Skip current and rejected
     [[ "$wp_id" == "$current_wallpaper" ]] && continue
@@ -860,21 +1043,23 @@ rotate_wallpaper() {
       weight=$(echo "$weights_json" | jq -r --arg wp "$wp_id" '.[$wp] // 1')
     fi
     weights+=("$weight")
-  done
+  done < <(get_enabled_generated_styles)
 
-  # Add recolor options if source images exist
-  while IFS= read -r img; do
-    [[ -z "$img" ]] && continue
-    local wp_id="recolor:$img"
-    [[ "$wp_id" == "$current_wallpaper" ]] && continue
-    [[ -n "${rejected_map[$wp_id]:-}" ]] && continue
-    available+=("$wp_id")
-    local weight=1
-    if [[ -n "$weights_json" ]]; then
-      weight=$(echo "$weights_json" | jq -r --arg wp "$wp_id" '.[$wp] // 1')
-    fi
-    weights+=("$weight")
-  done < <(get_all_wallpaper_images)
+  # Add recolor options if enabled and source images exist
+  if is_recolor_enabled; then
+    while IFS= read -r img; do
+      [[ -z "$img" ]] && continue
+      local wp_id="recolor:$img"
+      [[ "$wp_id" == "$current_wallpaper" ]] && continue
+      [[ -n "${rejected_map[$wp_id]:-}" ]] && continue
+      available+=("$wp_id")
+      local weight=1
+      if [[ -n "$weights_json" ]]; then
+        weight=$(echo "$weights_json" | jq -r --arg wp "$wp_id" '.[$wp] // 1')
+      fi
+      weights+=("$weight")
+    done < <(get_all_wallpaper_images)
+  fi
 
   if [[ ${#available[@]} -eq 0 ]]; then
     echo "Error: No alternative wallpapers available" >&2

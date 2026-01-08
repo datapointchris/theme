@@ -92,12 +92,21 @@ usage() {
   generate-wallpapers  Pre-generate all wallpapers (instant switching)
   wallpaper                    Show current wallpaper
   wallpaper rotate             Rotate to new wallpaper (keep theme)
+  wallpaper list               List all available wallpapers
+  wallpaper list --generated   List only generated styles
+  wallpaper list --recolor     List only recolor sources
   wallpaper like [note]        Like current wallpaper (for this theme)
   wallpaper dislike [note]     Dislike current wallpaper (for this theme)
   wallpaper reject <reason>    Reject wallpaper for this theme
   wallpaper history            Show wallpaper history
   wallpaper rank               Show wallpaper rankings for current theme
   wallpaper rank --global      Show global wallpaper rankings
+  wallpaper mode list          Show all available modes/styles
+  wallpaper mode current       Show currently enabled modes
+  wallpaper mode all           Enable all modes (default)
+  wallpaper mode <styles...>   Set exactly these styles
+  wallpaper mode +<style>      Add style to current
+  wallpaper mode -<style>      Remove style from current
   wallpaper source add <path>  Add image/directory for recoloring
   wallpaper source list        List configured sources
   wallpaper source remove <id> Remove a source
@@ -180,12 +189,21 @@ Wallpaper Commands
 ------------------
   wallpaper                       Show current wallpaper info
   wallpaper rotate                Rotate to new wallpaper (keep theme)
+  wallpaper list                  List all available wallpapers
+  wallpaper list --generated      List only generated styles
+  wallpaper list --recolor        List only recolor sources
   wallpaper like [note]           Like current wallpaper (for this theme)
   wallpaper dislike [note]        Dislike current wallpaper (for this theme)
   wallpaper reject <reason>       Reject wallpaper for this theme
   wallpaper history               Show wallpaper history
   wallpaper rank                  Show rankings for current theme
   wallpaper rank --global         Show global wallpaper rankings
+  wallpaper mode list             Show all available modes/styles
+  wallpaper mode current          Show currently enabled modes
+  wallpaper mode all              Enable all modes (default)
+  wallpaper mode <styles...>      Set exactly these styles
+  wallpaper mode +<style>         Add style to current
+  wallpaper mode -<style>         Remove style from current
   wallpaper source add <path>     Add image or directory for recoloring
   wallpaper source list           List configured sources
   wallpaper source remove <id>    Remove a source
@@ -195,6 +213,7 @@ Wallpaper Commands
   Preferences are per-theme: a wallpaper liked for Gruvbox may be
   rejected for Nord. Sources are stored as path references (not copied).
   gowall converts your images to match the current theme's color palette.
+  Mode settings control which wallpaper types are included in rotation.
 
 Sync Commands
 -------------
@@ -1352,6 +1371,132 @@ main() {
         echo "  ✗ wallpaper rotation failed" >&2
         exit 1
       fi
+      ;;
+    list)
+      local filter="${3:-}"
+      echo ""
+      echo "Available Wallpapers"
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      echo ""
+
+      local current_mode
+      current_mode=$(get_wallpaper_mode)
+      echo "Mode: $current_mode"
+      echo ""
+
+      if [[ "$filter" != "--recolor" ]]; then
+        echo "Generated Styles:"
+        for style in "${WALLPAPER_GENERATED_STYLES[@]}"; do
+          local enabled=""
+          if is_wallpaper_type_enabled "generated:$style"; then
+            enabled="✓"
+          else
+            enabled="✗"
+          fi
+          echo "  [$enabled] generated:$style"
+        done
+        echo ""
+      fi
+
+      if [[ "$filter" != "--generated" ]]; then
+        echo "Recolor Sources:"
+        local recolor_enabled=""
+        if is_recolor_enabled; then
+          recolor_enabled="✓"
+        else
+          recolor_enabled="✗"
+        fi
+        echo "  [$recolor_enabled] recolor mode"
+
+        local images
+        images=$(get_all_wallpaper_images)
+        if [[ -n "$images" ]]; then
+          local count
+          count=$(echo "$images" | wc -l | xargs)
+          echo "  $count source images available"
+          echo ""
+          echo "$images" | head -10 | while IFS= read -r img; do
+            echo "    - $(basename "$img")"
+          done
+          if [[ $count -gt 10 ]]; then
+            echo "    ... and $((count - 10)) more"
+          fi
+        else
+          echo "  No source images configured"
+          echo "  Add with: theme wallpaper source add <path>"
+        fi
+        echo ""
+      fi
+
+      local total_count
+      total_count=$(get_enabled_generated_styles | wc -l | xargs)
+      if is_recolor_enabled; then
+        local recolor_count
+        recolor_count=$(get_all_wallpaper_images | wc -l | xargs)
+        total_count=$((total_count + recolor_count))
+      fi
+      echo "Total enabled: $total_count wallpapers"
+      ;;
+    mode)
+      case "${3:-}" in
+      "" | list)
+        echo ""
+        echo "Available Wallpaper Modes"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo ""
+        echo "Generated styles:"
+        for style in "${WALLPAPER_GENERATED_STYLES[@]}"; do
+          echo "  generated:$style"
+        done
+        echo ""
+        echo "Other:"
+        echo "  recolor        - Recolor source images with gowall"
+        echo "  generated      - All generated styles (shortcut)"
+        echo "  all            - Everything (default)"
+        echo ""
+        echo "Examples:"
+        echo "  theme wallpaper mode all"
+        echo "  theme wallpaper mode generated:plasma generated:spheres recolor"
+        echo "  theme wallpaper mode +generated:hexagons"
+        echo "  theme wallpaper mode -recolor"
+        ;;
+      current)
+        echo ""
+        echo "Current Wallpaper Mode"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo ""
+        local current_mode
+        current_mode=$(get_wallpaper_mode)
+        if [[ "$current_mode" == "all" ]]; then
+          echo "Mode: all (everything enabled)"
+        else
+          echo "Enabled modes:"
+          echo "$current_mode" | while IFS= read -r mode; do
+            echo "  - $mode"
+          done
+        fi
+        ;;
+      all)
+        set_wallpaper_mode "all"
+        echo "Set mode: all (everything enabled)"
+        ;;
+      +*)
+        local mode="${3:1}"  # Remove leading +
+        add_wallpaper_mode "$mode"
+        ;;
+      -*)
+        local mode="${3:1}"  # Remove leading -
+        remove_wallpaper_mode "$mode"
+        ;;
+      *)
+        # Set specific modes
+        set_wallpaper_mode "${@:3}"
+        echo "Set modes:"
+        for mode in "${@:3}"; do
+          echo "  - $mode"
+        done
+        ;;
+      esac
       ;;
     like)
       local message="${*:3}"
