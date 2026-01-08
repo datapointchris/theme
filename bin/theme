@@ -92,6 +92,12 @@ usage() {
   generate-wallpapers  Pre-generate all wallpapers (instant switching)
   wallpaper                    Show current wallpaper
   wallpaper rotate             Rotate to new wallpaper (keep theme)
+  wallpaper like [note]        Like current wallpaper (for this theme)
+  wallpaper dislike [note]     Dislike current wallpaper (for this theme)
+  wallpaper reject <reason>    Reject wallpaper for this theme
+  wallpaper history            Show wallpaper history
+  wallpaper rank               Show wallpaper rankings for current theme
+  wallpaper rank --global      Show global wallpaper rankings
   wallpaper source add <path>  Add image/directory for recoloring
   wallpaper source list        List configured sources
   wallpaper source remove <id> Remove a source
@@ -174,14 +180,20 @@ Wallpaper Commands
 ------------------
   wallpaper                       Show current wallpaper info
   wallpaper rotate                Rotate to new wallpaper (keep theme)
+  wallpaper like [note]           Like current wallpaper (for this theme)
+  wallpaper dislike [note]        Dislike current wallpaper (for this theme)
+  wallpaper reject <reason>       Reject wallpaper for this theme
+  wallpaper history               Show wallpaper history
+  wallpaper rank                  Show rankings for current theme
+  wallpaper rank --global         Show global wallpaper rankings
   wallpaper source add <path>     Add image or directory for recoloring
   wallpaper source list           List configured sources
   wallpaper source remove <id>    Remove a source
   wallpaper source verify         Check for broken source paths
   wallpaper source clean          Remove broken source entries
 
-  Sources are stored as path references (not copied).
-  When sources exist, "recolor" is added to the wallpaper style rotation.
+  Preferences are per-theme: a wallpaper liked for Gruvbox may be
+  rejected for Nord. Sources are stored as path references (not copied).
   gowall converts your images to match the current theme's color palette.
 
 Sync Commands
@@ -312,12 +324,20 @@ apply_theme() {
 
   local applied
   applied=$(echo "$result" | grep "^APPLIED:" | cut -d: -f2)
+  local wallpaper_id
+  wallpaper_id=$(echo "$result" | grep "^WALLPAPER:" | cut -d: -f2-)
 
   # Reload applicable apps
   reload_apps "$applied"
 
-  # Log the action
+  # Log the theme action
   log_action "apply" "$canonical"
+
+  # Log the wallpaper action if one was applied
+  if [[ -n "$wallpaper_id" ]] && [[ "$wallpaper_id" != "none" ]]; then
+    log_wallpaper_action "apply" "$wallpaper_id" "$canonical"
+  fi
+
   sync_after_action
 
   echo ""
@@ -1310,13 +1330,175 @@ main() {
       fi
 
       echo "Rotating wallpaper..."
+
+      # Get current theme for filtering
+      local current_theme
+      current_theme=$(get_current_theme)
+
+      # Get rejected wallpapers and weights for this theme
+      local rejected_list weights_json
+      rejected_list=$(get_rejected_wallpaper_ids "$current_theme")
+      weights_json=$(compute_wallpaper_weights "$current_theme")
+
       local new_style
-      if new_style=$(rotate_wallpaper); then
+      if new_style=$(rotate_wallpaper "$rejected_list" "$weights_json"); then
         echo "  ✓ wallpaper ($new_style)"
+        # Log the wallpaper action
+        local wallpaper_id
+        wallpaper_id=$(get_current_wallpaper)
+        log_wallpaper_action "apply" "$wallpaper_id" "$current_theme"
+        sync_after_action
       else
         echo "  ✗ wallpaper rotation failed" >&2
         exit 1
       fi
+      ;;
+    like)
+      local message="${*:3}"
+      local wallpaper_id current_theme
+      wallpaper_id=$(get_current_wallpaper)
+      current_theme=$(get_current_theme)
+
+      if [[ -z "$wallpaper_id" ]]; then
+        echo "Error: No wallpaper currently set" >&2
+        exit 1
+      fi
+
+      log_wallpaper_action "like" "$wallpaper_id" "$current_theme" "$message"
+      sync_after_action
+
+      local wp_type="${wallpaper_id%%:*}"
+      local wp_value="${wallpaper_id#*:}"
+      echo "Liked wallpaper for theme: $current_theme"
+      if [[ "$wp_type" == "recolor" ]]; then
+        echo "  Wallpaper: recolor ($(basename "$wp_value"))"
+      else
+        echo "  Wallpaper: $wp_value"
+      fi
+      [[ -n "$message" ]] && echo "  Note: $message"
+      ;;
+    dislike)
+      local message="${*:3}"
+      local wallpaper_id current_theme
+      wallpaper_id=$(get_current_wallpaper)
+      current_theme=$(get_current_theme)
+
+      if [[ -z "$wallpaper_id" ]]; then
+        echo "Error: No wallpaper currently set" >&2
+        exit 1
+      fi
+
+      log_wallpaper_action "dislike" "$wallpaper_id" "$current_theme" "$message"
+      sync_after_action
+
+      local wp_type="${wallpaper_id%%:*}"
+      local wp_value="${wallpaper_id#*:}"
+      echo "Disliked wallpaper for theme: $current_theme"
+      if [[ "$wp_type" == "recolor" ]]; then
+        echo "  Wallpaper: recolor ($(basename "$wp_value"))"
+      else
+        echo "  Wallpaper: $wp_value"
+      fi
+      [[ -n "$message" ]] && echo "  Note: $message"
+      ;;
+    reject)
+      local message="${*:3}"
+      local wallpaper_id current_theme
+      wallpaper_id=$(get_current_wallpaper)
+      current_theme=$(get_current_theme)
+
+      if [[ -z "$wallpaper_id" ]]; then
+        echo "Error: No wallpaper currently set" >&2
+        exit 1
+      fi
+
+      if [[ -z "$message" ]]; then
+        echo "Error: Rejection reason required" >&2
+        echo "Usage: theme wallpaper reject <reason>" >&2
+        exit 1
+      fi
+
+      log_wallpaper_action "reject" "$wallpaper_id" "$current_theme" "$message"
+      sync_after_action
+
+      local wp_type="${wallpaper_id%%:*}"
+      local wp_value="${wallpaper_id#*:}"
+      echo "Rejected wallpaper for theme: $current_theme"
+      if [[ "$wp_type" == "recolor" ]]; then
+        echo "  Wallpaper: recolor ($(basename "$wp_value"))"
+      else
+        echo "  Wallpaper: $wp_value"
+      fi
+      echo "  Reason: $message"
+      echo ""
+      echo "This wallpaper will be skipped for this theme."
+      ;;
+    history)
+      sync_before_read
+      local history
+      history=$(get_wallpaper_history)
+
+      if [[ -z "$history" ]] || [[ "$history" == "[]" ]]; then
+        echo "No wallpaper history yet."
+        return
+      fi
+
+      echo ""
+      echo "Wallpaper History"
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      echo ""
+
+      echo "$history" | jq -r '.[] | "\(.ts) | \(.machine) | \(.theme) | \(.action) | \(.wallpaper)" + (if .message then " | \(.message)" else "" end)' | tail -20
+      ;;
+    rank)
+      sync_before_read
+      local current_theme global_flag
+      current_theme=$(get_current_theme)
+      global_flag="${3:-}"
+
+      local rankings
+      if [[ "$global_flag" == "--global" ]]; then
+        echo ""
+        echo "Global Wallpaper Rankings"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        rankings=$(get_wallpaper_rankings)
+      else
+        echo ""
+        echo "Wallpaper Rankings for: $current_theme"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        rankings=$(get_wallpaper_rankings "$current_theme")
+      fi
+
+      if [[ -z "$rankings" ]]; then
+        echo ""
+        echo "No rankings yet. Apply and rate some wallpapers!"
+        return
+      fi
+
+      echo ""
+      local rank=0
+      while IFS= read -r line; do
+        rank=$((rank + 1))
+        local wallpaper score likes dislikes applies
+        wallpaper=$(echo "$line" | jq -r '.wallpaper')
+        score=$(echo "$line" | jq -r '.score')
+        likes=$(echo "$line" | jq -r '.likes')
+        dislikes=$(echo "$line" | jq -r '.dislikes')
+        applies=$(echo "$line" | jq -r '.applies')
+
+        local wp_type="${wallpaper%%:*}"
+        local wp_value="${wallpaper#*:}"
+        local display_name
+        if [[ "$wp_type" == "recolor" ]]; then
+          display_name="recolor: $(basename "$wp_value")"
+        else
+          display_name="$wallpaper"
+        fi
+
+        printf "%2d. %s\n" "$rank" "$display_name"
+        printf "    Score: %+d (%d likes, %d dislikes) | Applied: %d times\n" "$score" "$likes" "$dislikes" "$applies"
+      done <<< "$rankings"
+      echo ""
       ;;
     source)
       case "${3:-list}" in

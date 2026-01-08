@@ -800,7 +800,13 @@ apply_wallpaper() {
 
 # Rotate wallpaper without changing theme (macOS)
 # Selects a different wallpaper than current, applies it
+# Args: [rejected_list] [weights_json]
+#   rejected_list: newline-separated list of rejected wallpaper IDs
+#   weights_json: JSON object mapping wallpaper ID to weight (default 1.0)
 rotate_wallpaper() {
+  local rejected_list="${1:-}"
+  local weights_json="${2:-}"
+
   local theme
   theme=$(get_current_theme)
 
@@ -826,23 +832,48 @@ rotate_wallpaper() {
 
   find "$wallpaper_dir" -name 'wallpaper-*.png' -mmin +1 -delete 2>/dev/null || true
 
-  # Build list of available wallpapers, excluding current
+  # Build list of available wallpapers, excluding current and rejected
   local current_wallpaper
   current_wallpaper=$(get_current_wallpaper)
 
+  # Convert rejected list to associative array for O(1) lookup
+  declare -A rejected_map
+  if [[ -n "$rejected_list" ]]; then
+    while IFS= read -r wp; do
+      [[ -n "$wp" ]] && rejected_map["$wp"]=1
+    done <<< "$rejected_list"
+  fi
+
   local available=()
+  local weights=()
   local styles=("plasma" "geometric" "hexagons" "circles" "swirl" "spotlight" "sphere" "spheres")
 
   for style in "${styles[@]}"; do
     local wp_id="generated:$style"
-    [[ "$wp_id" != "$current_wallpaper" ]] && available+=("$wp_id")
+    # Skip current and rejected
+    [[ "$wp_id" == "$current_wallpaper" ]] && continue
+    [[ -n "${rejected_map[$wp_id]:-}" ]] && continue
+    available+=("$wp_id")
+    # Get weight from JSON or default to 1
+    local weight=1
+    if [[ -n "$weights_json" ]]; then
+      weight=$(echo "$weights_json" | jq -r --arg wp "$wp_id" '.[$wp] // 1')
+    fi
+    weights+=("$weight")
   done
 
   # Add recolor options if source images exist
   while IFS= read -r img; do
     [[ -z "$img" ]] && continue
     local wp_id="recolor:$img"
-    [[ "$wp_id" != "$current_wallpaper" ]] && available+=("$wp_id")
+    [[ "$wp_id" == "$current_wallpaper" ]] && continue
+    [[ -n "${rejected_map[$wp_id]:-}" ]] && continue
+    available+=("$wp_id")
+    local weight=1
+    if [[ -n "$weights_json" ]]; then
+      weight=$(echo "$weights_json" | jq -r --arg wp "$wp_id" '.[$wp] // 1')
+    fi
+    weights+=("$weight")
   done < <(get_all_wallpaper_images)
 
   if [[ ${#available[@]} -eq 0 ]]; then
@@ -850,8 +881,28 @@ rotate_wallpaper() {
     return 1
   fi
 
-  # Pick random from available
-  local selected="${available[$((RANDOM % ${#available[@]}))]}"
+  # Weighted random selection
+  local total_weight=0
+  for w in "${weights[@]}"; do
+    total_weight=$(awk "BEGIN {print $total_weight + $w}")
+  done
+
+  local rand_val
+  rand_val=$(awk "BEGIN {srand(); print rand() * $total_weight}")
+
+  local cumulative=0
+  local selected=""
+  for i in "${!available[@]}"; do
+    cumulative=$(awk "BEGIN {print $cumulative + ${weights[$i]}}")
+    if awk "BEGIN {exit !($rand_val <= $cumulative)}"; then
+      selected="${available[$i]}"
+      break
+    fi
+  done
+
+  # Fallback if something went wrong with weighting
+  [[ -z "$selected" ]] && selected="${available[0]}"
+
   local wp_type="${selected%%:*}"
   local wp_value="${selected#*:}"
 
@@ -1108,11 +1159,13 @@ apply_theme_to_apps() {
   fi
 
   # Wallpaper (macOS only)
+  local wallpaper_id=""
   if [[ "$platform" == "macos" ]]; then
     local wallpaper_style
     if wallpaper_style=$(apply_wallpaper "$theme" 2>/dev/null); then
       applied+=("wallpaper")
       _print_app_status "wallpaper ($wallpaper_style)" "true"
+      wallpaper_id=$(get_current_wallpaper)
     else
       skipped+=("wallpaper")
       _print_app_status "wallpaper" "false"
@@ -1197,6 +1250,7 @@ apply_theme_to_apps() {
   # Return results
   echo "APPLIED:${applied[*]:-none}"
   echo "SKIPPED:${skipped[*]:-none}"
+  echo "WALLPAPER:${wallpaper_id:-none}"
 }
 
 #==============================================================================
