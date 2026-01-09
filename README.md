@@ -74,11 +74,14 @@ theme sync on                 # Re-enable sync
 
 After initialization, sync happens automatically in the background.
 
-### Updates
+### Version and Updates
 
 ```bash
-theme upgrade                 # Pull latest changes (shows changelog)
+theme --version               # Show current version
+theme upgrade                 # Update to latest release
 ```
+
+Releases are automated via [release-please](https://github.com/googleapis/release-please). The upgrade command only pulls tagged releases, ensuring you always get stable versions.
 
 ## Supported Applications
 
@@ -165,7 +168,7 @@ special:
   cursor: "#ebdbb2"
 ```
 
-3. Generate app configs using the generators in `lib/generators/`
+1. Generate app configs using the generators in `lib/generators/`
 
 ## License
 
