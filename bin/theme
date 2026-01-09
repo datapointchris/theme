@@ -24,6 +24,10 @@ source "$THEME_APP_DIR/lib/lib.sh"
 source "$THEME_APP_DIR/lib/storage.sh"
 source "$THEME_APP_DIR/lib/sync.sh"
 
+get_version() {
+  git -C "$THEME_APP_DIR" describe --tags --always 2>/dev/null || echo "dev"
+}
+
 # Rename original functions and create filtered versions
 eval "$(declare -f list_themes | sed '1s/list_themes/list_themes_unfiltered/')"
 eval "$(declare -f list_themes_with_status | sed '1s/list_themes_with_status/list_themes_with_status_unfiltered/')"
@@ -85,7 +89,7 @@ usage() {
   rejected             List all rejected themes
   unreject             Restore a rejected theme (fzf picker with history)
   verify               Check theme system is working
-  upgrade              Update theme to latest version (git pull)
+  upgrade              Update theme to latest release
   generate-previews    Pre-generate all preview images
   clear-cache          Clear preview cache
 EOF
@@ -127,7 +131,7 @@ Commands
   rejected             List all rejected themes
   unreject             Restore a rejected theme (fzf picker with history)
   verify               Check theme system is working
-  upgrade              Update theme to latest version (git pull)
+  upgrade              Update theme to latest release
   generate-previews    Pre-generate all preview images
   clear-cache          Clear preview cache
 
@@ -1443,27 +1447,24 @@ main() {
     verify_system
     ;;
   upgrade | update)
-    local before_commit after_commit
-    before_commit=$(git -C "$THEME_APP_DIR" rev-parse HEAD)
+    local before_version latest_tag
+    before_version=$(git -C "$THEME_APP_DIR" describe --tags --always 2>/dev/null)
 
-    if ! git -C "$THEME_APP_DIR" pull --quiet; then
-      echo "✗ theme upgrade failed" >&2
+    git -C "$THEME_APP_DIR" fetch --tags --quiet 2>/dev/null
+    latest_tag=$(git -C "$THEME_APP_DIR" tag -l 'v*' --sort=-v:refname | head -n1)
+
+    if [[ -z "$latest_tag" ]]; then
+      echo "✗ no releases found" >&2
       exit 1
     fi
 
-    after_commit=$(git -C "$THEME_APP_DIR" rev-parse HEAD)
-
-    if [[ "$before_commit" == "$after_commit" ]]; then
-      echo "✓ theme is already up to date"
-    else
-      local before_desc after_desc
-      before_desc=$(git -C "$THEME_APP_DIR" describe --tags --always "$before_commit" 2>/dev/null || echo "${before_commit:0:7}")
-      after_desc=$(git -C "$THEME_APP_DIR" describe --tags --always "$after_commit" 2>/dev/null || echo "${after_commit:0:7}")
-      echo "✓ theme upgraded from $before_desc to $after_desc"
-      echo ""
-      echo "Changes:"
-      git -C "$THEME_APP_DIR" log --format="  • %s" "${before_commit}..${after_commit}"
+    if [[ "$before_version" == "$latest_tag" ]]; then
+      echo "✓ theme already at latest: $latest_tag"
+      exit 0
     fi
+
+    git -C "$THEME_APP_DIR" checkout --quiet "$latest_tag"
+    echo "✓ theme upgraded: $before_version → $latest_tag"
     ;;
   opacity)
     case "${2:-}" in
@@ -1992,6 +1993,10 @@ main() {
       exit 1
       ;;
     esac
+    ;;
+  --version | -v)
+    echo "theme $(get_version)"
+    exit 0
     ;;
   help | --help | -h)
     usage
