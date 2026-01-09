@@ -940,7 +940,106 @@ set_current_background() {
   echo "$background_id" > "$BACKGROUND_CURRENT_FILE"
 }
 
-# Apply background (macOS)
+# Set desktop wallpaper (platform-specific dispatcher)
+set_desktop_wallpaper() {
+  local background_file="$1"
+  local platform
+  platform=$(detect_platform)
+
+  case "$platform" in
+    macos)
+      set_desktop_wallpaper_macos "$background_file"
+      ;;
+    arch)
+      set_desktop_wallpaper_hyprland "$background_file"
+      ;;
+    wsl)
+      set_desktop_wallpaper_wsl "$background_file"
+      ;;
+    *)
+      echo "Warning: Background not supported on platform: $platform" >&2
+      return 1
+      ;;
+  esac
+}
+
+# macOS: Set wallpaper via Finder AppleScript
+set_desktop_wallpaper_macos() {
+  local background_file="$1"
+  osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$background_file\"" 2>/dev/null
+}
+
+# Arch/Hyprland: Set wallpaper via hyprpaper IPC
+set_desktop_wallpaper_hyprland() {
+  local background_file="$1"
+
+  if ! pgrep -x hyprpaper &>/dev/null; then
+    echo "Warning: hyprpaper not running" >&2
+    return 1
+  fi
+
+  # Unload old wallpapers to free memory, then preload and set new one
+  hyprctl hyprpaper unload all 2>/dev/null || true
+  hyprctl hyprpaper preload "$background_file" 2>/dev/null || return 1
+  hyprctl hyprpaper wallpaper ",$background_file" 2>/dev/null || return 1
+
+  # Also update stable path for hyprpaper config fallback on restart
+  local stable_path="$HOME/.local/share/theme/background.png"
+  cp "$background_file" "$stable_path" 2>/dev/null || true
+}
+
+# WSL: Set Windows wallpaper via PowerShell (experimental, may fail on restricted systems)
+set_desktop_wallpaper_wsl() {
+  local background_file="$1"
+
+  # Get Windows username (may differ from Linux username)
+  local win_user
+  # shellcheck disable=SC2016  # $env:USERNAME is a PowerShell variable, not shell
+  win_user=$(powershell.exe -NoProfile -Command 'Write-Host -NoNewline $env:USERNAME' 2>/dev/null | tr -d '\r')
+
+  if [[ -z "$win_user" ]]; then
+    echo "Warning: Could not determine Windows username" >&2
+    return 1
+  fi
+
+  # Copy to Windows-accessible location
+  local win_dir="/mnt/c/Users/$win_user/Pictures/theme"
+  mkdir -p "$win_dir" 2>/dev/null || {
+    echo "Warning: Could not create Windows directory: $win_dir" >&2
+    return 1
+  }
+
+  local win_file="$win_dir/background.png"
+  cp "$background_file" "$win_file" 2>/dev/null || {
+    echo "Warning: Could not copy background to Windows path" >&2
+    return 1
+  }
+
+  # Convert to Windows path format
+  local win_path="C:\\Users\\$win_user\\Pictures\\theme\\background.png"
+
+  # Set via PowerShell using SystemParametersInfo
+  powershell.exe -NoProfile -Command "
+    Add-Type -TypeDefinition '
+    using System.Runtime.InteropServices;
+    public class Wallpaper {
+      public const int SPI_SETDESKWALLPAPER = 0x0014;
+      public const int SPIF_UPDATEINIFILE = 0x01;
+      public const int SPIF_SENDCHANGE = 0x02;
+      [DllImport(\"user32.dll\", CharSet=CharSet.Auto)]
+      static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+      public static void Set(string path) {
+        SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, path, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE);
+      }
+    }';
+    [Wallpaper]::Set('$win_path')
+  " 2>/dev/null || {
+    echo "Warning: PowerShell wallpaper command failed (may be restricted)" >&2
+    return 1
+  }
+}
+
+# Apply background
 # Returns: background_id (e.g., "generated:plasma" or "recolor:/path/to/image.jpg")
 apply_background() {
   local theme="$1"
@@ -1059,8 +1158,8 @@ apply_background() {
       ;;
   esac
 
-  # Set as desktop background on macOS using Finder (more reliable than System Events)
-  osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$background_file\"" 2>/dev/null || return 1
+  # Set as desktop background (platform-specific)
+  set_desktop_wallpaper "$background_file" || return 1
 
   # Track current background
   set_current_background "$background_id"
@@ -1074,7 +1173,7 @@ apply_background() {
   return 0
 }
 
-# Rotate background without changing theme (macOS)
+# Rotate background without changing theme
 # Selects a different background than current, applies it
 # Args: [rejected_list] [weights_json]
 #   rejected_list: newline-separated list of rejected background IDs
@@ -1252,7 +1351,7 @@ rotate_background() {
       ;;
   esac
 
-  osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$background_file\"" 2>/dev/null || return 1
+  set_desktop_wallpaper "$background_file" || return 1
 
   set_current_background "$selected"
 
@@ -1483,9 +1582,9 @@ apply_theme_to_apps() {
     fi
   fi
 
-  # Background (macOS only)
+  # Background (macOS, Arch, WSL)
   local background_id=""
-  if [[ "$platform" == "macos" ]]; then
+  if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]] || [[ "$platform" == "wsl" ]]; then
     local background_style
     if background_style=$(apply_background "$theme" 2>/dev/null); then
       applied+=("background")
