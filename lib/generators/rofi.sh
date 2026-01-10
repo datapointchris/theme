@@ -24,6 +24,12 @@ output_file="${2:-}"
 
 eval "$(load_colors "$input_file")"
 
+# Use extended palette colors when available, fall back to base16
+DIAG_ERROR="${EXTENDED_DIAGNOSTIC_ERROR:-$BASE08}"
+DIAG_OK="${EXTENDED_DIAGNOSTIC_OK:-$BASE0B}"
+UI_ACCENT="${EXTENDED_UI_ACCENT:-$BASE0D}"
+UI_BORDER="${EXTENDED_UI_BORDER:-$SPECIAL_BORDER}"
+
 generate() {
   cat << EOF
 /* ${THEME_NAME} - Rofi colors */
@@ -57,12 +63,12 @@ generate() {
     fg-alt: ${BASE04};
     fg-muted: ${BASE03};
     fg-bright: ${BASE06};
-    border: ${SPECIAL_BORDER};
+    border: ${UI_BORDER};
 
-    /* Status colors */
-    urgent: ${BASE08};
-    active: ${BASE0B};
-    selected: ${BASE0D};
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: ${DIAG_ERROR};
+    active: ${DIAG_OK};
+    selected: ${UI_ACCENT};
 
     /* Named accent colors */
     red: ${ANSI_RED};

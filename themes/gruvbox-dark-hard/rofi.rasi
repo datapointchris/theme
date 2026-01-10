@@ -1,16 +1,55 @@
 /* Gruvbox Dark Hard - Rofi colors */
 /* Generated from theme.yml */
+/* Author: morhetz (https://github.com/morhetz/gruvbox) */
 
 * {
+    /* Base16 palette */
+    base00: #1d2021;  /* Main background */
+    base01: #3c3836;  /* Lighter background */
+    base02: #504945;  /* Selection background */
+    base03: #665c54;  /* Comments, muted */
+    base04: #928374;  /* Dark foreground */
+    base05: #ebdbb2;  /* Default foreground */
+    base06: #d5c4a1;  /* Light foreground */
+    base07: #fbf1c7;  /* Brightest foreground */
+    base08: #fb4934;  /* Red */
+    base09: #fe8019;  /* Orange */
+    base0A: #fabd2f;  /* Yellow */
+    base0B: #b8bb26;  /* Green */
+    base0C: #8ec07c;  /* Cyan */
+    base0D: #83a598;  /* Blue */
+    base0E: #d3869b;  /* Magenta */
+    base0F: #d65d0e;  /* Brown */
+
+    /* Semantic colors */
     bg: #1d2021;
     bg-alt: #3c3836;
     bg-selected: #665c54;
     fg: #ebdbb2;
     fg-alt: #928374;
-    blue: #458588;
-    magenta: #b16286;
+    fg-muted: #665c54;
+    fg-bright: #d5c4a1;
+    border: #504945;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #fb4934;
+    active: #b8bb26;
+    selected: #83a598;
+
+    /* Named accent colors */
     red: #cc241d;
     green: #98971a;
     yellow: #d79921;
+    blue: #458588;
+    magenta: #b16286;
     cyan: #689d6a;
+    orange: #fe8019;
+
+    /* Bright variants */
+    bright-red: #fb4934;
+    bright-green: #b8bb26;
+    bright-yellow: #fabd2f;
+    bright-blue: #83a598;
+    bright-magenta: #d3869b;
+    bright-cyan: #8ec07c;
 }

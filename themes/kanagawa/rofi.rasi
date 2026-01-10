@@ -1,16 +1,55 @@
 /* Kanagawa - Rofi colors */
 /* Generated from theme.yml */
+/* Author: Tommaso Laurenzi (rebelot) */
 
 * {
+    /* Base16 palette */
+    base00: #1f1f28;  /* Main background */
+    base01: #16161d;  /* Lighter background */
+    base02: #2d4f67;  /* Selection background */
+    base03: #727169;  /* Comments, muted */
+    base04: #c8c093;  /* Dark foreground */
+    base05: #dcd7ba;  /* Default foreground */
+    base06: #c8c093;  /* Light foreground */
+    base07: #717c7c;  /* Brightest foreground */
+    base08: #c34043;  /* Red */
+    base09: #ffa066;  /* Orange */
+    base0A: #c0a36e;  /* Yellow */
+    base0B: #76946a;  /* Green */
+    base0C: #6a9589;  /* Cyan */
+    base0D: #7e9cd8;  /* Blue */
+    base0E: #957fb8;  /* Magenta */
+    base0F: #d27e99;  /* Brown */
+
+    /* Semantic colors */
     bg: #1f1f28;
     bg-alt: #16161d;
     bg-selected: #2d4f67;
     fg: #dcd7ba;
     fg-alt: #c8c093;
-    blue: #7e9cd8;
-    magenta: #957fb8;
+    fg-muted: #727169;
+    fg-bright: #c8c093;
+    border: #54546d;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #e82424;
+    active: #76946a;
+    selected: #7e9cd8;
+
+    /* Named accent colors */
     red: #c34043;
     green: #76946a;
     yellow: #c0a36e;
+    blue: #7e9cd8;
+    magenta: #957fb8;
     cyan: #6a9589;
+    orange: #ffa066;
+
+    /* Bright variants */
+    bright-red: #e82424;
+    bright-green: #98bb6c;
+    bright-yellow: #e6c384;
+    bright-blue: #7fb4ca;
+    bright-magenta: #938aa9;
+    bright-cyan: #7aa89f;
 }
