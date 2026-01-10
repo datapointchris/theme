@@ -58,25 +58,14 @@ special:
   panel: "#001419"
 
 extended:
-  # Background/foreground variants (from solarized-osaka.nvim HSL values)
-  base04: "#001419"
-  base03: "#002b36"
-  base02: "#073642"
-  base01: "#586e75"
-  base00: "#657b83"
-  base0: "#93a1a1"
-  base1: "#a9b1b1"
-  base2: "#eee8d5"
-  base3: "#fdf6e3"
-
-  # Diagnostic colors (from solarized-osaka.nvim)
+  # Diagnostic colors (maps to base16 - solarized uses consistent 16-color palette)
   diagnostic_error: "#dc322f"
   diagnostic_warning: "#b58900"
   diagnostic_info: "#268bd2"
   diagnostic_hint: "#2aa198"
   diagnostic_ok: "#859900"
 
-  # Syntax colors (from solarized-osaka.nvim groups/syntax.lua)
+  # Syntax colors (maps to base16)
   syntax_comment: "#586e75"
   syntax_string: "#2aa198"
   syntax_function: "#268bd2"
@@ -90,14 +79,14 @@ extended:
   syntax_preproc: "#dc322f"
   syntax_special: "#cb4b16"
 
-  # UI colors
+  # UI colors (maps to base16)
   ui_accent: "#268bd2"
   ui_border: "#073642"
   ui_selection: "#073642"
   ui_float_bg: "#002b36"
   ui_cursor_line: "#073642"
 
-  # Git colors
+  # Git colors (maps to base16)
   git_add: "#859900"
   git_change: "#b58900"
   git_delete: "#dc322f"
