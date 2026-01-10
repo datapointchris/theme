@@ -24,35 +24,41 @@ output_file="${2:-}"
 
 eval "$(load_colors "$input_file")"
 
+# Use extended palette colors when available, fall back to base16
+DIAG_ERROR="${EXTENDED_DIAGNOSTIC_ERROR:-$BASE08}"
+DIAG_INFO="${EXTENDED_DIAGNOSTIC_INFO:-$BASE0D}"
+DIAG_HINT="${EXTENDED_DIAGNOSTIC_HINT:-$BASE0C}"
+UI_ACCENT="${EXTENDED_UI_ACCENT:-$BASE0D}"
+
 generate() {
   cat << EOF
 # ${THEME_NAME} - Mako notification colors
 # Generated from theme.yml
 # Author: ${THEME_AUTHOR}
 
-# Default colors
+# Default colors - use info/accent for normal state
 text-color=${BASE05}
 background-color=${BASE00}
-border-color=${BASE0D}
-progress-color=over ${BASE0D}
+border-color=${DIAG_INFO}
+progress-color=over ${UI_ACCENT}
 
-# Low urgency - subtle cyan
+# Low urgency - subtle hint color
 [urgency=low]
 text-color=${BASE04}
 background-color=${BASE00}
-border-color=${BASE0C}
+border-color=${DIAG_HINT}
 
-# Normal urgency - blue accent
+# Normal urgency - info/accent color
 [urgency=normal]
 text-color=${BASE05}
 background-color=${BASE00}
-border-color=${BASE0D}
+border-color=${DIAG_INFO}
 
-# Critical urgency - red alert
+# Critical urgency - error color for maximum visibility
 [urgency=critical]
 text-color=${BASE07}
 background-color=${BASE01}
-border-color=${BASE08}
+border-color=${DIAG_ERROR}
 EOF
 }
 
