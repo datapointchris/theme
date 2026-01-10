@@ -23,6 +23,10 @@ output_file="${2:-}"
 
 eval "$(load_colors "$input_file")"
 
+# Use extended palette colors when available, fall back to base16
+UI_ACCENT="${EXTENDED_UI_ACCENT:-$BASE0D}"
+UI_BORDER="${EXTENDED_UI_BORDER:-$BASE02}"
+
 # Convert #RRGGBB to 0xAARRGGBB format
 hex_to_argb() {
   local hex="$1"
@@ -43,14 +47,14 @@ options=(
   width=8.0
   hidpi=on
 
-  # Active window - accent color (base0D)
-  active_color=$(hex_to_argb "$BASE0D")
+  # Active window - use UI accent color
+  active_color=$(hex_to_argb "$UI_ACCENT")
 
-  # Inactive windows - subtle border (base02)
-  inactive_color=$(hex_to_argb "$BASE02")
+  # Inactive windows - use UI border color
+  inactive_color=$(hex_to_argb "$UI_BORDER")
 
   # Glow effect using accent color
-  active_color='glow($(hex_to_argb "$BASE0D"))'
+  active_color='glow($(hex_to_argb "$UI_ACCENT"))'
 
   blacklist="System Settings|System Information|QuickTime Player"
 )
