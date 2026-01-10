@@ -22,6 +22,13 @@ def slug_to_module(slug: str) -> str:
     return slug.replace("-", "_")
 
 
+def get_color(extended: dict, extended_key: str, base16_fallback: str) -> str:
+    """Get color preferring extended palette, falling back to base16."""
+    if extended_key in extended:
+        return f"M.palette.{extended_key}"
+    return f"M.palette.{base16_fallback}"
+
+
 def generate_palette_lua(theme: dict) -> str:
     """Generate palette.lua from theme.yml."""
     meta = theme.get("meta", {})
@@ -101,36 +108,36 @@ def generate_palette_lua(theme: dict) -> str:
         "    },",
         "  },",
         "  syn = {",
-        f'    comment = M.palette.base03,',
-        f'    string = M.palette.base0B,',
-        f'    number = M.palette.base0E,',
-        f'    constant = M.palette.base0E,',
-        f'    identifier = M.palette.base0D,',
-        f'    parameter = M.palette.base0D,',
-        f'    fun = M.palette.base0B,',
-        f'    statement = M.palette.base08,',
-        f'    keyword = M.palette.base08,',
-        f'    operator = M.palette.base09,',
-        f'    preproc = M.palette.base0C,',
-        f'    type = M.palette.base0A,',
-        f'    special1 = M.palette.base09,',
-        f'    special2 = M.palette.base08,',
-        f'    special3 = M.palette.base0C,',
-        f'    punct = M.palette.base09,',
-        f'    regex = M.palette.base0C,',
+        f'    comment = {get_color(extended, "syntax_comment", "base03")},',
+        f'    string = {get_color(extended, "syntax_string", "base0B")},',
+        f'    number = {get_color(extended, "syntax_number", "base0E")},',
+        f'    constant = {get_color(extended, "syntax_constant", "base0E")},',
+        f'    identifier = {get_color(extended, "syntax_identifier", "base0D")},',
+        f'    parameter = {get_color(extended, "syntax_parameter", "base0D")},',
+        f'    fun = {get_color(extended, "syntax_function", "base0B")},',
+        f'    statement = {get_color(extended, "syntax_statement", "base08")},',
+        f'    keyword = {get_color(extended, "syntax_keyword", "base08")},',
+        f'    operator = {get_color(extended, "syntax_operator", "base09")},',
+        f'    preproc = {get_color(extended, "syntax_preproc", "base0C")},',
+        f'    type = {get_color(extended, "syntax_type", "base0A")},',
+        f'    special1 = {get_color(extended, "syntax_special1", "base09")},',
+        f'    special2 = {get_color(extended, "syntax_special2", "base08")},',
+        f'    special3 = {get_color(extended, "syntax_special3", "base0C")},',
+        f'    punct = {get_color(extended, "syntax_punct", "base09")},',
+        f'    regex = {get_color(extended, "syntax_regex", "base0C")},',
         f'    deprecated = M.palette.base03,',
         "  },",
         "  diag = {",
-        f'    error = M.palette.base08,',
-        f'    warning = M.palette.base09,',
-        f'    info = M.palette.base0D,',
-        f'    hint = M.palette.base0C,',
-        f'    ok = M.palette.base0B,',
+        f'    error = {get_color(extended, "diagnostic_error", "base08")},',
+        f'    warning = {get_color(extended, "diagnostic_warning", "base09")},',
+        f'    info = {get_color(extended, "diagnostic_info", "base0D")},',
+        f'    hint = {get_color(extended, "diagnostic_hint", "base0C")},',
+        f'    ok = {get_color(extended, "diagnostic_ok", "base0B")},',
         "  },",
         "  vcs = {",
-        f'    added = M.palette.base0B,',
-        f'    changed = M.palette.base0A,',
-        f'    removed = M.palette.base08,',
+        f'    added = {get_color(extended, "git_add", "base0B")},',
+        f'    changed = {get_color(extended, "git_change", "base0A")},',
+        f'    removed = {get_color(extended, "git_delete", "base08")},',
         "  },",
         "  diff = {",
         f'    add = M.palette.base0B,',
@@ -1027,16 +1034,33 @@ def main():
     import sys
 
     if len(sys.argv) < 2:
-        print("Usage: neovim_generator.py <theme_dir>")
+        print("Usage: neovim_generator.py <theme_dir> [--force]")
         print("  theme_dir: Directory containing theme.yml")
+        print("  --force: Generate even for plugin themes (not recommended)")
         sys.exit(1)
 
+    force = "--force" in sys.argv
     theme_dir = Path(sys.argv[1])
     theme_path = theme_dir / "theme.yml"
 
     if not theme_path.exists():
         print(f"Error: {theme_path} not found")
         sys.exit(1)
+
+    # Safety check: warn if this theme uses a plugin
+    theme = load_theme(theme_path)
+    meta = theme.get("meta", {})
+    colorscheme_source = meta.get("neovim_colorscheme_source", "generated")
+
+    if colorscheme_source == "plugin":
+        plugin = meta.get("plugin", "unknown")
+        print(f"Error: Theme '{meta.get('id', theme_dir.name)}' uses neovim_colorscheme_source: plugin")
+        print(f"       This theme is designed to use the original plugin: {plugin}")
+        print(f"       Generating a colorscheme would shadow the plugin.")
+        if not force:
+            print("\n       Use --force to generate anyway (not recommended).")
+            sys.exit(1)
+        print("\n       --force specified, generating anyway...")
 
     output_dir = theme_dir / "neovim"
     print(f"Generating Neovim colorscheme from: {theme_path}")
