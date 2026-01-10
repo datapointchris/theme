@@ -1,18 +1,71 @@
 /* Gruvbox - waybar theme */
 /* Generated from theme.yml */
+/* Author: ellisonleao (https://github.com/ellisonleao/gruvbox.nvim) */
 
-/* Base colors */
+/* =============================================================================
+   BASE16 PALETTE
+   ============================================================================= */
+
+/* Background tones */
+@define-color base00 #1d2021;  /* Main background */
+@define-color base01 #3c3836;  /* Lighter background */
+@define-color base02 #504945;  /* Selection background */
+
+/* Foreground tones */
+@define-color base03 #665c54;  /* Comments, muted */
+@define-color base04 #928374;  /* Dark foreground */
+@define-color base05 #ebdbb2;  /* Default foreground */
+@define-color base06 #d5c4a1;  /* Light foreground */
+@define-color base07 #fbf1c7;  /* Brightest foreground */
+
+/* Accent colors */
+@define-color base08 #fb4934;  /* Red */
+@define-color base09 #fe8019;  /* Orange */
+@define-color base0A #fabd2f;  /* Yellow */
+@define-color base0B #b8bb26;  /* Green */
+@define-color base0C #8ec07c;  /* Cyan */
+@define-color base0D #83a598;  /* Blue */
+@define-color base0E #d3869b;  /* Magenta */
+@define-color base0F #d65d0e;  /* Brown */
+
+/* =============================================================================
+   SEMANTIC ALIASES
+   ============================================================================= */
+
+/* Backgrounds */
 @define-color bg #1d2021;
 @define-color bg-dark #3c3836;
 @define-color bg-highlight #504945;
+@define-color bg-selection #504945;
+
+/* Foregrounds */
 @define-color fg #ebdbb2;
 @define-color fg-dark #928374;
+@define-color fg-muted #665c54;
+@define-color fg-bright #d5c4a1;
 
-/* Accent colors */
-@define-color blue #83a598;
-@define-color cyan #8ec07c;
-@define-color green #b8bb26;
-@define-color magenta #d3869b;
+/* Status colors - use extended diagnostic colors when available */
+@define-color success #b8bb26;
+@define-color warning #fabd2f;
+@define-color error #fb4934;
+@define-color info #83a598;
+
+/* Named accent colors */
 @define-color red #fb4934;
+@define-color green #b8bb26;
 @define-color yellow #fabd2f;
+@define-color blue #83a598;
+@define-color magenta #d3869b;
+@define-color cyan #8ec07c;
 @define-color orange #fe8019;
+
+/* Bright variants */
+@define-color bright-red #fb4934;
+@define-color bright-green #b8bb26;
+@define-color bright-yellow #fabd2f;
+@define-color bright-blue #83a598;
+@define-color bright-magenta #d3869b;
+@define-color bright-cyan #8ec07c;
+
+/* Border - use extended UI border when available */
+@define-color border #504945;

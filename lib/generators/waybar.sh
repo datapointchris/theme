@@ -23,6 +23,13 @@ output_file="${2:-}"
 # Load palette into variables
 eval "$(load_colors "$input_file")"
 
+# Use extended palette colors when available, fall back to base16
+DIAG_ERROR="${EXTENDED_DIAGNOSTIC_ERROR:-$BASE08}"
+DIAG_WARNING="${EXTENDED_DIAGNOSTIC_WARNING:-$BASE09}"
+DIAG_INFO="${EXTENDED_DIAGNOSTIC_INFO:-$BASE0D}"
+DIAG_OK="${EXTENDED_DIAGNOSTIC_OK:-$BASE0B}"
+UI_BORDER="${EXTENDED_UI_BORDER:-$SPECIAL_BORDER}"
+
 generate() {
   cat << EOF
 /* ${THEME_NAME} - waybar theme */
@@ -71,11 +78,11 @@ generate() {
 @define-color fg-muted ${BASE03};
 @define-color fg-bright ${BASE06};
 
-/* Status colors */
-@define-color success ${BASE0B};
-@define-color warning ${BASE09};
-@define-color error ${BASE08};
-@define-color info ${BASE0D};
+/* Status colors - use extended diagnostic colors when available */
+@define-color success ${DIAG_OK};
+@define-color warning ${DIAG_WARNING};
+@define-color error ${DIAG_ERROR};
+@define-color info ${DIAG_INFO};
 
 /* Named accent colors */
 @define-color red ${ANSI_RED};
@@ -94,8 +101,8 @@ generate() {
 @define-color bright-magenta ${ANSI_BRIGHT_MAGENTA};
 @define-color bright-cyan ${ANSI_BRIGHT_CYAN};
 
-/* Border */
-@define-color border ${SPECIAL_BORDER};
+/* Border - use extended UI border when available */
+@define-color border ${UI_BORDER};
 EOF
 }
 
