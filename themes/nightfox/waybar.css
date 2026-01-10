@@ -1,18 +1,71 @@
 /* Nightfox - waybar theme */
 /* Generated from theme.yml */
+/* Author: EdenEast */
 
-/* Base colors */
+/* =============================================================================
+   BASE16 PALETTE
+   ============================================================================= */
+
+/* Background tones */
+@define-color base00 #192330;  /* Main background */
+@define-color base01 #212e3f;  /* Lighter background */
+@define-color base02 #29394f;  /* Selection background */
+
+/* Foreground tones */
+@define-color base03 #738091;  /* Comments, muted */
+@define-color base04 #71839b;  /* Dark foreground */
+@define-color base05 #cdcecf;  /* Default foreground */
+@define-color base06 #d6d6d7;  /* Light foreground */
+@define-color base07 #aeafb0;  /* Brightest foreground */
+
+/* Accent colors */
+@define-color base08 #c94f6d;  /* Red */
+@define-color base09 #f4a261;  /* Orange */
+@define-color base0A #dbc074;  /* Yellow */
+@define-color base0B #81b29a;  /* Green */
+@define-color base0C #63cdcf;  /* Cyan */
+@define-color base0D #719cd6;  /* Blue */
+@define-color base0E #9d79d6;  /* Magenta */
+@define-color base0F #d67ad2;  /* Brown */
+
+/* =============================================================================
+   SEMANTIC ALIASES
+   ============================================================================= */
+
+/* Backgrounds */
 @define-color bg #192330;
 @define-color bg-dark #212e3f;
 @define-color bg-highlight #29394f;
+@define-color bg-selection #2b3b51;
+
+/* Foregrounds */
 @define-color fg #cdcecf;
 @define-color fg-dark #71839b;
+@define-color fg-muted #738091;
+@define-color fg-bright #d6d6d7;
 
-/* Accent colors */
-@define-color blue #719cd6;
-@define-color cyan #63cdcf;
-@define-color green #81b29a;
-@define-color magenta #9d79d6;
+/* Status colors - use extended diagnostic colors when available */
+@define-color success #81b29a;
+@define-color warning #dbc074;
+@define-color error #c94f6d;
+@define-color info #719cd6;
+
+/* Named accent colors */
 @define-color red #c94f6d;
+@define-color green #81b29a;
 @define-color yellow #dbc074;
+@define-color blue #719cd6;
+@define-color magenta #9d79d6;
+@define-color cyan #63cdcf;
 @define-color orange #f4a261;
+
+/* Bright variants */
+@define-color bright-red #d6616b;
+@define-color bright-green #8ebaa4;
+@define-color bright-yellow #e0c989;
+@define-color bright-blue #86abdc;
+@define-color bright-magenta #baa1e2;
+@define-color bright-cyan #7ad5d6;
+
+/* Border - use extended UI border when available */
+@define-color border #39506d;

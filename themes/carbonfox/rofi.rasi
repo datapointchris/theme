@@ -1,16 +1,55 @@
 /* Carbonfox - Rofi colors */
 /* Generated from theme.yml */
+/* Author: EdenEast */
 
 * {
+    /* Base16 palette */
+    base00: #161616;  /* Main background */
+    base01: #1c1c1c;  /* Lighter background */
+    base02: #252525;  /* Selection background */
+    base03: #7b7c7e;  /* Comments, muted */
+    base04: #b6b8bb;  /* Dark foreground */
+    base05: #f2f4f8;  /* Default foreground */
+    base06: #ffffff;  /* Light foreground */
+    base07: #c4c4c4;  /* Brightest foreground */
+    base08: #EE5396;  /* Red */
+    base09: #3DDBD9;  /* Orange */
+    base0A: #08BDBA;  /* Yellow */
+    base0B: #25be6a;  /* Green */
+    base0C: #33B1FF;  /* Cyan */
+    base0D: #78A9FF;  /* Blue */
+    base0E: #BE95FF;  /* Magenta */
+    base0F: #FF7EB6;  /* Brown */
+
+    /* Semantic colors */
     bg: #161616;
     bg-alt: #1c1c1c;
     bg-selected: #2a2a2a;
     fg: #f2f4f8;
     fg-alt: #b6b8bb;
-    blue: #78A9FF;
-    magenta: #BE95FF;
+    fg-muted: #7b7c7e;
+    fg-bright: #ffffff;
+    border: #393939;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #EE5396;
+    active: #25be6a;
+    selected: #78A9FF;
+
+    /* Named accent colors */
     red: #EE5396;
     green: #25be6a;
     yellow: #08BDBA;
+    blue: #78A9FF;
+    magenta: #BE95FF;
     cyan: #33B1FF;
+    orange: #3DDBD9;
+
+    /* Bright variants */
+    bright-red: #f47dae;
+    bright-green: #46d484;
+    bright-yellow: #2ed1cf;
+    bright-blue: #94bbff;
+    bright-magenta: #ceadff;
+    bright-cyan: #5cc0ff;
 }

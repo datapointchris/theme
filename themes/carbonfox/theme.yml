@@ -58,17 +58,53 @@ special:
   panel: "#101010"
 
 extended:
+  # Background/foreground variants
   bg0: "#101010"
   bg1: "#161616"
   bg2: "#1c1c1c"
-  bg3: "#252525"
-  bg4: "#353535"
-  fg0: "#ffffff"
+  bg3: "#262626"
+  bg4: "#393939"
+  fg0: "#f7f7f7"
   fg1: "#f2f4f8"
-  fg2: "#c4c4c4"
-  fg3: "#b6b8bb"
+  fg2: "#b6b8bb"
+  fg3: "#7a7c7e"
   sel0: "#2a2a2a"
   sel1: "#525253"
-  comment: "#7b7c7e"
+  comment: "#6e6e6e"
   orange: "#3DDBD9"
   pink: "#FF7EB6"
+
+  # Diagnostic colors (from nightfox.nvim)
+  diagnostic_error: "#EE5396"
+  diagnostic_warning: "#BE95FF"
+  diagnostic_info: "#78A9FF"
+  diagnostic_hint: "#3DDBD9"
+  diagnostic_ok: "#25be6a"
+
+  # Syntax colors (from nightfox.nvim)
+  syntax_comment: "#6e6e6e"
+  syntax_string: "#25be6a"
+  syntax_function: "#8cb5fe"
+  syntax_keyword: "#BE95FF"
+  syntax_type: "#08BDBA"
+  syntax_number: "#3DDBD9"
+  syntax_constant: "#5ae0de"
+  syntax_operator: "#b6b8bb"
+  syntax_variable: "#dfdfe0"
+  syntax_parameter: "#33B1FF"
+  syntax_field: "#78A9FF"
+  syntax_conditional: "#c7a4fe"
+  syntax_preproc: "#ff91c0"
+  syntax_regex: "#09eae6"
+
+  # UI colors
+  ui_accent: "#78A9FF"
+  ui_border: "#393939"
+  ui_selection: "#2a2a2a"
+  ui_float_bg: "#101010"
+  ui_cursor_line: "#262626"
+
+  # Git colors
+  git_add: "#25be6a"
+  git_change: "#08BDBA"
+  git_delete: "#EE5396"

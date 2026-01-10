@@ -1,16 +1,55 @@
 /* Nightfox - Rofi colors */
 /* Generated from theme.yml */
+/* Author: EdenEast */
 
 * {
+    /* Base16 palette */
+    base00: #192330;  /* Main background */
+    base01: #212e3f;  /* Lighter background */
+    base02: #29394f;  /* Selection background */
+    base03: #738091;  /* Comments, muted */
+    base04: #71839b;  /* Dark foreground */
+    base05: #cdcecf;  /* Default foreground */
+    base06: #d6d6d7;  /* Light foreground */
+    base07: #aeafb0;  /* Brightest foreground */
+    base08: #c94f6d;  /* Red */
+    base09: #f4a261;  /* Orange */
+    base0A: #dbc074;  /* Yellow */
+    base0B: #81b29a;  /* Green */
+    base0C: #63cdcf;  /* Cyan */
+    base0D: #719cd6;  /* Blue */
+    base0E: #9d79d6;  /* Magenta */
+    base0F: #d67ad2;  /* Brown */
+
+    /* Semantic colors */
     bg: #192330;
     bg-alt: #212e3f;
     bg-selected: #2b3b51;
     fg: #cdcecf;
     fg-alt: #71839b;
-    blue: #719cd6;
-    magenta: #9d79d6;
+    fg-muted: #738091;
+    fg-bright: #d6d6d7;
+    border: #39506d;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #c94f6d;
+    active: #81b29a;
+    selected: #719cd6;
+
+    /* Named accent colors */
     red: #c94f6d;
     green: #81b29a;
     yellow: #dbc074;
+    blue: #719cd6;
+    magenta: #9d79d6;
     cyan: #63cdcf;
+    orange: #f4a261;
+
+    /* Bright variants */
+    bright-red: #d6616b;
+    bright-green: #8ebaa4;
+    bright-yellow: #e0c989;
+    bright-blue: #86abdc;
+    bright-magenta: #baa1e2;
+    bright-cyan: #7ad5d6;
 }

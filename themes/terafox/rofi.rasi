@@ -1,16 +1,55 @@
 /* Terafox - Rofi colors */
 /* Generated from theme.yml */
+/* Author: EdenEast */
 
 * {
+    /* Base16 palette */
+    base00: #152528;  /* Main background */
+    base01: #1d3337;  /* Lighter background */
+    base02: #254147;  /* Selection background */
+    base03: #6d7f8b;  /* Comments, muted */
+    base04: #587b7b;  /* Dark foreground */
+    base05: #e6eaea;  /* Default foreground */
+    base06: #eaeeee;  /* Light foreground */
+    base07: #cbd9d8;  /* Brightest foreground */
+    base08: #e85c51;  /* Red */
+    base09: #ff8349;  /* Orange */
+    base0A: #fda47f;  /* Yellow */
+    base0B: #7aa4a1;  /* Green */
+    base0C: #a1cdd8;  /* Cyan */
+    base0D: #5a93aa;  /* Blue */
+    base0E: #ad5c7c;  /* Magenta */
+    base0F: #cb7985;  /* Brown */
+
+    /* Semantic colors */
     bg: #152528;
     bg-alt: #1d3337;
     bg-selected: #293e40;
     fg: #e6eaea;
     fg-alt: #587b7b;
-    blue: #5a93aa;
-    magenta: #ad5c7c;
+    fg-muted: #6d7f8b;
+    fg-bright: #eaeeee;
+    border: #2d4f56;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #e85c51;
+    active: #7aa4a1;
+    selected: #5a93aa;
+
+    /* Named accent colors */
     red: #e85c51;
     green: #7aa4a1;
     yellow: #fda47f;
+    blue: #5a93aa;
+    magenta: #ad5c7c;
     cyan: #a1cdd8;
+    orange: #ff8349;
+
+    /* Bright variants */
+    bright-red: #eb746b;
+    bright-green: #8eb2af;
+    bright-yellow: #fdb292;
+    bright-blue: #73a3b7;
+    bright-magenta: #b97490;
+    bright-cyan: #afd4de;
 }

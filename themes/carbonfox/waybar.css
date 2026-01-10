@@ -1,18 +1,71 @@
 /* Carbonfox - waybar theme */
 /* Generated from theme.yml */
+/* Author: EdenEast */
 
-/* Base colors */
+/* =============================================================================
+   BASE16 PALETTE
+   ============================================================================= */
+
+/* Background tones */
+@define-color base00 #161616;  /* Main background */
+@define-color base01 #1c1c1c;  /* Lighter background */
+@define-color base02 #252525;  /* Selection background */
+
+/* Foreground tones */
+@define-color base03 #7b7c7e;  /* Comments, muted */
+@define-color base04 #b6b8bb;  /* Dark foreground */
+@define-color base05 #f2f4f8;  /* Default foreground */
+@define-color base06 #ffffff;  /* Light foreground */
+@define-color base07 #c4c4c4;  /* Brightest foreground */
+
+/* Accent colors */
+@define-color base08 #EE5396;  /* Red */
+@define-color base09 #3DDBD9;  /* Orange */
+@define-color base0A #08BDBA;  /* Yellow */
+@define-color base0B #25be6a;  /* Green */
+@define-color base0C #33B1FF;  /* Cyan */
+@define-color base0D #78A9FF;  /* Blue */
+@define-color base0E #BE95FF;  /* Magenta */
+@define-color base0F #FF7EB6;  /* Brown */
+
+/* =============================================================================
+   SEMANTIC ALIASES
+   ============================================================================= */
+
+/* Backgrounds */
 @define-color bg #161616;
 @define-color bg-dark #1c1c1c;
 @define-color bg-highlight #252525;
+@define-color bg-selection #2a2a2a;
+
+/* Foregrounds */
 @define-color fg #f2f4f8;
 @define-color fg-dark #b6b8bb;
+@define-color fg-muted #7b7c7e;
+@define-color fg-bright #ffffff;
 
-/* Accent colors */
-@define-color blue #78A9FF;
-@define-color cyan #33B1FF;
-@define-color green #25be6a;
-@define-color magenta #BE95FF;
+/* Status colors - use extended diagnostic colors when available */
+@define-color success #25be6a;
+@define-color warning #BE95FF;
+@define-color error #EE5396;
+@define-color info #78A9FF;
+
+/* Named accent colors */
 @define-color red #EE5396;
+@define-color green #25be6a;
 @define-color yellow #08BDBA;
+@define-color blue #78A9FF;
+@define-color magenta #BE95FF;
+@define-color cyan #33B1FF;
 @define-color orange #3DDBD9;
+
+/* Bright variants */
+@define-color bright-red #f47dae;
+@define-color bright-green #46d484;
+@define-color bright-yellow #2ed1cf;
+@define-color bright-blue #94bbff;
+@define-color bright-magenta #ceadff;
+@define-color bright-cyan #5cc0ff;
+
+/* Border - use extended UI border when available */
+@define-color border #393939;
