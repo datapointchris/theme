@@ -24,6 +24,12 @@ output_file="${2:-}"
 
 eval "$(load_colors "$input_file")"
 
+# Use extended palette colors when available, fall back to base16
+DIAG_ERROR="${EXTENDED_DIAGNOSTIC_ERROR:-$BASE08}"
+DIAG_WARNING="${EXTENDED_DIAGNOSTIC_WARNING:-$BASE09}"
+DIAG_INFO="${EXTENDED_DIAGNOSTIC_INFO:-$BASE0D}"
+DIAG_OK="${EXTENDED_DIAGNOSTIC_OK:-$BASE0B}"
+
 hex_to_rgba() {
   local hex="$1"
   local alpha="${2:-1.0}"
@@ -76,11 +82,11 @@ generate() {
 \$font_color = $(hex_to_rgba "$BASE05" "1.0")
 \$font_color_dim = $(hex_to_rgba "$BASE04" "1.0")
 
-# Authentication state colors
-\$check_color = $(hex_to_rgba "$BASE0D" "1.0")
-\$fail_color = $(hex_to_rgba "$BASE08" "1.0")
-\$success_color = $(hex_to_rgba "$BASE0B" "1.0")
-\$caps_lock_color = $(hex_to_rgba "$BASE09" "1.0")
+# Authentication state colors - use extended diagnostic colors when available
+\$check_color = $(hex_to_rgba "$DIAG_INFO" "1.0")
+\$fail_color = $(hex_to_rgba "$DIAG_ERROR" "1.0")
+\$success_color = $(hex_to_rgba "$DIAG_OK" "1.0")
+\$caps_lock_color = $(hex_to_rgba "$DIAG_WARNING" "1.0")
 EOF
 }
 
