@@ -24,6 +24,10 @@ output_file="${2:-}"
 # Load palette into variables
 eval "$(load_colors "$input_file")"
 
+# Use extended palette colors when available, fall back to base16
+UI_ACCENT="${EXTENDED_UI_ACCENT:-$BASE0D}"
+UI_BORDER="${EXTENDED_UI_BORDER:-$BASE02}"
+
 # Convert #RRGGBB to RRGGBB for hyprland rgb() format
 strip_hash() {
   echo "${1#\#}"
@@ -57,11 +61,18 @@ generate() {
 \$base0F = rgb($(strip_hash "$BASE0F"))  # Brown
 
 # =============================================================================
+# EXTENDED PALETTE (when available)
+# =============================================================================
+
+\$uiAccent = rgb($(strip_hash "$UI_ACCENT"))
+\$uiBorder = rgb($(strip_hash "$UI_BORDER"))
+
+# =============================================================================
 # SEMANTIC COLORS
 # =============================================================================
 
-\$activeBorderColor = \$base0D
-\$inactiveBorderColor = \$base02
+\$activeBorderColor = \$uiAccent
+\$inactiveBorderColor = \$uiBorder
 \$groupActiveBorderColor = \$base0E
 \$groupInactiveBorderColor = \$base03
 \$groupLockedActiveBorderColor = \$base09
