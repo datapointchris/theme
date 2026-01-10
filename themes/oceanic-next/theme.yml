@@ -51,3 +51,37 @@ special:
   cursor_text: "#1b2b34"
   selection_bg: "#4f5b66"
   selection_fg: "#c0c5ce"
+
+extended:
+  # Diagnostic colors (from oceanic-next CocDiagnostics/DiagnosticSign)
+  diagnostic_error: "#ec5f67"
+  diagnostic_warning: "#fac863"
+  diagnostic_info: "#6699cc"
+  diagnostic_hint: "#62b3b2"
+  diagnostic_ok: "#99c794"
+
+  # Syntax colors (from oceanic-next highlight groups)
+  syntax_comment: "#65737e"
+  syntax_string: "#99c794"
+  syntax_function: "#6699cc"
+  syntax_keyword: "#c594c5"
+  syntax_type: "#c594c5"
+  syntax_number: "#f99157"
+  syntax_constant: "#f99157"
+  syntax_operator: "#f99157"
+  syntax_variable: "#62b3b2"
+  syntax_parameter: "#62b3b2"
+  syntax_preproc: "#fac863"
+  syntax_special: "#62b3b2"
+
+  # UI colors
+  ui_accent: "#6699cc"
+  ui_border: "#343d46"
+  ui_selection: "#4f5b66"
+  ui_float_bg: "#343d46"
+  ui_cursor_line: "#343d46"
+
+  # Git colors
+  git_add: "#99c794"
+  git_change: "#fac863"
+  git_delete: "#ec5f67"
