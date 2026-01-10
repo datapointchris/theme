@@ -1,16 +1,55 @@
 /* Flexoki Moon Black - Rofi colors */
 /* Generated from theme.yml */
+/* Author: datapointchris */
 
 * {
+    /* Base16 palette */
+    base00: #100f0f;  /* Main background */
+    base01: #1c1b1a;  /* Lighter background */
+    base02: #282726;  /* Selection background */
+    base03: #575653;  /* Comments, muted */
+    base04: #878580;  /* Dark foreground */
+    base05: #cecdc3;  /* Default foreground */
+    base06: #EDEECF;  /* Light foreground */
+    base07: #ffffff;  /* Brightest foreground */
+    base08: #d14d41;  /* Red */
+    base09: #da702c;  /* Orange */
+    base0A: #d0a215;  /* Yellow */
+    base0B: #879a39;  /* Green */
+    base0C: #3aa99f;  /* Cyan */
+    base0D: #4385be;  /* Blue */
+    base0E: #8b7ec8;  /* Magenta */
+    base0F: #ce5d97;  /* Brown */
+
+    /* Semantic colors */
     bg: #100f0f;
     bg-alt: #1c1b1a;
     bg-selected: #343331;
     fg: #cecdc3;
     fg-alt: #878580;
-    blue: #4385be;
-    magenta: #ce5d97;
+    fg-muted: #575653;
+    fg-bright: #EDEECF;
+    border: #575653;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #d14d41;
+    active: #879a39;
+    selected: #3aa99f;
+
+    /* Named accent colors */
     red: #d14d41;
     green: #879a39;
     yellow: #d0a215;
+    blue: #4385be;
+    magenta: #ce5d97;
     cyan: #3aa99f;
+    orange: #da702c;
+
+    /* Bright variants */
+    bright-red: #af3029;
+    bright-green: #66800b;
+    bright-yellow: #ad8301;
+    bright-blue: #205ea6;
+    bright-magenta: #a02f6f;
+    bright-cyan: #24837b;
 }

@@ -8,87 +8,78 @@ theme[main_bg]="#2A1F16"
 # Main text color
 theme[main_fg]="#D4C4A8"
 
-# Title color for boxes
-# base0C = cyan for titles
+# Title color for boxes - use accent color
 theme[title]="#4F7EDC"
 
-# Highlight color for keyboard shortcuts
-# base0D = blue for highlights
-theme[hi_fg]="#3672DA"
+# Highlight color for keyboard shortcuts - use UI accent
+theme[hi_fg]="#4F7EDC"
 
-# Background color of selected item in processes box
-# base02 = selection background
-theme[selected_bg]="#713D3A"
+# Background color of selected item in processes box - use UI selection
+theme[selected_bg]="#693C4E"
 
 # Foreground color of selected item in processes box
-# base06 = light foreground
 theme[selected_fg]="#FFF2D8"
 
 # Color of inactive/disabled text
-# base03 = comments/muted
 theme[inactive_fg]="#726250"
 
 # Misc colors for processes box
-theme[proc_misc]="#3672DA"
+theme[proc_misc]="#4F7EDC"
 
-# Box outline colors
-# base01 = lighter background for subtle borders
-theme[cpu_box]="#464132"
-theme[mem_box]="#464132"
-theme[net_box]="#464132"
-theme[proc_box]="#464132"
-theme[div_line]="#464132"
+# Box outline colors - use UI border
+theme[cpu_box]="#726250"
+theme[mem_box]="#726250"
+theme[net_box]="#726250"
+theme[proc_box]="#726250"
+theme[div_line]="#726250"
 
-# Temperature graph colors (gradient: blue -> cyan -> white)
-theme[temp_start]="#3672DA"
-theme[temp_mid]="#4F7EDC"
-theme[temp_end]="#FFF2D8"
+# Temperature graph colors (gradient: info -> warning -> error for heat)
+theme[temp_start]="#4F7EDC"
+theme[temp_mid]="#D19812"
+theme[temp_end]="#DD634D"
 
-# CPU graph colors
-theme[cpu_start]="#3672DA"
+# CPU graph colors (gradient: info -> accent -> bright)
+theme[cpu_start]="#4F7EDC"
 theme[cpu_mid]="#4F7EDC"
 theme[cpu_end]="#FFF2D8"
 
-# Memory free meter
+# Memory free meter (green = good/available)
 theme[free_start]="#7EAE0F"
 theme[free_mid]="#4F7EDC"
 theme[free_end]="#FFF2D8"
 
-# Memory cached meter
+# Memory cached meter (yellow/orange = cached/warning)
 theme[cached_start]="#957209"
 theme[cached_mid]="#D19812"
 theme[cached_end]="#FFF2D8"
 
-# Memory available meter
-theme[available_start]="#3672DA"
+# Memory available meter (blue = info/available)
+theme[available_start]="#4F7EDC"
 theme[available_mid]="#4F7EDC"
 theme[available_end]="#FFF2D8"
 
-# Memory used meter
-theme[used_start]="#DD634D"
-theme[used_mid]="#D19812"
+# Memory used meter (gradient: warning -> error as usage increases)
+theme[used_start]="#D19812"
+theme[used_mid]="#DD634D"
 theme[used_end]="#957209"
 
-# Download graph colors
+# Download graph colors (green = incoming/good)
 theme[download_start]="#7EAE0F"
 theme[download_mid]="#4F7EDC"
 theme[download_end]="#FFF2D8"
 
-# Upload graph colors
+# Upload graph colors (magenta/purple for outgoing)
 theme[upload_start]="#BE0033"
-theme[upload_mid]="#3672DA"
+theme[upload_mid]="#4F7EDC"
 theme[upload_end]="#FFF2D8"
 
 # Process tree colors
-# base0F = brown/secondary for tree structure
-theme[process_start]="#3672DA"
+theme[process_start]="#4F7EDC"
 theme[process_mid]="#CA1447"
 theme[process_end]="#DD634D"
 
 # Meter background
-# base04 = dark foreground for subtle meter backgrounds
 theme[meter_bg]="#C4B199"
 
 # Graph text (brightest for readability)
-# base07 = brightest foreground
 theme[graph_text]="#FFFFFF"

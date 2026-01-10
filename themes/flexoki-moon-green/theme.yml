@@ -56,3 +56,37 @@ special:
   selection_fg: "#ddd8e8"
   border: "#253426"
   panel: "#151f18"
+
+extended:
+  # Diagnostic colors (from flexoki-moon-nvim)
+  diagnostic_error: "#d14d41"
+  diagnostic_warning: "#da702c"
+  diagnostic_info: "#3aa99f"
+  diagnostic_hint: "#8b7ec8"
+  diagnostic_ok: "#879a39"
+
+  # Syntax colors (from flexoki-moon-nvim)
+  syntax_comment: "#8f8a98"
+  syntax_string: "#3aa99f"
+  syntax_function: "#da702c"
+  syntax_keyword: "#879a39"
+  syntax_type: "#3aa99f"
+  syntax_number: "#8b7ec8"
+  syntax_constant: "#d0a215"
+  syntax_operator: "#8f8a98"
+  syntax_variable: "#ddd8e8"
+  syntax_parameter: "#8b7ec8"
+  syntax_preproc: "#8b7ec8"
+  syntax_special: "#3aa99f"
+
+  # UI colors
+  ui_accent: "#3aa99f"
+  ui_border: "#6b7d6e"
+  ui_selection: "#2c3b2d"
+  ui_float_bg: "#101a13"
+  ui_cursor_line: "#151f18"
+
+  # Git colors
+  git_add: "#66800b"
+  git_change: "#ad8301"
+  git_delete: "#af3029"

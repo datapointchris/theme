@@ -1,18 +1,71 @@
 /* Flexoki Moon Toddler - waybar theme */
 /* Generated from theme.yml */
+/* Author: datapointchris */
 
-/* Base colors */
+/* =============================================================================
+   BASE16 PALETTE
+   ============================================================================= */
+
+/* Background tones */
+@define-color base00 #2a1f16;  /* Main background */
+@define-color base01 #464132;  /* Lighter background */
+@define-color base02 #713d3a;  /* Selection background */
+
+/* Foreground tones */
+@define-color base03 #726250;  /* Comments, muted */
+@define-color base04 #c4b199;  /* Dark foreground */
+@define-color base05 #d4c4a8;  /* Default foreground */
+@define-color base06 #fff2d8;  /* Light foreground */
+@define-color base07 #ffffff;  /* Brightest foreground */
+
+/* Accent colors */
+@define-color base08 #dd634d;  /* Red */
+@define-color base09 #d19812;  /* Orange */
+@define-color base0A #957209;  /* Yellow */
+@define-color base0B #7eae0f;  /* Green */
+@define-color base0C #4f7edc;  /* Cyan */
+@define-color base0D #3672da;  /* Blue */
+@define-color base0E #be0033;  /* Magenta */
+@define-color base0F #ca1447;  /* Brown */
+
+/* =============================================================================
+   SEMANTIC ALIASES
+   ============================================================================= */
+
+/* Backgrounds */
 @define-color bg #2a1f16;
 @define-color bg-dark #464132;
 @define-color bg-highlight #713d3a;
+@define-color bg-selection #693c4e;
+
+/* Foregrounds */
 @define-color fg #d4c4a8;
 @define-color fg-dark #c4b199;
+@define-color fg-muted #726250;
+@define-color fg-bright #fff2d8;
 
-/* Accent colors */
-@define-color blue #3672da;
-@define-color cyan #4f7edc;
-@define-color green #7eae0f;
-@define-color magenta #ca1447;
+/* Status colors - use extended diagnostic colors when available */
+@define-color success #7eae0f;
+@define-color warning #d19812;
+@define-color error #dd634d;
+@define-color info #4f7edc;
+
+/* Named accent colors */
 @define-color red #dd634d;
+@define-color green #7eae0f;
 @define-color yellow #957209;
+@define-color blue #3672da;
+@define-color magenta #ca1447;
+@define-color cyan #4f7edc;
 @define-color orange #d19812;
+
+/* Bright variants */
+@define-color bright-red #ce291d;
+@define-color bright-green #6da700;
+@define-color bright-yellow #e1a100;
+@define-color bright-blue #5586e6;
+@define-color bright-magenta #cb0036;
+@define-color bright-cyan #1f554d;
+
+/* Border - use extended UI border when available */
+@define-color border #726250;

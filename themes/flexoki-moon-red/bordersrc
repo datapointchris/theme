@@ -8,14 +8,14 @@ options=(
   width=8.0
   hidpi=on
 
-  # Active window - accent color (base0D)
-  active_color=0xff4385be
+  # Active window - use UI accent color
+  active_color=0xff3aa99f
 
-  # Inactive windows - subtle border (base02)
-  inactive_color=0xff3a2b28
+  # Inactive windows - use UI border color
+  inactive_color=0xff8a6b60
 
   # Glow effect using accent color
-  active_color='glow(0xff4385be)'
+  active_color='glow(0xff3aa99f)'
 
   blacklist="System Settings|System Information|QuickTime Player"
 )

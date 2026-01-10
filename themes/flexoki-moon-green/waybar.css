@@ -1,18 +1,71 @@
 /* Flexoki Moon Green - waybar theme */
 /* Generated from theme.yml */
+/* Author: datapointchris */
 
-/* Base colors */
+/* =============================================================================
+   BASE16 PALETTE
+   ============================================================================= */
+
+/* Background tones */
+@define-color base00 #08120b;  /* Main background */
+@define-color base01 #151f18;  /* Lighter background */
+@define-color base02 #253426;  /* Selection background */
+
+/* Foreground tones */
+@define-color base03 #6b7d6e;  /* Comments, muted */
+@define-color base04 #8f8a98;  /* Dark foreground */
+@define-color base05 #ddd8e8;  /* Default foreground */
+@define-color base06 #d6fadc;  /* Light foreground */
+@define-color base07 #ffffff;  /* Brightest foreground */
+
+/* Accent colors */
+@define-color base08 #d14d41;  /* Red */
+@define-color base09 #da702c;  /* Orange */
+@define-color base0A #d0a215;  /* Yellow */
+@define-color base0B #879a39;  /* Green */
+@define-color base0C #3aa99f;  /* Cyan */
+@define-color base0D #4385be;  /* Blue */
+@define-color base0E #8b7ec8;  /* Magenta */
+@define-color base0F #ce5d97;  /* Brown */
+
+/* =============================================================================
+   SEMANTIC ALIASES
+   ============================================================================= */
+
+/* Backgrounds */
 @define-color bg #08120b;
 @define-color bg-dark #151f18;
 @define-color bg-highlight #253426;
+@define-color bg-selection #2c3b2d;
+
+/* Foregrounds */
 @define-color fg #ddd8e8;
 @define-color fg-dark #8f8a98;
+@define-color fg-muted #6b7d6e;
+@define-color fg-bright #d6fadc;
 
-/* Accent colors */
-@define-color blue #4385be;
-@define-color cyan #3aa99f;
-@define-color green #879a39;
-@define-color magenta #ce5d97;
+/* Status colors - use extended diagnostic colors when available */
+@define-color success #879a39;
+@define-color warning #da702c;
+@define-color error #d14d41;
+@define-color info #3aa99f;
+
+/* Named accent colors */
 @define-color red #d14d41;
+@define-color green #879a39;
 @define-color yellow #d0a215;
+@define-color blue #4385be;
+@define-color magenta #ce5d97;
+@define-color cyan #3aa99f;
 @define-color orange #da702c;
+
+/* Bright variants */
+@define-color bright-red #af3029;
+@define-color bright-green #66800b;
+@define-color bright-yellow #ad8301;
+@define-color bright-blue #205ea6;
+@define-color bright-magenta #a02f6f;
+@define-color bright-cyan #24837b;
+
+/* Border - use extended UI border when available */
+@define-color border #6b7d6e;
