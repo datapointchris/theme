@@ -1,18 +1,71 @@
 /* GitHub Dark Dimmed - waybar theme */
 /* Generated from theme.yml */
+/* Author: Projekt0n */
 
-/* Base colors */
+/* =============================================================================
+   BASE16 PALETTE
+   ============================================================================= */
+
+/* Background tones */
+@define-color base00 #22272e;  /* Main background */
+@define-color base01 #2d333b;  /* Lighter background */
+@define-color base02 #373e47;  /* Selection background */
+
+/* Foreground tones */
+@define-color base03 #768390;  /* Comments, muted */
+@define-color base04 #636e7b;  /* Dark foreground */
+@define-color base05 #adbac7;  /* Default foreground */
+@define-color base06 #cdd9e5;  /* Light foreground */
+@define-color base07 #ffffff;  /* Brightest foreground */
+
+/* Accent colors */
+@define-color base08 #f47067;  /* Red */
+@define-color base09 #e0823d;  /* Orange */
+@define-color base0A #c69026;  /* Yellow */
+@define-color base0B #57ab5a;  /* Green */
+@define-color base0C #96d0ff;  /* Cyan */
+@define-color base0D #6cb6ff;  /* Blue */
+@define-color base0E #dcbdfb;  /* Magenta */
+@define-color base0F #e5534b;  /* Brown */
+
+/* =============================================================================
+   SEMANTIC ALIASES
+   ============================================================================= */
+
+/* Backgrounds */
 @define-color bg #22272e;
 @define-color bg-dark #2d333b;
 @define-color bg-highlight #373e47;
+@define-color bg-selection #3d4752;
+
+/* Foregrounds */
 @define-color fg #adbac7;
 @define-color fg-dark #636e7b;
+@define-color fg-muted #768390;
+@define-color fg-bright #cdd9e5;
 
-/* Accent colors */
-@define-color blue #539bf5;
-@define-color cyan #76e3ea;
-@define-color green #57ab5a;
-@define-color magenta #b083f0;
+/* Status colors - use extended diagnostic colors when available */
+@define-color success #46954a;
+@define-color warning #ae7c14;
+@define-color error #c93c37;
+@define-color info #539bf5;
+
+/* Named accent colors */
 @define-color red #f47067;
+@define-color green #57ab5a;
 @define-color yellow #c69026;
+@define-color blue #539bf5;
+@define-color magenta #b083f0;
+@define-color cyan #76e3ea;
 @define-color orange #e0823d;
+
+/* Bright variants */
+@define-color bright-red #ff938a;
+@define-color bright-green #6bc46d;
+@define-color bright-yellow #daaa3f;
+@define-color bright-blue #6cb6ff;
+@define-color bright-magenta #dcbdfb;
+@define-color bright-cyan #b3f0ff;
+
+/* Border - use extended UI border when available */
+@define-color border #444c56;

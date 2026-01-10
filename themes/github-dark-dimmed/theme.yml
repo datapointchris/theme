@@ -56,3 +56,37 @@ special:
   selection_fg: "#adbac7"
   border: "#444c56"
   panel: "#1c2128"
+
+extended:
+  # Diagnostic colors (from github-nvim-theme)
+  diagnostic_error: "#c93c37"
+  diagnostic_warning: "#ae7c14"
+  diagnostic_info: "#539bf5"
+  diagnostic_hint: "#768390"
+  diagnostic_ok: "#46954a"
+
+  # Syntax colors (from prettylights)
+  syntax_comment: "#768390"
+  syntax_string: "#96d0ff"
+  syntax_function: "#dcbdfb"
+  syntax_keyword: "#f47067"
+  syntax_type: "#f69d50"
+  syntax_number: "#6cb6ff"
+  syntax_constant: "#6cb6ff"
+  syntax_operator: "#6cb6ff"
+  syntax_variable: "#adbac7"
+  syntax_parameter: "#adbac7"
+  syntax_preproc: "#f47067"
+  syntax_special: "#8ddb8c"
+
+  # UI colors
+  ui_accent: "#539bf5"
+  ui_border: "#444c56"
+  ui_selection: "#373e47"
+  ui_float_bg: "#2d333b"
+  ui_cursor_line: "#373e47"
+
+  # Git colors
+  git_add: "#46954a"
+  git_change: "#ae7c14"
+  git_delete: "#c93c37"
