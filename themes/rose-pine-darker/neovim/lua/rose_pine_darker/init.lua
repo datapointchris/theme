@@ -8,24 +8,24 @@ M.config = {
 }
 
 function M.setup(opts)
-  M.config = vim.tbl_deep_extend('force', M.config, opts or {})
+  M.config = vim.tbl_deep_extend("force", M.config, opts or {})
 end
 
 function M.load()
   if vim.g.colors_name then
-    vim.cmd('hi clear')
+    vim.cmd("hi clear")
   end
 
-  vim.g.colors_name = 'rose-pine-darker'
+  vim.g.colors_name = "rose-pine-darker"
   vim.o.termguicolors = true
-  vim.o.background = 'dark'
+  vim.o.background = "dark"
 
-  local colors = require('rose_pine_darker.palette')
+  local colors = require("rose_pine_darker.palette")
   local highlights = {}
 
   -- Collect all highlight groups
-  for _, mod in ipairs({ 'editor', 'syntax', 'treesitter', 'lsp', 'plugins' }) do
-    local ok, hl_mod = pcall(require, 'rose_pine_darker.highlights.' .. mod)
+  for _, mod in ipairs({ "editor", "syntax", "treesitter", "lsp", "plugins" }) do
+    local ok, hl_mod = pcall(require, "rose_pine_darker.highlights." .. mod)
     if ok then
       for hl, spec in pairs(hl_mod.setup(colors)) do
         highlights[hl] = spec

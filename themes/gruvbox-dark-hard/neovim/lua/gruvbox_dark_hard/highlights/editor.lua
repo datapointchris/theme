@@ -9,9 +9,9 @@ function M.setup(colors)
     Conceal = { fg = theme.ui.special, bold = true },
     CurSearch = { fg = theme.ui.fg, bg = theme.ui.bg_search, bold = true },
     Cursor = { fg = theme.ui.bg, bg = theme.ui.fg },
-    lCursor = { link = 'Cursor' },
-    CursorIM = { link = 'Cursor' },
-    CursorColumn = { link = 'CursorLine' },
+    lCursor = { link = "Cursor" },
+    CursorIM = { link = "Cursor" },
+    CursorColumn = { link = "CursorLine" },
     CursorLine = { bg = theme.ui.bg_p2 },
     Directory = { fg = theme.syn.fun },
 
@@ -24,7 +24,7 @@ function M.setup(colors)
     EndOfBuffer = { fg = theme.ui.bg },
     ErrorMsg = { fg = theme.diag.error },
     WinSeparator = { fg = theme.ui.bg_m3 },
-    VertSplit = { link = 'WinSeparator' },
+    VertSplit = { link = "WinSeparator" },
     Folded = { fg = theme.ui.special, bg = theme.ui.bg_p1 },
     FoldColumn = { fg = theme.ui.nontext, bg = theme.ui.bg_gutter },
     SignColumn = { fg = theme.ui.special, bg = theme.ui.bg_gutter },
@@ -50,7 +50,7 @@ function M.setup(colors)
     FloatBorder = { fg = theme.ui.float.fg_border, bg = theme.ui.float.bg_border },
     FloatTitle = { fg = theme.ui.special, bg = theme.ui.float.bg_border, bold = true },
     FloatFooter = { fg = theme.ui.nontext, bg = theme.ui.float.bg_border },
-    NormalNC = { link = 'Normal' },
+    NormalNC = { link = "Normal" },
 
     -- Popup menu
     Pmenu = { fg = theme.ui.pmenu.fg, bg = theme.ui.pmenu.bg },
@@ -61,9 +61,9 @@ function M.setup(colors)
     PmenuExtraSel = { fg = theme.ui.special, bg = theme.ui.pmenu.bg_sel },
     PmenuSbar = { bg = theme.ui.pmenu.bg_sbar },
     PmenuThumb = { bg = theme.ui.pmenu.bg_thumb },
-    PmenuBorder = { link = 'FloatBorder' },
+    PmenuBorder = { link = "FloatBorder" },
 
-    Question = { link = 'MoreMsg' },
+    Question = { link = "MoreMsg" },
     QuickFixLine = { bg = theme.ui.bg_p1 },
     Search = { fg = theme.ui.fg, bg = theme.ui.bg_search },
     SpecialKey = { fg = theme.ui.special },
@@ -85,12 +85,12 @@ function M.setup(colors)
 
     Title = { fg = theme.syn.fun, bold = true },
     Visual = { bg = theme.ui.bg_visual },
-    VisualNOS = { link = 'Visual' },
+    VisualNOS = { link = "Visual" },
     WarningMsg = { fg = theme.diag.warning },
     Whitespace = { fg = theme.ui.whitespace },
-    WildMenu = { link = 'Pmenu' },
-    WinBar = { fg = theme.ui.fg_dim, bg = 'NONE' },
-    WinBarNC = { fg = theme.ui.fg_dim, bg = 'NONE' },
+    WildMenu = { link = "Pmenu" },
+    WinBar = { fg = theme.ui.fg_dim, bg = "NONE" },
+    WinBarNC = { fg = theme.ui.fg_dim, bg = "NONE" },
 
     -- Debug
     debugPC = { bg = theme.diff.delete },
@@ -98,7 +98,7 @@ function M.setup(colors)
 
     -- LSP references
     LspReferenceText = { bg = theme.diff.text },
-    LspReferenceRead = { link = 'LspReferenceText' },
+    LspReferenceRead = { link = "LspReferenceText" },
     LspReferenceWrite = { bg = theme.diff.text, underline = true },
 
     -- Diagnostics
@@ -119,10 +119,10 @@ function M.setup(colors)
     DiagnosticSignInfo = { fg = theme.diag.info, bg = theme.ui.bg_gutter },
     DiagnosticSignHint = { fg = theme.diag.hint, bg = theme.ui.bg_gutter },
 
-    DiagnosticVirtualTextError = { link = 'DiagnosticError' },
-    DiagnosticVirtualTextWarn = { link = 'DiagnosticWarn' },
-    DiagnosticVirtualTextInfo = { link = 'DiagnosticInfo' },
-    DiagnosticVirtualTextHint = { link = 'DiagnosticHint' },
+    DiagnosticVirtualTextError = { link = "DiagnosticError" },
+    DiagnosticVirtualTextWarn = { link = "DiagnosticWarn" },
+    DiagnosticVirtualTextInfo = { link = "DiagnosticInfo" },
+    DiagnosticVirtualTextHint = { link = "DiagnosticHint" },
 
     DiagnosticUnderlineError = { undercurl = true, sp = theme.diag.error },
     DiagnosticUnderlineWarn = { undercurl = true, sp = theme.diag.warning },
