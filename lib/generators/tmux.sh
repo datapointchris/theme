@@ -28,9 +28,11 @@ eval "$(load_colors "$input_file")"
 # This ensures author-intended colors are used (e.g., brighter reds for errors in kanagawa)
 DIAG_ERROR="${EXTENDED_DIAGNOSTIC_ERROR:-$BASE08}"
 DIAG_WARNING="${EXTENDED_DIAGNOSTIC_WARNING:-$BASE09}"
+DIAG_INFO="${EXTENDED_DIAGNOSTIC_INFO:-$BASE0D}"
 DIAG_OK="${EXTENDED_DIAGNOSTIC_OK:-$BASE0B}"
 UI_ACCENT="${EXTENDED_UI_ACCENT:-$BASE0D}"
-UI_BORDER="${EXTENDED_UI_BORDER:-$BASE02}"
+UI_SELECTION="${EXTENDED_UI_SELECTION:-$BASE02}"
+UI_BORDER="${EXTENDED_UI_BORDER:-$BASE01}"
 GIT_ADD="${EXTENDED_GIT_ADD:-$BASE0B}"
 
 generate() {
@@ -107,15 +109,15 @@ set-option -g message-command-style "fg=${BASE0A},bg=${BASE00}"
 # ==============================================================================
 
 # Copy mode highlighting - use ok/success color for "selected/good" semantic
-# base01 background to maintain readability
-set-window-option -g mode-style "fg=${DIAG_OK},bg=${BASE01}"
+# UI selection background for visual consistency with other selection states
+set-window-option -g mode-style "fg=${DIAG_OK},bg=${UI_SELECTION}"
 
 # ==============================================================================
 # CLOCK
 # ==============================================================================
 
-# Clock color (prefix + t) - use info/accent color
-set-window-option -g clock-mode-colour "${UI_ACCENT}"
+# Clock color (prefix + t) - use info color for informational display
+set-window-option -g clock-mode-colour "${DIAG_INFO}"
 
 # ==============================================================================
 # WINDOW STYLES (PANE BACKGROUNDS)
