@@ -1,0 +1,127 @@
+# Rose Pine Darker - Yazi flavor
+# Generated algorithmically from theme.yml
+# Author: Emilia Dunfelt <edun@dunfelt.se>
+
+[mgr]
+cwd = { fg = "#9ccfd8" }
+hovered = { reversed = true, bold = true }
+preview_hovered = { underline = true }
+find_keyword = { fg = "#f6c177", bg = "#191724" }
+find_position = {}
+marker_copied = { fg = "#31748f", bg = "#31748f" }
+marker_cut = { fg = "#eb6f92", bg = "#eb6f92" }
+marker_marked = { fg = "#ebbcba", bg = "#ebbcba" }
+marker_selected = { fg = "#f6c177", bg = "#f6c177" }
+count_copied = { fg = "#191724", bg = "#31748f" }
+count_cut = { fg = "#191724", bg = "#eb6f92" }
+count_selected = { fg = "#191724", bg = "#f6c177" }
+border_symbol = "│"
+border_style = { fg = "#6e6a86" }
+
+[tabs]
+active = { fg = "#191724", bg = "#31748f", bold = true }
+inactive = { fg = "#31748f", bg = "#26233a" }
+sep_inner = { open = "", close = "" }
+sep_outer = { open = "", close = "" }
+
+[mode]
+normal_main = { fg = "#191724", bg = "#9ccfd8", bold = true }
+normal_alt = { fg = "#9ccfd8", bg = "#26233a" }
+select_main = { fg = "#191724", bg = "#eb6f92", bold = true }
+select_alt = { fg = "#eb6f92", bg = "#26233a" }
+unset_main = { fg = "#191724", bg = "#eb6f92", bold = true }
+unset_alt = { fg = "#eb6f92", bg = "#26233a" }
+
+[status]
+sep_left = { open = "", close = "" }
+sep_right = { open = "", close = "" }
+overall = { fg = "#908caa", bg = "#1f1d2e" }
+progress_label = { fg = "#c4a7e7", bold = true }
+progress_normal = { fg = "#26233a", bg = "#191724" }
+progress_error = { fg = "#26233a", bg = "#191724" }
+perm_type = { fg = "#c4a7e7" }
+perm_read = { fg = "#f6c177" }
+perm_write = { fg = "#eb6f92" }
+perm_exec = { fg = "#9ccfd8" }
+perm_sep = { fg = "#f6c177" }
+
+[pick]
+border = { fg = "#9ccfd8" }
+active = { fg = "#f6c177", bold = true }
+inactive = {}
+
+[input]
+border = { fg = "#9ccfd8" }
+title = {}
+value = {}
+selected = { reversed = true }
+
+[cmp]
+border = { fg = "#9ccfd8" }
+active = { reversed = true }
+inactive = {}
+
+[tasks]
+border = { fg = "#9ccfd8" }
+title = {}
+hovered = { fg = "#f6c177" }
+
+[which]
+cols = 2
+separator = " - "
+separator_style = { fg = "#6e6a86" }
+mask = { bg = "#1f1d2e" }
+rest = { fg = "#6e6a86" }
+cand = { fg = "#c4a7e7" }
+desc = { fg = "#26233a" }
+
+[help]
+on = { fg = "#ebbcba" }
+run = { fg = "#f6c177" }
+desc = {}
+hovered = { reversed = true, bold = true }
+footer = { fg = "#191724", bg = "#e0def4" }
+
+[notify]
+title_info = { fg = "#31748f" }
+title_warn = { fg = "#f6c177" }
+title_error = { fg = "#eb6f92" }
+
+[confirm]
+border = { fg = "#908caa" }
+title = { fg = "#c4a7e7" }
+content = { fg = "#524f67" }
+list = { fg = "#e0def4" }
+btn_yes = { reversed = true, fg = "#e0def4" }
+btn_no = {}
+
+[spot]
+border = { fg = "#26233a" }
+title = { fg = "#6e6a86", bold = true }
+tbl_col = { fg = "#908caa" }
+tbl_cell = { bg = "#1f1d2e" }
+
+[filetype]
+rules = [
+  # Images
+  { mime = "image/*", fg = "#c4a7e7" },
+
+  # Media
+  { mime = "{audio,video}/*", fg = "#f6c177" },
+
+  # Archives
+  { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "#eb6f92" },
+
+  # Documents
+  { mime = "application/{pdf,doc,rtf,vnd.*}", fg = "#ebbcba" },
+
+  # Broken symlinks
+  { name = "*", is = "orphan", fg = "#eb6f92" },
+
+  # Executables
+  { name = "*", is = "exec", fg = "#9ccfd8" },
+
+  # Fallback
+  { name = "*", fg = "#e0def4" },
+  { name = "*/", fg = "#31748f" },
+]

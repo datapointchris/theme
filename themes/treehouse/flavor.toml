@@ -1,0 +1,127 @@
+# Treehouse - Yazi flavor
+# Generated algorithmically from theme.yml
+# Author: Ghostty
+
+[mgr]
+cwd = { fg = "#58859a" }
+hovered = { reversed = true, bold = true }
+preview_hovered = { underline = true }
+find_keyword = { fg = "#ed5d20", bg = "#191919" }
+find_position = {}
+marker_copied = { fg = "#b25a1e", bg = "#b25a1e" }
+marker_cut = { fg = "#97363d", bg = "#97363d" }
+marker_marked = { fg = "#58859a", bg = "#58859a" }
+marker_selected = { fg = "#ffc800", bg = "#ffc800" }
+count_copied = { fg = "#191919", bg = "#b25a1e" }
+count_cut = { fg = "#191919", bg = "#97363d" }
+count_selected = { fg = "#191919", bg = "#ffc800" }
+border_symbol = "│"
+border_style = { fg = "#504332" }
+
+[tabs]
+active = { fg = "#191919", bg = "#786b53", bold = true }
+inactive = { fg = "#786b53", bg = "#786b53" }
+sep_inner = { open = "", close = "" }
+sep_outer = { open = "", close = "" }
+
+[mode]
+normal_main = { fg = "#191919", bg = "#786b53", bold = true }
+normal_alt = { fg = "#786b53", bg = "#786b53" }
+select_main = { fg = "#191919", bg = "#ed5d20", bold = true }
+select_alt = { fg = "#ed5d20", bg = "#786b53" }
+unset_main = { fg = "#191919", bg = "#44a900", bold = true }
+unset_alt = { fg = "#44a900", bg = "#786b53" }
+
+[status]
+sep_left = { open = "", close = "" }
+sep_right = { open = "", close = "" }
+overall = { fg = "#786b53", bg = "#504332" }
+progress_label = { fg = "#58859a", bold = true }
+progress_normal = { fg = "#786b53", bg = "#191919" }
+progress_error = { fg = "#786b53", bg = "#191919" }
+perm_type = { fg = "#786b53" }
+perm_read = { fg = "#55f238" }
+perm_write = { fg = "#b2270e" }
+perm_exec = { fg = "#55f238" }
+perm_sep = { fg = "#97363d" }
+
+[pick]
+border = { fg = "#85cfed" }
+active = { fg = "#97363d", bold = true }
+inactive = {}
+
+[input]
+border = { fg = "#85cfed" }
+title = {}
+value = {}
+selected = { reversed = true }
+
+[cmp]
+border = { fg = "#85cfed" }
+active = { reversed = true }
+inactive = {}
+
+[tasks]
+border = { fg = "#85cfed" }
+title = {}
+hovered = { fg = "#97363d" }
+
+[which]
+cols = 2
+separator = " - "
+separator_style = { fg = "#504332" }
+mask = { bg = "#504332" }
+rest = { fg = "#504332" }
+cand = { fg = "#58859a" }
+desc = { fg = "#786b53" }
+
+[help]
+on = { fg = "#f07d14" }
+run = { fg = "#97363d" }
+desc = {}
+hovered = { reversed = true, bold = true }
+footer = { fg = "#191919", bg = "#786b53" }
+
+[notify]
+title_info = { fg = "#b25a1e" }
+title_warn = { fg = "#ffc800" }
+title_error = { fg = "#97363d" }
+
+[confirm]
+border = { fg = "#786b53" }
+title = { fg = "#58859a" }
+content = { fg = "#ffc800" }
+list = { fg = "#786b53" }
+btn_yes = { reversed = true, fg = "#786b53" }
+btn_no = {}
+
+[spot]
+border = { fg = "#786b53" }
+title = { fg = "#504332", bold = true }
+tbl_col = { fg = "#786b53" }
+tbl_cell = { bg = "#504332" }
+
+[filetype]
+rules = [
+  # Images
+  { mime = "image/*", fg = "#97363d" },
+
+  # Media
+  { mime = "{audio,video}/*", fg = "#f2b732" },
+
+  # Archives
+  { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "#b2270e" },
+
+  # Documents
+  { mime = "application/{pdf,doc,rtf,vnd.*}", fg = "#b25a1e" },
+
+  # Broken symlinks
+  { name = "*", is = "orphan", fg = "#b2270e" },
+
+  # Executables
+  { name = "*", is = "exec", fg = "#44a900" },
+
+  # Fallback
+  { name = "*", fg = "#786b53" },
+  { name = "*/", fg = "#58859a" },
+]

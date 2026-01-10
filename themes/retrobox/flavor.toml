@@ -1,0 +1,127 @@
+# Retrobox - Yazi flavor
+# Generated algorithmically from theme.yml
+# Author: Maxim Kim (https://github.com/vim/colorschemes)
+
+[mgr]
+cwd = { fg = "#83a598" }
+hovered = { reversed = true, bold = true }
+preview_hovered = { underline = true }
+find_keyword = { fg = "#fe8019", bg = "#1c1c1c" }
+find_position = {}
+marker_copied = { fg = "#8ec07c", bg = "#8ec07c" }
+marker_cut = { fg = "#d3869b", bg = "#d3869b" }
+marker_marked = { fg = "#83a598", bg = "#83a598" }
+marker_selected = { fg = "#fbf1c7", bg = "#fbf1c7" }
+count_copied = { fg = "#1c1c1c", bg = "#8ec07c" }
+count_cut = { fg = "#1c1c1c", bg = "#d3869b" }
+count_selected = { fg = "#1c1c1c", bg = "#fbf1c7" }
+border_symbol = "│"
+border_style = { fg = "#928374" }
+
+[tabs]
+active = { fg = "#1c1c1c", bg = "#a89984", bold = true }
+inactive = { fg = "#a89984", bg = "#504945" }
+sep_inner = { open = "", close = "" }
+sep_outer = { open = "", close = "" }
+
+[mode]
+normal_main = { fg = "#1c1c1c", bg = "#a89984", bold = true }
+normal_alt = { fg = "#a89984", bg = "#504945" }
+select_main = { fg = "#1c1c1c", bg = "#fe8019", bold = true }
+select_alt = { fg = "#fe8019", bg = "#504945" }
+unset_main = { fg = "#1c1c1c", bg = "#b8bb26", bold = true }
+unset_alt = { fg = "#b8bb26", bg = "#504945" }
+
+[status]
+sep_left = { open = "", close = "" }
+sep_right = { open = "", close = "" }
+overall = { fg = "#a89984", bg = "#3c3836" }
+progress_label = { fg = "#83a598", bold = true }
+progress_normal = { fg = "#504945", bg = "#1c1c1c" }
+progress_error = { fg = "#504945", bg = "#1c1c1c" }
+perm_type = { fg = "#504945" }
+perm_read = { fg = "#b8bb26" }
+perm_write = { fg = "#fb4934" }
+perm_exec = { fg = "#b8bb26" }
+perm_sep = { fg = "#d3869b" }
+
+[pick]
+border = { fg = "#83a598" }
+active = { fg = "#d3869b", bold = true }
+inactive = {}
+
+[input]
+border = { fg = "#83a598" }
+title = {}
+value = {}
+selected = { reversed = true }
+
+[cmp]
+border = { fg = "#83a598" }
+active = { reversed = true }
+inactive = {}
+
+[tasks]
+border = { fg = "#83a598" }
+title = {}
+hovered = { fg = "#d3869b" }
+
+[which]
+cols = 2
+separator = " - "
+separator_style = { fg = "#928374" }
+mask = { bg = "#3c3836" }
+rest = { fg = "#928374" }
+cand = { fg = "#83a598" }
+desc = { fg = "#504945" }
+
+[help]
+on = { fg = "#8ec07c" }
+run = { fg = "#d3869b" }
+desc = {}
+hovered = { reversed = true, bold = true }
+footer = { fg = "#1c1c1c", bg = "#ebdbb2" }
+
+[notify]
+title_info = { fg = "#8ec07c" }
+title_warn = { fg = "#fbf1c7" }
+title_error = { fg = "#d3869b" }
+
+[confirm]
+border = { fg = "#a89984" }
+title = { fg = "#83a598" }
+content = { fg = "#fbf1c7" }
+list = { fg = "#ebdbb2" }
+btn_yes = { reversed = true, fg = "#ebdbb2" }
+btn_no = {}
+
+[spot]
+border = { fg = "#504945" }
+title = { fg = "#928374", bold = true }
+tbl_col = { fg = "#a89984" }
+tbl_cell = { bg = "#3c3836" }
+
+[filetype]
+rules = [
+  # Images
+  { mime = "image/*", fg = "#d3869b" },
+
+  # Media
+  { mime = "{audio,video}/*", fg = "#fabd2f" },
+
+  # Archives
+  { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "#fb4934" },
+
+  # Documents
+  { mime = "application/{pdf,doc,rtf,vnd.*}", fg = "#689d6a" },
+
+  # Broken symlinks
+  { name = "*", is = "orphan", fg = "#fb4934" },
+
+  # Executables
+  { name = "*", is = "exec", fg = "#b8bb26" },
+
+  # Fallback
+  { name = "*", fg = "#ebdbb2" },
+  { name = "*/", fg = "#83a598" },
+]

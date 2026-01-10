@@ -335,6 +335,25 @@ apply_borders() {
   return 0
 }
 
+# Apply yazi theme (all platforms)
+# Uses flavor system: copies to ~/.config/yazi/flavors/current.yazi/flavor.toml
+apply_yazi() {
+  local theme="$1"
+  local lib_path
+  lib_path=$(get_library_path "$theme")
+
+  if [[ -z "$lib_path" ]] || [[ ! -f "$lib_path/flavor.toml" ]]; then
+    return 1
+  fi
+
+  local yazi_flavor_dir="$HOME/.config/yazi/flavors/current.yazi"
+  mkdir -p "$yazi_flavor_dir"
+
+  cp "$lib_path/flavor.toml" "$yazi_flavor_dir/flavor.toml"
+
+  return 0
+}
+
 #==============================================================================
 # OPACITY MANAGEMENT
 #==============================================================================
@@ -1612,6 +1631,15 @@ apply_theme_to_apps() {
   else
     skipped+=("btop")
     _print_app_status "btop" "false"
+  fi
+
+  # Yazi (all platforms)
+  if apply_yazi "$theme" 2>/dev/null; then
+    applied+=("yazi")
+    _print_app_status "yazi" "true"
+  else
+    skipped+=("yazi")
+    _print_app_status "yazi" "false"
   fi
 
   # Hyprland (Arch only)

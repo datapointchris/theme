@@ -1,0 +1,127 @@
+# Gruvbox - Yazi flavor
+# Generated algorithmically from theme.yml
+# Author: ellisonleao (https://github.com/ellisonleao/gruvbox.nvim)
+
+[mgr]
+cwd = { fg = "#fabd2f" }
+hovered = { reversed = true, bold = true }
+preview_hovered = { underline = true }
+find_keyword = { fg = "#fe8019", bg = "#1d2021" }
+find_position = {}
+marker_copied = { fg = "#b8bb26", bg = "#b8bb26" }
+marker_cut = { fg = "#fb4934", bg = "#fb4934" }
+marker_marked = { fg = "#d3869b", bg = "#d3869b" }
+marker_selected = { fg = "#fe8019", bg = "#fe8019" }
+count_copied = { fg = "#1d2021", bg = "#b8bb26" }
+count_cut = { fg = "#1d2021", bg = "#fb4934" }
+count_selected = { fg = "#1d2021", bg = "#fe8019" }
+border_symbol = "│"
+border_style = { fg = "#665c54" }
+
+[tabs]
+active = { fg = "#1d2021", bg = "#83a598", bold = true }
+inactive = { fg = "#83a598", bg = "#504945" }
+sep_inner = { open = "", close = "" }
+sep_outer = { open = "", close = "" }
+
+[mode]
+normal_main = { fg = "#1d2021", bg = "#83a598", bold = true }
+normal_alt = { fg = "#83a598", bg = "#504945" }
+select_main = { fg = "#1d2021", bg = "#fe8019", bold = true }
+select_alt = { fg = "#fe8019", bg = "#504945" }
+unset_main = { fg = "#1d2021", bg = "#fabd2f", bold = true }
+unset_alt = { fg = "#fabd2f", bg = "#504945" }
+
+[status]
+sep_left = { open = "", close = "" }
+sep_right = { open = "", close = "" }
+overall = { fg = "#928374", bg = "#3c3836" }
+progress_label = { fg = "#83a598", bold = true }
+progress_normal = { fg = "#504945", bg = "#1d2021" }
+progress_error = { fg = "#504945", bg = "#1d2021" }
+perm_type = { fg = "#b8bb26" }
+perm_read = { fg = "#fabd2f" }
+perm_write = { fg = "#fb4934" }
+perm_exec = { fg = "#8ec07c" }
+perm_sep = { fg = "#d3869b" }
+
+[pick]
+border = { fg = "#83a598" }
+active = { fg = "#d3869b", bold = true }
+inactive = {}
+
+[input]
+border = { fg = "#83a598" }
+title = {}
+value = {}
+selected = { reversed = true }
+
+[cmp]
+border = { fg = "#83a598" }
+active = { reversed = true }
+inactive = {}
+
+[tasks]
+border = { fg = "#83a598" }
+title = {}
+hovered = { fg = "#d3869b" }
+
+[which]
+cols = 2
+separator = " - "
+separator_style = { fg = "#665c54" }
+mask = { bg = "#3c3836" }
+rest = { fg = "#665c54" }
+cand = { fg = "#83a598" }
+desc = { fg = "#504945" }
+
+[help]
+on = { fg = "#8ec07c" }
+run = { fg = "#d3869b" }
+desc = {}
+hovered = { reversed = true, bold = true }
+footer = { fg = "#1d2021", bg = "#ebdbb2" }
+
+[notify]
+title_info = { fg = "#b8bb26" }
+title_warn = { fg = "#fabd2f" }
+title_error = { fg = "#fb4934" }
+
+[confirm]
+border = { fg = "#928374" }
+title = { fg = "#83a598" }
+content = { fg = "#fbf1c7" }
+list = { fg = "#ebdbb2" }
+btn_yes = { reversed = true, fg = "#ebdbb2" }
+btn_no = {}
+
+[spot]
+border = { fg = "#504945" }
+title = { fg = "#665c54", bold = true }
+tbl_col = { fg = "#928374" }
+tbl_cell = { bg = "#3c3836" }
+
+[filetype]
+rules = [
+  # Images
+  { mime = "image/*", fg = "#fabd2f" },
+
+  # Media
+  { mime = "{audio,video}/*", fg = "#d3869b" },
+
+  # Archives
+  { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "#fb4934" },
+
+  # Documents
+  { mime = "application/{pdf,doc,rtf,vnd.*}", fg = "#8ec07c" },
+
+  # Broken symlinks
+  { name = "*", is = "orphan", fg = "#fb4934" },
+
+  # Executables
+  { name = "*", is = "exec", fg = "#b8bb26" },
+
+  # Fallback
+  { name = "*", fg = "#ebdbb2" },
+  { name = "*/", fg = "#83a598" },
+]

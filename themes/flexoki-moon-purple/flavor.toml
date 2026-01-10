@@ -1,0 +1,127 @@
+# Flexoki Moon Purple - Yazi flavor
+# Generated algorithmically from theme.yml
+# Author: datapointchris
+
+[mgr]
+cwd = { fg = "#d0a215" }
+hovered = { reversed = true, bold = true }
+preview_hovered = { underline = true }
+find_keyword = { fg = "#da702c", bg = "#12101d" }
+find_position = {}
+marker_copied = { fg = "#879a39", bg = "#879a39" }
+marker_cut = { fg = "#d14d41", bg = "#d14d41" }
+marker_marked = { fg = "#8b7ec8", bg = "#8b7ec8" }
+marker_selected = { fg = "#da702c", bg = "#da702c" }
+count_copied = { fg = "#12101d", bg = "#879a39" }
+count_cut = { fg = "#12101d", bg = "#d14d41" }
+count_selected = { fg = "#12101d", bg = "#da702c" }
+border_symbol = "│"
+border_style = { fg = "#625f68" }
+
+[tabs]
+active = { fg = "#12101d", bg = "#4385be", bold = true }
+inactive = { fg = "#4385be", bg = "#1f1d2a" }
+sep_inner = { open = "", close = "" }
+sep_outer = { open = "", close = "" }
+
+[mode]
+normal_main = { fg = "#12101d", bg = "#4385be", bold = true }
+normal_alt = { fg = "#4385be", bg = "#1f1d2a" }
+select_main = { fg = "#12101d", bg = "#da702c", bold = true }
+select_alt = { fg = "#da702c", bg = "#1f1d2a" }
+unset_main = { fg = "#12101d", bg = "#d0a215", bold = true }
+unset_alt = { fg = "#d0a215", bg = "#1f1d2a" }
+
+[status]
+sep_left = { open = "", close = "" }
+sep_right = { open = "", close = "" }
+overall = { fg = "#8f8a98", bg = "#1c1a25" }
+progress_label = { fg = "#4385be", bold = true }
+progress_normal = { fg = "#1f1d2a", bg = "#12101d" }
+progress_error = { fg = "#1f1d2a", bg = "#12101d" }
+perm_type = { fg = "#879a39" }
+perm_read = { fg = "#d0a215" }
+perm_write = { fg = "#d14d41" }
+perm_exec = { fg = "#3aa99f" }
+perm_sep = { fg = "#8b7ec8" }
+
+[pick]
+border = { fg = "#205ea6" }
+active = { fg = "#8b7ec8", bold = true }
+inactive = {}
+
+[input]
+border = { fg = "#205ea6" }
+title = {}
+value = {}
+selected = { reversed = true }
+
+[cmp]
+border = { fg = "#205ea6" }
+active = { reversed = true }
+inactive = {}
+
+[tasks]
+border = { fg = "#205ea6" }
+title = {}
+hovered = { fg = "#8b7ec8" }
+
+[which]
+cols = 2
+separator = " - "
+separator_style = { fg = "#625f68" }
+mask = { bg = "#1c1a25" }
+rest = { fg = "#625f68" }
+cand = { fg = "#4385be" }
+desc = { fg = "#1f1d2a" }
+
+[help]
+on = { fg = "#24837b" }
+run = { fg = "#8b7ec8" }
+desc = {}
+hovered = { reversed = true, bold = true }
+footer = { fg = "#12101d", bg = "#ddd8e8" }
+
+[notify]
+title_info = { fg = "#879a39" }
+title_warn = { fg = "#d0a215" }
+title_error = { fg = "#d14d41" }
+
+[confirm]
+border = { fg = "#8f8a98" }
+title = { fg = "#4385be" }
+content = { fg = "#ffffff" }
+list = { fg = "#ddd8e8" }
+btn_yes = { reversed = true, fg = "#ddd8e8" }
+btn_no = {}
+
+[spot]
+border = { fg = "#1f1d2a" }
+title = { fg = "#625f68", bold = true }
+tbl_col = { fg = "#8f8a98" }
+tbl_cell = { bg = "#1c1a25" }
+
+[filetype]
+rules = [
+  # Images
+  { mime = "image/*", fg = "#d0a215" },
+
+  # Media
+  { mime = "{audio,video}/*", fg = "#8b7ec8" },
+
+  # Archives
+  { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "#d14d41" },
+
+  # Documents
+  { mime = "application/{pdf,doc,rtf,vnd.*}", fg = "#3aa99f" },
+
+  # Broken symlinks
+  { name = "*", is = "orphan", fg = "#d14d41" },
+
+  # Executables
+  { name = "*", is = "exec", fg = "#879a39" },
+
+  # Fallback
+  { name = "*", fg = "#ddd8e8" },
+  { name = "*/", fg = "#4385be" },
+]
