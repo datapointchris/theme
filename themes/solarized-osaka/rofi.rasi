@@ -1,16 +1,55 @@
 /* Solarized Osaka - Rofi colors */
 /* Generated from theme.yml */
+/* Author: Takuya Matsuyama (craftzdog) */
 
 * {
+    /* Base16 palette */
+    base00: #001419;  /* Main background */
+    base01: #002b36;  /* Lighter background */
+    base02: #073642;  /* Selection background */
+    base03: #586e75;  /* Comments, muted */
+    base04: #657b83;  /* Dark foreground */
+    base05: #93a1a1;  /* Default foreground */
+    base06: #a9b1b1;  /* Light foreground */
+    base07: #eee8d5;  /* Brightest foreground */
+    base08: #dc322f;  /* Red */
+    base09: #cb4b16;  /* Orange */
+    base0A: #b58900;  /* Yellow */
+    base0B: #859900;  /* Green */
+    base0C: #2aa198;  /* Cyan */
+    base0D: #268bd2;  /* Blue */
+    base0E: #6c71c4;  /* Magenta */
+    base0F: #d33682;  /* Brown */
+
+    /* Semantic colors */
     bg: #001419;
     bg-alt: #002b36;
     bg-selected: #073642;
     fg: #93a1a1;
     fg-alt: #657b83;
-    blue: #268bd2;
-    magenta: #d33682;
+    fg-muted: #586e75;
+    fg-bright: #a9b1b1;
+    border: #073642;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #dc322f;
+    active: #859900;
+    selected: #268bd2;
+
+    /* Named accent colors */
     red: #dc322f;
     green: #859900;
     yellow: #b58900;
+    blue: #268bd2;
+    magenta: #d33682;
     cyan: #2aa198;
+    orange: #cb4b16;
+
+    /* Bright variants */
+    bright-red: #cb4b16;
+    bright-green: #859900;
+    bright-yellow: #b58900;
+    bright-blue: #268bd2;
+    bright-magenta: #6c71c4;
+    bright-cyan: #2aa198;
 }
