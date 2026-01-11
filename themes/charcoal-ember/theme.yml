@@ -63,6 +63,7 @@ special:
   panel: "#2d2d2d"          # Charleston Green
 
 # Extended palette for richer theming
+extended_source: plugin
 extended:
   # Original tmux color names for reference
   dark_gray: "#1d1f21"

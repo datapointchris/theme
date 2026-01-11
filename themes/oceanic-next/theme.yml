@@ -52,6 +52,7 @@ special:
   selection_bg: "#4f5b66"
   selection_fg: "#c0c5ce"
 
+extended_source: plugin
 extended:
   # Diagnostic colors (from oceanic-next CocDiagnostics/DiagnosticSign)
   diagnostic_error: "#ec5f67"

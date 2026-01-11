@@ -65,6 +65,7 @@ special:
   panel: "#3c3836"
 
 # Extended palette for richer theming
+extended_source: plugin
 extended:
   # Gruvbox original neutral colors (ANSI 1-6 in Ghostty)
   neutral_red: "#cc241d"

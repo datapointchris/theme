@@ -57,6 +57,7 @@ special:
   border: "#444c56"
   panel: "#1c2128"
 
+extended_source: plugin
 extended:
   # Diagnostic colors (from github-nvim-theme)
   diagnostic_error: "#c93c37"

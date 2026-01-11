@@ -62,6 +62,7 @@ special:
   panel: "#3c3836"
 
 # Extended palette
+extended_source: plugin
 extended:
   # Background shades
   bg0: "#1c1c1c"

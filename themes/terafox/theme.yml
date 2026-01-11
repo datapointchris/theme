@@ -57,6 +57,7 @@ special:
   border: "#2d4f56"
   panel: "#0f1c1e"
 
+extended_source: plugin
 extended:
   # Background/foreground variants
   bg0: "#0f1c1e"

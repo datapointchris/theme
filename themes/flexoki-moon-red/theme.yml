@@ -57,6 +57,7 @@ special:
   border: "#3a2b28"
   panel: "#251a1a"
 
+extended_source: plugin
 extended:
   # Diagnostic colors (from flexoki-moon-nvim)
   diagnostic_error: "#d14d41"

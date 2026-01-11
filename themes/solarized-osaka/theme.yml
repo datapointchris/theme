@@ -57,6 +57,7 @@ special:
   border: "#002b36"
   panel: "#001419"
 
+extended_source: plugin
 extended:
   # Diagnostic colors (maps to base16 - solarized uses consistent 16-color palette)
   diagnostic_error: "#dc322f"

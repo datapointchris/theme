@@ -61,6 +61,7 @@ special:
   panel: "#1f1d2e"
 
 # Extended palette (full rose-pine neovim colors)
+extended_source: plugin
 extended:
   # Rose Pine signature colors
   _nc: "#16141f"

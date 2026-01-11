@@ -61,6 +61,7 @@ special:
   panel: "#16161d"
 
 # Extended palette (full kanagawa.nvim colors)
+extended_source: plugin
 extended:
   # Sumi Ink (backgrounds)
   sumi_ink0: "#16161d"

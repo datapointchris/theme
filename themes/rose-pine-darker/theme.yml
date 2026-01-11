@@ -61,6 +61,7 @@ special:
   panel: "#1f1d2e"
 
 # Extended palette for richer theming
+extended_source: plugin
 extended:
   # Rose Pine signature colors
   love: "#eb6f92"

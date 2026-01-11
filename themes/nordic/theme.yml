@@ -54,6 +54,7 @@ special:
   border: "#191D24"         # black0 (border_fg when not bright)
   panel: "#191D24"          # black0 (bg_dark)
 
+extended_source: plugin
 extended:
   # Nordic-specific colors
   black0: "#191D24"

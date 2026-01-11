@@ -65,6 +65,7 @@ special:
 
 # Extended palette for richer theming
 # Complete gruvbox.nvim palette
+extended_source: plugin
 extended:
   # Dark backgrounds
   dark0_hard: "#1d2021"
