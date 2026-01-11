@@ -1,5 +1,31 @@
 # Changelog
 
+## [3.0.0](https://github.com/datapointchris/theme/compare/v2.0.0...v3.0.0) (2026-01-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mako:** migrate notification configs to new format
+
+### Features
+
+* **extended:** add batch generator with plugin protection ([6f646e1](https://github.com/datapointchris/theme/commit/6f646e1bce1e4cc08e458952ad754ae2462566cb))
+* **flexoki-moon:** add extended palette for all 5 variants ([e4cf44f](https://github.com/datapointchris/theme/commit/e4cf44f77635fa38a2c7761835a34c6b3baa4e47))
+* **github:** add extended palette extraction and regenerate configs ([e7af1bb](https://github.com/datapointchris/theme/commit/e7af1bbee3c5b825cdfd2c0faf6ce3f82b75dee5))
+* **gruvbox-dark-medium:** regenerate configs with extended palette ([3e6a0d0](https://github.com/datapointchris/theme/commit/3e6a0d06a7ed5a767f8699319a3aa3573f36c0bd))
+* **nightfox:** add extended palette colors from plugin source ([2e8cbad](https://github.com/datapointchris/theme/commit/2e8cbad658997ca5b3df09f637421f9ad1600428))
+* **oceanic-next:** add extended palette from plugin source ([3631920](https://github.com/datapointchris/theme/commit/3631920d9e75da320fb6ca41229e865246854be1))
+* **solarized-osaka:** add extended palette from plugin source ([15a0960](https://github.com/datapointchris/theme/commit/15a0960b54da4d455d713b1e351b8c943e0fd90a))
+* **themes:** add generated extended palettes for 20 themes ([cb18920](https://github.com/datapointchris/theme/commit/cb18920f3b137d2240cb9b7e171e3d712ac5984f))
+* **themes:** protect plugin-extracted extended palettes ([12b64d8](https://github.com/datapointchris/theme/commit/12b64d8e2d5d3fe20d18e33ff423301fe2b5748e))
+* **themes:** regenerate app configs to use extended palette colors ([50159fb](https://github.com/datapointchris/theme/commit/50159fb8c7df25f24a16ff25721eb8de26648bf9))
+* **themes:** regenerate remaining app configs with extended palette ([37e3c30](https://github.com/datapointchris/theme/commit/37e3c30005add8f660f6541b19dd075bedb4c601))
+
+
+### Code Refactoring
+
+* **mako:** migrate notification configs to new format ([fa5c80c](https://github.com/datapointchris/theme/commit/fa5c80cbb4d3f9b4740375d72a1a7f1fd5532dd3))
+
 ## [2.0.0](https://github.com/datapointchris/theme/compare/v1.0.0...v2.0.0) (2026-01-10)
 
 
