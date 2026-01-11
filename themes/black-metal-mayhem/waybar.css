@@ -1,18 +1,71 @@
 /* Black Metal (Mayhem) - waybar theme */
 /* Generated from theme.yml */
+/* Author: Ghostty */
 
-/* Base colors */
+/* =============================================================================
+   BASE16 PALETTE
+   ============================================================================= */
+
+/* Background tones */
+@define-color base00 #000000;  /* Main background */
+@define-color base01 #3f3f3f;  /* Lighter background */
+@define-color base02 #c1c1c1;  /* Selection background */
+
+/* Foreground tones */
+@define-color base03 #3f3f3f;  /* Comments, muted */
+@define-color base04 #c1c1c1;  /* Dark foreground */
+@define-color base05 #c1c1c1;  /* Default foreground */
+@define-color base06 #c1c1c1;  /* Light foreground */
+@define-color base07 #c1c1c1;  /* Brightest foreground */
+
+/* Accent colors */
+@define-color base08 #5f8787;  /* Red */
+@define-color base09 #5f8787;  /* Orange */
+@define-color base0A #eecc6c;  /* Yellow */
+@define-color base0B #f3ecd4;  /* Green */
+@define-color base0C #aaaaaa;  /* Cyan */
+@define-color base0D #888888;  /* Blue */
+@define-color base0E #999999;  /* Magenta */
+@define-color base0F #999999;  /* Brown */
+
+/* =============================================================================
+   SEMANTIC ALIASES
+   ============================================================================= */
+
+/* Backgrounds */
 @define-color bg #000000;
 @define-color bg-dark #3f3f3f;
 @define-color bg-highlight #c1c1c1;
+@define-color bg-selection #c1c1c1;
+
+/* Foregrounds */
 @define-color fg #c1c1c1;
 @define-color fg-dark #c1c1c1;
+@define-color fg-muted #3f3f3f;
+@define-color fg-bright #c1c1c1;
 
-/* Accent colors */
-@define-color blue #888888;
-@define-color cyan #aaaaaa;
-@define-color green #f3ecd4;
-@define-color magenta #999999;
+/* Status colors - use extended diagnostic colors when available */
+@define-color success #f3ecd4;
+@define-color warning #5f8787;
+@define-color error #5f8787;
+@define-color info #aaaaaa;
+
+/* Named accent colors */
 @define-color red #5f8787;
+@define-color green #f3ecd4;
 @define-color yellow #eecc6c;
+@define-color blue #888888;
+@define-color magenta #999999;
+@define-color cyan #aaaaaa;
 @define-color orange #5f8787;
+
+/* Bright variants */
+@define-color bright-red #5f8787;
+@define-color bright-green #f3ecd4;
+@define-color bright-yellow #eecc6c;
+@define-color bright-blue #888888;
+@define-color bright-magenta #999999;
+@define-color bright-cyan #aaaaaa;
+
+/* Border - use extended UI border when available */
+@define-color border #3f3f3f;

@@ -1,18 +1,71 @@
 /* GitHub Dark - waybar theme */
 /* Generated from theme.yml */
+/* Author: Ghostty */
 
-/* Base colors */
+/* =============================================================================
+   BASE16 PALETTE
+   ============================================================================= */
+
+/* Background tones */
+@define-color base00 #101216;  /* Main background */
+@define-color base01 #4d4d4d;  /* Lighter background */
+@define-color base02 #3b5070;  /* Selection background */
+
+/* Foreground tones */
+@define-color base03 #4d4d4d;  /* Comments, muted */
+@define-color base04 #ffffff;  /* Dark foreground */
+@define-color base05 #8b949e;  /* Default foreground */
+@define-color base06 #ffffff;  /* Light foreground */
+@define-color base07 #ffffff;  /* Brightest foreground */
+
+/* Accent colors */
+@define-color base08 #f78166;  /* Red */
+@define-color base09 #f78166;  /* Orange */
+@define-color base0A #e3b341;  /* Yellow */
+@define-color base0B #56d364;  /* Green */
+@define-color base0C #2b7489;  /* Cyan */
+@define-color base0D #6ca4f8;  /* Blue */
+@define-color base0E #db61a2;  /* Magenta */
+@define-color base0F #db61a2;  /* Brown */
+
+/* =============================================================================
+   SEMANTIC ALIASES
+   ============================================================================= */
+
+/* Backgrounds */
 @define-color bg #101216;
 @define-color bg-dark #4d4d4d;
 @define-color bg-highlight #3b5070;
+@define-color bg-selection #3b5070;
+
+/* Foregrounds */
 @define-color fg #8b949e;
 @define-color fg-dark #ffffff;
+@define-color fg-muted #4d4d4d;
+@define-color fg-bright #ffffff;
 
-/* Accent colors */
-@define-color blue #6ca4f8;
-@define-color cyan #2b7489;
-@define-color green #56d364;
-@define-color magenta #db61a2;
+/* Status colors - use extended diagnostic colors when available */
+@define-color success #56d364;
+@define-color warning #f78166;
+@define-color error #f78166;
+@define-color info #6ca4f8;
+
+/* Named accent colors */
 @define-color red #f78166;
+@define-color green #56d364;
 @define-color yellow #e3b341;
+@define-color blue #6ca4f8;
+@define-color magenta #db61a2;
+@define-color cyan #2b7489;
 @define-color orange #f78166;
+
+/* Bright variants */
+@define-color bright-red #f78166;
+@define-color bright-green #56d364;
+@define-color bright-yellow #e3b341;
+@define-color bright-blue #6ca4f8;
+@define-color bright-magenta #db61a2;
+@define-color bright-cyan #2b7489;
+
+/* Border - use extended UI border when available */
+@define-color border #3b5070;

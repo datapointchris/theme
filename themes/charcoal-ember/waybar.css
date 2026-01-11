@@ -1,0 +1,71 @@
+/* Charcoal Ember - waybar theme */
+/* Generated from theme.yml */
+/* Author: datapointchris */
+
+/* =============================================================================
+   BASE16 PALETTE
+   ============================================================================= */
+
+/* Background tones */
+@define-color base00 #1d1f21;  /* Main background */
+@define-color base01 #2d2d2d;  /* Lighter background */
+@define-color base02 #373b41;  /* Selection background */
+
+/* Foreground tones */
+@define-color base03 #969896;  /* Comments, muted */
+@define-color base04 #969896;  /* Dark foreground */
+@define-color base05 #c5c8c6;  /* Default foreground */
+@define-color base06 #e0e0e0;  /* Light foreground */
+@define-color base07 #ffffff;  /* Brightest foreground */
+
+/* Accent colors */
+@define-color base08 #c90d00;  /* Red */
+@define-color base09 #f79802;  /* Orange */
+@define-color base0A #ffc400;  /* Yellow */
+@define-color base0B #60b45a;  /* Green */
+@define-color base0C #5fb3b3;  /* Cyan */
+@define-color base0D #4eb6fe;  /* Blue */
+@define-color base0E #b294bb;  /* Magenta */
+@define-color base0F #c09c24;  /* Brown */
+
+/* =============================================================================
+   SEMANTIC ALIASES
+   ============================================================================= */
+
+/* Backgrounds */
+@define-color bg #1d1f21;
+@define-color bg-dark #2d2d2d;
+@define-color bg-highlight #373b41;
+@define-color bg-selection #373b41;
+
+/* Foregrounds */
+@define-color fg #c5c8c6;
+@define-color fg-dark #969896;
+@define-color fg-muted #969896;
+@define-color fg-bright #e0e0e0;
+
+/* Status colors - use extended diagnostic colors when available */
+@define-color success #60b45a;
+@define-color warning #f79802;
+@define-color error #c90d00;
+@define-color info #4eb6fe;
+
+/* Named accent colors */
+@define-color red #c90d00;
+@define-color green #60b45a;
+@define-color yellow #c09c24;
+@define-color blue #4eb6fe;
+@define-color magenta #b294bb;
+@define-color cyan #5fb3b3;
+@define-color orange #f79802;
+
+/* Bright variants */
+@define-color bright-red #ff3334;
+@define-color bright-green #9ec400;
+@define-color bright-yellow #ffc400;
+@define-color bright-blue #6699cc;
+@define-color bright-magenta #c397d8;
+@define-color bright-cyan #70c0b1;
+
+/* Border - use extended UI border when available */
+@define-color border #373b41;

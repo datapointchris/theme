@@ -1,16 +1,55 @@
 /* Everforest Dark Hard - Rofi colors */
 /* Generated from theme.yml */
+/* Author: Ghostty */
 
 * {
+    /* Base16 palette */
+    base00: #1e2326;  /* Main background */
+    base01: #a6b0a0;  /* Lighter background */
+    base02: #4c3743;  /* Selection background */
+    base03: #a6b0a0;  /* Comments, muted */
+    base04: #f2efdf;  /* Dark foreground */
+    base05: #d3c6aa;  /* Default foreground */
+    base06: #fffbef;  /* Light foreground */
+    base07: #fffbef;  /* Brightest foreground */
+    base08: #e67e80;  /* Red */
+    base09: #f85552;  /* Orange */
+    base0A: #dbbc7f;  /* Yellow */
+    base0B: #a7c080;  /* Green */
+    base0C: #83c092;  /* Cyan */
+    base0D: #7fbbb3;  /* Blue */
+    base0E: #d699b6;  /* Magenta */
+    base0F: #d699b6;  /* Brown */
+
+    /* Semantic colors */
     bg: #1e2326;
     bg-alt: #a6b0a0;
     bg-selected: #4c3743;
     fg: #d3c6aa;
     fg-alt: #f2efdf;
-    blue: #7fbbb3;
-    magenta: #d699b6;
+    fg-muted: #a6b0a0;
+    fg-bright: #fffbef;
+    border: #a6b0a0;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #e67e80;
+    active: #a7c080;
+    selected: #83c092;
+
+    /* Named accent colors */
     red: #e67e80;
     green: #a7c080;
     yellow: #dbbc7f;
+    blue: #7fbbb3;
+    magenta: #d699b6;
     cyan: #83c092;
+    orange: #f85552;
+
+    /* Bright variants */
+    bright-red: #f85552;
+    bright-green: #8da101;
+    bright-yellow: #dfa000;
+    bright-blue: #3a94c5;
+    bright-magenta: #df69ba;
+    bright-cyan: #35a77c;
 }

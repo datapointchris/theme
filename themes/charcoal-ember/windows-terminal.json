@@ -1,0 +1,23 @@
+{
+  "name": "Charcoal Ember",
+  "background": "#1d1f21",
+  "foreground": "#c5c8c6",
+  "cursorColor": "#c5c8c6",
+  "selectionBackground": "#373b41",
+  "black": "#111111",
+  "red": "#c90d00",
+  "green": "#60b45a",
+  "yellow": "#c09c24",
+  "blue": "#4eb6fe",
+  "purple": "#b294bb",
+  "cyan": "#5fb3b3",
+  "white": "#c5c8c6",
+  "brightBlack": "#969896",
+  "brightRed": "#ff3334",
+  "brightGreen": "#9ec400",
+  "brightYellow": "#ffc400",
+  "brightBlue": "#6699cc",
+  "brightPurple": "#c397d8",
+  "brightCyan": "#70c0b1",
+  "brightWhite": "#ffffff"
+}

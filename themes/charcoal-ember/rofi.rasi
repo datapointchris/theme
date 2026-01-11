@@ -1,0 +1,55 @@
+/* Charcoal Ember - Rofi colors */
+/* Generated from theme.yml */
+/* Author: datapointchris */
+
+* {
+    /* Base16 palette */
+    base00: #1d1f21;  /* Main background */
+    base01: #2d2d2d;  /* Lighter background */
+    base02: #373b41;  /* Selection background */
+    base03: #969896;  /* Comments, muted */
+    base04: #969896;  /* Dark foreground */
+    base05: #c5c8c6;  /* Default foreground */
+    base06: #e0e0e0;  /* Light foreground */
+    base07: #ffffff;  /* Brightest foreground */
+    base08: #c90d00;  /* Red */
+    base09: #f79802;  /* Orange */
+    base0A: #ffc400;  /* Yellow */
+    base0B: #60b45a;  /* Green */
+    base0C: #5fb3b3;  /* Cyan */
+    base0D: #4eb6fe;  /* Blue */
+    base0E: #b294bb;  /* Magenta */
+    base0F: #c09c24;  /* Brown */
+
+    /* Semantic colors */
+    bg: #1d1f21;
+    bg-alt: #2d2d2d;
+    bg-selected: #373b41;
+    fg: #c5c8c6;
+    fg-alt: #969896;
+    fg-muted: #969896;
+    fg-bright: #e0e0e0;
+    border: #373b41;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #c90d00;
+    active: #60b45a;
+    selected: #4eb6fe;
+
+    /* Named accent colors */
+    red: #c90d00;
+    green: #60b45a;
+    yellow: #c09c24;
+    blue: #4eb6fe;
+    magenta: #b294bb;
+    cyan: #5fb3b3;
+    orange: #f79802;
+
+    /* Bright variants */
+    bright-red: #ff3334;
+    bright-green: #9ec400;
+    bright-yellow: #ffc400;
+    bright-blue: #6699cc;
+    bright-magenta: #c397d8;
+    bright-cyan: #70c0b1;
+}
