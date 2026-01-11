@@ -1,16 +1,55 @@
 /* Popping and Locking - Rofi colors */
 /* Generated from theme.yml */
+/* Author: Ghostty */
 
 * {
+    /* Base16 palette */
+    base00: #181921;  /* Main background */
+    base01: #928374;  /* Lighter background */
+    base02: #ebdbb2;  /* Selection background */
+    base03: #928374;  /* Comments, muted */
+    base04: #a89984;  /* Dark foreground */
+    base05: #ebdbb2;  /* Default foreground */
+    base06: #ebdbb2;  /* Light foreground */
+    base07: #ebdbb2;  /* Brightest foreground */
+    base08: #cc241d;  /* Red */
+    base09: #f42c3e;  /* Orange */
+    base0A: #d79921;  /* Yellow */
+    base0B: #98971a;  /* Green */
+    base0C: #689d6a;  /* Cyan */
+    base0D: #458588;  /* Blue */
+    base0E: #b16286;  /* Magenta */
+    base0F: #b16286;  /* Brown */
+
+    /* Semantic colors */
     bg: #181921;
     bg-alt: #928374;
     bg-selected: #ebdbb2;
     fg: #ebdbb2;
     fg-alt: #a89984;
-    blue: #458588;
-    magenta: #b16286;
+    fg-muted: #928374;
+    fg-bright: #ebdbb2;
+    border: #ebdbb2;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #cc241d;
+    active: #98971a;
+    selected: #458588;
+
+    /* Named accent colors */
     red: #cc241d;
     green: #98971a;
     yellow: #d79921;
+    blue: #458588;
+    magenta: #b16286;
     cyan: #689d6a;
+    orange: #f42c3e;
+
+    /* Bright variants */
+    bright-red: #f42c3e;
+    bright-green: #b8bb26;
+    bright-yellow: #fabd2f;
+    bright-blue: #99c6ca;
+    bright-magenta: #d3869b;
+    bright-cyan: #7ec16e;
 }

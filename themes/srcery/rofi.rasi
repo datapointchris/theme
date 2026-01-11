@@ -1,16 +1,55 @@
 /* Srcery - Rofi colors */
 /* Generated from theme.yml */
+/* Author: Ghostty */
 
 * {
+    /* Base16 palette */
+    base00: #1c1b19;  /* Main background */
+    base01: #918175;  /* Lighter background */
+    base02: #fce8c3;  /* Selection background */
+    base03: #918175;  /* Comments, muted */
+    base04: #baa67f;  /* Dark foreground */
+    base05: #fce8c3;  /* Default foreground */
+    base06: #fce8c3;  /* Light foreground */
+    base07: #fce8c3;  /* Brightest foreground */
+    base08: #ef2f27;  /* Red */
+    base09: #f75341;  /* Orange */
+    base0A: #fbb829;  /* Yellow */
+    base0B: #519f50;  /* Green */
+    base0C: #0aaeb3;  /* Cyan */
+    base0D: #2c78bf;  /* Blue */
+    base0E: #e02c6d;  /* Magenta */
+    base0F: #e02c6d;  /* Brown */
+
+    /* Semantic colors */
     bg: #1c1b19;
     bg-alt: #918175;
     bg-selected: #fce8c3;
     fg: #fce8c3;
     fg-alt: #baa67f;
-    blue: #2c78bf;
-    magenta: #e02c6d;
+    fg-muted: #918175;
+    fg-bright: #fce8c3;
+    border: #fce8c3;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #ef2f27;
+    active: #519f50;
+    selected: #2c78bf;
+
+    /* Named accent colors */
     red: #ef2f27;
     green: #519f50;
     yellow: #fbb829;
+    blue: #2c78bf;
+    magenta: #e02c6d;
     cyan: #0aaeb3;
+    orange: #f75341;
+
+    /* Bright variants */
+    bright-red: #f75341;
+    bright-green: #98bc37;
+    bright-yellow: #fed06e;
+    bright-blue: #68a8e4;
+    bright-magenta: #ff5c8f;
+    bright-cyan: #2be4d0;
 }

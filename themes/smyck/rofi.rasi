@@ -1,16 +1,55 @@
 /* Smyck - Rofi colors */
 /* Generated from theme.yml */
+/* Author: Ghostty */
 
 * {
+    /* Base16 palette */
+    base00: #1b1b1b;  /* Main background */
+    base01: #7a7a7a;  /* Lighter background */
+    base02: #207483;  /* Selection background */
+    base03: #7a7a7a;  /* Comments, muted */
+    base04: #a1a1a1;  /* Dark foreground */
+    base05: #f7f7f7;  /* Default foreground */
+    base06: #f7f7f7;  /* Light foreground */
+    base07: #f7f7f7;  /* Brightest foreground */
+    base08: #b84131;  /* Red */
+    base09: #d6837c;  /* Orange */
+    base0A: #c4a500;  /* Yellow */
+    base0B: #7da900;  /* Green */
+    base0C: #207383;  /* Cyan */
+    base0D: #62a3c4;  /* Blue */
+    base0E: #ba8acc;  /* Magenta */
+    base0F: #ba8acc;  /* Brown */
+
+    /* Semantic colors */
     bg: #1b1b1b;
     bg-alt: #7a7a7a;
     bg-selected: #207483;
     fg: #f7f7f7;
     fg-alt: #a1a1a1;
-    blue: #62a3c4;
-    magenta: #ba8acc;
+    fg-muted: #7a7a7a;
+    fg-bright: #f7f7f7;
+    border: #7a7a7a;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #b84131;
+    active: #7da900;
+    selected: #207383;
+
+    /* Named accent colors */
     red: #b84131;
     green: #7da900;
     yellow: #c4a500;
+    blue: #62a3c4;
+    magenta: #ba8acc;
     cyan: #207383;
+    orange: #d6837c;
+
+    /* Bright variants */
+    bright-red: #d6837c;
+    bright-green: #c4f137;
+    bright-yellow: #fee14d;
+    bright-blue: #8dcff0;
+    bright-magenta: #f79aff;
+    bright-cyan: #6ad9cf;
 }

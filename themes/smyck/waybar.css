@@ -1,18 +1,71 @@
 /* Smyck - waybar theme */
 /* Generated from theme.yml */
+/* Author: Ghostty */
 
-/* Base colors */
+/* =============================================================================
+   BASE16 PALETTE
+   ============================================================================= */
+
+/* Background tones */
+@define-color base00 #1b1b1b;  /* Main background */
+@define-color base01 #7a7a7a;  /* Lighter background */
+@define-color base02 #207483;  /* Selection background */
+
+/* Foreground tones */
+@define-color base03 #7a7a7a;  /* Comments, muted */
+@define-color base04 #a1a1a1;  /* Dark foreground */
+@define-color base05 #f7f7f7;  /* Default foreground */
+@define-color base06 #f7f7f7;  /* Light foreground */
+@define-color base07 #f7f7f7;  /* Brightest foreground */
+
+/* Accent colors */
+@define-color base08 #b84131;  /* Red */
+@define-color base09 #d6837c;  /* Orange */
+@define-color base0A #c4a500;  /* Yellow */
+@define-color base0B #7da900;  /* Green */
+@define-color base0C #207383;  /* Cyan */
+@define-color base0D #62a3c4;  /* Blue */
+@define-color base0E #ba8acc;  /* Magenta */
+@define-color base0F #ba8acc;  /* Brown */
+
+/* =============================================================================
+   SEMANTIC ALIASES
+   ============================================================================= */
+
+/* Backgrounds */
 @define-color bg #1b1b1b;
 @define-color bg-dark #7a7a7a;
 @define-color bg-highlight #207483;
+@define-color bg-selection #207483;
+
+/* Foregrounds */
 @define-color fg #f7f7f7;
 @define-color fg-dark #a1a1a1;
+@define-color fg-muted #7a7a7a;
+@define-color fg-bright #f7f7f7;
 
-/* Accent colors */
-@define-color blue #62a3c4;
-@define-color cyan #207383;
-@define-color green #7da900;
-@define-color magenta #ba8acc;
+/* Status colors - use extended diagnostic colors when available */
+@define-color success #7da900;
+@define-color warning #d6837c;
+@define-color error #b84131;
+@define-color info #207383;
+
+/* Named accent colors */
 @define-color red #b84131;
+@define-color green #7da900;
 @define-color yellow #c4a500;
+@define-color blue #62a3c4;
+@define-color magenta #ba8acc;
+@define-color cyan #207383;
 @define-color orange #d6837c;
+
+/* Bright variants */
+@define-color bright-red #d6837c;
+@define-color bright-green #c4f137;
+@define-color bright-yellow #fee14d;
+@define-color bright-blue #8dcff0;
+@define-color bright-magenta #f79aff;
+@define-color bright-cyan #6ad9cf;
+
+/* Border - use extended UI border when available */
+@define-color border #7a7a7a;

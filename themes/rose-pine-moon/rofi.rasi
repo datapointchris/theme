@@ -1,16 +1,55 @@
 /* Rose Pine Moon - Rofi colors */
 /* Generated from theme.yml */
+/* Author: Ghostty */
 
 * {
+    /* Base16 palette */
+    base00: #232136;  /* Main background */
+    base01: #6e6a86;  /* Lighter background */
+    base02: #44415a;  /* Selection background */
+    base03: #6e6a86;  /* Comments, muted */
+    base04: #e0def4;  /* Dark foreground */
+    base05: #e0def4;  /* Default foreground */
+    base06: #e0def4;  /* Light foreground */
+    base07: #e0def4;  /* Brightest foreground */
+    base08: #eb6f92;  /* Red */
+    base09: #eb6f92;  /* Orange */
+    base0A: #f6c177;  /* Yellow */
+    base0B: #3e8fb0;  /* Green */
+    base0C: #ea9a97;  /* Cyan */
+    base0D: #9ccfd8;  /* Blue */
+    base0E: #c4a7e7;  /* Magenta */
+    base0F: #c4a7e7;  /* Brown */
+
+    /* Semantic colors */
     bg: #232136;
     bg-alt: #6e6a86;
     bg-selected: #44415a;
     fg: #e0def4;
     fg-alt: #e0def4;
-    blue: #9ccfd8;
-    magenta: #c4a7e7;
+    fg-muted: #6e6a86;
+    fg-bright: #e0def4;
+    border: #44415a;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #eb6f92;
+    active: #3e8fb0;
+    selected: #9ccfd8;
+
+    /* Named accent colors */
     red: #eb6f92;
     green: #3e8fb0;
     yellow: #f6c177;
+    blue: #9ccfd8;
+    magenta: #c4a7e7;
     cyan: #ea9a97;
+    orange: #eb6f92;
+
+    /* Bright variants */
+    bright-red: #eb6f92;
+    bright-green: #3e8fb0;
+    bright-yellow: #f6c177;
+    bright-blue: #9ccfd8;
+    bright-magenta: #c4a7e7;
+    bright-cyan: #ea9a97;
 }

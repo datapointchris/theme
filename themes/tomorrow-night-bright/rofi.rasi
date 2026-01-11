@@ -1,16 +1,55 @@
 /* Tomorrow Night Bright - Rofi colors */
 /* Generated from theme.yml */
+/* Author: Ghostty */
 
 * {
+    /* Base16 palette */
+    base00: #000000;  /* Main background */
+    base01: #404040;  /* Lighter background */
+    base02: #424242;  /* Selection background */
+    base03: #404040;  /* Comments, muted */
+    base04: #ffffff;  /* Dark foreground */
+    base05: #eaeaea;  /* Default foreground */
+    base06: #ffffff;  /* Light foreground */
+    base07: #ffffff;  /* Brightest foreground */
+    base08: #d54e53;  /* Red */
+    base09: #d54e53;  /* Orange */
+    base0A: #e7c547;  /* Yellow */
+    base0B: #b9ca4a;  /* Green */
+    base0C: #70c0b1;  /* Cyan */
+    base0D: #7aa6da;  /* Blue */
+    base0E: #c397d8;  /* Magenta */
+    base0F: #c397d8;  /* Brown */
+
+    /* Semantic colors */
     bg: #000000;
     bg-alt: #404040;
     bg-selected: #424242;
     fg: #eaeaea;
     fg-alt: #ffffff;
-    blue: #7aa6da;
-    magenta: #c397d8;
+    fg-muted: #404040;
+    fg-bright: #ffffff;
+    border: #404040;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #d54e53;
+    active: #b9ca4a;
+    selected: #70c0b1;
+
+    /* Named accent colors */
     red: #d54e53;
     green: #b9ca4a;
     yellow: #e7c547;
+    blue: #7aa6da;
+    magenta: #c397d8;
     cyan: #70c0b1;
+    orange: #d54e53;
+
+    /* Bright variants */
+    bright-red: #d54e53;
+    bright-green: #b9ca4a;
+    bright-yellow: #e7c547;
+    bright-blue: #7aa6da;
+    bright-magenta: #c397d8;
+    bright-cyan: #70c0b1;
 }

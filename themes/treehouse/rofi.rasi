@@ -1,16 +1,55 @@
 /* Treehouse - Rofi colors */
 /* Generated from theme.yml */
+/* Author: Ghostty */
 
 * {
+    /* Base16 palette */
+    base00: #191919;  /* Main background */
+    base01: #504332;  /* Lighter background */
+    base02: #786b53;  /* Selection background */
+    base03: #504332;  /* Comments, muted */
+    base04: #786b53;  /* Dark foreground */
+    base05: #786b53;  /* Default foreground */
+    base06: #ffc800;  /* Light foreground */
+    base07: #ffc800;  /* Brightest foreground */
+    base08: #b2270e;  /* Red */
+    base09: #ed5d20;  /* Orange */
+    base0A: #aa820c;  /* Yellow */
+    base0B: #44a900;  /* Green */
+    base0C: #b25a1e;  /* Cyan */
+    base0D: #58859a;  /* Blue */
+    base0E: #97363d;  /* Magenta */
+    base0F: #97363d;  /* Brown */
+
+    /* Semantic colors */
     bg: #191919;
     bg-alt: #504332;
     bg-selected: #786b53;
     fg: #786b53;
     fg-alt: #786b53;
-    blue: #58859a;
-    magenta: #97363d;
+    fg-muted: #504332;
+    fg-bright: #ffc800;
+    border: #786b53;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #b2270e;
+    active: #44a900;
+    selected: #58859a;
+
+    /* Named accent colors */
     red: #b2270e;
     green: #44a900;
     yellow: #aa820c;
+    blue: #58859a;
+    magenta: #97363d;
     cyan: #b25a1e;
+    orange: #ed5d20;
+
+    /* Bright variants */
+    bright-red: #ed5d20;
+    bright-green: #55f238;
+    bright-yellow: #f2b732;
+    bright-blue: #85cfed;
+    bright-magenta: #e14c5a;
+    bright-cyan: #f07d14;
 }

@@ -1,18 +1,71 @@
 /* Retro Legends - waybar theme */
 /* Generated from theme.yml */
+/* Author: Ghostty */
 
-/* Base colors */
+/* =============================================================================
+   BASE16 PALETTE
+   ============================================================================= */
+
+/* Background tones */
+@define-color base00 #0d0d0d;  /* Main background */
+@define-color base01 #4c594c;  /* Lighter background */
+@define-color base02 #336633;  /* Selection background */
+
+/* Foreground tones */
+@define-color base03 #4c594c;  /* Comments, muted */
+@define-color base04 #bfe6bf;  /* Dark foreground */
+@define-color base05 #45eb45;  /* Default foreground */
+@define-color base06 #f2fff2;  /* Light foreground */
+@define-color base07 #f2fff2;  /* Brightest foreground */
+
+/* Accent colors */
+@define-color base08 #de5454;  /* Red */
+@define-color base09 #ff6666;  /* Orange */
+@define-color base0A #f7bf2b;  /* Yellow */
+@define-color base0B #45eb45;  /* Green */
+@define-color base0C #40d9e6;  /* Cyan */
+@define-color base0D #4066f2;  /* Blue */
+@define-color base0E #bf4cf2;  /* Magenta */
+@define-color base0F #bf4cf2;  /* Brown */
+
+/* =============================================================================
+   SEMANTIC ALIASES
+   ============================================================================= */
+
+/* Backgrounds */
 @define-color bg #0d0d0d;
 @define-color bg-dark #4c594c;
 @define-color bg-highlight #336633;
+@define-color bg-selection #336633;
+
+/* Foregrounds */
 @define-color fg #45eb45;
 @define-color fg-dark #bfe6bf;
+@define-color fg-muted #4c594c;
+@define-color fg-bright #f2fff2;
 
-/* Accent colors */
-@define-color blue #4066f2;
-@define-color cyan #40d9e6;
-@define-color green #45eb45;
-@define-color magenta #bf4cf2;
+/* Status colors - use extended diagnostic colors when available */
+@define-color success #45eb45;
+@define-color warning #ff6666;
+@define-color error #de5454;
+@define-color info #40d9e6;
+
+/* Named accent colors */
 @define-color red #de5454;
+@define-color green #45eb45;
 @define-color yellow #f7bf2b;
+@define-color blue #4066f2;
+@define-color magenta #bf4cf2;
+@define-color cyan #40d9e6;
 @define-color orange #ff6666;
+
+/* Bright variants */
+@define-color bright-red #ff6666;
+@define-color bright-green #59ff59;
+@define-color bright-yellow #ffd933;
+@define-color bright-blue #4c80ff;
+@define-color bright-magenta #e666ff;
+@define-color bright-cyan #59e6ff;
+
+/* Border - use extended UI border when available */
+@define-color border #4c594c;

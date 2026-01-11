@@ -1,16 +1,55 @@
 /* Rose Pine Darker - Rofi colors */
 /* Generated from theme.yml */
+/* Author: Emilia Dunfelt <edun@dunfelt.se> */
 
 * {
+    /* Base16 palette */
+    base00: #191724;  /* Main background */
+    base01: #1f1d2e;  /* Lighter background */
+    base02: #26233a;  /* Selection background */
+    base03: #6e6a86;  /* Comments, muted */
+    base04: #908caa;  /* Dark foreground */
+    base05: #e0def4;  /* Default foreground */
+    base06: #e0def4;  /* Light foreground */
+    base07: #524f67;  /* Brightest foreground */
+    base08: #eb6f92;  /* Red */
+    base09: #f6c177;  /* Orange */
+    base0A: #ebbcba;  /* Yellow */
+    base0B: #31748f;  /* Green */
+    base0C: #9ccfd8;  /* Cyan */
+    base0D: #c4a7e7;  /* Blue */
+    base0E: #f6c177;  /* Magenta */
+    base0F: #524f67;  /* Brown */
+
+    /* Semantic colors */
     bg: #191724;
     bg-alt: #1f1d2e;
     bg-selected: #26233a;
     fg: #e0def4;
     fg-alt: #908caa;
-    blue: #9ccfd8;
-    magenta: #c4a7e7;
+    fg-muted: #6e6a86;
+    fg-bright: #e0def4;
+    border: #26233a;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #eb6f92;
+    active: #31748f;
+    selected: #c4a7e7;
+
+    /* Named accent colors */
     red: #eb6f92;
     green: #31748f;
     yellow: #f6c177;
+    blue: #9ccfd8;
+    magenta: #c4a7e7;
     cyan: #ebbcba;
+    orange: #f6c177;
+
+    /* Bright variants */
+    bright-red: #eb6f92;
+    bright-green: #31748f;
+    bright-yellow: #f6c177;
+    bright-blue: #9ccfd8;
+    bright-magenta: #c4a7e7;
+    bright-cyan: #ebbcba;
 }

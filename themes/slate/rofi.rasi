@@ -1,16 +1,55 @@
 /* Slate - Rofi colors */
 /* Generated from theme.yml */
+/* Author: Ralph Amissah (https://github.com/vim/colorschemes) */
 
 * {
+    /* Base16 palette */
+    base00: #262626;  /* Main background */
+    base01: #333333;  /* Lighter background */
+    base02: #4a4a4a;  /* Selection background */
+    base03: #666666;  /* Comments, muted */
+    base04: #afaf87;  /* Dark foreground */
+    base05: #ffffff;  /* Default foreground */
+    base06: #e5e5e5;  /* Light foreground */
+    base07: #ffffff;  /* Brightest foreground */
+    base08: #ff8787;  /* Red */
+    base09: #d7875f;  /* Orange */
+    base0A: #ffd700;  /* Yellow */
+    base0B: #87d7ff;  /* Green */
+    base0C: #00cdcd;  /* Cyan */
+    base0D: #5f87d7;  /* Blue */
+    base0E: #cd00cd;  /* Magenta */
+    base0F: #ffafaf;  /* Brown */
+
+    /* Semantic colors */
     bg: #262626;
     bg-alt: #333333;
     bg-selected: #5f8700;
     fg: #ffffff;
     fg-alt: #afaf87;
-    blue: #0000ee;
-    magenta: #cd00cd;
+    fg-muted: #666666;
+    fg-bright: #e5e5e5;
+    border: #4a4a4a;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #ff8787;
+    active: #87d7ff;
+    selected: #5f87d7;
+
+    /* Named accent colors */
     red: #cd0000;
     green: #00cd00;
     yellow: #cdcd00;
+    blue: #0000ee;
+    magenta: #cd00cd;
     cyan: #00cdcd;
+    orange: #d7875f;
+
+    /* Bright variants */
+    bright-red: #ff0000;
+    bright-green: #00ff00;
+    bright-yellow: #ffff00;
+    bright-blue: #5c5cff;
+    bright-magenta: #ff00ff;
+    bright-cyan: #00ffff;
 }

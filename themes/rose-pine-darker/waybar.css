@@ -1,18 +1,71 @@
 /* Rose Pine Darker - waybar theme */
 /* Generated from theme.yml */
+/* Author: Emilia Dunfelt <edun@dunfelt.se> */
 
-/* Base colors */
+/* =============================================================================
+   BASE16 PALETTE
+   ============================================================================= */
+
+/* Background tones */
+@define-color base00 #191724;  /* Main background */
+@define-color base01 #1f1d2e;  /* Lighter background */
+@define-color base02 #26233a;  /* Selection background */
+
+/* Foreground tones */
+@define-color base03 #6e6a86;  /* Comments, muted */
+@define-color base04 #908caa;  /* Dark foreground */
+@define-color base05 #e0def4;  /* Default foreground */
+@define-color base06 #e0def4;  /* Light foreground */
+@define-color base07 #524f67;  /* Brightest foreground */
+
+/* Accent colors */
+@define-color base08 #eb6f92;  /* Red */
+@define-color base09 #f6c177;  /* Orange */
+@define-color base0A #ebbcba;  /* Yellow */
+@define-color base0B #31748f;  /* Green */
+@define-color base0C #9ccfd8;  /* Cyan */
+@define-color base0D #c4a7e7;  /* Blue */
+@define-color base0E #f6c177;  /* Magenta */
+@define-color base0F #524f67;  /* Brown */
+
+/* =============================================================================
+   SEMANTIC ALIASES
+   ============================================================================= */
+
+/* Backgrounds */
 @define-color bg #191724;
 @define-color bg-dark #1f1d2e;
 @define-color bg-highlight #26233a;
+@define-color bg-selection #26233a;
+
+/* Foregrounds */
 @define-color fg #e0def4;
 @define-color fg-dark #908caa;
+@define-color fg-muted #6e6a86;
+@define-color fg-bright #e0def4;
 
-/* Accent colors */
-@define-color blue #9ccfd8;
-@define-color cyan #ebbcba;
-@define-color green #31748f;
-@define-color magenta #c4a7e7;
+/* Status colors - use extended diagnostic colors when available */
+@define-color success #31748f;
+@define-color warning #f6c177;
+@define-color error #eb6f92;
+@define-color info #9ccfd8;
+
+/* Named accent colors */
 @define-color red #eb6f92;
+@define-color green #31748f;
 @define-color yellow #f6c177;
+@define-color blue #9ccfd8;
+@define-color magenta #c4a7e7;
+@define-color cyan #ebbcba;
 @define-color orange #f6c177;
+
+/* Bright variants */
+@define-color bright-red #eb6f92;
+@define-color bright-green #31748f;
+@define-color bright-yellow #f6c177;
+@define-color bright-blue #9ccfd8;
+@define-color bright-magenta #c4a7e7;
+@define-color bright-cyan #ebbcba;
+
+/* Border - use extended UI border when available */
+@define-color border #26233a;

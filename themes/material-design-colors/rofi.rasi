@@ -1,16 +1,55 @@
 /* Material Design Colors - Rofi colors */
 /* Generated from theme.yml */
+/* Author: Ghostty */
 
 * {
+    /* Base16 palette */
+    base00: #1d262a;  /* Main background */
+    base01: #a1b0b8;  /* Lighter background */
+    base02: #4e6a78;  /* Selection background */
+    base03: #a1b0b8;  /* Comments, muted */
+    base04: #ffffff;  /* Dark foreground */
+    base05: #e7ebed;  /* Default foreground */
+    base06: #ffffff;  /* Light foreground */
+    base07: #ffffff;  /* Brightest foreground */
+    base08: #fc3841;  /* Red */
+    base09: #fc746d;  /* Orange */
+    base0A: #fed032;  /* Yellow */
+    base0B: #5cf19e;  /* Green */
+    base0C: #59ffd1;  /* Cyan */
+    base0D: #37b6ff;  /* Blue */
+    base0E: #fc226e;  /* Magenta */
+    base0F: #fc226e;  /* Brown */
+
+    /* Semantic colors */
     bg: #1d262a;
     bg-alt: #a1b0b8;
     bg-selected: #4e6a78;
     fg: #e7ebed;
     fg-alt: #ffffff;
-    blue: #37b6ff;
-    magenta: #fc226e;
+    fg-muted: #a1b0b8;
+    fg-bright: #ffffff;
+    border: #4e6a78;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #fc3841;
+    active: #5cf19e;
+    selected: #37b6ff;
+
+    /* Named accent colors */
     red: #fc3841;
     green: #5cf19e;
     yellow: #fed032;
+    blue: #37b6ff;
+    magenta: #fc226e;
     cyan: #59ffd1;
+    orange: #fc746d;
+
+    /* Bright variants */
+    bright-red: #fc746d;
+    bright-green: #adf7be;
+    bright-yellow: #fee16c;
+    bright-blue: #70cfff;
+    bright-magenta: #fc669b;
+    bright-cyan: #9affe6;
 }

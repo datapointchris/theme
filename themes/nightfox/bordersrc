@@ -8,11 +8,11 @@ options=(
   width=8.0
   hidpi=on
 
-  # Active window - accent color (base0D)
+  # Active window - use UI accent color
   active_color=0xff719cd6
 
-  # Inactive windows - subtle border (base02)
-  inactive_color=0xff29394f
+  # Inactive windows - use UI border color
+  inactive_color=0xff39506d
 
   # Glow effect using accent color
   active_color='glow(0xff719cd6)'
