@@ -1,53 +1,77 @@
 meta:
-  id: "shades-of-purple"
-  display_name: "Shades of Purple"
-  neovim_colorscheme_name: "shades-of-purple"
-  neovim_colorscheme_source: "generated"
+  id: shades-of-purple
+  display_name: Shades of Purple
+  neovim_colorscheme_name: shades-of-purple
+  neovim_colorscheme_source: generated
   plugin: null
-  derived_from: "ghostty-builtin"
-  variant: "dark"
-  author: "Ghostty"
-
+  derived_from: ghostty-builtin
+  variant: dark
+  author: Ghostty
 base16:
-  base00: "#1e1d40"
-  base01: "#686868"
-  base02: "#b362ff"
-  base03: "#686868"
-  base04: "#c7c7c7"
-  base05: "#ffffff"
-  base06: "#ffffff"
-  base07: "#ffffff"
-  base08: "#d90429"
-  base09: "#f92a1c"
-  base0A: "#ffe700"
-  base0B: "#3ad900"
-  base0C: "#00c5c7"
-  base0D: "#6943ff"
-  base0E: "#ff2c70"
-  base0F: "#ff2c70"
-
+  base00: '#1e1d40'
+  base01: '#686868'
+  base02: '#b362ff'
+  base03: '#686868'
+  base04: '#c7c7c7'
+  base05: '#ffffff'
+  base06: '#ffffff'
+  base07: '#ffffff'
+  base08: '#d90429'
+  base09: '#f92a1c'
+  base0A: '#ffe700'
+  base0B: '#3ad900'
+  base0C: '#00c5c7'
+  base0D: '#6943ff'
+  base0E: '#ff2c70'
+  base0F: '#ff2c70'
 ansi:
-  black: "#000000"
-  red: "#d90429"
-  green: "#3ad900"
-  yellow: "#ffe700"
-  blue: "#6943ff"
-  magenta: "#ff2c70"
-  cyan: "#00c5c7"
-  white: "#c7c7c7"
-  bright_black: "#686868"
-  bright_red: "#f92a1c"
-  bright_green: "#43d426"
-  bright_yellow: "#f1d000"
-  bright_blue: "#6871ff"
-  bright_magenta: "#ff77ff"
-  bright_cyan: "#79e8fb"
-  bright_white: "#ffffff"
-
+  black: '#000000'
+  red: '#d90429'
+  green: '#3ad900'
+  yellow: '#ffe700'
+  blue: '#6943ff'
+  magenta: '#ff2c70'
+  cyan: '#00c5c7'
+  white: '#c7c7c7'
+  bright_black: '#686868'
+  bright_red: '#f92a1c'
+  bright_green: '#43d426'
+  bright_yellow: '#f1d000'
+  bright_blue: '#6871ff'
+  bright_magenta: '#ff77ff'
+  bright_cyan: '#79e8fb'
+  bright_white: '#ffffff'
 special:
-  background: "#1e1d40"
-  foreground: "#ffffff"
-  cursor: "#fad000"
-  cursor_text: "#fefff4"
-  selection_bg: "#b362ff"
-  selection_fg: "#c2c2c2"
+  background: '#1e1d40'
+  foreground: '#ffffff'
+  cursor: '#fad000'
+  cursor_text: '#fefff4'
+  selection_bg: '#b362ff'
+  selection_fg: '#c2c2c2'
+extended_source: generated
+extended:
+  diagnostic_error: '#d90429'
+  diagnostic_ok: '#3ad900'
+  diagnostic_warning: '#f92a1c'
+  diagnostic_info: '#6943ff'
+  diagnostic_hint: '#ff2c70'
+  syntax_comment: '#686868'
+  syntax_string: '#00c5c7'
+  syntax_function: '#6943ff'
+  syntax_keyword: '#3ad900'
+  syntax_type: '#ffe700'
+  syntax_number: '#ff2c70'
+  syntax_constant: '#f92a1c'
+  syntax_operator: '#c7c7c7'
+  syntax_variable: '#ffffff'
+  syntax_parameter: '#6943ff'
+  syntax_preproc: '#ff2c70'
+  syntax_special: '#00c5c7'
+  ui_accent: '#6943ff'
+  ui_border: '#b362ff'
+  ui_selection: '#b362ff'
+  ui_float_bg: '#686868'
+  ui_cursor_line: '#686868'
+  git_add: '#3ad900'
+  git_change: '#f92a1c'
+  git_delete: '#d90429'

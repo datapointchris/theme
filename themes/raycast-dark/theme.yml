@@ -1,53 +1,77 @@
 meta:
-  id: "raycast-dark"
-  display_name: "Raycast Dark"
-  neovim_colorscheme_name: "raycast-dark"
-  neovim_colorscheme_source: "generated"
+  id: raycast-dark
+  display_name: Raycast Dark
+  neovim_colorscheme_name: raycast-dark
+  neovim_colorscheme_source: generated
   plugin: null
-  derived_from: "ghostty-builtin"
-  variant: "dark"
-  author: "Ghostty"
-
+  derived_from: ghostty-builtin
+  variant: dark
+  author: Ghostty
 base16:
-  base00: "#1a1a1a"
-  base01: "#4c4c4c"
-  base02: "#333333"
-  base03: "#4c4c4c"
-  base04: "#ffffff"
-  base05: "#ffffff"
-  base06: "#ffffff"
-  base07: "#ffffff"
-  base08: "#ff5360"
-  base09: "#ff6363"
-  base0A: "#ffc531"
-  base0B: "#59d499"
-  base0C: "#52eee5"
-  base0D: "#56c2ff"
-  base0E: "#cf2f98"
-  base0F: "#cf2f98"
-
+  base00: '#1a1a1a'
+  base01: '#4c4c4c'
+  base02: '#333333'
+  base03: '#4c4c4c'
+  base04: '#ffffff'
+  base05: '#ffffff'
+  base06: '#ffffff'
+  base07: '#ffffff'
+  base08: '#ff5360'
+  base09: '#ff6363'
+  base0A: '#ffc531'
+  base0B: '#59d499'
+  base0C: '#52eee5'
+  base0D: '#56c2ff'
+  base0E: '#cf2f98'
+  base0F: '#cf2f98'
 ansi:
-  black: "#000000"
-  red: "#ff5360"
-  green: "#59d499"
-  yellow: "#ffc531"
-  blue: "#56c2ff"
-  magenta: "#cf2f98"
-  cyan: "#52eee5"
-  white: "#ffffff"
-  bright_black: "#4c4c4c"
-  bright_red: "#ff6363"
-  bright_green: "#59d499"
-  bright_yellow: "#ffc531"
-  bright_blue: "#56c2ff"
-  bright_magenta: "#cf2f98"
-  bright_cyan: "#52eee5"
-  bright_white: "#ffffff"
-
+  black: '#000000'
+  red: '#ff5360'
+  green: '#59d499'
+  yellow: '#ffc531'
+  blue: '#56c2ff'
+  magenta: '#cf2f98'
+  cyan: '#52eee5'
+  white: '#ffffff'
+  bright_black: '#4c4c4c'
+  bright_red: '#ff6363'
+  bright_green: '#59d499'
+  bright_yellow: '#ffc531'
+  bright_blue: '#56c2ff'
+  bright_magenta: '#cf2f98'
+  bright_cyan: '#52eee5'
+  bright_white: '#ffffff'
 special:
-  background: "#1a1a1a"
-  foreground: "#ffffff"
-  cursor: "#cccccc"
-  cursor_text: "#ffffff"
-  selection_bg: "#333333"
-  selection_fg: "#595959"
+  background: '#1a1a1a'
+  foreground: '#ffffff'
+  cursor: '#cccccc'
+  cursor_text: '#ffffff'
+  selection_bg: '#333333'
+  selection_fg: '#595959'
+extended_source: generated
+extended:
+  diagnostic_error: '#ff5360'
+  diagnostic_ok: '#59d499'
+  diagnostic_warning: '#ffc531'
+  diagnostic_info: '#56c2ff'
+  diagnostic_hint: '#52eee5'
+  syntax_comment: '#4c4c4c'
+  syntax_string: '#59d499'
+  syntax_function: '#56c2ff'
+  syntax_keyword: '#cf2f98'
+  syntax_type: '#ffc531'
+  syntax_number: '#ff6363'
+  syntax_constant: '#ff6363'
+  syntax_operator: '#ffffff'
+  syntax_variable: '#ffffff'
+  syntax_parameter: '#56c2ff'
+  syntax_preproc: '#cf2f98'
+  syntax_special: '#52eee5'
+  ui_accent: '#56c2ff'
+  ui_border: '#333333'
+  ui_selection: '#333333'
+  ui_float_bg: '#4c4c4c'
+  ui_cursor_line: '#4c4c4c'
+  git_add: '#59d499'
+  git_change: '#ffc531'
+  git_delete: '#ff5360'

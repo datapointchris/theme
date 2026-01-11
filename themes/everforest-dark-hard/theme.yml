@@ -1,53 +1,77 @@
 meta:
-  id: "everforest-dark-hard"
-  display_name: "Everforest Dark Hard"
-  neovim_colorscheme_name: "everforest-dark-hard"
-  neovim_colorscheme_source: "generated"
+  id: everforest-dark-hard
+  display_name: Everforest Dark Hard
+  neovim_colorscheme_name: everforest-dark-hard
+  neovim_colorscheme_source: generated
   plugin: null
-  derived_from: "ghostty-builtin"
-  variant: "dark"
-  author: "Ghostty"
-
+  derived_from: ghostty-builtin
+  variant: dark
+  author: Ghostty
 base16:
-  base00: "#1e2326"
-  base01: "#a6b0a0"
-  base02: "#4c3743"
-  base03: "#a6b0a0"
-  base04: "#f2efdf"
-  base05: "#d3c6aa"
-  base06: "#fffbef"
-  base07: "#fffbef"
-  base08: "#e67e80"
-  base09: "#f85552"
-  base0A: "#dbbc7f"
-  base0B: "#a7c080"
-  base0C: "#83c092"
-  base0D: "#7fbbb3"
-  base0E: "#d699b6"
-  base0F: "#d699b6"
-
+  base00: '#1e2326'
+  base01: '#a6b0a0'
+  base02: '#4c3743'
+  base03: '#a6b0a0'
+  base04: '#f2efdf'
+  base05: '#d3c6aa'
+  base06: '#fffbef'
+  base07: '#fffbef'
+  base08: '#e67e80'
+  base09: '#f85552'
+  base0A: '#dbbc7f'
+  base0B: '#a7c080'
+  base0C: '#83c092'
+  base0D: '#7fbbb3'
+  base0E: '#d699b6'
+  base0F: '#d699b6'
 ansi:
-  black: "#7a8478"
-  red: "#e67e80"
-  green: "#a7c080"
-  yellow: "#dbbc7f"
-  blue: "#7fbbb3"
-  magenta: "#d699b6"
-  cyan: "#83c092"
-  white: "#f2efdf"
-  bright_black: "#a6b0a0"
-  bright_red: "#f85552"
-  bright_green: "#8da101"
-  bright_yellow: "#dfa000"
-  bright_blue: "#3a94c5"
-  bright_magenta: "#df69ba"
-  bright_cyan: "#35a77c"
-  bright_white: "#fffbef"
-
+  black: '#7a8478'
+  red: '#e67e80'
+  green: '#a7c080'
+  yellow: '#dbbc7f'
+  blue: '#7fbbb3'
+  magenta: '#d699b6'
+  cyan: '#83c092'
+  white: '#f2efdf'
+  bright_black: '#a6b0a0'
+  bright_red: '#f85552'
+  bright_green: '#8da101'
+  bright_yellow: '#dfa000'
+  bright_blue: '#3a94c5'
+  bright_magenta: '#df69ba'
+  bright_cyan: '#35a77c'
+  bright_white: '#fffbef'
 special:
-  background: "#1e2326"
-  foreground: "#d3c6aa"
-  cursor: "#e69875"
-  cursor_text: "#4c3743"
-  selection_bg: "#4c3743"
-  selection_fg: "#d3c6aa"
+  background: '#1e2326'
+  foreground: '#d3c6aa'
+  cursor: '#e69875'
+  cursor_text: '#4c3743'
+  selection_bg: '#4c3743'
+  selection_fg: '#d3c6aa'
+extended_source: generated
+extended:
+  diagnostic_error: '#e67e80'
+  diagnostic_ok: '#a7c080'
+  diagnostic_warning: '#dbbc7f'
+  diagnostic_info: '#83c092'
+  diagnostic_hint: '#83c092'
+  syntax_comment: '#f2efdf'
+  syntax_string: '#a7c080'
+  syntax_function: '#f85552'
+  syntax_keyword: '#d699b6'
+  syntax_type: '#83c092'
+  syntax_number: '#d699b6'
+  syntax_constant: '#dbbc7f'
+  syntax_operator: '#f2efdf'
+  syntax_variable: '#d3c6aa'
+  syntax_parameter: '#7fbbb3'
+  syntax_preproc: '#d699b6'
+  syntax_special: '#83c092'
+  ui_accent: '#83c092'
+  ui_border: '#a6b0a0'
+  ui_selection: '#4c3743'
+  ui_float_bg: '#a6b0a0'
+  ui_cursor_line: '#a6b0a0'
+  git_add: '#a7c080'
+  git_change: '#dbbc7f'
+  git_delete: '#e67e80'

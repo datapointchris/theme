@@ -1,53 +1,77 @@
 meta:
-  id: "github-dark"
-  display_name: "GitHub Dark"
-  neovim_colorscheme_name: "github-dark"
-  neovim_colorscheme_source: "generated"
+  id: github-dark
+  display_name: GitHub Dark
+  neovim_colorscheme_name: github-dark
+  neovim_colorscheme_source: generated
   plugin: null
-  derived_from: "ghostty-builtin"
-  variant: "dark"
-  author: "Ghostty"
-
+  derived_from: ghostty-builtin
+  variant: dark
+  author: Ghostty
 base16:
-  base00: "#101216"
-  base01: "#4d4d4d"
-  base02: "#3b5070"
-  base03: "#4d4d4d"
-  base04: "#ffffff"
-  base05: "#8b949e"
-  base06: "#ffffff"
-  base07: "#ffffff"
-  base08: "#f78166"
-  base09: "#f78166"
-  base0A: "#e3b341"
-  base0B: "#56d364"
-  base0C: "#2b7489"
-  base0D: "#6ca4f8"
-  base0E: "#db61a2"
-  base0F: "#db61a2"
-
+  base00: '#101216'
+  base01: '#4d4d4d'
+  base02: '#3b5070'
+  base03: '#4d4d4d'
+  base04: '#ffffff'
+  base05: '#8b949e'
+  base06: '#ffffff'
+  base07: '#ffffff'
+  base08: '#f78166'
+  base09: '#f78166'
+  base0A: '#e3b341'
+  base0B: '#56d364'
+  base0C: '#2b7489'
+  base0D: '#6ca4f8'
+  base0E: '#db61a2'
+  base0F: '#db61a2'
 ansi:
-  black: "#000000"
-  red: "#f78166"
-  green: "#56d364"
-  yellow: "#e3b341"
-  blue: "#6ca4f8"
-  magenta: "#db61a2"
-  cyan: "#2b7489"
-  white: "#ffffff"
-  bright_black: "#4d4d4d"
-  bright_red: "#f78166"
-  bright_green: "#56d364"
-  bright_yellow: "#e3b341"
-  bright_blue: "#6ca4f8"
-  bright_magenta: "#db61a2"
-  bright_cyan: "#2b7489"
-  bright_white: "#ffffff"
-
+  black: '#000000'
+  red: '#f78166'
+  green: '#56d364'
+  yellow: '#e3b341'
+  blue: '#6ca4f8'
+  magenta: '#db61a2'
+  cyan: '#2b7489'
+  white: '#ffffff'
+  bright_black: '#4d4d4d'
+  bright_red: '#f78166'
+  bright_green: '#56d364'
+  bright_yellow: '#e3b341'
+  bright_blue: '#6ca4f8'
+  bright_magenta: '#db61a2'
+  bright_cyan: '#2b7489'
+  bright_white: '#ffffff'
 special:
-  background: "#101216"
-  foreground: "#8b949e"
-  cursor: "#c9d1d9"
-  cursor_text: "#101216"
-  selection_bg: "#3b5070"
-  selection_fg: "#ffffff"
+  background: '#101216'
+  foreground: '#8b949e'
+  cursor: '#c9d1d9'
+  cursor_text: '#101216'
+  selection_bg: '#3b5070'
+  selection_fg: '#ffffff'
+extended_source: generated
+extended:
+  diagnostic_error: '#f78166'
+  diagnostic_ok: '#56d364'
+  diagnostic_warning: '#f78166'
+  diagnostic_info: '#6ca4f8'
+  diagnostic_hint: '#2b7489'
+  syntax_comment: '#4d4d4d'
+  syntax_string: '#56d364'
+  syntax_function: '#6ca4f8'
+  syntax_keyword: '#db61a2'
+  syntax_type: '#e3b341'
+  syntax_number: '#f78166'
+  syntax_constant: '#f78166'
+  syntax_operator: '#ffffff'
+  syntax_variable: '#8b949e'
+  syntax_parameter: '#6ca4f8'
+  syntax_preproc: '#db61a2'
+  syntax_special: '#2b7489'
+  ui_accent: '#6ca4f8'
+  ui_border: '#3b5070'
+  ui_selection: '#3b5070'
+  ui_float_bg: '#4d4d4d'
+  ui_cursor_line: '#4d4d4d'
+  git_add: '#56d364'
+  git_change: '#e3b341'
+  git_delete: '#f78166'
