@@ -172,6 +172,12 @@ get_rankings() {
 
   get_history | jq -c --argjson usage "$usage_times" '
     group_by(.theme) |
+    # Filter out rejected themes (last reject/unreject action is "reject")
+    map(
+      (. | map(select(.action == "reject" or .action == "unreject")) | sort_by(.ts) | last | .action // "none") as $last_reject_action |
+      if $last_reject_action == "reject" then null else . end
+    ) |
+    map(select(. != null)) |
     map({
       theme: .[0].theme,
       likes: map(select(.action == "like")) | length,
@@ -446,6 +452,7 @@ get_background_stats() {
     return 1
   fi
 
+  # shellcheck disable=SC2016  # jq variable, not shell variable
   local filter='.background == $background'
   if [[ -n "$theme" ]]; then
     filter="$filter and .theme == \$theme"
@@ -525,6 +532,7 @@ get_background_rankings() {
 
   local filter='true'
   if [[ -n "$theme" ]]; then
+    # shellcheck disable=SC2016  # jq variable, not shell variable
     filter='.theme == $theme'
   fi
 
@@ -551,6 +559,7 @@ get_background_apply_counts() {
 
   local filter='true'
   if [[ -n "$theme" ]]; then
+    # shellcheck disable=SC2016  # jq variable, not shell variable
     filter='.theme == $theme'
   fi
 
@@ -570,6 +579,7 @@ get_recent_backgrounds() {
 
   local filter='true'
   if [[ -n "$theme" ]]; then
+    # shellcheck disable=SC2016  # jq variable, not shell variable
     filter='.theme == $theme'
   fi
 
