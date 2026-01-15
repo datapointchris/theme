@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/datapointchris/theme/compare/v3.0.0...v3.0.1) (2026-01-15)
+
+
+### Bug Fixes
+
+* **rankings:** filter rejected themes from rankings display ([1a0d1c9](https://github.com/datapointchris/theme/commit/1a0d1c9a122d6e9946161aa148ace749b27274ae))
+
 ## [3.0.0](https://github.com/datapointchris/theme/compare/v2.0.0...v3.0.0) (2026-01-11)
 
 
