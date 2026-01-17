@@ -1,2 +1,2 @@
 -- Colorscheme entry point
-require('treehouse').load()
+require("treehouse").load()

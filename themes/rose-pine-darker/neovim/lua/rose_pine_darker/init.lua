@@ -33,6 +33,12 @@ function M.load()
     end
   end
 
+  -- Apply theme-specific overrides (if overrides.lua exists)
+  local ok, overrides = pcall(require, "rose_pine_darker.overrides")
+  if ok and overrides.highlights then
+    highlights = overrides.highlights(colors, highlights)
+  end
+
   -- Apply highlights
   for hl, spec in pairs(highlights) do
     vim.api.nvim_set_hl(0, hl, spec)

@@ -1,2 +1,2 @@
 -- Colorscheme entry point
-require('smyck').load()
+require("smyck").load()

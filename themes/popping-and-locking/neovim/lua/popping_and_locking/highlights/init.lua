@@ -4,8 +4,8 @@ local M = {}
 function M.setup(colors)
   local highlights = {}
 
-  for _, mod in ipairs({ 'editor', 'syntax', 'treesitter', 'lsp', 'plugins' }) do
-    local ok, hl_mod = pcall(require, 'popping_and_locking.highlights.' .. mod)
+  for _, mod in ipairs({ "editor", "syntax", "treesitter", "lsp", "plugins" }) do
+    local ok, hl_mod = pcall(require, "popping_and_locking.highlights." .. mod)
     if ok then
       for hl, spec in pairs(hl_mod.setup(colors)) do
         highlights[hl] = spec

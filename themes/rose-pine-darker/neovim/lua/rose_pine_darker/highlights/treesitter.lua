@@ -88,7 +88,7 @@ function M.setup(colors)
 
     -- Comments
     ["@comment"] = { link = "Comment" },
-    ["@comment.documentation"] = { fg = theme.syn.comment, italic = true },
+    ["@comment.documentation"] = { fg = theme.syn.comment },
     ["@comment.error"] = { fg = theme.ui.fg, bg = theme.diag.error, bold = true },
     ["@comment.warning"] = { fg = theme.ui.fg_reverse, bg = theme.diag.warning, bold = true },
     ["@comment.todo"] = { fg = theme.ui.fg_reverse, bg = theme.diag.hint, bold = true },

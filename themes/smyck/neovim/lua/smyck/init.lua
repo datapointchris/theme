@@ -8,29 +8,35 @@ M.config = {
 }
 
 function M.setup(opts)
-  M.config = vim.tbl_deep_extend('force', M.config, opts or {})
+  M.config = vim.tbl_deep_extend("force", M.config, opts or {})
 end
 
 function M.load()
   if vim.g.colors_name then
-    vim.cmd('hi clear')
+    vim.cmd("hi clear")
   end
 
-  vim.g.colors_name = 'smyck'
+  vim.g.colors_name = "smyck"
   vim.o.termguicolors = true
-  vim.o.background = 'dark'
+  vim.o.background = "dark"
 
-  local colors = require('smyck.palette')
+  local colors = require("smyck.palette")
   local highlights = {}
 
   -- Collect all highlight groups
-  for _, mod in ipairs({ 'editor', 'syntax', 'treesitter', 'lsp', 'plugins' }) do
-    local ok, hl_mod = pcall(require, 'smyck.highlights.' .. mod)
+  for _, mod in ipairs({ "editor", "syntax", "treesitter", "lsp", "plugins" }) do
+    local ok, hl_mod = pcall(require, "smyck.highlights." .. mod)
     if ok then
       for hl, spec in pairs(hl_mod.setup(colors)) do
         highlights[hl] = spec
       end
     end
+  end
+
+  -- Apply theme-specific overrides (if overrides.lua exists)
+  local ok, overrides = pcall(require, "smyck.overrides")
+  if ok and overrides.highlights then
+    highlights = overrides.highlights(colors, highlights)
   end
 
   -- Apply highlights

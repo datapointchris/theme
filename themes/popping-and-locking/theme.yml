@@ -9,7 +9,7 @@ meta:
   author: Ghostty
 base16:
   base00: '#181921'
-  base01: '#928374'
+  base01: '#252631'  # Computed: slightly lighter than base00 (was #928374 - wrong, that's comments)
   base02: '#ebdbb2'
   base03: '#928374'
   base04: '#a89984'
@@ -70,8 +70,8 @@ extended:
   ui_accent: '#458588'
   ui_border: '#ebdbb2'
   ui_selection: '#ebdbb2'
-  ui_float_bg: '#928374'
-  ui_cursor_line: '#928374'
+  ui_float_bg: '#252631'  # Matches base01
+  ui_cursor_line: '#252631'  # Matches base01
   git_add: '#98971a'
   git_change: '#d79921'
   git_delete: '#cc241d'

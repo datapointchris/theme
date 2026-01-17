@@ -8,29 +8,35 @@ M.config = {
 }
 
 function M.setup(opts)
-  M.config = vim.tbl_deep_extend('force', M.config, opts or {})
+  M.config = vim.tbl_deep_extend("force", M.config, opts or {})
 end
 
 function M.load()
   if vim.g.colors_name then
-    vim.cmd('hi clear')
+    vim.cmd("hi clear")
   end
 
-  vim.g.colors_name = 'everforest-dark-hard'
+  vim.g.colors_name = "everforest-dark-hard"
   vim.o.termguicolors = true
-  vim.o.background = 'dark'
+  vim.o.background = "dark"
 
-  local colors = require('everforest_dark_hard.palette')
+  local colors = require("everforest_dark_hard.palette")
   local highlights = {}
 
   -- Collect all highlight groups
-  for _, mod in ipairs({ 'editor', 'syntax', 'treesitter', 'lsp', 'plugins' }) do
-    local ok, hl_mod = pcall(require, 'everforest_dark_hard.highlights.' .. mod)
+  for _, mod in ipairs({ "editor", "syntax", "treesitter", "lsp", "plugins" }) do
+    local ok, hl_mod = pcall(require, "everforest_dark_hard.highlights." .. mod)
     if ok then
       for hl, spec in pairs(hl_mod.setup(colors)) do
         highlights[hl] = spec
       end
     end
+  end
+
+  -- Apply theme-specific overrides (if overrides.lua exists)
+  local ok, overrides = pcall(require, "everforest_dark_hard.overrides")
+  if ok and overrides.highlights then
+    highlights = overrides.highlights(colors, highlights)
   end
 
   -- Apply highlights

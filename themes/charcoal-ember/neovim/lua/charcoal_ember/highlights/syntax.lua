@@ -4,7 +4,7 @@ local M = {}
 function M.setup(colors)
   local theme = colors.theme
   return {
-    Comment = { fg = theme.syn.comment, italic = true },
+    Comment = { fg = theme.syn.comment },
 
     Constant = { fg = theme.syn.constant },
     String = { fg = theme.syn.string },
