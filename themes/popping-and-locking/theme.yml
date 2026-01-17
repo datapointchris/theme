@@ -4,9 +4,9 @@ meta:
   neovim_colorscheme_name: popping-and-locking
   neovim_colorscheme_source: generated
   plugin: null
-  derived_from: ghostty-builtin
+  derived_from: hedinne/popping-and-locking-vscode
   variant: dark
-  author: Ghostty
+  author: Hedinn Eiriksson
 base16:
   base00: '#181921'
   base01: '#252631'  # Computed: slightly lighter than base00 (was #928374 - wrong, that's comments)
@@ -48,24 +48,24 @@ special:
   cursor_text: '#ffffff'
   selection_bg: '#ebdbb2'
   selection_fg: '#928374'
-extended_source: generated
+extended_source: hedinne/popping-and-locking-vscode
 extended:
   diagnostic_error: '#cc241d'
-  diagnostic_ok: '#98971a'
+  diagnostic_ok: '#b8bb26'
   diagnostic_warning: '#f42c3e'
   diagnostic_info: '#689d6a'
   diagnostic_hint: '#689d6a'
-  syntax_comment: '#928374'
-  syntax_string: '#98971a'
-  syntax_function: '#458588'
-  syntax_keyword: '#b16286'
-  syntax_type: '#d79921'
-  syntax_number: '#b16286'
-  syntax_constant: '#d79921'
-  syntax_operator: '#a89984'
-  syntax_variable: '#ebdbb2'
-  syntax_parameter: '#458588'
-  syntax_preproc: '#b16286'
+  syntax_comment: '#506899'      # was #928374 - blue-gray, not brown
+  syntax_string: '#b8bb26'       # was #98971a - brighter green
+  syntax_function: '#7ec16e'     # was #458588 - bright green, not blue!
+  syntax_keyword: '#f42c3e'      # was #b16286 - red, not magenta
+  syntax_type: '#fabd2f'         # was #d79921 - brighter yellow
+  syntax_number: '#d3869b'       # was #b16286 - pink (matches constant)
+  syntax_constant: '#d3869b'     # was #d79921 - pink
+  syntax_operator: '#7ec16e'     # was #a89984 - keyword operators are green
+  syntax_variable: '#99c6ca'     # was #ebdbb2 - cyan, not cream
+  syntax_parameter: '#99c6ca'    # matches variable
+  syntax_preproc: '#f42c3e'      # storage/types use red in VS Code theme
   syntax_special: '#689d6a'
   ui_accent: '#458588'
   ui_border: '#ebdbb2'
