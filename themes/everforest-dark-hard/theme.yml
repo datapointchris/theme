@@ -1,29 +1,29 @@
 meta:
   id: everforest-dark-hard
   display_name: Everforest Dark Hard
-  neovim_colorscheme_name: everforest-dark-hard
-  neovim_colorscheme_source: generated
-  plugin: null
-  derived_from: ghostty-builtin
+  neovim_colorscheme_name: everforest
+  neovim_colorscheme_source: plugin
+  plugin: neanias/everforest-nvim
+  derived_from: neanias/everforest-nvim
   variant: dark
-  author: Ghostty
+  author: sainnhe
 base16:
-  base00: '#1e2326'
-  base01: '#2e383c'  # bg1 from everforest.vim (was #a6b0a0 - wrong, that's a fg color)
-  base02: '#4c3743'
-  base03: '#a6b0a0'
-  base04: '#f2efdf'
-  base05: '#d3c6aa'
-  base06: '#fffbef'
-  base07: '#fffbef'
-  base08: '#e67e80'
-  base09: '#f85552'
-  base0A: '#dbbc7f'
-  base0B: '#a7c080'
-  base0C: '#83c092'
-  base0D: '#7fbbb3'
-  base0E: '#d699b6'
-  base0F: '#d699b6'
+  base00: '#1e2326'  # bg_dim - main background
+  base01: '#2e383c'  # bg1 - lighter background
+  base02: '#374145'  # bg2 - selection/visual background
+  base03: '#859289'  # grey1 - comments, line numbers
+  base04: '#9da9a0'  # grey2 - dark foreground
+  base05: '#d3c6aa'  # fg - default foreground
+  base06: '#d3c6aa'  # fg - light foreground
+  base07: '#d3c6aa'  # fg - lightest foreground
+  base08: '#e67e80'  # red - keywords, errors
+  base09: '#e69875'  # orange - operators, labels
+  base0A: '#dbbc7f'  # yellow - types, special
+  base0B: '#a7c080'  # green - strings, functions
+  base0C: '#83c092'  # aqua - constants, macros
+  base0D: '#7fbbb3'  # blue - identifiers
+  base0E: '#d699b6'  # purple - numbers, preproc
+  base0F: '#e69875'  # orange - tags, delimiters
 ansi:
   black: '#7a8478'
   red: '#e67e80'
@@ -42,36 +42,43 @@ ansi:
   bright_cyan: '#35a77c'
   bright_white: '#fffbef'
 special:
-  background: '#1e2326'
-  foreground: '#d3c6aa'
-  cursor: '#e69875'
-  cursor_text: '#4c3743'
-  selection_bg: '#4c3743'
-  selection_fg: '#d3c6aa'
-extended_source: generated
+  background: '#1e2326'  # bg_dim
+  foreground: '#d3c6aa'  # fg
+  cursor: '#d3c6aa'      # fg - standard cursor color
+  cursor_text: '#1e2326' # bg_dim - text under cursor
+  selection_bg: '#4c3743'  # bg_visual
+  selection_fg: '#d3c6aa'  # fg
+extended_source: plugin
 extended:
-  diagnostic_error: '#e67e80'
-  diagnostic_ok: '#a7c080'
-  diagnostic_warning: '#dbbc7f'
-  diagnostic_info: '#83c092'
-  diagnostic_hint: '#83c092'
-  syntax_comment: '#f2efdf'
-  syntax_string: '#a7c080'
-  syntax_function: '#f85552'
-  syntax_keyword: '#d699b6'
-  syntax_type: '#83c092'
-  syntax_number: '#d699b6'
-  syntax_constant: '#dbbc7f'
-  syntax_operator: '#f2efdf'
-  syntax_variable: '#d3c6aa'
-  syntax_parameter: '#7fbbb3'
-  syntax_preproc: '#d699b6'
-  syntax_special: '#83c092'
-  ui_accent: '#83c092'
-  ui_border: '#414b50'  # bg3 from everforest.vim
-  ui_selection: '#4c3743'
-  ui_float_bg: '#272e33'  # bg0 from everforest.vim (darker than main bg)
-  ui_cursor_line: '#2e383c'  # bg1 from everforest.vim
-  git_add: '#a7c080'
-  git_change: '#dbbc7f'
-  git_delete: '#e67e80'
+  # Diagnostics
+  diagnostic_error: '#e67e80'    # red
+  diagnostic_ok: '#a7c080'       # green
+  diagnostic_warning: '#dbbc7f'  # yellow
+  diagnostic_info: '#7fbbb3'     # blue
+  diagnostic_hint: '#a7c080'     # green
+
+  # Syntax - from everforest highlights.lua
+  syntax_comment: '#859289'      # grey1 - NOT white!
+  syntax_string: '#a7c080'       # green
+  syntax_function: '#a7c080'     # green - NOT red!
+  syntax_keyword: '#e67e80'      # red - NOT purple!
+  syntax_type: '#dbbc7f'         # yellow - NOT aqua!
+  syntax_number: '#d699b6'       # purple
+  syntax_constant: '#83c092'     # aqua - NOT yellow!
+  syntax_operator: '#e69875'     # orange - NOT white!
+  syntax_variable: '#d3c6aa'     # fg
+  syntax_parameter: '#7fbbb3'    # blue
+  syntax_preproc: '#d699b6'      # purple
+  syntax_special: '#dbbc7f'      # yellow - NOT aqua!
+
+  # UI
+  ui_accent: '#a7c080'           # green - primary accent
+  ui_border: '#414b50'           # bg3
+  ui_selection: '#4c3743'        # bg_visual
+  ui_float_bg: '#272e33'         # bg0
+  ui_cursor_line: '#2e383c'      # bg1
+
+  # VCS
+  git_add: '#a7c080'             # green
+  git_change: '#dbbc7f'          # yellow
+  git_delete: '#e67e80'          # red
