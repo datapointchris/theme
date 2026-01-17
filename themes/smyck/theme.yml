@@ -4,9 +4,9 @@ meta:
   neovim_colorscheme_name: smyck
   neovim_colorscheme_source: generated
   plugin: null
-  derived_from: ghostty-builtin
+  derived_from: hukl/Smyck-Color-Scheme
   variant: dark
-  author: Ghostty
+  author: hukl
 base16:
   base00: '#1b1b1b'
   base01: '#2b2b2b'  # Computed: slightly lighter than base00 (was #7a7a7a - wrong, that's comments)
@@ -48,25 +48,25 @@ special:
   cursor_text: '#ffffff'
   selection_bg: '#207483'
   selection_fg: '#f7f7f7'
-extended_source: generated
+extended_source: hukl/Smyck-Color-Scheme
 extended:
   diagnostic_error: '#b84131'
   diagnostic_ok: '#7da900'
   diagnostic_warning: '#d6837c'
-  diagnostic_info: '#207383'
+  diagnostic_info: '#96D9F1'
   diagnostic_hint: '#ba8acc'
-  syntax_comment: '#7a7a7a'
-  syntax_string: '#207383'
-  syntax_function: '#62a3c4'
-  syntax_keyword: '#7da900'
-  syntax_type: '#207383'
-  syntax_number: '#ba8acc'
-  syntax_constant: '#c4a500'
-  syntax_operator: '#a1a1a1'
+  syntax_comment: '#8F8F8F'      # was #7a7a7a - brighter gray from VimScript
+  syntax_string: '#F6DC69'       # was #207383 - gold, not teal!
+  syntax_function: '#96D9F1'     # was #62a3c4 - sky blue (links to Constant in VimScript)
+  syntax_keyword: '#D1FA71'      # was #7da900 - bright lime green
+  syntax_type: '#96D9F1'         # was #207383 - sky blue, not teal
+  syntax_number: '#F6DC69'       # was #ba8acc - gold (same as String in VimScript)
+  syntax_constant: '#96D9F1'     # was #c4a500 - sky blue
+  syntax_operator: '#f7f7f7'     # was #a1a1a1 - Method group uses white in VimScript
   syntax_variable: '#f7f7f7'
-  syntax_parameter: '#62a3c4'
-  syntax_preproc: '#ba8acc'
-  syntax_special: '#207383'
+  syntax_parameter: '#96D9F1'    # matches Identifier/Constant
+  syntax_preproc: '#D1FA71'      # was #ba8acc - PreProc uses bright green in VimScript
+  syntax_special: '#d7d7d7'      # was #207383 - Special uses light gray in VimScript
   ui_accent: '#207383'
   ui_border: '#7a7a7a'
   ui_selection: '#207483'
