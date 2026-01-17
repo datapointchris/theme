@@ -1,9 +1,35 @@
-/* OceanicNext - Walker colors */
-/* Generated from palette.yml */
+/* Oceanic Next - Walker colors */
+/* Generated from theme.yml */
+/* Author: Ghostty */
 
-@define-color selected-text #5fb3b3;
-@define-color text #c0c5ce;
-@define-color base #162c35;
-@define-color border #c0c5ce;
-@define-color foreground #c0c5ce;
+/* Base16 palette */
+@define-color base00 #162c35;
+@define-color base01 #65737e;
+@define-color base02 #4f5b66;
+@define-color base03 #65737e;
+@define-color base04 #ffffff;
+@define-color base05 #c0c5ce;
+@define-color base06 #ffffff;
+@define-color base07 #ffffff;
+@define-color base08 #ec5f67;
+@define-color base09 #ec5f67;
+@define-color base0A #fac863;
+@define-color base0B #99c794;
+@define-color base0C #5fb3b3;
+@define-color base0D #6699cc;
+@define-color base0E #c594c5;
+@define-color base0F #c594c5;
+
+/* Semantic colors */
 @define-color background #162c35;
+@define-color foreground #c0c5ce;
+@define-color base #162c35;
+@define-color text #c0c5ce;
+@define-color text-muted #ffffff;
+@define-color border #65737e;
+
+/* Selection and highlight */
+@define-color selected-bg #4f5b66;
+@define-color selected-text #6699cc;
+@define-color match #ec5f67;
+@define-color accent #6699cc;

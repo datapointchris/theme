@@ -1,9 +1,35 @@
 /* Terafox - Walker colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: EdenEast */
 
-@define-color selected-text #a1cdd8;
-@define-color text #e6eaea;
-@define-color base #152528;
-@define-color border #e6eaea;
-@define-color foreground #e6eaea;
+/* Base16 palette */
+@define-color base00 #152528;
+@define-color base01 #1d3337;
+@define-color base02 #254147;
+@define-color base03 #6d7f8b;
+@define-color base04 #587b7b;
+@define-color base05 #e6eaea;
+@define-color base06 #eaeeee;
+@define-color base07 #cbd9d8;
+@define-color base08 #e85c51;
+@define-color base09 #ff8349;
+@define-color base0A #fda47f;
+@define-color base0B #7aa4a1;
+@define-color base0C #a1cdd8;
+@define-color base0D #5a93aa;
+@define-color base0E #ad5c7c;
+@define-color base0F #cb7985;
+
+/* Semantic colors */
 @define-color background #152528;
+@define-color foreground #e6eaea;
+@define-color base #152528;
+@define-color text #e6eaea;
+@define-color text-muted #587b7b;
+@define-color border #2d4f56;
+
+/* Selection and highlight */
+@define-color selected-bg #254147;
+@define-color selected-text #5a93aa;
+@define-color match #ff8349;
+@define-color accent #5a93aa;

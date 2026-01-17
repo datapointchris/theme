@@ -1,9 +1,35 @@
 /* GitHub Dark Dimmed - Walker colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: Projekt0n */
 
-@define-color selected-text #96d0ff;
-@define-color text #adbac7;
-@define-color base #22272e;
-@define-color border #adbac7;
-@define-color foreground #adbac7;
+/* Base16 palette */
+@define-color base00 #22272e;
+@define-color base01 #2d333b;
+@define-color base02 #373e47;
+@define-color base03 #768390;
+@define-color base04 #636e7b;
+@define-color base05 #adbac7;
+@define-color base06 #cdd9e5;
+@define-color base07 #ffffff;
+@define-color base08 #f47067;
+@define-color base09 #e0823d;
+@define-color base0A #c69026;
+@define-color base0B #57ab5a;
+@define-color base0C #96d0ff;
+@define-color base0D #6cb6ff;
+@define-color base0E #dcbdfb;
+@define-color base0F #e5534b;
+
+/* Semantic colors */
 @define-color background #22272e;
+@define-color foreground #adbac7;
+@define-color base #22272e;
+@define-color text #adbac7;
+@define-color text-muted #636e7b;
+@define-color border #444c56;
+
+/* Selection and highlight */
+@define-color selected-bg #373e47;
+@define-color selected-text #6cb6ff;
+@define-color match #e0823d;
+@define-color accent #6cb6ff;

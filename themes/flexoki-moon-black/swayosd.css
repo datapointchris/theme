@@ -1,8 +1,35 @@
 /* Flexoki Moon Black - SwayOSD colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: datapointchris */
 
+/* Base16 palette */
+@define-color base00 #100f0f;
+@define-color base01 #1c1b1a;
+@define-color base02 #282726;
+@define-color base03 #575653;
+@define-color base04 #878580;
+@define-color base05 #cecdc3;
+@define-color base06 #EDEECF;
+@define-color base07 #ffffff;
+@define-color base08 #d14d41;
+@define-color base09 #da702c;
+@define-color base0A #d0a215;
+@define-color base0B #879a39;
+@define-color base0C #3aa99f;
+@define-color base0D #4385be;
+@define-color base0E #8b7ec8;
+@define-color base0F #ce5d97;
+
+/* OSD element colors */
 @define-color background-color #100f0f;
-@define-color border-color #cecdc3;
+@define-color border-color #282726;
 @define-color label #cecdc3;
-@define-color image #cecdc3;
-@define-color progress #cecdc3;
+@define-color image #4385be;
+@define-color progress #4385be;
+@define-color progress-bg #1c1b1a;
+
+/* Status colors for volume/brightness */
+@define-color muted #d14d41;
+@define-color low #3aa99f;
+@define-color normal #4385be;
+@define-color high #da702c;

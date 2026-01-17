@@ -1,8 +1,35 @@
 /* Everforest Dark Hard - SwayOSD colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: sainnhe */
 
+/* Base16 palette */
+@define-color base00 #1e2326;
+@define-color base01 #2e383c;
+@define-color base02 #374145;
+@define-color base03 #859289;
+@define-color base04 #9da9a0;
+@define-color base05 #d3c6aa;
+@define-color base06 #d3c6aa;
+@define-color base07 #d3c6aa;
+@define-color base08 #e67e80;
+@define-color base09 #e69875;
+@define-color base0A #dbbc7f;
+@define-color base0B #a7c080;
+@define-color base0C #83c092;
+@define-color base0D #7fbbb3;
+@define-color base0E #d699b6;
+@define-color base0F #e69875;
+
+/* OSD element colors */
 @define-color background-color #1e2326;
-@define-color border-color #d3c6aa;
+@define-color border-color #374145;
 @define-color label #d3c6aa;
-@define-color image #d3c6aa;
-@define-color progress #d3c6aa;
+@define-color image #7fbbb3;
+@define-color progress #7fbbb3;
+@define-color progress-bg #2e383c;
+
+/* Status colors for volume/brightness */
+@define-color muted #e67e80;
+@define-color low #83c092;
+@define-color normal #7fbbb3;
+@define-color high #e69875;

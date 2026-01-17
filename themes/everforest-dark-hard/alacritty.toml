@@ -1,14 +1,14 @@
 # Everforest Dark Hard - alacritty theme
 # Generated from theme.yml
-# Author: Ghostty
+# Author: sainnhe
 
 [colors.primary]
 background = "#1e2326"
 foreground = "#d3c6aa"
 
 [colors.cursor]
-text = "#4c3743"
-cursor = "#e69875"
+text = "#1e2326"
+cursor = "#d3c6aa"
 
 [colors.selection]
 text = "#d3c6aa"

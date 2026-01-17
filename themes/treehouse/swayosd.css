@@ -1,8 +1,35 @@
 /* Treehouse - SwayOSD colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: Ghostty */
 
+/* Base16 palette */
+@define-color base00 #191919;
+@define-color base01 #252220;
+@define-color base02 #786b53;
+@define-color base03 #504332;
+@define-color base04 #786b53;
+@define-color base05 #786b53;
+@define-color base06 #ffc800;
+@define-color base07 #ffc800;
+@define-color base08 #b2270e;
+@define-color base09 #ed5d20;
+@define-color base0A #aa820c;
+@define-color base0B #44a900;
+@define-color base0C #b25a1e;
+@define-color base0D #58859a;
+@define-color base0E #97363d;
+@define-color base0F #97363d;
+
+/* OSD element colors */
 @define-color background-color #191919;
 @define-color border-color #786b53;
 @define-color label #786b53;
-@define-color image #786b53;
-@define-color progress #786b53;
+@define-color image #58859a;
+@define-color progress #58859a;
+@define-color progress-bg #252220;
+
+/* Status colors for volume/brightness */
+@define-color muted #b2270e;
+@define-color low #b25a1e;
+@define-color normal #58859a;
+@define-color high #ed5d20;

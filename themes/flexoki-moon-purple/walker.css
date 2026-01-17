@@ -1,9 +1,35 @@
 /* Flexoki Moon Purple - Walker colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: datapointchris */
 
-@define-color selected-text #3aa99f;
-@define-color text #ddd8e8;
-@define-color base #12101d;
-@define-color border #ddd8e8;
-@define-color foreground #ddd8e8;
+/* Base16 palette */
+@define-color base00 #12101d;
+@define-color base01 #1c1a25;
+@define-color base02 #1f1d2a;
+@define-color base03 #625f68;
+@define-color base04 #8f8a98;
+@define-color base05 #ddd8e8;
+@define-color base06 #EDEECF;
+@define-color base07 #ffffff;
+@define-color base08 #d14d41;
+@define-color base09 #da702c;
+@define-color base0A #d0a215;
+@define-color base0B #879a39;
+@define-color base0C #3aa99f;
+@define-color base0D #4385be;
+@define-color base0E #8b7ec8;
+@define-color base0F #ce5d97;
+
+/* Semantic colors */
 @define-color background #12101d;
+@define-color foreground #ddd8e8;
+@define-color base #12101d;
+@define-color text #ddd8e8;
+@define-color text-muted #8f8a98;
+@define-color border #1f1d2a;
+
+/* Selection and highlight */
+@define-color selected-bg #1f1d2a;
+@define-color selected-text #4385be;
+@define-color match #da702c;
+@define-color accent #4385be;

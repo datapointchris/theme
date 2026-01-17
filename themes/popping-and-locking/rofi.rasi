@@ -5,7 +5,7 @@
 * {
     /* Base16 palette */
     base00: #181921;  /* Main background */
-    base01: #928374;  /* Lighter background */
+    base01: #252631;  /* Lighter background */
     base02: #ebdbb2;  /* Selection background */
     base03: #928374;  /* Comments, muted */
     base04: #a89984;  /* Dark foreground */
@@ -23,7 +23,7 @@
 
     /* Semantic colors */
     bg: #181921;
-    bg-alt: #928374;
+    bg-alt: #252631;
     bg-selected: #ebdbb2;
     fg: #ebdbb2;
     fg-alt: #a89984;

@@ -1,8 +1,35 @@
 /* Terafox - SwayOSD colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: EdenEast */
 
+/* Base16 palette */
+@define-color base00 #152528;
+@define-color base01 #1d3337;
+@define-color base02 #254147;
+@define-color base03 #6d7f8b;
+@define-color base04 #587b7b;
+@define-color base05 #e6eaea;
+@define-color base06 #eaeeee;
+@define-color base07 #cbd9d8;
+@define-color base08 #e85c51;
+@define-color base09 #ff8349;
+@define-color base0A #fda47f;
+@define-color base0B #7aa4a1;
+@define-color base0C #a1cdd8;
+@define-color base0D #5a93aa;
+@define-color base0E #ad5c7c;
+@define-color base0F #cb7985;
+
+/* OSD element colors */
 @define-color background-color #152528;
-@define-color border-color #e6eaea;
+@define-color border-color #254147;
 @define-color label #e6eaea;
-@define-color image #e6eaea;
-@define-color progress #e6eaea;
+@define-color image #5a93aa;
+@define-color progress #5a93aa;
+@define-color progress-bg #1d3337;
+
+/* Status colors for volume/brightness */
+@define-color muted #e85c51;
+@define-color low #a1cdd8;
+@define-color normal #5a93aa;
+@define-color high #ff8349;

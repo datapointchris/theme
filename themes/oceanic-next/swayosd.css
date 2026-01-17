@@ -1,8 +1,35 @@
-/* OceanicNext - SwayOSD colors */
-/* Generated from palette.yml */
+/* Oceanic Next - SwayOSD colors */
+/* Generated from theme.yml */
+/* Author: Ghostty */
 
+/* Base16 palette */
+@define-color base00 #162c35;
+@define-color base01 #65737e;
+@define-color base02 #4f5b66;
+@define-color base03 #65737e;
+@define-color base04 #ffffff;
+@define-color base05 #c0c5ce;
+@define-color base06 #ffffff;
+@define-color base07 #ffffff;
+@define-color base08 #ec5f67;
+@define-color base09 #ec5f67;
+@define-color base0A #fac863;
+@define-color base0B #99c794;
+@define-color base0C #5fb3b3;
+@define-color base0D #6699cc;
+@define-color base0E #c594c5;
+@define-color base0F #c594c5;
+
+/* OSD element colors */
 @define-color background-color #162c35;
-@define-color border-color #c0c5ce;
+@define-color border-color #4f5b66;
 @define-color label #c0c5ce;
-@define-color image #c0c5ce;
-@define-color progress #c0c5ce;
+@define-color image #6699cc;
+@define-color progress #6699cc;
+@define-color progress-bg #65737e;
+
+/* Status colors for volume/brightness */
+@define-color muted #ec5f67;
+@define-color low #5fb3b3;
+@define-color normal #6699cc;
+@define-color high #ec5f67;

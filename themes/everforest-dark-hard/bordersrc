@@ -1,7 +1,7 @@
 #!/bin/bash
 # Everforest Dark Hard - JankyBorders theme
 # Generated from theme.yml
-# Author: Ghostty
+# Author: sainnhe
 
 options=(
   style=round
@@ -9,13 +9,13 @@ options=(
   hidpi=on
 
   # Active window - use UI accent color
-  active_color=0xff83c092
+  active_color=0xffa7c080
 
   # Inactive windows - use UI border color
-  inactive_color=0xffa6b0a0
+  inactive_color=0xff414b50
 
   # Glow effect using accent color
-  active_color='glow(0xff83c092)'
+  active_color='glow(0xffa7c080)'
 
   blacklist="System Settings|System Information|QuickTime Player"
 )

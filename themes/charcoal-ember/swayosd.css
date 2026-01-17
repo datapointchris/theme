@@ -1,0 +1,35 @@
+/* Charcoal Ember - SwayOSD colors */
+/* Generated from theme.yml */
+/* Author: datapointchris */
+
+/* Base16 palette */
+@define-color base00 #1d1f21;
+@define-color base01 #2d2d2d;
+@define-color base02 #373b41;
+@define-color base03 #969896;
+@define-color base04 #969896;
+@define-color base05 #c5c8c6;
+@define-color base06 #e0e0e0;
+@define-color base07 #ffffff;
+@define-color base08 #c90d00;
+@define-color base09 #f79802;
+@define-color base0A #ffc400;
+@define-color base0B #60b45a;
+@define-color base0C #5fb3b3;
+@define-color base0D #4eb6fe;
+@define-color base0E #b294bb;
+@define-color base0F #c09c24;
+
+/* OSD element colors */
+@define-color background-color #1d1f21;
+@define-color border-color #373b41;
+@define-color label #c5c8c6;
+@define-color image #4eb6fe;
+@define-color progress #4eb6fe;
+@define-color progress-bg #2d2d2d;
+
+/* Status colors for volume/brightness */
+@define-color muted #c90d00;
+@define-color low #5fb3b3;
+@define-color normal #4eb6fe;
+@define-color high #f79802;

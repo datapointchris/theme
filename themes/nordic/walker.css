@@ -1,9 +1,35 @@
 /* Nordic - Walker colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: AlexvZyl */
 
-@define-color selected-text #8FBCBB;
-@define-color text #BBC3D4;
-@define-color base #242933;
-@define-color border #BBC3D4;
-@define-color foreground #BBC3D4;
+/* Base16 palette */
+@define-color base00 #242933;
+@define-color base01 #2E3440;
+@define-color base02 #3B4252;
+@define-color base03 #4C566A;
+@define-color base04 #60728A;
+@define-color base05 #BBC3D4;
+@define-color base06 #D8DEE9;
+@define-color base07 #E5E9F0;
+@define-color base08 #BF616A;
+@define-color base09 #D08770;
+@define-color base0A #EBCB8B;
+@define-color base0B #A3BE8C;
+@define-color base0C #8FBCBB;
+@define-color base0D #81A1C1;
+@define-color base0E #B48EAD;
+@define-color base0F #5E81AC;
+
+/* Semantic colors */
 @define-color background #242933;
+@define-color foreground #BBC3D4;
+@define-color base #242933;
+@define-color text #BBC3D4;
+@define-color text-muted #60728A;
+@define-color border #191D24;
+
+/* Selection and highlight */
+@define-color selected-bg #3B4252;
+@define-color selected-text #81A1C1;
+@define-color match #D08770;
+@define-color accent #81A1C1;

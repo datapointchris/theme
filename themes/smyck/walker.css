@@ -1,9 +1,35 @@
 /* Smyck - Walker colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: Ghostty */
 
-@define-color selected-text #207383;
-@define-color text #f7f7f7;
-@define-color base #1b1b1b;
-@define-color border #f7f7f7;
-@define-color foreground #f7f7f7;
+/* Base16 palette */
+@define-color base00 #1b1b1b;
+@define-color base01 #2b2b2b;
+@define-color base02 #207483;
+@define-color base03 #7a7a7a;
+@define-color base04 #a1a1a1;
+@define-color base05 #f7f7f7;
+@define-color base06 #f7f7f7;
+@define-color base07 #f7f7f7;
+@define-color base08 #b84131;
+@define-color base09 #d6837c;
+@define-color base0A #c4a500;
+@define-color base0B #7da900;
+@define-color base0C #207383;
+@define-color base0D #62a3c4;
+@define-color base0E #ba8acc;
+@define-color base0F #ba8acc;
+
+/* Semantic colors */
 @define-color background #1b1b1b;
+@define-color foreground #f7f7f7;
+@define-color base #1b1b1b;
+@define-color text #f7f7f7;
+@define-color text-muted #a1a1a1;
+@define-color border #7a7a7a;
+
+/* Selection and highlight */
+@define-color selected-bg #207483;
+@define-color selected-text #62a3c4;
+@define-color match #d6837c;
+@define-color accent #62a3c4;

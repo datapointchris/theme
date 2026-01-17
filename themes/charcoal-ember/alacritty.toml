@@ -1,0 +1,35 @@
+# Charcoal Ember - alacritty theme
+# Generated from theme.yml
+# Author: datapointchris
+
+[colors.primary]
+background = "#1d1f21"
+foreground = "#c5c8c6"
+
+[colors.cursor]
+text = "#1d1f21"
+cursor = "#c5c8c6"
+
+[colors.selection]
+text = "#c5c8c6"
+background = "#373b41"
+
+[colors.normal]
+black = "#111111"
+red = "#c90d00"
+green = "#60b45a"
+yellow = "#c09c24"
+blue = "#4eb6fe"
+magenta = "#b294bb"
+cyan = "#5fb3b3"
+white = "#c5c8c6"
+
+[colors.bright]
+black = "#969896"
+red = "#ff3334"
+green = "#9ec400"
+yellow = "#ffc400"
+blue = "#6699cc"
+magenta = "#c397d8"
+cyan = "#70c0b1"
+white = "#ffffff"

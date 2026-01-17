@@ -1,8 +1,35 @@
 /* Nordic - SwayOSD colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: AlexvZyl */
 
+/* Base16 palette */
+@define-color base00 #242933;
+@define-color base01 #2E3440;
+@define-color base02 #3B4252;
+@define-color base03 #4C566A;
+@define-color base04 #60728A;
+@define-color base05 #BBC3D4;
+@define-color base06 #D8DEE9;
+@define-color base07 #E5E9F0;
+@define-color base08 #BF616A;
+@define-color base09 #D08770;
+@define-color base0A #EBCB8B;
+@define-color base0B #A3BE8C;
+@define-color base0C #8FBCBB;
+@define-color base0D #81A1C1;
+@define-color base0E #B48EAD;
+@define-color base0F #5E81AC;
+
+/* OSD element colors */
 @define-color background-color #242933;
-@define-color border-color #BBC3D4;
+@define-color border-color #3B4252;
 @define-color label #BBC3D4;
-@define-color image #BBC3D4;
-@define-color progress #BBC3D4;
+@define-color image #81A1C1;
+@define-color progress #81A1C1;
+@define-color progress-bg #2E3440;
+
+/* Status colors for volume/brightness */
+@define-color muted #BF616A;
+@define-color low #8FBCBB;
+@define-color normal #81A1C1;
+@define-color high #D08770;

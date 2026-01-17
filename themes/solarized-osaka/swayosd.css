@@ -1,8 +1,35 @@
 /* Solarized Osaka - SwayOSD colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: Takuya Matsuyama (craftzdog) */
 
+/* Base16 palette */
+@define-color base00 #001419;
+@define-color base01 #002b36;
+@define-color base02 #073642;
+@define-color base03 #586e75;
+@define-color base04 #657b83;
+@define-color base05 #93a1a1;
+@define-color base06 #a9b1b1;
+@define-color base07 #eee8d5;
+@define-color base08 #dc322f;
+@define-color base09 #cb4b16;
+@define-color base0A #b58900;
+@define-color base0B #859900;
+@define-color base0C #2aa198;
+@define-color base0D #268bd2;
+@define-color base0E #6c71c4;
+@define-color base0F #d33682;
+
+/* OSD element colors */
 @define-color background-color #001419;
-@define-color border-color #93a1a1;
+@define-color border-color #073642;
 @define-color label #93a1a1;
-@define-color image #93a1a1;
-@define-color progress #93a1a1;
+@define-color image #268bd2;
+@define-color progress #268bd2;
+@define-color progress-bg #002b36;
+
+/* Status colors for volume/brightness */
+@define-color muted #dc322f;
+@define-color low #2aa198;
+@define-color normal #268bd2;
+@define-color high #cb4b16;

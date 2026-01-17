@@ -1,8 +1,35 @@
 /* Kanagawa - SwayOSD colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: Tommaso Laurenzi (rebelot) */
 
+/* Base16 palette */
+@define-color base00 #1f1f28;
+@define-color base01 #16161d;
+@define-color base02 #2d4f67;
+@define-color base03 #727169;
+@define-color base04 #c8c093;
+@define-color base05 #dcd7ba;
+@define-color base06 #c8c093;
+@define-color base07 #717c7c;
+@define-color base08 #c34043;
+@define-color base09 #ffa066;
+@define-color base0A #c0a36e;
+@define-color base0B #76946a;
+@define-color base0C #6a9589;
+@define-color base0D #7e9cd8;
+@define-color base0E #957fb8;
+@define-color base0F #d27e99;
+
+/* OSD element colors */
 @define-color background-color #1f1f28;
-@define-color border-color #dcd7ba;
+@define-color border-color #2d4f67;
 @define-color label #dcd7ba;
-@define-color image #dcd7ba;
-@define-color progress #dcd7ba;
+@define-color image #7e9cd8;
+@define-color progress #7e9cd8;
+@define-color progress-bg #16161d;
+
+/* Status colors for volume/brightness */
+@define-color muted #c34043;
+@define-color low #6a9589;
+@define-color normal #7e9cd8;
+@define-color high #ffa066;

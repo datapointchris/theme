@@ -1,9 +1,35 @@
 /* Kanagawa - Walker colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: Tommaso Laurenzi (rebelot) */
 
-@define-color selected-text #6a9589;
-@define-color text #dcd7ba;
-@define-color base #1f1f28;
-@define-color border #dcd7ba;
-@define-color foreground #dcd7ba;
+/* Base16 palette */
+@define-color base00 #1f1f28;
+@define-color base01 #16161d;
+@define-color base02 #2d4f67;
+@define-color base03 #727169;
+@define-color base04 #c8c093;
+@define-color base05 #dcd7ba;
+@define-color base06 #c8c093;
+@define-color base07 #717c7c;
+@define-color base08 #c34043;
+@define-color base09 #ffa066;
+@define-color base0A #c0a36e;
+@define-color base0B #76946a;
+@define-color base0C #6a9589;
+@define-color base0D #7e9cd8;
+@define-color base0E #957fb8;
+@define-color base0F #d27e99;
+
+/* Semantic colors */
 @define-color background #1f1f28;
+@define-color foreground #dcd7ba;
+@define-color base #1f1f28;
+@define-color text #dcd7ba;
+@define-color text-muted #c8c093;
+@define-color border #54546d;
+
+/* Selection and highlight */
+@define-color selected-bg #2d4f67;
+@define-color selected-text #7e9cd8;
+@define-color match #ffa066;
+@define-color accent #7e9cd8;

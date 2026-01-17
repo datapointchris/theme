@@ -1,9 +1,35 @@
 /* Treehouse - Walker colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: Ghostty */
 
-@define-color selected-text #b25a1e;
-@define-color text #786b53;
-@define-color base #191919;
-@define-color border #786b53;
-@define-color foreground #786b53;
+/* Base16 palette */
+@define-color base00 #191919;
+@define-color base01 #252220;
+@define-color base02 #786b53;
+@define-color base03 #504332;
+@define-color base04 #786b53;
+@define-color base05 #786b53;
+@define-color base06 #ffc800;
+@define-color base07 #ffc800;
+@define-color base08 #b2270e;
+@define-color base09 #ed5d20;
+@define-color base0A #aa820c;
+@define-color base0B #44a900;
+@define-color base0C #b25a1e;
+@define-color base0D #58859a;
+@define-color base0E #97363d;
+@define-color base0F #97363d;
+
+/* Semantic colors */
 @define-color background #191919;
+@define-color foreground #786b53;
+@define-color base #191919;
+@define-color text #786b53;
+@define-color text-muted #786b53;
+@define-color border #504332;
+
+/* Selection and highlight */
+@define-color selected-bg #786b53;
+@define-color selected-text #58859a;
+@define-color match #ed5d20;
+@define-color accent #58859a;

@@ -8,7 +8,7 @@
 
 /* Background tones */
 @define-color base00 #181921;  /* Main background */
-@define-color base01 #928374;  /* Lighter background */
+@define-color base01 #252631;  /* Lighter background */
 @define-color base02 #ebdbb2;  /* Selection background */
 
 /* Foreground tones */
@@ -34,7 +34,7 @@
 
 /* Backgrounds */
 @define-color bg #181921;
-@define-color bg-dark #928374;
+@define-color bg-dark #252631;
 @define-color bg-highlight #ebdbb2;
 @define-color bg-selection #ebdbb2;
 

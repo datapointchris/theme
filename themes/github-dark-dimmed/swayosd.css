@@ -1,8 +1,35 @@
 /* GitHub Dark Dimmed - SwayOSD colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: Projekt0n */
 
+/* Base16 palette */
+@define-color base00 #22272e;
+@define-color base01 #2d333b;
+@define-color base02 #373e47;
+@define-color base03 #768390;
+@define-color base04 #636e7b;
+@define-color base05 #adbac7;
+@define-color base06 #cdd9e5;
+@define-color base07 #ffffff;
+@define-color base08 #f47067;
+@define-color base09 #e0823d;
+@define-color base0A #c69026;
+@define-color base0B #57ab5a;
+@define-color base0C #96d0ff;
+@define-color base0D #6cb6ff;
+@define-color base0E #dcbdfb;
+@define-color base0F #e5534b;
+
+/* OSD element colors */
 @define-color background-color #22272e;
-@define-color border-color #adbac7;
+@define-color border-color #373e47;
 @define-color label #adbac7;
-@define-color image #adbac7;
-@define-color progress #adbac7;
+@define-color image #6cb6ff;
+@define-color progress #6cb6ff;
+@define-color progress-bg #2d333b;
+
+/* Status colors for volume/brightness */
+@define-color muted #f47067;
+@define-color low #96d0ff;
+@define-color normal #6cb6ff;
+@define-color high #e0823d;

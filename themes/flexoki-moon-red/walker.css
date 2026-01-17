@@ -1,9 +1,35 @@
 /* Flexoki Moon Red - Walker colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: datapointchris */
 
-@define-color selected-text #3aa99f;
-@define-color text #f0e8dd;
-@define-color base #18090b;
-@define-color border #f0e8dd;
-@define-color foreground #f0e8dd;
+/* Base16 palette */
+@define-color base00 #18090b;
+@define-color base01 #251a1a;
+@define-color base02 #3a2b28;
+@define-color base03 #8a6b60;
+@define-color base04 #b5967e;
+@define-color base05 #f0e8dd;
+@define-color base06 #ffeaec;
+@define-color base07 #ffffff;
+@define-color base08 #d14d41;
+@define-color base09 #da702c;
+@define-color base0A #d0a215;
+@define-color base0B #879a39;
+@define-color base0C #3aa99f;
+@define-color base0D #4385be;
+@define-color base0E #8b7ec8;
+@define-color base0F #ce5d97;
+
+/* Semantic colors */
 @define-color background #18090b;
+@define-color foreground #f0e8dd;
+@define-color base #18090b;
+@define-color text #f0e8dd;
+@define-color text-muted #b5967e;
+@define-color border #3a2b28;
+
+/* Selection and highlight */
+@define-color selected-bg #3a2b28;
+@define-color selected-text #4385be;
+@define-color match #da702c;
+@define-color accent #4385be;

@@ -1,8 +1,35 @@
 /* Popping and Locking - SwayOSD colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: Ghostty */
 
+/* Base16 palette */
+@define-color base00 #181921;
+@define-color base01 #252631;
+@define-color base02 #ebdbb2;
+@define-color base03 #928374;
+@define-color base04 #a89984;
+@define-color base05 #ebdbb2;
+@define-color base06 #ebdbb2;
+@define-color base07 #ebdbb2;
+@define-color base08 #cc241d;
+@define-color base09 #f42c3e;
+@define-color base0A #d79921;
+@define-color base0B #98971a;
+@define-color base0C #689d6a;
+@define-color base0D #458588;
+@define-color base0E #b16286;
+@define-color base0F #b16286;
+
+/* OSD element colors */
 @define-color background-color #181921;
 @define-color border-color #ebdbb2;
 @define-color label #ebdbb2;
-@define-color image #ebdbb2;
-@define-color progress #ebdbb2;
+@define-color image #458588;
+@define-color progress #458588;
+@define-color progress-bg #252631;
+
+/* Status colors for volume/brightness */
+@define-color muted #cc241d;
+@define-color low #689d6a;
+@define-color normal #458588;
+@define-color high #f42c3e;

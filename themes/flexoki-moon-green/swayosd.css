@@ -1,8 +1,35 @@
 /* Flexoki Moon Green - SwayOSD colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: datapointchris */
 
+/* Base16 palette */
+@define-color base00 #08120b;
+@define-color base01 #151f18;
+@define-color base02 #253426;
+@define-color base03 #6b7d6e;
+@define-color base04 #8f8a98;
+@define-color base05 #ddd8e8;
+@define-color base06 #d6fadc;
+@define-color base07 #ffffff;
+@define-color base08 #d14d41;
+@define-color base09 #da702c;
+@define-color base0A #d0a215;
+@define-color base0B #879a39;
+@define-color base0C #3aa99f;
+@define-color base0D #4385be;
+@define-color base0E #8b7ec8;
+@define-color base0F #ce5d97;
+
+/* OSD element colors */
 @define-color background-color #08120b;
-@define-color border-color #ddd8e8;
+@define-color border-color #253426;
 @define-color label #ddd8e8;
-@define-color image #ddd8e8;
-@define-color progress #ddd8e8;
+@define-color image #4385be;
+@define-color progress #4385be;
+@define-color progress-bg #151f18;
+
+/* Status colors for volume/brightness */
+@define-color muted #d14d41;
+@define-color low #3aa99f;
+@define-color normal #4385be;
+@define-color high #da702c;

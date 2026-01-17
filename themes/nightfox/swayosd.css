@@ -1,8 +1,35 @@
 /* Nightfox - SwayOSD colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: EdenEast */
 
+/* Base16 palette */
+@define-color base00 #192330;
+@define-color base01 #212e3f;
+@define-color base02 #29394f;
+@define-color base03 #738091;
+@define-color base04 #71839b;
+@define-color base05 #cdcecf;
+@define-color base06 #d6d6d7;
+@define-color base07 #aeafb0;
+@define-color base08 #c94f6d;
+@define-color base09 #f4a261;
+@define-color base0A #dbc074;
+@define-color base0B #81b29a;
+@define-color base0C #63cdcf;
+@define-color base0D #719cd6;
+@define-color base0E #9d79d6;
+@define-color base0F #d67ad2;
+
+/* OSD element colors */
 @define-color background-color #192330;
-@define-color border-color #cdcecf;
+@define-color border-color #29394f;
 @define-color label #cdcecf;
-@define-color image #cdcecf;
-@define-color progress #cdcecf;
+@define-color image #719cd6;
+@define-color progress #719cd6;
+@define-color progress-bg #212e3f;
+
+/* Status colors for volume/brightness */
+@define-color muted #c94f6d;
+@define-color low #63cdcf;
+@define-color normal #719cd6;
+@define-color high #f4a261;

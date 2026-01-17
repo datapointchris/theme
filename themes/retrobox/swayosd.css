@@ -1,8 +1,35 @@
 /* Retrobox - SwayOSD colors */
-/* Generated from palette.yml */
+/* Generated from theme.yml */
+/* Author: Maxim Kim (https://github.com/vim/colorschemes) */
 
+/* Base16 palette */
+@define-color base00 #1c1c1c;
+@define-color base01 #3c3836;
+@define-color base02 #504945;
+@define-color base03 #928374;
+@define-color base04 #a89984;
+@define-color base05 #ebdbb2;
+@define-color base06 #d5c4a1;
+@define-color base07 #fbf1c7;
+@define-color base08 #fb4934;
+@define-color base09 #fe8019;
+@define-color base0A #fabd2f;
+@define-color base0B #b8bb26;
+@define-color base0C #8ec07c;
+@define-color base0D #83a598;
+@define-color base0E #d3869b;
+@define-color base0F #d65d0e;
+
+/* OSD element colors */
 @define-color background-color #1c1c1c;
-@define-color border-color #ebdbb2;
+@define-color border-color #504945;
 @define-color label #ebdbb2;
-@define-color image #ebdbb2;
-@define-color progress #ebdbb2;
+@define-color image #83a598;
+@define-color progress #83a598;
+@define-color progress-bg #3c3836;
+
+/* Status colors for volume/brightness */
+@define-color muted #fb4934;
+@define-color low #8ec07c;
+@define-color normal #83a598;
+@define-color high #fe8019;
