@@ -96,7 +96,7 @@ theme_name_to_canonical() {
     local theme_file="$dir/theme.yml"
     if [[ -f "$theme_file" ]]; then
       local meta_name
-      meta_name=$(yq '.meta.display_name // ""' "$theme_file" 2>/dev/null || echo "")
+      meta_name=$(yq -r '.meta.display_name // ""' "$theme_file" 2>/dev/null || echo "")
       if [[ "${meta_name,,}" == "${input,,}" ]]; then
         basename "$dir"
         return
