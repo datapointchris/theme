@@ -84,7 +84,7 @@ usage() {
   note <message>       Add note to current theme (message required)
   rank                 Show themes ranked by likes/usage
   log                  View complete history
-  info <theme>         Show theme details and app mappings
+  info [theme]         Browse themes and view detailed history
   reject <message>     Mark current theme as rejected (avoids rediscovery)
   rejected             List all rejected themes
   unreject             Restore a rejected theme (fzf picker with history)
@@ -126,7 +126,7 @@ Commands
   note <message>       Add note to current theme (message required)
   rank                 Show themes ranked by likes/usage
   log                  View complete history
-  info <theme>         Show theme details and app mappings
+  info [theme]         Browse themes and view detailed history
   reject <message>     Mark current theme as rejected (avoids rediscovery)
   rejected             List all rejected themes
   unreject             Restore a rejected theme (fzf picker with history)
@@ -441,38 +441,7 @@ show_current() {
     return
   fi
 
-  local display_info
-  display_info=$(get_theme_display_info "$current")
-
-  echo ""
-  echo "Current Theme: $display_info"
-  echo "            ID: $current"
-  echo ""
-
-  local stats
-  stats=$(get_theme_stats "$current" 2>/dev/null || echo "{}")
-
-  if [[ -n "$stats" ]] && [[ "$stats" != "{}" ]] && [[ "$stats" != "null" ]]; then
-    local score likes dislikes notes applies
-    score=$(echo "$stats" | jq -r '.score // 0')
-    likes=$(echo "$stats" | jq -r '.likes // 0')
-    dislikes=$(echo "$stats" | jq -r '.dislikes // 0')
-    notes=$(echo "$stats" | jq -r '.notes // 0')
-    applies=$(echo "$stats" | jq -r '.applies // 0')
-
-    printf "Score: %+d (%d likes, %d dislikes)\n" "$score" "$likes" "$dislikes"
-    printf "Notes: %d | Times applied: %d\n" "$notes" "$applies"
-  fi
-
-  local base16
-  base16=$(get_theme_mapping "$current" "base16" 2>/dev/null || echo "")
-  local ghostty
-  ghostty=$(get_theme_mapping "$current" "ghostty" 2>/dev/null || echo "")
-
-  echo ""
-  echo "App mappings:"
-  [[ -n "$base16" ]] && echo "  Base16: $base16"
-  [[ -n "$ghostty" ]] && echo "  Ghostty: $ghostty"
+  display_theme_details "$current" "full"
 }
 
 show_list() {
@@ -953,43 +922,98 @@ show_rankings() {
     return
   fi
 
+  # Colors
+  local c_reset='\033[0m'
+  local c_gold='\033[0;33m'
+  local c_green='\033[0;32m'
+  local c_red='\033[0;31m'
+  local c_white='\033[0;37m'
+
   echo ""
-  echo "Theme Rankings (by score and usage)"
-  echo ""
+  echo -e "${c_gold}Theme Rankings${c_reset}"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+  # Find max display name length and max usage time for alignment and color scaling
+  local max_len=0
+  local max_usage=0
+  local has_usage=false
+  while IFS= read -r line; do
+    local theme=$(echo "$line" | jq -r '.theme')
+    local display_info
+    display_info=$(get_theme_display_info "$theme")
+    local len=${#display_info}
+    [[ $len -gt $max_len ]] && max_len=$len
+    local usage=$(echo "$line" | jq -r '.usage_seconds // 0')
+    if [[ "$usage" -gt 0 ]]; then
+      has_usage=true
+      [[ $usage -gt $max_usage ]] && max_usage=$usage
+    fi
+  done <<< "$rankings"
+
+  # Cap max length at 40 to prevent overly wide output
+  [[ $max_len -gt 40 ]] && max_len=40
 
   local rank=0
   while IFS= read -r line; do
     rank=$((rank + 1))
-    local theme score likes dislikes last_used platforms usage_seconds
-    theme=$(echo "$line" | jq -r '.theme')
-    score=$(echo "$line" | jq -r '.score')
-    likes=$(echo "$line" | jq -r '.likes')
-    dislikes=$(echo "$line" | jq -r '.dislikes')
-    last_used=$(echo "$line" | jq -r '.last_used')
-    platforms=$(echo "$line" | jq -r '.platforms')
-    usage_seconds=$(echo "$line" | jq -r '.usage_seconds // 0')
+    local theme=$(echo "$line" | jq -r '.theme')
+    local score=$(echo "$line" | jq -r '.score')
+    local usage_seconds=$(echo "$line" | jq -r '.usage_seconds // 0')
 
+    # Get display info
     local display_info
     display_info=$(get_theme_display_info "$theme")
 
-    if [[ "$last_used" == "never" ]]; then
-      last_used="never used"
-    else
-      last_used=$(date -d "$last_used" "+%b %d, %Y" 2>/dev/null || echo "$last_used")
-    fi
-
-    local usage_time="not used"
+    # Format usage time
+    local usage_time="-"
     if [[ "$usage_seconds" -gt 0 ]]; then
       usage_time=$(format_duration "$usage_seconds")
     fi
 
-    printf "%2d. %s\n" "$rank" "$display_info"
-    printf "    Score: %+d (%d likes, %d dislikes)\n" "$score" "$likes" "$dislikes"
-    printf "    Usage time: %s\n" "$usage_time"
-    printf "    Last used: %s\n" "$last_used"
-    [[ -n "$platforms" ]] && printf "    Platforms: %s\n" "$platforms"
-    echo ""
-  done <<<"$rankings"
+    # Truncate long display names
+    if [[ ${#display_info} -gt 40 ]]; then
+      display_info="${display_info:0:37}..."
+    fi
+
+    # Score color
+    local score_color="$c_white"
+    if [[ $score -gt 0 ]]; then
+      score_color="$c_green"
+    elif [[ $score -lt 0 ]]; then
+      score_color="$c_red"
+    fi
+
+    # Usage bar (visual representation of relative usage)
+    local bar=""
+    local bar_width=10
+    if [[ "$usage_seconds" -gt 0 ]] && [[ "$has_usage" == "true" ]] && [[ $max_usage -gt 0 ]]; then
+      local filled=$((usage_seconds * bar_width / max_usage))
+      [[ $filled -lt 1 ]] && filled=1
+      local empty=$((bar_width - filled))
+
+      # Color gradient based on percentage
+      local percent=$((usage_seconds * 100 / max_usage))
+      local bar_color
+      if [[ $percent -ge 50 ]]; then
+        bar_color="$c_green"
+      else
+        bar_color="$c_red"
+      fi
+
+      local filled_part=$(printf '█%.0s' $(seq 1 $filled))
+      local empty_part=""
+      [[ $empty -gt 0 ]] && empty_part=$(printf '░%.0s' $(seq 1 $empty))
+      bar="${bar_color}${filled_part}${c_reset}${empty_part}"
+    elif [[ "$usage_seconds" -gt 0 ]]; then
+      bar="${c_green}$(printf '█%.0s' $(seq 1 $bar_width))${c_reset}"
+    else
+      bar="$(printf '░%.0s' $(seq 1 $bar_width))"
+    fi
+
+    printf "%2d. %-${max_len}s  ${score_color}%+3d${c_reset}    %b  %s\n" \
+      "$rank" "$display_info" "$score" "$bar" "$usage_time"
+  done <<< "$rankings"
+  echo ""
 }
 
 show_log() {
@@ -1029,14 +1053,59 @@ show_log() {
 }
 
 show_info() {
-  local theme_input="$1"
+  local theme_input="${1:-}"
 
+  # If no argument, show fzf picker
   if [[ -z "$theme_input" ]]; then
-    echo "Error: Theme name required"
-    echo "Usage: theme info <theme-name>"
-    exit 1
+    if ! command -v fzf &>/dev/null; then
+      echo "Error: fzf not found. Install with: brew install fzf"
+      echo "Or provide a theme name: theme info <theme-name>"
+      exit 1
+    fi
+
+    sync_before_read
+
+    local preview_script="/tmp/theme-info-preview-$$.sh"
+    cat > "$preview_script" <<PREVIEW_EOF
+#!/bin/bash
+source "$THEME_APP_DIR/lib/lib.sh"
+source "$THEME_APP_DIR/lib/storage.sh"
+# Extract theme ID from tab-separated input (display_name\ttheme_id)
+theme="\$(echo "\$1" | cut -f2)"
+display_theme_details "\$theme" "full"
+PREVIEW_EOF
+
+    chmod +x "$preview_script"
+
+    # Build list: display_name\ttheme_id
+    local theme_list
+    theme_list=$(list_themes | while IFS= read -r theme; do
+      local display_info
+      display_info=$(get_theme_display_info "$theme")
+      printf "%s\t%s\n" "$display_info" "$theme"
+    done)
+
+    local selected
+    selected=$(echo "$theme_list" | fzf \
+      --prompt="Select theme to view > " \
+      --height=100% \
+      --with-nth=1 \
+      --delimiter=$'\t' \
+      --preview="$preview_script {}" \
+      --preview-window=right:70%)
+
+    rm -f "$preview_script"
+
+    if [[ -n "$selected" ]]; then
+      # Extract theme ID from selection
+      local theme_id
+      theme_id=$(echo "$selected" | cut -f2)
+      display_theme_details "$theme_id" "full"
+    fi
+    return
   fi
 
+  # Direct theme lookup
   local canonical
   canonical=$(theme_name_to_canonical "$theme_input")
 
@@ -1051,48 +1120,7 @@ show_info() {
     exit 1
   fi
 
-  local display_info
-  display_info=$(get_theme_display_info "$canonical")
-
-  echo ""
-  echo "Theme: $display_info"
-  echo "    ID: $canonical"
-  echo ""
-
-  echo "App Mappings:"
-  local ghostty kitty neovim base16 windows
-  ghostty=$(echo "$theme_data" | yq -r '.ghostty // "not available"')
-  kitty=$(echo "$theme_data" | yq -r '.kitty // "not available"')
-  neovim=$(echo "$theme_data" | yq -r '.neovim // "not available"')
-  base16=$(echo "$theme_data" | yq -r '.base16 // "not available"')
-  windows=$(echo "$theme_data" | yq -r '.windows_terminal // "not available"')
-
-  echo "  Ghostty: $ghostty"
-  echo "  Kitty: $kitty"
-  echo "  Neovim: $neovim"
-  echo "  Base16: $base16"
-  echo "  Windows Terminal: $windows"
-
-  local tags
-  tags=$(echo "$theme_data" | yq -r '.tags | join(", ") // "none"')
-  echo ""
-  echo "Tags: $tags"
-
-  local stats
-  stats=$(get_theme_stats "$canonical" 2>/dev/null || echo "{}")
-
-  if [[ -n "$stats" ]] && [[ "$stats" != "{}" ]] && [[ "$stats" != "null" ]]; then
-    local score likes dislikes applies
-    score=$(echo "$stats" | jq -r '.score // 0')
-    likes=$(echo "$stats" | jq -r '.likes // 0')
-    dislikes=$(echo "$stats" | jq -r '.dislikes // 0')
-    applies=$(echo "$stats" | jq -r '.applies // 0')
-
-    echo ""
-    echo "Your Stats:"
-    printf "  Score: %+d (%d likes, %d dislikes)\n" "$score" "$likes" "$dislikes"
-    printf "  Times applied: %d\n" "$applies"
-  fi
+  display_theme_details "$canonical" "full"
 }
 
 verify_system() {
