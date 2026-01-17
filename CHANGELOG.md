@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.3.0](https://github.com/datapointchris/theme/compare/v3.2.0...v3.3.0) (2026-01-17)
+
+
+### Features
+
+* **regenerate:** add parallel regeneration script with timing stats ([2916baf](https://github.com/datapointchris/theme/commit/2916bafaf068229c2438761b4b2544464c0c9463))
+
+
+### Bug Fixes
+
+* **popping-and-locking:** correct syntax colors to match hedinne/popping-and-locking-vscode ([cb1b864](https://github.com/datapointchris/theme/commit/cb1b864c09c8908ed577ebd4645e70cbbf2ee937))
+* **smyck:** correct syntax colors to match hukl/Smyck-Color-Scheme ([ecfbc43](https://github.com/datapointchris/theme/commit/ecfbc4376b0229a6d2906a59133f08aa8e8bbc7a))
+
 ## [3.2.0](https://github.com/datapointchris/theme/compare/v3.1.0...v3.2.0) (2026-01-17)
 
 
