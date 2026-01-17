@@ -507,17 +507,22 @@ apply_theme() {
   local canonical
   canonical=$(theme_name_to_canonical "$theme_input")
 
-  # Check if theme is in library
+  # Check if theme exists in library
   local lib_path
   lib_path=$(get_library_path "$canonical")
+
+  if [[ -z "$lib_path" ]]; then
+    echo "Error: Theme not found: $theme_input"
+    echo ""
+    echo "Available themes:"
+    list_themes_with_status
+    exit 1
+  fi
 
   local display_info
   display_info=$(get_theme_display_info "$canonical")
 
   echo "Applying theme: $display_info"
-  if [[ -z "$lib_path" ]]; then
-    echo "  (not in library - limited app support)"
-  fi
   echo ""
 
   # Apply to all apps
