@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/datapointchris/theme/compare/v3.1.0...v3.2.0) (2026-01-17)
+
+
+### Features
+
+* **neovim:** add overrides.lua system and remove italic from comments ([53454fc](https://github.com/datapointchris/theme/commit/53454fc7848032e3f0f24654e84eac0985199048))
+
 ## [3.1.0](https://github.com/datapointchris/theme/compare/v3.0.1...v3.1.0) (2026-01-17)
 
 
