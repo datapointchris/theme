@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.1.0](https://github.com/datapointchris/theme/compare/v3.0.1...v3.1.0) (2026-01-17)
+
+
+### Features
+
+* **display:** unify theme display functions with font tool pattern ([ec4ca3c](https://github.com/datapointchris/theme/commit/ec4ca3cd2032798011ae83d0919e42b7e1fe726c))
+
+
+### Bug Fixes
+
+* **apply:** add missing -r flag to yq for display name matching ([a9ecc18](https://github.com/datapointchris/theme/commit/a9ecc18a6dc8cd89f005f415a7984645ce78b877))
+* **apply:** reject invalid themes instead of applying with warning ([490a1f3](https://github.com/datapointchris/theme/commit/490a1f3a3b3a510fc16d3810df8d585d7f591f2b))
+
 ## [3.0.1](https://github.com/datapointchris/theme/compare/v3.0.0...v3.0.1) (2026-01-15)
 
 
