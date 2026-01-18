@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.4.1](https://github.com/datapointchris/theme/compare/v3.4.0...v3.4.1) (2026-01-18)
+
+
+### Bug Fixes
+
+* **themes:** correct all syntax colors to match Neovim colorscheme plugins ([dd7e6e8](https://github.com/datapointchris/theme/commit/dd7e6e8d28269007771eefe7a20f41a2bcf72860))
+
 ## [3.4.0](https://github.com/datapointchris/theme/compare/v3.3.0...v3.4.0) (2026-01-18)
 
 
