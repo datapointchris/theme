@@ -42,6 +42,8 @@ declare -A GENERATOR_OUTPUT=(
   [icons]="icons.theme"
   [hyprland-picker]="hyprland-picker.css"
   [chromium]="chromium.theme"
+  [firefox-based]="userChrome.css"
+  [bat]="bat.tmTheme"
 )
 
 # Parse arguments

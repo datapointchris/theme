@@ -89,6 +89,7 @@ usage() {
   rejected             List all rejected themes
   unreject             Restore a rejected theme (fzf picker with history)
   verify               Check theme system is working
+  browsers             Show browser theme status and setup
   upgrade              Update theme to latest release
   generate-previews    Pre-generate all preview images
   clear-cache          Clear preview cache
@@ -131,6 +132,7 @@ Commands
   rejected             List all rejected themes
   unreject             Restore a rejected theme (fzf picker with history)
   verify               Check theme system is working
+  browsers             Show browser theme status and setup
   upgrade              Update theme to latest release
   generate-previews    Pre-generate all preview images
   clear-cache          Clear preview cache
@@ -427,6 +429,53 @@ EOF
   fi
 }
 
+browsers_usage() {
+  if command -v print_section &>/dev/null; then
+    print_section "Browser Theme Diagnostics" "yellow"
+
+    print_section "Description" "blue"
+    cat <<'EOF'
+  Show detected browsers and their theme configuration status.
+  Supports Firefox-based browsers: Zen, Librewolf, Firefox, Thunderbird.
+EOF
+
+    print_section "Setup Required" "blue"
+    cat <<'EOF'
+  For userChrome.css to work, enable in each browser's about:config:
+    toolkit.legacyUserProfileCustomizations.stylesheets = true
+  Then restart the browser.
+EOF
+
+    print_section "Theme Application" "blue"
+    cat <<'EOF'
+  Themes are applied automatically when running 'theme apply'.
+  Browser restart required for changes to take effect.
+EOF
+
+  else
+    cat <<'EOF'
+Browser Theme Diagnostics
+=========================
+
+Description
+-----------
+  Show detected browsers and their theme configuration status.
+  Supports Firefox-based browsers: Zen, Librewolf, Firefox, Thunderbird.
+
+Setup Required
+--------------
+  For userChrome.css to work, enable in each browser's about:config:
+    toolkit.legacyUserProfileCustomizations.stylesheets = true
+  Then restart the browser.
+
+Theme Application
+-----------------
+  Themes are applied automatically when running 'theme apply'.
+  Browser restart required for changes to take effect.
+EOF
+  fi
+}
+
 #==============================================================================
 # THEME OPERATIONS
 #==============================================================================
@@ -459,6 +508,99 @@ show_list() {
 
   echo ""
   echo "Apply with: theme apply <name>"
+}
+
+show_browsers() {
+  # Source browser profiles discovery
+  source "$THEME_APP_DIR/lib/browser-profiles.sh"
+
+  local current_theme
+  current_theme=$(get_current_theme 2>/dev/null || echo "")
+
+  echo ""
+  echo "Browser Theme Status"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+
+  echo "Detected Browsers:"
+  local found_any=false
+  local browsers=("zen" "librewolf" "firefox" "thunderbird")
+  local browser_names=("Zen Browser" "Librewolf" "Firefox" "Thunderbird")
+
+  for i in "${!browsers[@]}"; do
+    local browser="${browsers[$i]}"
+    local name="${browser_names[$i]}"
+    local profile
+
+    if profile=$(find_browser_profile "$browser" 2>/dev/null); then
+      found_any=true
+      printf "  %-14s %s\n" "$name" "$profile"
+    fi
+  done
+
+  if [[ "$found_any" == "false" ]]; then
+    echo "  No Firefox-based browsers detected"
+  fi
+
+  echo ""
+  echo "Theme Status:"
+
+  for i in "${!browsers[@]}"; do
+    local browser="${browsers[$i]}"
+    local name="${browser_names[$i]}"
+    local profile
+
+    if profile=$(find_browser_profile "$browser" 2>/dev/null); then
+      # Check if userChrome enabled in prefs.js
+      local enabled_status
+      if is_userchrome_enabled "$profile"; then
+        enabled_status="userChrome enabled"
+      else
+        enabled_status="userChrome DISABLED"
+      fi
+
+      # Check if userChrome.css exists and get theme name
+      local theme_status
+      if has_userchrome "$profile"; then
+        local installed_theme
+        if installed_theme=$(get_userchrome_theme "$profile" 2>/dev/null); then
+          theme_status="installed ($installed_theme)"
+        else
+          theme_status="installed (unknown theme)"
+        fi
+      else
+        theme_status="not configured"
+      fi
+
+      printf "  %-14s %s, %s\n" "$name" "$enabled_status" "$theme_status"
+    fi
+  done
+
+  echo ""
+  echo "Setup Required:"
+  echo "  Enable in about:config (for each browser):"
+  echo "    toolkit.legacyUserProfileCustomizations.stylesheets = true"
+  echo "  Then restart the browser."
+
+  # Show chromium status if chromium.theme exists
+  local chromium_theme_file="$HOME/.config/chromium/chromium.theme"
+  if [[ -f "$chromium_theme_file" ]]; then
+    echo ""
+    echo "Chromium Theme:"
+    local chromium_colors
+    chromium_colors=$(tr '\n' ' ' < "$chromium_theme_file" 2>/dev/null)
+    echo "  Colors: $chromium_colors"
+  fi
+
+  echo ""
+  if [[ -n "$current_theme" ]]; then
+    echo "Current theme: $current_theme"
+    echo ""
+    echo "Apply to browsers with: theme apply $current_theme"
+    echo "(Browser restart required for changes to take effect)"
+  else
+    echo "No theme currently applied. Run: theme apply <theme-name>"
+  fi
 }
 
 apply_theme() {
@@ -1478,6 +1620,13 @@ main() {
     ;;
   verify)
     verify_system
+    ;;
+  browsers)
+    if [[ "${2:-}" == "--help" ]] || [[ "${2:-}" == "-h" ]]; then
+      browsers_usage
+    else
+      show_browsers
+    fi
     ;;
   upgrade | update)
     local before_version latest_tag

@@ -7,7 +7,11 @@ set -euo pipefail
 THEME_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 THEME_APP_DIR="$(cd "$THEME_LIB_DIR/.." && pwd)"
 
-# Dev mode: use THEME_ENV=development (set via direnv in ~/tools/theme/.envrc)
+# State directories:
+# - THEME_LIVE_DIR: Always production - for files that apps watch (current theme, background)
+# - THEME_STATE_DIR: Respects dev mode - for history files that shouldn't be polluted during dev
+THEME_LIVE_DIR="$HOME/.local/state/theme"
+
 if [[ "${THEME_ENV:-}" == "development" ]]; then
   THEME_STATE_DIR="$THEME_APP_DIR/.dev-data"
 else
@@ -16,7 +20,9 @@ fi
 
 # Configuration - themes/ is the single source of truth
 THEMES_DIR="$THEME_APP_DIR/themes"
-CURRENT_THEME_FILE="$THEME_STATE_DIR/current"
+
+# Live files - always in production so apps respond to changes
+CURRENT_THEME_FILE="$THEME_LIVE_DIR/current"
 
 #==============================================================================
 # THEME ACCESS - scans themes/ directory
@@ -354,6 +360,73 @@ apply_yazi() {
   return 0
 }
 
+# Apply Firefox-based browser theme (all platforms)
+# Copies userChrome.css to detected browser profiles
+apply_firefox_based() {
+  local theme="$1"
+  local lib_path
+  lib_path=$(get_library_path "$theme")
+
+  if [[ -z "$lib_path" ]] || [[ ! -f "$lib_path/userChrome.css" ]]; then
+    return 1
+  fi
+
+  # Source browser profiles discovery
+  local browser_profiles_lib="$THEME_LIB_DIR/browser-profiles.sh"
+  if [[ ! -f "$browser_profiles_lib" ]]; then
+    return 1
+  fi
+  source "$browser_profiles_lib"
+
+  local applied=0
+  local browsers=("zen" "librewolf" "firefox" "thunderbird")
+
+  for browser in "${browsers[@]}"; do
+    local profile
+    if profile=$(find_browser_profile "$browser" 2>/dev/null); then
+      local chrome_dir="$profile/chrome"
+      mkdir -p "$chrome_dir"
+      cp "$lib_path/userChrome.css" "$chrome_dir/userChrome.css"
+      applied=$((applied + 1))
+    fi
+  done
+
+  if [[ $applied -eq 0 ]]; then
+    return 1
+  fi
+
+  return 0
+}
+
+# Apply bat syntax highlighter theme (all platforms)
+# Copies .tmTheme to bat themes dir and rebuilds cache
+apply_bat() {
+  local theme="$1"
+  local lib_path
+  lib_path=$(get_library_path "$theme")
+
+  if [[ -z "$lib_path" ]] || [[ ! -f "$lib_path/bat.tmTheme" ]]; then
+    return 1
+  fi
+
+  # Check if bat is installed
+  if ! command -v bat &>/dev/null; then
+    return 1
+  fi
+
+  local bat_themes_dir="$HOME/.config/bat/themes"
+  mkdir -p "$bat_themes_dir"
+
+  # Copy theme as "current.tmTheme" (mirrors ghostty/kitty pattern)
+  # Bat config should have: --theme=current
+  cp "$lib_path/bat.tmTheme" "$bat_themes_dir/current.tmTheme"
+
+  # Rebuild bat cache to register the updated theme
+  bat cache --build >/dev/null 2>&1 || true
+
+  return 0
+}
+
 #==============================================================================
 # OPACITY MANAGEMENT
 #==============================================================================
@@ -525,8 +598,8 @@ BACKGROUND_CACHE_DIR="${BACKGROUND_CACHE_DIR:-$HOME/.cache/theme/backgrounds}"
 # Background sources config file (path references, not copies)
 BACKGROUND_SOURCES_FILE="${BACKGROUND_SOURCES_FILE:-$HOME/.config/theme/background-sources.conf}"
 
-# Current background tracking
-BACKGROUND_CURRENT_FILE="$THEME_STATE_DIR/background-current"
+# Current background tracking - always in production so background actually changes
+BACKGROUND_CURRENT_FILE="$THEME_LIVE_DIR/background-current"
 
 # Mode setting (which background types to include in rotation)
 BACKGROUND_MODE_FILE="${BACKGROUND_MODE_FILE:-$HOME/.config/theme/background-mode}"
@@ -1640,6 +1713,24 @@ apply_theme_to_apps() {
   else
     skipped+=("yazi")
     _print_app_status "yazi" "false"
+  fi
+
+  # Firefox-based browsers (all platforms)
+  if apply_firefox_based "$theme" 2>/dev/null; then
+    applied+=("browsers")
+    _print_app_status "browsers" "true"
+  else
+    skipped+=("browsers")
+    _print_app_status "browsers" "false"
+  fi
+
+  # bat syntax highlighter (all platforms)
+  if apply_bat "$theme" 2>/dev/null; then
+    applied+=("bat")
+    _print_app_status "bat" "true"
+  else
+    skipped+=("bat")
+    _print_app_status "bat" "false"
   fi
 
   # Hyprland (Arch only)
