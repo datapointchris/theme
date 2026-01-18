@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.4.0](https://github.com/datapointchris/theme/compare/v3.3.0...v3.4.0) (2026-01-18)
+
+
+### Features
+
+* **browsers,bat:** add Firefox-based browser and bat syntax theming ([8fbb1ef](https://github.com/datapointchris/theme/commit/8fbb1eff1d2b6c7e5fc6296b0615d6f3d5f3f24d))
+
 ## [3.3.0](https://github.com/datapointchris/theme/compare/v3.2.0...v3.3.0) (2026-01-17)
 
 
