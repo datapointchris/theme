@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.4.2](https://github.com/datapointchris/theme/compare/v3.4.1...v3.4.2) (2026-01-18)
+
+
+### Bug Fixes
+
+* **bat:** align variable and tag colors with Neovim colorschemes ([11533c9](https://github.com/datapointchris/theme/commit/11533c9be64e2ff837cf61f244796b1f86724971))
+
 ## [3.4.1](https://github.com/datapointchris/theme/compare/v3.4.0...v3.4.1) (2026-01-18)
 
 
