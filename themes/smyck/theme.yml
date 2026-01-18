@@ -67,6 +67,9 @@ extended:
   syntax_parameter: '#96D9F1'    # matches Identifier/Constant
   syntax_preproc: '#D1FA71'      # was #ba8acc - PreProc uses bright green in VimScript
   syntax_special: '#d7d7d7'      # was #207383 - Special uses light gray in VimScript
+  syntax_punctuation: '#8F8F8F'  # comment gray - muted
+  syntax_tag: '#207383'          # teal
+  syntax_attribute: '#d6837c'    # salmon/pink
   ui_accent: '#207383'
   ui_border: '#7a7a7a'
   ui_selection: '#207483'

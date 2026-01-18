@@ -1,6 +1,6 @@
 # Smyck - btop theme
 # Generated from theme.yml
-# Author: Ghostty
+# Author: hukl
 
 # Main background, empty for terminal default
 theme[main_bg]="#1B1B1B"
@@ -34,12 +34,12 @@ theme[proc_box]="#7A7A7A"
 theme[div_line]="#7A7A7A"
 
 # Temperature graph colors (gradient: info -> warning -> error for heat)
-theme[temp_start]="#207383"
+theme[temp_start]="#96D9F1"
 theme[temp_mid]="#D6837C"
 theme[temp_end]="#B84131"
 
 # CPU graph colors (gradient: info -> accent -> bright)
-theme[cpu_start]="#207383"
+theme[cpu_start]="#96D9F1"
 theme[cpu_mid]="#207383"
 theme[cpu_end]="#F7F7F7"
 
@@ -54,7 +54,7 @@ theme[cached_mid]="#D6837C"
 theme[cached_end]="#F7F7F7"
 
 # Memory available meter (blue = info/available)
-theme[available_start]="#207383"
+theme[available_start]="#96D9F1"
 theme[available_mid]="#207383"
 theme[available_end]="#F7F7F7"
 

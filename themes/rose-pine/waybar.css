@@ -45,7 +45,7 @@
 @define-color fg-bright #e0def4;
 
 /* Status colors - use extended diagnostic colors when available */
-@define-color success #31748f;
+@define-color success #95b1ac;
 @define-color warning #f6c177;
 @define-color error #eb6f92;
 @define-color info #9ccfd8;

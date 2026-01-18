@@ -117,16 +117,18 @@ extended:
   syntax_comment: "#928374"     # gray (Neovim style)
   syntax_string: "#b8bb26"      # bright_green
   syntax_number: "#d3869b"      # bright_purple (Neovim uses purple for numbers)
-  syntax_constant: "#d3869b"    # bright_purple
+  syntax_constant: "#fe8019"    # bright_purple
   syntax_variable: "#ebdbb2"    # light1
   syntax_parameter: "#83a598"   # bright_blue
   syntax_function: "#b8bb26"    # bright_green (Neovim style)
   syntax_keyword: "#fb4934"     # bright_red (Neovim uses red for keywords)
   syntax_type: "#fabd2f"        # bright_yellow
   syntax_operator: "#fe8019"    # bright_orange
-  syntax_punctuation: "#ebdbb2" # light1
-  syntax_tag: "#fb4934"         # bright_red
-  syntax_attribute: "#fabd2f"   # bright_yellow
+  syntax_punctuation: "#fe8019" # light1
+  syntax_tag: "#fe8019"         # bright_red
+  syntax_attribute: "#83a598"   # bright_yellow
+  syntax_preproc: "#8ec07c"
+  syntax_special: "#fe8019"
 
   # Diagnostic colors
   diagnostic_error: "#fb4934"   # bright_red

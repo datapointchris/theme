@@ -56,9 +56,9 @@ extended_source: plugin
 extended:
   # Diagnostic colors (from oceanic-next CocDiagnostics/DiagnosticSign)
   diagnostic_error: "#ec5f67"
-  diagnostic_warning: "#fac863"
+  diagnostic_warning: "#fce094"
   diagnostic_info: "#6699cc"
-  diagnostic_hint: "#62b3b2"
+  diagnostic_hint: "#a6dbff"
   diagnostic_ok: "#99c794"
 
   # Syntax colors (from oceanic-next highlight groups)
@@ -66,14 +66,17 @@ extended:
   syntax_string: "#99c794"
   syntax_function: "#6699cc"
   syntax_keyword: "#c594c5"
-  syntax_type: "#c594c5"
+  syntax_type: "#fac863"
   syntax_number: "#f99157"
-  syntax_constant: "#f99157"
+  syntax_constant: "#62b3b2"
   syntax_operator: "#f99157"
-  syntax_variable: "#62b3b2"
-  syntax_parameter: "#62b3b2"
+  syntax_variable: "#cdd3de"
+  syntax_parameter: "#cdd3de"
   syntax_preproc: "#fac863"
-  syntax_special: "#62b3b2"
+  syntax_special: "#ab7967"
+  syntax_punctuation: "#62b3b2"
+  syntax_tag: "#d8dee9"
+  syntax_attribute: "#d8dee9"
 
   # UI colors
   ui_accent: "#6699cc"

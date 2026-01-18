@@ -55,19 +55,22 @@ extended:
   diagnostic_ok: '#a7c080'       # green
   diagnostic_warning: '#dbbc7f'  # yellow
   diagnostic_info: '#7fbbb3'     # blue
-  diagnostic_hint: '#a7c080'     # green
+  diagnostic_hint: "#d699b6"     # green
 
   # Syntax - from everforest highlights.lua
   syntax_comment: '#859289'      # grey1 - NOT white!
-  syntax_string: '#a7c080'       # green
+  syntax_string: "#83c092"       # green
   syntax_function: '#a7c080'     # green - NOT red!
   syntax_keyword: '#e67e80'      # red - NOT purple!
   syntax_type: '#dbbc7f'         # yellow - NOT aqua!
   syntax_number: '#d699b6'       # purple
-  syntax_constant: '#83c092'     # aqua - NOT yellow!
+  syntax_constant: "#d699b6"     # aqua - NOT yellow!
   syntax_operator: '#e69875'     # orange - NOT white!
   syntax_variable: '#d3c6aa'     # fg
-  syntax_parameter: '#7fbbb3'    # blue
+  syntax_parameter: "#d3c6aa"    # blue
+  syntax_punctuation: "#859289"
+  syntax_tag: "#e69875"
+  syntax_attribute: "#a7c080"
   syntax_preproc: '#d699b6'      # purple
   syntax_special: '#dbbc7f'      # yellow - NOT aqua!
 

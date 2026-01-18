@@ -1,6 +1,6 @@
 # Popping and Locking - btop theme
 # Generated from theme.yml
-# Author: Ghostty
+# Author: Hedinn Eiriksson
 
 # Main background, empty for terminal default
 theme[main_bg]="#181921"
@@ -44,7 +44,7 @@ theme[cpu_mid]="#689D6A"
 theme[cpu_end]="#EBDBB2"
 
 # Memory free meter (green = good/available)
-theme[free_start]="#98971A"
+theme[free_start]="#B8BB26"
 theme[free_mid]="#689D6A"
 theme[free_end]="#EBDBB2"
 
@@ -64,7 +64,7 @@ theme[used_mid]="#CC241D"
 theme[used_end]="#D79921"
 
 # Download graph colors (green = incoming/good)
-theme[download_start]="#98971A"
+theme[download_start]="#B8BB26"
 theme[download_mid]="#689D6A"
 theme[download_end]="#EBDBB2"
 

@@ -73,12 +73,15 @@ extended:
   syntax_keyword: "#879a39"
   syntax_type: "#3aa99f"
   syntax_number: "#8b7ec8"
-  syntax_constant: "#d0a215"
+  syntax_constant: "#da702c"
   syntax_operator: "#b5967e"
   syntax_variable: "#f0e8dd"
   syntax_parameter: "#8b7ec8"
   syntax_preproc: "#8b7ec8"
   syntax_special: "#3aa99f"
+  syntax_punctuation: "#b5967e"
+  syntax_tag: "#3aa99f"
+  syntax_attribute: "#8b7ec8"
 
   # UI colors
   ui_accent: "#3aa99f"

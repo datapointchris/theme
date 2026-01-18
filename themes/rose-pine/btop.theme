@@ -44,7 +44,7 @@ theme[cpu_mid]="#9CCFD8"
 theme[cpu_end]="#E0DEF4"
 
 # Memory free meter (green = good/available)
-theme[free_start]="#31748F"
+theme[free_start]="#95B1AC"
 theme[free_mid]="#9CCFD8"
 theme[free_end]="#E0DEF4"
 
@@ -64,7 +64,7 @@ theme[used_mid]="#EB6F92"
 theme[used_end]="#EBBCBA"
 
 # Download graph colors (green = incoming/good)
-theme[download_start]="#31748F"
+theme[download_start]="#95B1AC"
 theme[download_mid]="#9CCFD8"
 theme[download_end]="#E0DEF4"
 

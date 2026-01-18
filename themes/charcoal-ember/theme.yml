@@ -84,14 +84,16 @@ extended:
   syntax_number: "#f79802"
   syntax_constant: "#f79802"
   syntax_variable: "#c5c8c6"
-  syntax_parameter: "#b294bb"
+  syntax_parameter: "#5fb3b3"
   syntax_function: "#4eb6fe"
   syntax_keyword: "#b294bb"
   syntax_type: "#ffc400"
-  syntax_operator: "#c5c8c6"
+  syntax_operator: "#f79802"
   syntax_punctuation: "#969896"
   syntax_tag: "#c90d00"
   syntax_attribute: "#ffc400"
+  syntax_preproc: "#b294bb"
+  syntax_special: "#f79802"
 
   # Diagnostic colors
   diagnostic_error: "#c90d00"

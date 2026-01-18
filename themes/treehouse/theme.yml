@@ -67,6 +67,9 @@ extended:
   syntax_parameter: '#58859a'
   syntax_preproc: '#97363d'
   syntax_special: '#b25a1e'
+  syntax_punctuation: '#504332'  # dark brown - muted
+  syntax_tag: '#97363d'          # maroon
+  syntax_attribute: '#aa820c'    # yellow/gold
   ui_accent: '#58859a'
   ui_border: '#786b53'
   ui_selection: '#786b53'

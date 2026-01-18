@@ -35,8 +35,8 @@ theme[div_line]="#444C56"
 
 # Temperature graph colors (gradient: info -> warning -> error for heat)
 theme[temp_start]="#539BF5"
-theme[temp_mid]="#AE7C14"
-theme[temp_end]="#C93C37"
+theme[temp_mid]="#C69026"
+theme[temp_end]="#E5534B"
 
 # CPU graph colors (gradient: info -> accent -> bright)
 theme[cpu_start]="#539BF5"
@@ -50,7 +50,7 @@ theme[free_end]="#CDD9E5"
 
 # Memory cached meter (yellow/orange = cached/warning)
 theme[cached_start]="#C69026"
-theme[cached_mid]="#AE7C14"
+theme[cached_mid]="#C69026"
 theme[cached_end]="#CDD9E5"
 
 # Memory available meter (blue = info/available)
@@ -59,8 +59,8 @@ theme[available_mid]="#96D0FF"
 theme[available_end]="#CDD9E5"
 
 # Memory used meter (gradient: warning -> error as usage increases)
-theme[used_start]="#AE7C14"
-theme[used_mid]="#C93C37"
+theme[used_start]="#C69026"
+theme[used_mid]="#E5534B"
 theme[used_end]="#C69026"
 
 # Download graph colors (green = incoming/good)
@@ -76,7 +76,7 @@ theme[upload_end]="#CDD9E5"
 # Process tree colors
 theme[process_start]="#539BF5"
 theme[process_mid]="#E5534B"
-theme[process_end]="#C93C37"
+theme[process_end]="#E5534B"
 
 # Meter background
 theme[meter_bg]="#636E7B"

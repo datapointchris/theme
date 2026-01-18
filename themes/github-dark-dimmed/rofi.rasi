@@ -32,7 +32,7 @@
     border: #444c56;
 
     /* Status colors - use extended diagnostic colors when available */
-    urgent: #c93c37;
+    urgent: #e5534b;
     active: #46954a;
     selected: #539bf5;
 

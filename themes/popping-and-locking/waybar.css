@@ -1,6 +1,6 @@
 /* Popping and Locking - waybar theme */
 /* Generated from theme.yml */
-/* Author: Ghostty */
+/* Author: Hedinn Eiriksson */
 
 /* =============================================================================
    BASE16 PALETTE
@@ -45,7 +45,7 @@
 @define-color fg-bright #ebdbb2;
 
 /* Status colors - use extended diagnostic colors when available */
-@define-color success #98971a;
+@define-color success #b8bb26;
 @define-color warning #f42c3e;
 @define-color error #cc241d;
 @define-color info #689d6a;

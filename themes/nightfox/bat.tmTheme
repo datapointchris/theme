@@ -116,7 +116,7 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#f5af78</string>
+				<string>#f6b079</string>
 			</dict>
 		</dict>
 
@@ -155,7 +155,7 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#63cdcf</string>
+				<string>#7ad5d6</string>
 			</dict>
 		</dict>
 
@@ -259,7 +259,7 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#86aadc</string>
+				<string>#86abdc</string>
 			</dict>
 		</dict>
 
@@ -272,7 +272,7 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#86aadc</string>
+				<string>#86abdc</string>
 			</dict>
 		</dict>
 
@@ -285,7 +285,7 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#86aadc</string>
+				<string>#86abdc</string>
 			</dict>
 		</dict>
 
@@ -324,7 +324,7 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#c94f6d</string>
+				<string>#9d79d6</string>
 			</dict>
 		</dict>
 
@@ -337,7 +337,7 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#dbc074</string>
+				<string>#86abdc</string>
 			</dict>
 		</dict>
 
@@ -350,7 +350,7 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#71839b</string>
+				<string>#aeafb0</string>
 			</dict>
 		</dict>
 
@@ -363,7 +363,7 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#71839b</string>
+				<string>#aeafb0</string>
 			</dict>
 		</dict>
 
@@ -389,7 +389,7 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#f5af78</string>
+				<string>#f6b079</string>
 			</dict>
 		</dict>
 
@@ -551,7 +551,7 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#c94f6d</string>
+				<string>#9d79d6</string>
 			</dict>
 		</dict>
 
@@ -709,12 +709,12 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#86aadc</string>
+				<string>#86abdc</string>
 			</dict>
 		</dict>
 
 	</array>
 	<key>uuid</key>
-	<string>146A871D-4C39-48A2-850E-AC7BE3B7A2B6</string>
+	<string>EDBE9B71-40C7-4C9A-BE22-1823177DBCF7</string>
 </dict>
 </plist>

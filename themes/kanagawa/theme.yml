@@ -121,20 +121,25 @@ extended:
   syntax_comment: "#727169"
   syntax_string: "#98bb6c"
   syntax_number: "#d27e99"
-  syntax_constant: "#ffa066"
+  syntax_constant: "#7fb4ca"
   syntax_variable: "#dcd7ba"
-  syntax_parameter: "#e6c384"
+  syntax_parameter: "#b8b4d0"
   syntax_function: "#7e9cd8"
   syntax_keyword: "#957fb8"
   syntax_type: "#7aa89f"
   syntax_operator: "#c0a36e"
+  syntax_punctuation: "#9cabca"
+  syntax_tag: "#7fb4ca"
+  syntax_attribute: "#e6c384"
+  syntax_preproc: "#e46876"
+  syntax_special: "#7fb4ca"
 
   # Diagnostic colors
   diagnostic_error: "#e82424"
   diagnostic_warning: "#ff9e3b"
   diagnostic_info: "#658594"
   diagnostic_hint: "#6a9589"
-  diagnostic_ok: "#76946a"
+  diagnostic_ok: "#98bb6c"
 
   # Git/diff colors
   git_add: "#76946a"

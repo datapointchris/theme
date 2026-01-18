@@ -92,11 +92,15 @@ extended:
   syntax_constant: "#ff9664"
   syntax_operator: "#cbd9d8"
   syntax_variable: "#ebebeb"
-  syntax_parameter: "#a1cdd8"
+  syntax_parameter: "#afd4de"
   syntax_field: "#5a93aa"
   syntax_conditional: "#b97490"
   syntax_preproc: "#d38d97"
   syntax_regex: "#fdb292"
+  syntax_punctuation: "#cbd9d8"
+  syntax_tag: "#ad5c7c"
+  syntax_attribute: "#73a3b7"
+  syntax_special: "#73a3b7"
 
   # UI colors
   ui_accent: "#5a93aa"

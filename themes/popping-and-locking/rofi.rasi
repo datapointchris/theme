@@ -1,6 +1,6 @@
 /* Popping and Locking - Rofi colors */
 /* Generated from theme.yml */
-/* Author: Ghostty */
+/* Author: Hedinn Eiriksson */
 
 * {
     /* Base16 palette */
@@ -33,7 +33,7 @@
 
     /* Status colors - use extended diagnostic colors when available */
     urgent: #cc241d;
-    active: #98971a;
+    active: #b8bb26;
     selected: #458588;
 
     /* Named accent colors */

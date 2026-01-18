@@ -33,7 +33,7 @@
 
     /* Status colors - use extended diagnostic colors when available */
     urgent: #eb6f92;
-    active: #31748f;
+    active: #95b1ac;
     selected: #c4a7e7;
 
     /* Named accent colors */

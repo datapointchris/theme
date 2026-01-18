@@ -1,6 +1,6 @@
 /* Smyck - waybar theme */
 /* Generated from theme.yml */
-/* Author: Ghostty */
+/* Author: hukl */
 
 /* =============================================================================
    BASE16 PALETTE
@@ -48,7 +48,7 @@
 @define-color success #7da900;
 @define-color warning #d6837c;
 @define-color error #b84131;
-@define-color info #207383;
+@define-color info #96D9F1;
 
 /* Named accent colors */
 @define-color red #b84131;

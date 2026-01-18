@@ -60,8 +60,8 @@ special:
 extended_source: plugin
 extended:
   # Diagnostic colors (from github-nvim-theme)
-  diagnostic_error: "#c93c37"
-  diagnostic_warning: "#ae7c14"
+  diagnostic_error: "#e5534b"
+  diagnostic_warning: "#c69026"
   diagnostic_info: "#539bf5"
   diagnostic_hint: "#768390"
   diagnostic_ok: "#46954a"
@@ -78,7 +78,10 @@ extended:
   syntax_variable: "#adbac7"
   syntax_parameter: "#adbac7"
   syntax_preproc: "#f47067"
-  syntax_special: "#8ddb8c"
+  syntax_special: "#adbac7"
+  syntax_punctuation: "#adbac7"
+  syntax_tag: "#8ddb8c"
+  syntax_attribute: "#6cb6ff"
 
   # UI colors
   ui_accent: "#539bf5"

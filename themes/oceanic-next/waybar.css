@@ -46,7 +46,7 @@
 
 /* Status colors - use extended diagnostic colors when available */
 @define-color success #99c794;
-@define-color warning #fac863;
+@define-color warning #fce094;
 @define-color error #ec5f67;
 @define-color info #6699cc;
 

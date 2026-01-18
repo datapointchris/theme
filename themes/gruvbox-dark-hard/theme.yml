@@ -122,6 +122,8 @@ extended:
   syntax_punctuation: "#a89984" # fg4
   syntax_tag: "#fb4934"         # bright_red
   syntax_attribute: "#fabd2f"   # bright_yellow
+  syntax_preproc: "#8ec07c"     # bright_aqua
+  syntax_special: "#fe8019"     # orange
 
   # Diagnostic colors
   diagnostic_error: "#fb4934"   # bright_red

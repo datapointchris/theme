@@ -1,7 +1,7 @@
 #!/bin/bash
 # Popping and Locking - JankyBorders theme
 # Generated from theme.yml
-# Author: Ghostty
+# Author: Hedinn Eiriksson
 
 options=(
   style=round

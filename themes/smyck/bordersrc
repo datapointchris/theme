@@ -1,7 +1,7 @@
 #!/bin/bash
 # Smyck - JankyBorders theme
 # Generated from theme.yml
-# Author: Ghostty
+# Author: hukl
 
 options=(
   style=round

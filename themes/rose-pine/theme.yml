@@ -85,23 +85,28 @@ extended:
   highlight_high: "#524f67"
 
   # Semantic colors (rose-pine specific mappings)
-  syntax_comment: "#6e6a86"     # muted
+  syntax_comment: "#908caa"     # muted
   syntax_string: "#f6c177"      # gold (rose-pine uses gold for strings)
-  syntax_number: "#ebbcba"      # rose
+  syntax_number: "#f6c177"      # rose
   syntax_constant: "#f6c177"    # gold
   syntax_variable: "#e0def4"    # text
   syntax_parameter: "#c4a7e7"   # iris
-  syntax_function: "#c4a7e7"    # iris
-  syntax_keyword: "#eb6f92"     # love
+  syntax_function: "#ebbcba"    # iris
+  syntax_keyword: "#31748f"     # love
   syntax_type: "#9ccfd8"        # foam
   syntax_operator: "#908caa"    # subtle
+  syntax_punctuation: "#908caa"
+  syntax_tag: "#9ccfd8"
+  syntax_attribute: "#c4a7e7"
+  syntax_preproc: "#c4a7e7"
+  syntax_special: "#f6c177"
 
   # Diagnostic colors
   diagnostic_error: "#eb6f92"   # love
   diagnostic_warning: "#f6c177" # gold
   diagnostic_info: "#9ccfd8"    # foam
   diagnostic_hint: "#c4a7e7"    # iris
-  diagnostic_ok: "#31748f"      # pine
+  diagnostic_ok: "#95b1ac"      # pine
 
   # Git/diff colors
   git_add: "#31748f"     # pine

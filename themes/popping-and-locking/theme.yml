@@ -67,6 +67,9 @@ extended:
   syntax_parameter: '#99c6ca'    # matches variable
   syntax_preproc: '#f42c3e'      # storage/types use red in VS Code theme
   syntax_special: '#689d6a'
+  syntax_punctuation: '#506899'  # blue-gray, matches comment
+  syntax_tag: '#f42c3e'          # red, matches keyword
+  syntax_attribute: '#99c6ca'    # cyan, matches variable
   ui_accent: '#458588'
   ui_border: '#ebdbb2'
   ui_selection: '#ebdbb2'

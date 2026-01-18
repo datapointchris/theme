@@ -98,6 +98,8 @@ extended:
   syntax_punctuation: "#908caa"
   syntax_tag: "#eb6f92"
   syntax_attribute: "#ebbcba"
+  syntax_preproc: "#9ccfd8"
+  syntax_special: "#f6c177"
 
   # Diagnostic colors
   diagnostic_error: "#eb6f92"
