@@ -142,7 +142,7 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#ebebeb</string>
+				<string>#e6eaea</string>
 			</dict>
 		</dict>
 
@@ -324,7 +324,7 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#ad5c7c</string>
+				<string>#a1cdd8</string>
 			</dict>
 		</dict>
 
@@ -551,7 +551,7 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#ad5c7c</string>
+				<string>#a1cdd8</string>
 			</dict>
 		</dict>
 
@@ -696,7 +696,7 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#ebebeb</string>
+				<string>#e6eaea</string>
 			</dict>
 		</dict>
 
@@ -715,6 +715,6 @@
 
 	</array>
 	<key>uuid</key>
-	<string>4DE5A186-6EE6-4C08-8817-92D5653F35CF</string>
+	<string>8D6C54A0-7FD9-4B53-BADA-23CA4C46EB1F</string>
 </dict>
 </plist>
