@@ -1070,9 +1070,8 @@ set_desktop_wallpaper_hyprland() {
     return 1
   fi
 
-  # Unload old wallpapers to free memory, then preload and set new one
-  hyprctl hyprpaper unload all 2>/dev/null || true
-  hyprctl hyprpaper preload "$background_file" 2>/dev/null || return 1
+  # Set wallpaper via IPC (hyprpaper 0.8+ only supports 'wallpaper' request)
+  # Format: [monitor],[path],[fit_mode] - empty monitor = all monitors
   hyprctl hyprpaper wallpaper ",$background_file" 2>/dev/null || return 1
 
   # Also update stable path for hyprpaper config fallback on restart
