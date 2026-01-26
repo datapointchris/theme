@@ -438,6 +438,8 @@ KITTY_OPACITY_DIR="$HOME/.config/kitty/opacity"
 KITTY_OPACITY_FILE="$KITTY_OPACITY_DIR/current.conf"
 WINDOWS_TERMINAL_OPACITY_FILE="$HOME/.config/windows-terminal/opacity.json"
 TMUX_OPACITY_FILE="$HOME/.config/tmux/opacity.conf"
+WAYBAR_OPACITY_DIR="$HOME/.config/waybar/opacity"
+WAYBAR_OPACITY_FILE="$WAYBAR_OPACITY_DIR/current.css"
 
 # Get current opacity from ghostty opacity config
 get_ghostty_opacity() {
@@ -519,6 +521,31 @@ EOF
   fi
 }
 
+# Get current opacity from waybar opacity config
+get_waybar_opacity() {
+  if [[ -f "$WAYBAR_OPACITY_FILE" ]]; then
+    grep -E "^/\* opacity:" "$WAYBAR_OPACITY_FILE" 2>/dev/null | sed 's|.* opacity: \([0-9.]*\).*|\1|' || echo "1.0"
+  else
+    echo "1.0"
+  fi
+}
+
+# Set waybar opacity
+set_waybar_opacity() {
+  local opacity="$1"
+  mkdir -p "$WAYBAR_OPACITY_DIR"
+  cat > "$WAYBAR_OPACITY_FILE" << EOF
+/* Waybar opacity - managed by theme tool */
+/* opacity: $opacity */
+@define-color waybar-bg alpha(@bg, $opacity);
+EOF
+
+  # Reload waybar if running
+  if pgrep -x waybar &>/dev/null; then
+    killall -SIGUSR2 waybar 2>/dev/null || true
+  fi
+}
+
 # Get current opacity (from first available terminal)
 get_current_opacity() {
   local opacity
@@ -553,13 +580,14 @@ change_opacity() {
     new_opacity="1.00"
   fi
 
-  # Apply to all terminals
+  # Apply to all terminals and waybar
   local applied=()
 
   set_ghostty_opacity "$new_opacity" && applied+=("ghostty")
   set_kitty_opacity "$new_opacity" && applied+=("kitty")
   set_windows_terminal_opacity "$new_opacity" && applied+=("windows-terminal")
   set_tmux_opacity "$new_opacity" && applied+=("tmux")
+  set_waybar_opacity "$new_opacity" && applied+=("waybar")
 
   echo "$current → $new_opacity (${applied[*]})"
 }
@@ -581,13 +609,14 @@ set_opacity() {
   local new_opacity
   new_opacity=$(awk "BEGIN {printf \"%.2f\", $value / 100}")
 
-  # Apply to all terminals
+  # Apply to all terminals and waybar
   local applied=()
 
   set_ghostty_opacity "$new_opacity" && applied+=("ghostty")
   set_kitty_opacity "$new_opacity" && applied+=("kitty")
   set_windows_terminal_opacity "$new_opacity" && applied+=("windows-terminal")
   set_tmux_opacity "$new_opacity" && applied+=("tmux")
+  set_waybar_opacity "$new_opacity" && applied+=("waybar")
 
   echo "$current → $new_opacity (${applied[*]})"
 }
