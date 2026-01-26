@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.4.3](https://github.com/datapointchris/theme/compare/v3.4.2...v3.4.3) (2026-01-26)
+
+
+### Bug Fixes
+
+* **hyprland:** update hyprpaper IPC for 0.8+ compatibility ([c1c8375](https://github.com/datapointchris/theme/commit/c1c83752d16fc5ea3a2aa7c8440088436c3c6909))
+
 ## [3.4.2](https://github.com/datapointchris/theme/compare/v3.4.1...v3.4.2) (2026-01-18)
 
 
