@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.5.0](https://github.com/datapointchris/theme/compare/v3.4.3...v3.5.0) (2026-01-26)
+
+
+### Features
+
+* **opacity:** add waybar opacity control ([ae5f1cc](https://github.com/datapointchris/theme/commit/ae5f1cc1dc591f5fe2d079ce3ffd16db7486386e))
+
 ## [3.4.3](https://github.com/datapointchris/theme/compare/v3.4.2...v3.4.3) (2026-01-26)
 
 
