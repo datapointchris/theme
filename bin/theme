@@ -1729,13 +1729,6 @@ main() {
       fi
       ;;
     rotate)
-      local platform
-      platform=$(detect_platform)
-      if [[ "$platform" != "macos" ]]; then
-        echo "Error: Background rotation only supported on macOS" >&2
-        exit 1
-      fi
-
       echo "Rotating background..."
 
       # Get current theme for filtering
