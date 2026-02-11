@@ -712,7 +712,7 @@ change_theme() {
     exit 1
   fi
 
-  if ! command -v magick &>/dev/null; then
+  if ! command -v convert &>/dev/null; then
     echo "Error: ImageMagick not found. Install with: brew install imagemagick"
     exit 1
   fi
@@ -1451,7 +1451,7 @@ generate_all_previews() {
   echo "This will take a few minutes but makes browsing instant."
   echo ""
 
-  if ! command -v magick &>/dev/null; then
+  if ! command -v convert &>/dev/null; then
     echo "Error: ImageMagick not found. Install with: brew install imagemagick"
     exit 1
   fi
@@ -1498,7 +1498,7 @@ generate_all_backgrounds() {
   echo "This will take a while but makes theme switching instant."
   echo ""
 
-  if ! command -v magick &>/dev/null; then
+  if ! command -v convert &>/dev/null; then
     echo "Error: ImageMagick not found. Install with: brew install imagemagick"
     exit 1
   fi

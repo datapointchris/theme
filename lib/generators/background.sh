@@ -12,7 +12,7 @@
 #   sphere     - Single centered 3D sphere
 #   spheres    - Multiple 3D spheres
 #
-# Requires: ImageMagick (magick command)
+# Requires: ImageMagick (convert command)
 
 set -euo pipefail
 
@@ -54,7 +54,7 @@ generate_plasma() {
   local colors=("$BASE0D" "$BASE0E" "$BASE0C" "$BASE09" "$BASE0B")
 
   # Generate base with first plasma
-  magick -size "${width}x${height}" -seed $RANDOM plasma:fractal \
+  convert -size "${width}x${height}" -seed $RANDOM plasma:fractal \
     -grayscale Rec709Luminance \
     -sigmoidal-contrast 12x50% \
     -solarize 50% \
@@ -68,7 +68,7 @@ generate_plasma() {
     local contrast=$((10 + RANDOM % 8))
     local solarize=$((35 + RANDOM % 35))
 
-    magick -size "${width}x${height}" -seed $RANDOM plasma:fractal \
+    convert -size "${width}x${height}" -seed $RANDOM plasma:fractal \
       -grayscale Rec709Luminance \
       -sigmoidal-contrast "${contrast}x50%" \
       -solarize "${solarize}%" \
@@ -76,7 +76,7 @@ generate_plasma() {
       +level-colors "${BASE00},${color}" \
       /tmp/plasma_layer_$$.png
 
-    magick /tmp/plasma_base_$$.png /tmp/plasma_layer_$$.png \
+    convert /tmp/plasma_base_$$.png /tmp/plasma_layer_$$.png \
       -compose lighten -composite /tmp/plasma_base_$$.png
   done
 
@@ -114,8 +114,8 @@ generate_geometric() {
     esac
   done
 
-  # Single magick call with all draws
-  eval "magick -size '${width}x${height}' xc:'${BASE00}' $draw_commands '$output_file'"
+  # Single convert call with all draws
+  eval "convert -size '${width}x${height}' xc:'${BASE00}' $draw_commands '$output_file'"
 }
 
 generate_hexagons() {
@@ -137,7 +137,7 @@ generate_hexagons() {
     draw_commands+=" -fill '${color_alpha}' -draw 'translate $cx,$cy rotate $angle polygon 0,$((-s)) $h,$((-s/2)) $h,$((s/2)) 0,$s $((-h)),$((s/2)) $((-h)),$((-s/2))'"
   done
 
-  eval "magick -size '${width}x${height}' xc:'${BASE00}' $draw_commands '$output_file'"
+  eval "convert -size '${width}x${height}' xc:'${BASE00}' $draw_commands '$output_file'"
 }
 
 generate_circles() {
@@ -154,13 +154,13 @@ generate_circles() {
     draw_commands+=" -fill '${color_alpha}' -draw 'circle $x,$y $((x + radius)),$y'"
   done
 
-  # Single magick call with all circles
-  eval "magick -size '${width}x${height}' xc:'${BASE00}' $draw_commands '$output_file'"
+  # Single convert call with all circles
+  eval "convert -size '${width}x${height}' xc:'${BASE00}' $draw_commands '$output_file'"
 }
 
 generate_swirl() {
   # Vortex gradient using two accent colors
-  magick -size "${width}x${height}" \
+  convert -size "${width}x${height}" \
     \( gradient:"${BASE00}-${BASE0D}" \) \
     \( gradient:"${BASE00}-${BASE0E}" -rotate 90 \) \
     -compose multiply -composite \
@@ -170,7 +170,7 @@ generate_swirl() {
 
 generate_spotlight() {
   # Soft centered glow
-  magick -size "${width}x${height}" xc:"${BASE00}" \
+  convert -size "${width}x${height}" xc:"${BASE00}" \
     \( -size 800x800 radial-gradient:"${BASE0D}90-none" \) \
     -gravity center -compose over -composite \
     -blur 0x20 \
@@ -179,7 +179,7 @@ generate_spotlight() {
 
 generate_sphere() {
   # Single centered 3D sphere
-  magick -size "${width}x${height}" xc:"${BASE00}" \
+  convert -size "${width}x${height}" xc:"${BASE00}" \
     \( -size 600x600 radial-gradient:"${BASE0D}-transparent" \) \
     -gravity center -compose over -composite \
     "$output_file"
@@ -187,7 +187,7 @@ generate_sphere() {
 
 generate_spheres() {
   # Multiple 3D spheres distributed across screen
-  magick -size "${width}x${height}" xc:"${BASE00}" \
+  convert -size "${width}x${height}" xc:"${BASE00}" \
     \( -size 320x320 radial-gradient:"${BASE0D}-transparent" \) -gravity center -geometry -650-350 -compose over -composite \
     \( -size 280x280 radial-gradient:"${BASE0E}-transparent" \) -gravity center -geometry -350-400 -compose over -composite \
     \( -size 250x250 radial-gradient:"${BASE0C}-transparent" \) -gravity center -geometry -50-320 -compose over -composite \

@@ -1951,7 +1951,7 @@ generate_theme_preview() {
     return 1
   fi
 
-  if ! command -v magick &>/dev/null; then
+  if ! command -v convert &>/dev/null; then
     echo "Error: ImageMagick not found" >&2
     return 1
   fi

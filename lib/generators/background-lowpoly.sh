@@ -38,7 +38,7 @@ eval "$(load_colors "$theme_file")"
 
 # Scale up source image to 4K for better quality
 scaled_image="/tmp/lowpoly_scaled_$$.png"
-magick "$source_image" -resize 3840x2160^ -gravity center -extent 3840x2160 "$scaled_image"
+convert "$source_image" -resize 3840x2160^ -gravity center -extent 3840x2160 "$scaled_image"
 
 # Generate low-poly version with theme background
 # -pts: number of points (more = more detail)

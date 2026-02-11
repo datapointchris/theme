@@ -3,7 +3,7 @@
 # Usage: background-banner.sh <theme.yml> <output-file> [text]
 #
 # Creates ASCII art text banner with theme colors.
-# Requires: figlet, ImageMagick (magick)
+# Requires: figlet, ImageMagick (convert)
 
 set -euo pipefail
 
@@ -15,7 +15,7 @@ if [[ $# -lt 2 ]]; then
   echo ""
   echo "Creates ASCII banner with theme colors."
   echo "Default text: theme display name"
-  echo "Requires: figlet, magick"
+  echo "Requires: figlet, convert"
   exit 1
 fi
 
@@ -28,8 +28,8 @@ if ! command -v figlet &>/dev/null; then
   exit 1
 fi
 
-if ! command -v magick &>/dev/null; then
-  echo "Error: ImageMagick not found. Install with: brew install imagemagick" >&2
+if ! command -v convert &>/dev/null; then
+  echo "Error: ImageMagick not found. Install with: brew install imageconvert" >&2
   exit 1
 fi
 
@@ -72,7 +72,7 @@ accent_colors=("$BASE0D" "$BASE0E" "$BASE0C" "$BASE09" "$BASE0B")
 text_color="${accent_colors[$((RANDOM % ${#accent_colors[@]}))]}"
 
 # Generate image with ImageMagick
-magick -size "${img_width}x${img_height}" "xc:${BASE00}" \
+convert -size "${img_width}x${img_height}" "xc:${BASE00}" \
   -gravity center \
   -font "Menlo" \
   -pointsize 20 \

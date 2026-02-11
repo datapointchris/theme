@@ -21,7 +21,7 @@ if [[ ! -f "$theme_file" ]]; then
   exit 1
 fi
 
-if ! command -v magick &>/dev/null; then
+if ! command -v convert &>/dev/null; then
   echo "Error: ImageMagick not found" >&2
   exit 1
 fi
@@ -82,7 +82,7 @@ WIDTH=1200
 HEIGHT=1600
 
 # Generate the preview image
-if ! magick -size ${WIDTH}x${HEIGHT} "xc:${SPECIAL_BG}" \
+if ! convert -size ${WIDTH}x${HEIGHT} "xc:${SPECIAL_BG}" \
   -font "$FONT_FILE" -pointsize 18 \
   \
   `# Theme name (large)` \
