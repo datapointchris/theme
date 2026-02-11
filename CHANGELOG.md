@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.5.1](https://github.com/datapointchris/theme/compare/v3.5.0...v3.5.1) (2026-02-11)
+
+
+### Bug Fixes
+
+* **generators:** use 'convert' instead of 'magick' for ImageMagick 6 compat ([f65cd9d](https://github.com/datapointchris/theme/commit/f65cd9d4c50bbf404a8349721a2339c594f9d1ed)), closes [#13](https://github.com/datapointchris/theme/issues/13)
+* **storage:** add parentheses to jq score arithmetic for jq 1.7 compat ([63e9f53](https://github.com/datapointchris/theme/commit/63e9f539f57fc4a468d67c7bd4c3682ed16962bb)), closes [#14](https://github.com/datapointchris/theme/issues/14)
+* **windows-terminal:** apply opacity and colorScheme to all profiles ([17ac8ae](https://github.com/datapointchris/theme/commit/17ac8ae7d4daa3e8e7d620edb18262d2da54d479)), closes [#12](https://github.com/datapointchris/theme/issues/12)
+
 ## [3.5.0](https://github.com/datapointchris/theme/compare/v3.4.3...v3.5.0) (2026-01-26)
 
 
