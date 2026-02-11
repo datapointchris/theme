@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.5.3](https://github.com/datapointchris/theme/compare/v3.5.2...v3.5.3) (2026-02-11)
+
+
+### Bug Fixes
+
+* **background:** use 4K resolution (3840x2160) instead of hardcoded 1080p ([18c173d](https://github.com/datapointchris/theme/commit/18c173d621940247e7afc5502a858c45185e9672))
+
 ## [3.5.2](https://github.com/datapointchris/theme/compare/v3.5.1...v3.5.2) (2026-02-11)
 
 
