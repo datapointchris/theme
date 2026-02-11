@@ -491,6 +491,35 @@ set_windows_terminal_opacity() {
   pct=$(awk "BEGIN {printf \"%.0f\", $opacity * 100}")
   mkdir -p "$(dirname "$WINDOWS_TERMINAL_OPACITY_FILE")"
   echo "{\"opacity\": $pct}" > "$WINDOWS_TERMINAL_OPACITY_FILE"
+
+  _apply_windows_terminal_opacity "$pct"
+}
+
+# Apply opacity directly to Windows Terminal settings.json
+_apply_windows_terminal_opacity() {
+  local opacity_pct="$1"
+
+  local windows_user wt_settings=""
+  windows_user=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r\n')
+  [[ -z "$windows_user" ]] && return 1
+
+  for path in "/mnt/c/Users/$windows_user/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json" \
+              "/mnt/c/Users/$windows_user/AppData/Local/Packages/Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe/LocalState/settings.json" \
+              "/mnt/c/Users/$windows_user/AppData/Local/Microsoft/Windows Terminal/settings.json"; do
+    [[ -f "$path" ]] && wt_settings="$path" && break
+  done
+  [[ -z "$wt_settings" ]] && return 1
+
+  cp "$wt_settings" "${wt_settings}.backup"
+
+  if [[ "$opacity_pct" == "100" ]]; then
+    jq 'del(.profiles.defaults.opacity) | .profiles.list = [.profiles.list[] | del(.opacity)]' \
+      "$wt_settings" > "${wt_settings}.tmp" && mv "${wt_settings}.tmp" "$wt_settings"
+  else
+    jq --argjson opacity "$opacity_pct" \
+      '.profiles.defaults.opacity = $opacity | .profiles.list = [.profiles.list[] | .opacity = $opacity]' \
+      "$wt_settings" > "${wt_settings}.tmp" && mv "${wt_settings}.tmp" "$wt_settings"
+  fi
 }
 
 # Set tmux opacity (uses 'default' bg when < 1.0, otherwise uses theme bg)
@@ -1626,13 +1655,22 @@ apply_windows_terminal() {
     '.schemes = [.schemes[] | select(.name != $scheme.name)] + [$scheme]' \
     "$wt_settings" > "${wt_settings}.tmp" && mv "${wt_settings}.tmp" "$wt_settings"
 
-  # Set as active colorScheme for WSL profile
-  local wsl_profile_guid
-  wsl_profile_guid=$(jq -r '.profiles.list[] | select(.source == "Windows.Terminal.Wsl") | .guid' "$wt_settings" 2>/dev/null | head -1)
-  if [[ -n "$wsl_profile_guid" ]]; then
-    jq --arg guid "$wsl_profile_guid" --arg theme "$theme_name" \
-      '(.profiles.list[] | select(.guid == $guid)).colorScheme = $theme' \
-      "$wt_settings" > "${wt_settings}.tmp" && mv "${wt_settings}.tmp" "$wt_settings"
+  # Set as active colorScheme for defaults AND all profiles
+  jq --arg theme "$theme_name" '
+    .profiles.defaults.colorScheme = $theme |
+    .profiles.list = [.profiles.list[] | .colorScheme = $theme]
+  ' "$wt_settings" > "${wt_settings}.tmp" && mv "${wt_settings}.tmp" "$wt_settings"
+
+  # Also apply opacity if configured (to all profiles)
+  if [[ -f "$WINDOWS_TERMINAL_OPACITY_FILE" ]]; then
+    local opacity_pct
+    opacity_pct=$(jq -r '.opacity // 100' "$WINDOWS_TERMINAL_OPACITY_FILE" 2>/dev/null)
+    if [[ -n "$opacity_pct" ]] && [[ "$opacity_pct" != "100" ]]; then
+      jq --argjson opacity "$opacity_pct" '
+        .profiles.defaults.opacity = $opacity |
+        .profiles.list = [.profiles.list[] | .opacity = $opacity]
+      ' "$wt_settings" > "${wt_settings}.tmp" && mv "${wt_settings}.tmp" "$wt_settings"
+    fi
   fi
 
   return 0
