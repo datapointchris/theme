@@ -94,12 +94,13 @@ _sync_merge_histories() {
   {
     [[ -f "$local_file" ]] && cat "$local_file"
     echo "$remote_content"
-  } | jq -s '
+  } | jq -s "$(_jq_normalize_history)
     flatten |
-    map(select(. != null and . != {} and type == "object")) |
+    map(select(. != null and . != {} and type == \"object\")) |
+    map(normalize) |
     unique_by([.ts, .machine, .theme, .action]) |
     sort_by(.ts)
-  ' | jq -c '.[]'
+  " | jq -c '.[]'
 }
 
 sync_init() {

@@ -14,6 +14,22 @@ else
 fi
 THEME_HISTORY_FILE="$THEME_STATE_DIR/history.jsonl"
 
+_jq_normalize_history() {
+  cat <<'JQ'
+    def normalize_theme:
+      if . == "Nordic" then "nordic"
+      elif . == "Oceanic Next" then "oceanic-next"
+      elif . == "Retrobox" then "retrobox"
+      else .
+      end;
+    def normalize_machine:
+      if . == "arch-unknown" then "arch-archlinux"
+      else .
+      end;
+    def normalize: .theme = (.theme | normalize_theme) | .machine = (.machine | normalize_machine);
+JQ
+}
+
 detect_platform() {
   if [[ -n "${PLATFORM:-}" ]]; then
     echo "$PLATFORM"
@@ -86,7 +102,7 @@ log_action() {
 
 get_history() {
   if [[ -f "$THEME_HISTORY_FILE" ]]; then
-    jq -s 'sort_by(.ts)' "$THEME_HISTORY_FILE"
+    jq -s "$(_jq_normalize_history) map(normalize) | sort_by(.ts)" "$THEME_HISTORY_FILE"
   else
     echo "[]"
   fi
@@ -94,7 +110,7 @@ get_history() {
 
 get_history_raw() {
   if [[ -f "$THEME_HISTORY_FILE" ]]; then
-    jq -c '.' "$THEME_HISTORY_FILE" | sort
+    jq -s -c "$(_jq_normalize_history) map(normalize) | sort_by(.ts) | .[]" "$THEME_HISTORY_FILE"
   fi
 }
 
