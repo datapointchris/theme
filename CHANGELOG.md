@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.5.4](https://github.com/datapointchris/theme/compare/v3.5.3...v3.5.4) (2026-02-11)
+
+
+### Bug Fixes
+
+* **storage:** normalize theme and machine names in history queries ([b477a43](https://github.com/datapointchris/theme/commit/b477a43406c2156051d29307218cc00c461d5b42))
+
 ## [3.5.3](https://github.com/datapointchris/theme/compare/v3.5.2...v3.5.3) (2026-02-11)
 
 
