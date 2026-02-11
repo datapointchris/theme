@@ -662,6 +662,10 @@ BACKGROUND_CURRENT_FILE="$THEME_LIVE_DIR/background-current"
 # Mode setting (which background types to include in rotation)
 BACKGROUND_MODE_FILE="${BACKGROUND_MODE_FILE:-$HOME/.config/theme/background-mode}"
 
+# Default background resolution
+BACKGROUND_WIDTH=3840
+BACKGROUND_HEIGHT=2160
+
 # All available generated styles (no source image needed)
 BACKGROUND_GENERATED_STYLES=("plasma" "geometric" "hexagons" "circles" "swirl" "spotlight" "sphere" "spheres" "code" "banner")
 
@@ -1181,6 +1185,8 @@ set_desktop_wallpaper_wsl() {
         SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, path, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE);
       }
     }';
+    Set-ItemProperty -Path 'HKCU:\Control Panel\Desktop' -Name WallpaperStyle -Value '10'
+    Set-ItemProperty -Path 'HKCU:\Control Panel\Desktop' -Name TileWallpaper -Value '0'
     [Wallpaper]::Set('$win_path')
   " 2>/dev/null || {
     echo "Warning: PowerShell wallpaper command failed (may be restricted)" >&2
@@ -1268,7 +1274,7 @@ apply_background() {
           else
             local generator_script="$generators_dir/background.sh"
             [[ ! -f "$generator_script" ]] && return 1
-            bash "$generator_script" "$lib_path/theme.yml" "$background_file" "$bg_value" 1920 1080 >/dev/null 2>&1 || return 1
+            bash "$generator_script" "$lib_path/theme.yml" "$background_file" "$bg_value" "$BACKGROUND_WIDTH" "$BACKGROUND_HEIGHT" >/dev/null 2>&1 || return 1
           fi
           ;;
       esac
@@ -1465,7 +1471,7 @@ rotate_background() {
           else
             local generator_script="$generators_dir/background.sh"
             [[ ! -f "$generator_script" ]] && return 1
-            bash "$generator_script" "$lib_path/theme.yml" "$background_file" "$bg_value" 1920 1080 >/dev/null 2>&1 || return 1
+            bash "$generator_script" "$lib_path/theme.yml" "$background_file" "$bg_value" "$BACKGROUND_WIDTH" "$BACKGROUND_HEIGHT" >/dev/null 2>&1 || return 1
           fi
           ;;
       esac
