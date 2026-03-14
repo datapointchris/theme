@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.5.5](https://github.com/datapointchris/theme/compare/v3.5.4...v3.5.5) (2026-03-14)
+
+
+### Bug Fixes
+
+* **tmux:** remove last-window highlight from status bar ([595113e](https://github.com/datapointchris/theme/commit/595113e5c223353dcb27f2577968b3c5ace13fa0))
+
 ## [3.5.4](https://github.com/datapointchris/theme/compare/v3.5.3...v3.5.4) (2026-02-11)
 
 
