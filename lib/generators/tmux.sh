@@ -68,9 +68,8 @@ set-window-option -g window-status-style "fg=${BASE04},bg=${BASE00}"
 # ANSI black for deeper contrast on current window
 set-window-option -g window-status-current-style "fg=${DIAG_WARNING},bg=${ANSI_BLACK},bold"
 
-# Last visited window - slightly brighter than inactive
-# base05 = normal foreground, base01 = panel background
-set-window-option -g window-status-last-style "fg=${BASE05},bg=${BASE01}"
+# Last visited window - same as inactive (no special highlight)
+set-window-option -g window-status-last-style "fg=${BASE04},bg=${BASE00}"
 
 # Activity alert - use error color to draw attention
 set-window-option -g window-status-activity-style "fg=${DIAG_ERROR},bg=${BASE00}"
