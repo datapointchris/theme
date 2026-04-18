@@ -1,0 +1,48 @@
+/* Popping and Locking - Ghostty tab CSS
+ * Generated from theme.yml
+ *
+ * Widget tree (ghostty-org/ghostty discussions #5806, #9477):
+ *   tabbar > tabbox > tabboxchild > tab > label
+ * Selected state is tab:selected (libadwaita pseudo-class, not :checked).
+ * Base16 mapping: BASE00 = bg, BASE01 = lifted bg, BASE04 = muted fg, BASE05 = fg.
+ */
+
+/* Tab strip background — blend into terminal */
+tabbar,
+tabbar tabbox {
+  background-color: #181921;
+  border: none;
+  box-shadow: none;
+  margin-top: 2px;
+}
+
+/* No borders — let libadwaita handle separators adaptively */
+tabbar tabbox tabboxchild {
+  margin: 0 2px;
+}
+
+/* Tab base — tight vertical padding to compress strip height */
+tabbar tabbox tab {
+  background-color: #181921;
+  padding: 2px 14px;
+  margin: 0;
+}
+
+/* Inactive tab label — muted */
+tabbar tabbox tab label,
+tabbar tabbox tab .title {
+  font-family: "Comic Mono Nerd Font";
+  font-size: 13pt;
+  color: #a89984;
+  font-weight: normal;
+}
+
+/* Active tab — lifted background + foreground-color text */
+tabbar tabbox tab:selected {
+  background-color: #252631;
+}
+
+tabbar tabbox tab:selected label,
+tabbar tabbox tab:selected .title {
+  color: #ebdbb2;
+}

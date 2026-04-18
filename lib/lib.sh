@@ -246,6 +246,12 @@ apply_ghostty() {
   # Copy theme colors to current.conf
   cp "$lib_path/ghostty.conf" "$ghostty_theme_dir/current.conf"
 
+  # Copy theme CSS to current.css if generator has run for this theme.
+  # Referenced from main ghostty config via: gtk-custom-css = themes/current.css
+  if [[ -f "$lib_path/ghostty.css" ]]; then
+    cp "$lib_path/ghostty.css" "$ghostty_theme_dir/current.css"
+  fi
+
   return 0
 }
 

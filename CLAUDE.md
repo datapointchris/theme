@@ -16,7 +16,8 @@ apps/common/theme/
 ├── demo/               # Sample code files for theme preview
 ├── lib/                # Core libraries and generators
 │   ├── generators/     # App-specific generators
-│   │   ├── ghostty.sh, kitty.sh     # Terminal emulators
+│   │   ├── ghostty.sh, kitty.sh     # Terminal emulators (colors)
+│   │   ├── ghostty-css.sh           # Ghostty tab custom CSS
 │   │   ├── tmux.sh, btop.sh         # Terminal apps
 │   │   ├── borders.sh               # JankyBorders (macOS)
 │   │   ├── background.sh            # Themed backgrounds (macOS)
@@ -75,7 +76,8 @@ Each theme directory contains app-specific configs generated from `theme.yml`:
 ```text
 themes/{theme-id}/
 ├── theme.yml           # Source palette (required)
-├── ghostty.conf        # Ghostty terminal
+├── ghostty.conf        # Ghostty terminal colors
+├── ghostty.css         # Ghostty tab custom CSS
 ├── kitty.conf          # Kitty terminal
 ├── tmux.conf           # tmux status bar
 ├── btop.theme          # btop system monitor
@@ -163,6 +165,7 @@ cd apps/common/theme
 
 # Core apps (all platforms)
 bash lib/generators/ghostty.sh themes/{id}/theme.yml themes/{id}/ghostty.conf
+bash lib/generators/ghostty-css.sh themes/{id}/theme.yml themes/{id}/ghostty.css
 bash lib/generators/kitty.sh themes/{id}/theme.yml themes/{id}/kitty.conf
 bash lib/generators/tmux.sh themes/{id}/theme.yml themes/{id}/tmux.conf
 bash lib/generators/btop.sh themes/{id}/theme.yml themes/{id}/btop.theme
@@ -227,6 +230,7 @@ The `colorscheme-manager.lua` plugin:
 | `install.sh` | Installation script for fresh installs |
 | `scripts/migrate-history.sh` | One-time migration from old format |
 | `lib/generators/ghostty.sh` | Ghostty terminal colors |
+| `lib/generators/ghostty-css.sh` | Ghostty tab custom CSS |
 | `lib/generators/kitty.sh` | Kitty terminal colors |
 | `lib/generators/tmux.sh` | tmux status bar theme |
 | `lib/generators/btop.sh` | btop system monitor theme |
