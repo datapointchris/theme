@@ -200,7 +200,7 @@ detect_platform() {
   elif [[ -f /proc/version ]] && grep -qi microsoft /proc/version; then
     echo "wsl"
   elif [[ -f /etc/arch-release ]]; then
-    echo "arch"
+    echo "archlinux"
   else
     echo "linux"
   fi
@@ -1104,7 +1104,7 @@ set_desktop_wallpaper() {
     macos)
       set_desktop_wallpaper_macos "$background_file"
       ;;
-    arch)
+    archlinux)
       set_desktop_wallpaper_hyprland "$background_file"
       ;;
     wsl)
@@ -1714,7 +1714,7 @@ apply_theme_to_apps() {
   fi
 
   # Ghostty (macOS and Arch)
-  if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]]; then
+  if [[ "$platform" == "macos" ]] || [[ "$platform" == "archlinux" ]]; then
     if apply_ghostty "$theme" 2>/dev/null; then
       applied+=("ghostty")
       _print_app_status "ghostty" "true"
@@ -1725,7 +1725,7 @@ apply_theme_to_apps() {
   fi
 
   # Kitty (macOS and Arch)
-  if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]]; then
+  if [[ "$platform" == "macos" ]] || [[ "$platform" == "archlinux" ]]; then
     if apply_kitty "$theme" 2>/dev/null; then
       applied+=("kitty")
       _print_app_status "kitty" "true"
@@ -1748,7 +1748,7 @@ apply_theme_to_apps() {
 
   # Background (macOS, Arch, WSL)
   local background_id=""
-  if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]] || [[ "$platform" == "wsl" ]]; then
+  if [[ "$platform" == "macos" ]] || [[ "$platform" == "archlinux" ]] || [[ "$platform" == "wsl" ]]; then
     local background_style
     if background_style=$(apply_background "$theme" 2>/dev/null); then
       applied+=("background")
@@ -1806,7 +1806,7 @@ apply_theme_to_apps() {
   fi
 
   # Hyprland (Arch only)
-  if [[ "$platform" == "arch" ]]; then
+  if [[ "$platform" == "archlinux" ]]; then
     if apply_hyprland "$theme" 2>/dev/null; then
       applied+=("hyprland")
       _print_app_status "hyprland" "true"
@@ -1954,7 +1954,7 @@ reload_apps() {
   [[ "$applied_apps" == *"tmux"* ]] && reload_tmux
 
   # Platform-specific reloads
-  if [[ "$platform" == "arch" ]]; then
+  if [[ "$platform" == "archlinux" ]]; then
     [[ "$applied_apps" == *"kitty"* ]] && reload_kitty
     [[ "$applied_apps" == *"hyprland"* ]] && reload_hyprland
     [[ "$applied_apps" == *"waybar"* ]] && reload_waybar
