@@ -3,8 +3,9 @@
 # Usage: ghostty-css.sh <theme.yml> [output-file]
 #
 # Outputs tab-styling CSS for gtk-custom-css. Colors pulled from base16 palette
-# for cross-theme consistency. Font is hardcoded — font is a separate concern
-# from theming (managed by `font apply`, not `theme apply`).
+# for cross-theme consistency. Font is NOT set here — font is a separate concern
+# managed by the font tool, which writes fonts/current.css with font-family and
+# font-size for the same selectors. Ghostty merges both CSS files.
 # Applied via: gtk-custom-css = themes/current.css (in main ghostty config)
 
 set -euo pipefail
@@ -54,11 +55,9 @@ tabbar tabbox tab {
   margin: 0;
 }
 
-/* Inactive tab label — muted */
+/* Inactive tab label — muted (font set by font tool in fonts/current.css) */
 tabbar tabbox tab label,
 tabbar tabbox tab .title {
-  font-family: "Comic Mono Nerd Font";
-  font-size: 13pt;
   color: ${BASE04};
   font-weight: normal;
 }

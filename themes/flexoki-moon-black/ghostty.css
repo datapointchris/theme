@@ -28,11 +28,9 @@ tabbar tabbox tab {
   margin: 0;
 }
 
-/* Inactive tab label — muted */
+/* Inactive tab label — muted (font set by font tool in fonts/current.css) */
 tabbar tabbox tab label,
 tabbar tabbox tab .title {
-  font-family: "Comic Mono Nerd Font";
-  font-size: 13pt;
   color: #878580;
   font-weight: normal;
 }
