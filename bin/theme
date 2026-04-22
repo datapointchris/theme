@@ -1632,11 +1632,15 @@ main() {
     local before_version latest_tag
     before_version=$(git -C "$THEME_APP_DIR" describe --tags --always 2>/dev/null)
 
-    git -C "$THEME_APP_DIR" fetch --tags --quiet 2>/dev/null
+    if ! git -C "$THEME_APP_DIR" fetch --tags --quiet 2>/dev/null; then
+      echo "✗ theme upgrade failed: could not fetch from remote" >&2
+      exit 1
+    fi
+
     latest_tag=$(git -C "$THEME_APP_DIR" tag -l 'v*' --sort=-v:refname | head -n1)
 
     if [[ -z "$latest_tag" ]]; then
-      echo "✗ no releases found" >&2
+      echo "✗ theme upgrade failed: no releases found" >&2
       exit 1
     fi
 
@@ -1645,8 +1649,18 @@ main() {
       exit 0
     fi
 
-    git -C "$THEME_APP_DIR" checkout --quiet "$latest_tag"
+    if ! git -C "$THEME_APP_DIR" checkout --quiet "$latest_tag" 2>/dev/null; then
+      echo "✗ theme upgrade failed: could not checkout $latest_tag" >&2
+      exit 1
+    fi
+
     echo "✓ theme upgraded: $before_version → $latest_tag"
+
+    if [[ "$before_version" =~ ^v[0-9] ]]; then
+      echo ""
+      echo "Changes:"
+      git -C "$THEME_APP_DIR" log --format="  • %s" "${before_version}..${latest_tag}" 2>/dev/null || true
+    fi
     ;;
   opacity)
     case "${2:-}" in
