@@ -1929,9 +1929,15 @@ reload_hyprland() {
   return 1
 }
 
+# Restart waybar instead of SIGUSR2 reload.
+# Why: Waybar's in-process reload races with MPRIS/playerctl D-Bus signal
+# callbacks, occasionally segfaulting in libplayerctl during teardown.
+# A clean process restart sidesteps the race entirely.
 reload_waybar() {
-  if command -v killall &> /dev/null; then
-    killall -SIGUSR2 waybar 2>/dev/null || true
+  if pgrep -x waybar &> /dev/null; then
+    pkill -x waybar 2> /dev/null || true
+    setsid waybar > /dev/null 2>&1 < /dev/null &
+    disown
     return 0
   fi
   return 1
