@@ -532,8 +532,6 @@ generate() {
 
 [mgr]
 cwd = { fg = "${CWD_COLOR}" }
-hovered = { ${HOVERED_STYLE} }
-preview_hovered = { underline = true }
 find_keyword = { fg = "${BASE09}", bg = "${BASE00}" }
 find_position = {}
 marker_copied = { fg = "${MARKER_COPIED}", bg = "${MARKER_COPIED}" }
@@ -545,6 +543,10 @@ count_cut = { fg = "${BASE00}", bg = "${MARKER_CUT}" }
 count_selected = { fg = "${BASE00}", bg = "${MARKER_SELECTED}" }
 border_symbol = "│"
 border_style = { fg = "${BASE03}" }
+
+[indicator]
+current = { ${HOVERED_STYLE} }
+preview = { underline = true }
 
 [tabs]
 active = { fg = "${BASE00}", bg = "${TAB_ACTIVE_BG}", bold = true }
@@ -618,7 +620,7 @@ title_error = { fg = "${NOTIFY_ERROR}" }
 [confirm]
 border = { fg = "${BASE04}" }
 title = { fg = "${BASE0D}" }
-content = { fg = "${BASE07}" }
+body = { fg = "${BASE07}" }
 list = { fg = "${BASE05}" }
 btn_yes = { reversed = true, fg = "${BASE05}" }
 btn_no = {}
@@ -644,14 +646,14 @@ rules = [
   { mime = "application/{pdf,doc,rtf,vnd.*}", fg = "${FILETYPE_DOCS}" },
 
   # Broken symlinks
-  { name = "*", is = "orphan", fg = "${BASE08}" },
+  { url = "*", is = "orphan", fg = "${BASE08}" },
 
   # Executables
-  { name = "*", is = "exec", fg = "${FILETYPE_EXEC}" },
+  { url = "*", is = "exec", fg = "${FILETYPE_EXEC}" },
 
   # Fallback
-  { name = "*", fg = "${BASE05}" },
-  { name = "*/", fg = "${FILETYPE_DIRS}" },
+  { url = "*", fg = "${BASE05}" },
+  { url = "*/", fg = "${FILETYPE_DIRS}" },
 ]
 EOF
 }

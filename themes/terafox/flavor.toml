@@ -4,8 +4,6 @@
 
 [mgr]
 cwd = { fg = "#fda47f" }
-hovered = { reversed = true, bold = true }
-preview_hovered = { underline = true }
 find_keyword = { fg = "#ff8349", bg = "#152528" }
 find_position = {}
 marker_copied = { fg = "#8eb2af", bg = "#8eb2af" }
@@ -17,6 +15,10 @@ count_cut = { fg = "#152528", bg = "#e85c51" }
 count_selected = { fg = "#152528", bg = "#ff8349" }
 border_symbol = "│"
 border_style = { fg = "#6d7f8b" }
+
+[indicator]
+current = { reversed = true, bold = true }
+preview = { underline = true }
 
 [tabs]
 active = { fg = "#152528", bg = "#5a93aa", bold = true }
@@ -90,7 +92,7 @@ title_error = { fg = "#e85c51" }
 [confirm]
 border = { fg = "#587b7b" }
 title = { fg = "#5a93aa" }
-content = { fg = "#cbd9d8" }
+body = { fg = "#cbd9d8" }
 list = { fg = "#e6eaea" }
 btn_yes = { reversed = true, fg = "#e6eaea" }
 btn_no = {}
@@ -116,12 +118,12 @@ rules = [
   { mime = "application/{pdf,doc,rtf,vnd.*}", fg = "#a1cdd8" },
 
   # Broken symlinks
-  { name = "*", is = "orphan", fg = "#e85c51" },
+  { url = "*", is = "orphan", fg = "#e85c51" },
 
   # Executables
-  { name = "*", is = "exec", fg = "#7aa4a1" },
+  { url = "*", is = "exec", fg = "#7aa4a1" },
 
   # Fallback
-  { name = "*", fg = "#e6eaea" },
-  { name = "*/", fg = "#5a93aa" },
+  { url = "*", fg = "#e6eaea" },
+  { url = "*/", fg = "#5a93aa" },
 ]

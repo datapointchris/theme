@@ -1,11 +1,9 @@
 # Smyck - Yazi flavor
 # Generated algorithmically from theme.yml
-# Author: Ghostty
+# Author: hukl
 
 [mgr]
 cwd = { fg = "#62a3c4" }
-hovered = { reversed = true, bold = true }
-preview_hovered = { underline = true }
 find_keyword = { fg = "#d6837c", bg = "#1b1b1b" }
 find_position = {}
 marker_copied = { fg = "#207383", bg = "#207383" }
@@ -17,6 +15,10 @@ count_cut = { fg = "#1b1b1b", bg = "#ba8acc" }
 count_selected = { fg = "#1b1b1b", bg = "#f7f7f7" }
 border_symbol = "│"
 border_style = { fg = "#7a7a7a" }
+
+[indicator]
+current = { reversed = true, bold = true }
+preview = { underline = true }
 
 [tabs]
 active = { fg = "#1b1b1b", bg = "#a1a1a1", bold = true }
@@ -35,7 +37,7 @@ unset_alt = { fg = "#fee14d", bg = "#207483" }
 [status]
 sep_left = { open = "", close = "" }
 sep_right = { open = "", close = "" }
-overall = { fg = "#a1a1a1", bg = "#7a7a7a" }
+overall = { fg = "#a1a1a1", bg = "#2b2b2b" }
 progress_label = { fg = "#62a3c4", bold = true }
 progress_normal = { fg = "#207483", bg = "#1b1b1b" }
 progress_error = { fg = "#207483", bg = "#1b1b1b" }
@@ -70,7 +72,7 @@ hovered = { fg = "#ba8acc" }
 cols = 2
 separator = " - "
 separator_style = { fg = "#7a7a7a" }
-mask = { bg = "#7a7a7a" }
+mask = { bg = "#2b2b2b" }
 rest = { fg = "#7a7a7a" }
 cand = { fg = "#62a3c4" }
 desc = { fg = "#207483" }
@@ -90,7 +92,7 @@ title_error = { fg = "#ba8acc" }
 [confirm]
 border = { fg = "#a1a1a1" }
 title = { fg = "#62a3c4" }
-content = { fg = "#f7f7f7" }
+body = { fg = "#f7f7f7" }
 list = { fg = "#f7f7f7" }
 btn_yes = { reversed = true, fg = "#f7f7f7" }
 btn_no = {}
@@ -99,7 +101,7 @@ btn_no = {}
 border = { fg = "#207483" }
 title = { fg = "#7a7a7a", bold = true }
 tbl_col = { fg = "#a1a1a1" }
-tbl_cell = { bg = "#7a7a7a" }
+tbl_cell = { bg = "#2b2b2b" }
 
 [filetype]
 rules = [
@@ -116,12 +118,12 @@ rules = [
   { mime = "application/{pdf,doc,rtf,vnd.*}", fg = "#207383" },
 
   # Broken symlinks
-  { name = "*", is = "orphan", fg = "#b84131" },
+  { url = "*", is = "orphan", fg = "#b84131" },
 
   # Executables
-  { name = "*", is = "exec", fg = "#7da900" },
+  { url = "*", is = "exec", fg = "#7da900" },
 
   # Fallback
-  { name = "*", fg = "#f7f7f7" },
-  { name = "*/", fg = "#62a3c4" },
+  { url = "*", fg = "#f7f7f7" },
+  { url = "*/", fg = "#62a3c4" },
 ]

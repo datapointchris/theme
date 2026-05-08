@@ -1,11 +1,9 @@
 # Popping and Locking - Yazi flavor
 # Generated algorithmically from theme.yml
-# Author: Ghostty
+# Author: Hedinn Eiriksson
 
 [mgr]
 cwd = { fg = "#458588" }
-hovered = { reversed = true, bold = true }
-preview_hovered = { underline = true }
 find_keyword = { fg = "#f42c3e", bg = "#181921" }
 find_position = {}
 marker_copied = { fg = "#689d6a", bg = "#689d6a" }
@@ -17,6 +15,10 @@ count_cut = { fg = "#181921", bg = "#b16286" }
 count_selected = { fg = "#181921", bg = "#ebdbb2" }
 border_symbol = "│"
 border_style = { fg = "#928374" }
+
+[indicator]
+current = { reversed = true, bold = true }
+preview = { underline = true }
 
 [tabs]
 active = { fg = "#181921", bg = "#a89984", bold = true }
@@ -35,7 +37,7 @@ unset_alt = { fg = "#fabd2f", bg = "#ebdbb2" }
 [status]
 sep_left = { open = "", close = "" }
 sep_right = { open = "", close = "" }
-overall = { fg = "#a89984", bg = "#928374" }
+overall = { fg = "#a89984", bg = "#252631" }
 progress_label = { fg = "#458588", bold = true }
 progress_normal = { fg = "#ebdbb2", bg = "#181921" }
 progress_error = { fg = "#ebdbb2", bg = "#181921" }
@@ -70,7 +72,7 @@ hovered = { fg = "#b16286" }
 cols = 2
 separator = " - "
 separator_style = { fg = "#928374" }
-mask = { bg = "#928374" }
+mask = { bg = "#252631" }
 rest = { fg = "#928374" }
 cand = { fg = "#458588" }
 desc = { fg = "#ebdbb2" }
@@ -90,7 +92,7 @@ title_error = { fg = "#b16286" }
 [confirm]
 border = { fg = "#a89984" }
 title = { fg = "#458588" }
-content = { fg = "#ebdbb2" }
+body = { fg = "#ebdbb2" }
 list = { fg = "#ebdbb2" }
 btn_yes = { reversed = true, fg = "#ebdbb2" }
 btn_no = {}
@@ -99,7 +101,7 @@ btn_no = {}
 border = { fg = "#ebdbb2" }
 title = { fg = "#928374", bold = true }
 tbl_col = { fg = "#a89984" }
-tbl_cell = { bg = "#928374" }
+tbl_cell = { bg = "#252631" }
 
 [filetype]
 rules = [
@@ -116,12 +118,12 @@ rules = [
   { mime = "application/{pdf,doc,rtf,vnd.*}", fg = "#689d6a" },
 
   # Broken symlinks
-  { name = "*", is = "orphan", fg = "#cc241d" },
+  { url = "*", is = "orphan", fg = "#cc241d" },
 
   # Executables
-  { name = "*", is = "exec", fg = "#98971a" },
+  { url = "*", is = "exec", fg = "#98971a" },
 
   # Fallback
-  { name = "*", fg = "#ebdbb2" },
-  { name = "*/", fg = "#458588" },
+  { url = "*", fg = "#ebdbb2" },
+  { url = "*/", fg = "#458588" },
 ]

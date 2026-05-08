@@ -4,8 +4,6 @@
 
 [mgr]
 cwd = { fg = "#58859a" }
-hovered = { reversed = true, bold = true }
-preview_hovered = { underline = true }
 find_keyword = { fg = "#ed5d20", bg = "#191919" }
 find_position = {}
 marker_copied = { fg = "#b25a1e", bg = "#b25a1e" }
@@ -17,6 +15,10 @@ count_cut = { fg = "#191919", bg = "#97363d" }
 count_selected = { fg = "#191919", bg = "#ffc800" }
 border_symbol = "│"
 border_style = { fg = "#504332" }
+
+[indicator]
+current = { reversed = true, bold = true }
+preview = { underline = true }
 
 [tabs]
 active = { fg = "#191919", bg = "#786b53", bold = true }
@@ -35,7 +37,7 @@ unset_alt = { fg = "#44a900", bg = "#786b53" }
 [status]
 sep_left = { open = "", close = "" }
 sep_right = { open = "", close = "" }
-overall = { fg = "#786b53", bg = "#504332" }
+overall = { fg = "#786b53", bg = "#252220" }
 progress_label = { fg = "#58859a", bold = true }
 progress_normal = { fg = "#786b53", bg = "#191919" }
 progress_error = { fg = "#786b53", bg = "#191919" }
@@ -70,7 +72,7 @@ hovered = { fg = "#97363d" }
 cols = 2
 separator = " - "
 separator_style = { fg = "#504332" }
-mask = { bg = "#504332" }
+mask = { bg = "#252220" }
 rest = { fg = "#504332" }
 cand = { fg = "#58859a" }
 desc = { fg = "#786b53" }
@@ -90,7 +92,7 @@ title_error = { fg = "#97363d" }
 [confirm]
 border = { fg = "#786b53" }
 title = { fg = "#58859a" }
-content = { fg = "#ffc800" }
+body = { fg = "#ffc800" }
 list = { fg = "#786b53" }
 btn_yes = { reversed = true, fg = "#786b53" }
 btn_no = {}
@@ -99,7 +101,7 @@ btn_no = {}
 border = { fg = "#786b53" }
 title = { fg = "#504332", bold = true }
 tbl_col = { fg = "#786b53" }
-tbl_cell = { bg = "#504332" }
+tbl_cell = { bg = "#252220" }
 
 [filetype]
 rules = [
@@ -116,12 +118,12 @@ rules = [
   { mime = "application/{pdf,doc,rtf,vnd.*}", fg = "#b25a1e" },
 
   # Broken symlinks
-  { name = "*", is = "orphan", fg = "#b2270e" },
+  { url = "*", is = "orphan", fg = "#b2270e" },
 
   # Executables
-  { name = "*", is = "exec", fg = "#44a900" },
+  { url = "*", is = "exec", fg = "#44a900" },
 
   # Fallback
-  { name = "*", fg = "#786b53" },
-  { name = "*/", fg = "#58859a" },
+  { url = "*", fg = "#786b53" },
+  { url = "*/", fg = "#58859a" },
 ]

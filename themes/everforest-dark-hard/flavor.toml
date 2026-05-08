@@ -1,44 +1,46 @@
 # Everforest Dark Hard - Yazi flavor
 # Generated algorithmically from theme.yml
-# Author: Ghostty
+# Author: sainnhe
 
 [mgr]
 cwd = { fg = "#dbbc7f" }
-hovered = { reversed = true, bold = true }
-preview_hovered = { underline = true }
-find_keyword = { fg = "#f85552", bg = "#1e2326" }
+find_keyword = { fg = "#e69875", bg = "#1e2326" }
 find_position = {}
 marker_copied = { fg = "#a7c080", bg = "#a7c080" }
 marker_cut = { fg = "#e67e80", bg = "#e67e80" }
 marker_marked = { fg = "#d699b6", bg = "#d699b6" }
-marker_selected = { fg = "#f85552", bg = "#f85552" }
+marker_selected = { fg = "#e69875", bg = "#e69875" }
 count_copied = { fg = "#1e2326", bg = "#a7c080" }
 count_cut = { fg = "#1e2326", bg = "#e67e80" }
-count_selected = { fg = "#1e2326", bg = "#f85552" }
+count_selected = { fg = "#1e2326", bg = "#e69875" }
 border_symbol = "│"
-border_style = { fg = "#a6b0a0" }
+border_style = { fg = "#859289" }
+
+[indicator]
+current = { reversed = true, bold = true }
+preview = { underline = true }
 
 [tabs]
 active = { fg = "#1e2326", bg = "#7fbbb3", bold = true }
-inactive = { fg = "#7fbbb3", bg = "#4c3743" }
+inactive = { fg = "#7fbbb3", bg = "#374145" }
 sep_inner = { open = "", close = "" }
 sep_outer = { open = "", close = "" }
 
 [mode]
 normal_main = { fg = "#1e2326", bg = "#7fbbb3", bold = true }
-normal_alt = { fg = "#7fbbb3", bg = "#4c3743" }
-select_main = { fg = "#1e2326", bg = "#d699b6", bold = true }
-select_alt = { fg = "#d699b6", bg = "#4c3743" }
+normal_alt = { fg = "#7fbbb3", bg = "#374145" }
+select_main = { fg = "#1e2326", bg = "#e69875", bold = true }
+select_alt = { fg = "#e69875", bg = "#374145" }
 unset_main = { fg = "#1e2326", bg = "#dbbc7f", bold = true }
-unset_alt = { fg = "#dbbc7f", bg = "#4c3743" }
+unset_alt = { fg = "#dbbc7f", bg = "#374145" }
 
 [status]
 sep_left = { open = "", close = "" }
 sep_right = { open = "", close = "" }
-overall = { fg = "#f2efdf", bg = "#a6b0a0" }
+overall = { fg = "#9da9a0", bg = "#2e383c" }
 progress_label = { fg = "#7fbbb3", bold = true }
-progress_normal = { fg = "#4c3743", bg = "#1e2326" }
-progress_error = { fg = "#4c3743", bg = "#1e2326" }
+progress_normal = { fg = "#374145", bg = "#1e2326" }
+progress_error = { fg = "#374145", bg = "#1e2326" }
 perm_type = { fg = "#a7c080" }
 perm_read = { fg = "#dbbc7f" }
 perm_write = { fg = "#e67e80" }
@@ -69,11 +71,11 @@ hovered = { fg = "#d699b6" }
 [which]
 cols = 2
 separator = " - "
-separator_style = { fg = "#a6b0a0" }
-mask = { bg = "#a6b0a0" }
-rest = { fg = "#a6b0a0" }
+separator_style = { fg = "#859289" }
+mask = { bg = "#2e383c" }
+rest = { fg = "#859289" }
 cand = { fg = "#7fbbb3" }
-desc = { fg = "#4c3743" }
+desc = { fg = "#374145" }
 
 [help]
 on = { fg = "#35a77c" }
@@ -88,18 +90,18 @@ title_warn = { fg = "#dbbc7f" }
 title_error = { fg = "#e67e80" }
 
 [confirm]
-border = { fg = "#f2efdf" }
+border = { fg = "#9da9a0" }
 title = { fg = "#7fbbb3" }
-content = { fg = "#fffbef" }
+body = { fg = "#d3c6aa" }
 list = { fg = "#d3c6aa" }
 btn_yes = { reversed = true, fg = "#d3c6aa" }
 btn_no = {}
 
 [spot]
-border = { fg = "#4c3743" }
-title = { fg = "#a6b0a0", bold = true }
-tbl_col = { fg = "#f2efdf" }
-tbl_cell = { bg = "#a6b0a0" }
+border = { fg = "#374145" }
+title = { fg = "#859289", bold = true }
+tbl_col = { fg = "#9da9a0" }
+tbl_cell = { bg = "#2e383c" }
 
 [filetype]
 rules = [
@@ -116,12 +118,12 @@ rules = [
   { mime = "application/{pdf,doc,rtf,vnd.*}", fg = "#83c092" },
 
   # Broken symlinks
-  { name = "*", is = "orphan", fg = "#e67e80" },
+  { url = "*", is = "orphan", fg = "#e67e80" },
 
   # Executables
-  { name = "*", is = "exec", fg = "#a7c080" },
+  { url = "*", is = "exec", fg = "#a7c080" },
 
   # Fallback
-  { name = "*", fg = "#d3c6aa" },
-  { name = "*/", fg = "#7fbbb3" },
+  { url = "*", fg = "#d3c6aa" },
+  { url = "*/", fg = "#7fbbb3" },
 ]
