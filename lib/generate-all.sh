@@ -44,6 +44,7 @@ declare -A GENERATOR_OUTPUT=(
   [chromium]="chromium.theme"
   [firefox-based]="userChrome.css"
   [bat]="bat.tmTheme"
+  [sioyek]="sioyek.config"
 )
 
 # Parse arguments

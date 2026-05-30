@@ -404,6 +404,49 @@ apply_firefox_based() {
   return 0
 }
 
+# Apply sioyek PDF viewer theme (all platforms)
+# Splices a marker-delimited managed block into the user's prefs_user.config.
+#
+# Sioyek has no `include` directive (config.cpp deserializer is key=value only)
+# and user_config_paths is a fixed per-platform list, so we have to write into
+# the single prefs_user.config file directly. The managed-block pattern keeps
+# user-added prefs (use_system_theme, startup_commands, etc.) outside the block
+# untouched. Target path is the XDG location, which sioyek supports on both
+# Linux and macOS (main.cpp:234-236 explicitly handcrafts an XDG path on mac).
+apply_sioyek() {
+  local theme="$1"
+  local lib_path
+  lib_path=$(get_library_path "$theme")
+
+  if [[ -z "$lib_path" ]] || [[ ! -f "$lib_path/sioyek.config" ]]; then
+    return 1
+  fi
+
+  local sioyek_config_dir="$HOME/.config/sioyek"
+  local target="$sioyek_config_dir/prefs_user.config"
+  mkdir -p "$sioyek_config_dir"
+
+  local block
+  block=$(<"$lib_path/sioyek.config")
+
+  if [[ ! -f "$target" ]]; then
+    printf '%s\n' "$block" >"$target"
+    return 0
+  fi
+
+  if grep -q "^# >>> theme tool" "$target"; then
+    awk -v block="$block" '
+      /^# >>> theme tool .managed./ { print block; in_block=1; next }
+      /^# <<< theme tool .managed./ && in_block { in_block=0; next }
+      !in_block { print }
+    ' "$target" >"$target.tmp" && mv "$target.tmp" "$target"
+  else
+    printf '\n%s\n' "$block" >>"$target"
+  fi
+
+  return 0
+}
+
 # Apply bat syntax highlighter theme (all platforms)
 # Copies .tmTheme to bat themes dir and rebuilds cache
 apply_bat() {
@@ -1809,6 +1852,15 @@ apply_theme_to_apps() {
   else
     skipped+=("bat")
     _print_app_status "bat" "false"
+  fi
+
+  # sioyek PDF viewer (all platforms)
+  if apply_sioyek "$theme" 2>/dev/null; then
+    applied+=("sioyek")
+    _print_app_status "sioyek" "true"
+  else
+    skipped+=("sioyek")
+    _print_app_status "sioyek" "false"
   fi
 
   # Hyprland (Arch only)
