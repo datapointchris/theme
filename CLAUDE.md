@@ -4,9 +4,9 @@
 
 Unified theme generation system that creates consistent color configurations
 across terminal and desktop applications from a single `theme.yml` source file.
-Supports Ghostty, Kitty, tmux, btop, JankyBorders, Hyprland, Waybar, Rofi,
-Dunst, Windows Terminal, and more. Each theme in `themes/` provides app configs
-that match a corresponding Neovim colorscheme.
+Supports Ghostty, Kitty, tmux, btop, sioyek, JankyBorders, Hyprland, Waybar,
+Rofi, Dunst, Windows Terminal, and more. Each theme in `themes/` provides app
+configs that match a corresponding Neovim colorscheme.
 
 ## Directory Structure
 
@@ -19,6 +19,7 @@ apps/common/theme/
 │   │   ├── ghostty.sh, kitty.sh     # Terminal emulators (colors)
 │   │   ├── ghostty-css.sh           # Ghostty tab custom CSS
 │   │   ├── tmux.sh, btop.sh         # Terminal apps
+│   │   ├── sioyek.sh                # PDF viewer (custom color mode)
 │   │   ├── borders.sh               # JankyBorders (macOS)
 │   │   ├── background.sh            # Themed backgrounds (macOS)
 │   │   ├── hyprland.sh, hyprlock.sh # Hyprland WM (Arch)
@@ -81,6 +82,7 @@ themes/{theme-id}/
 ├── kitty.conf          # Kitty terminal
 ├── tmux.conf           # tmux status bar
 ├── btop.theme          # btop system monitor
+├── sioyek.config       # sioyek PDF viewer (managed block, spliced on apply)
 ├── bordersrc           # JankyBorders (macOS)
 ├── hyprland.conf       # Hyprland WM (Arch)
 ├── waybar.css          # Waybar status bar (Arch)
@@ -169,6 +171,7 @@ bash lib/generators/ghostty-css.sh themes/{id}/theme.yml themes/{id}/ghostty.css
 bash lib/generators/kitty.sh themes/{id}/theme.yml themes/{id}/kitty.conf
 bash lib/generators/tmux.sh themes/{id}/theme.yml themes/{id}/tmux.conf
 bash lib/generators/btop.sh themes/{id}/theme.yml themes/{id}/btop.theme
+bash lib/generators/sioyek.sh themes/{id}/theme.yml themes/{id}/sioyek.config
 
 # macOS
 bash lib/generators/borders.sh themes/{id}/theme.yml themes/{id}/bordersrc
@@ -234,6 +237,7 @@ The `colorscheme-manager.lua` plugin:
 | `lib/generators/kitty.sh` | Kitty terminal colors |
 | `lib/generators/tmux.sh` | tmux status bar theme |
 | `lib/generators/btop.sh` | btop system monitor theme |
+| `lib/generators/sioyek.sh` | sioyek PDF viewer custom-color-mode block |
 | `lib/generators/borders.sh` | JankyBorders window highlights (macOS) |
 | `lib/generators/background.sh` | Themed background generator (macOS) |
 | `lib/generators/hyprland.sh` | Hyprland WM colors (Arch) |

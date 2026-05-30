@@ -91,6 +91,7 @@ Releases are automated via [release-please](https://github.com/googleapis/releas
 - **Kitty** - Terminal emulator
 - **tmux** - Terminal multiplexer
 - **btop** - System monitor
+- **sioyek** - PDF viewer (custom color mode)
 - **Neovim** - Text editor (via colorscheme plugins or generated)
 
 ### macOS
