@@ -1171,8 +1171,9 @@ set_desktop_wallpaper_macos() {
   local background_file="$1"
 
   # Over ssh there is no reachable GUI session, so the Finder AppleScript blocks
-  # forever — there is no desktop to set from a remote shell. Skip it.
-  if [[ -n "$SSH_CONNECTION" ]]; then
+  # forever — there is no desktop to set from a remote shell. Skip it. Use :- so
+  # this is safe under `set -u` when SSH_CONNECTION is unset (the local case).
+  if [[ -n "${SSH_CONNECTION:-}" ]]; then
     return 0
   fi
 
@@ -1180,7 +1181,7 @@ set_desktop_wallpaper_macos() {
   # prompt (Terminal controlling Finder). Cap it with a timeout so a theme apply
   # or `theme random` always completes; the wallpaper simply stays unchanged until
   # permission is granted in System Settings > Privacy & Security > Automation.
-  if ! timeout 5 osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$background_file\"" 2>/dev/null; then
+  if ! timeout 10 osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$background_file\"" 2>/dev/null; then
     echo "Warning: could not set wallpaper (grant your terminal Automation access to Finder to enable it)" >&2
     return 1
   fi
