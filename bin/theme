@@ -1494,8 +1494,8 @@ generate_all_previews() {
 #==============================================================================
 
 generate_all_backgrounds() {
-  echo "Pre-generating all theme backgrounds..."
-  echo "This will take a while but makes theme switching instant."
+  echo "Pre-generating all theme backgrounds at ${BACKGROUND_WIDTH}x${BACKGROUND_HEIGHT}..."
+  echo "This takes a while (plasma is heavy at 4K) but makes theme switching an instant copy."
   echo ""
 
   if ! command -v convert &>/dev/null; then
@@ -1540,8 +1540,9 @@ generate_all_backgrounds() {
         continue
       fi
 
-      if bash "$generator_script" "$lib_path/theme.yml" "$cache_file" "$style" 1920 1080 2>/dev/null; then
-        printf "  %-10s ✓ generated\n" "$style"
+      local style_start=$SECONDS
+      if bash "$generator_script" "$lib_path/theme.yml" "$cache_file" "$style" "$BACKGROUND_WIDTH" "$BACKGROUND_HEIGHT" 2>/dev/null; then
+        printf "  %-10s ✓ generated (%ds)\n" "$style" "$((SECONDS - style_start))"
       else
         printf "  %-10s ✗ failed\n" "$style"
       fi

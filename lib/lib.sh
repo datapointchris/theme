@@ -1310,6 +1310,14 @@ apply_background() {
   local bg_value="${selected#*:}"
   local background_id=""
 
+  # Progress to the terminal (this function's stdout is captured by the caller).
+  # A cache hit copies in ~0s; an on-the-fly render at 4K can take a while, so the
+  # live style name + elapsed time make it obvious the apply is working, not hung.
+  local gen_start=$SECONDS
+  if [[ -w /dev/tty ]]; then
+    printf '  Background: %s (%s) ... ' "$bg_value" "$bg_type" >/dev/tty
+  fi
+
   case "$bg_type" in
     generated)
       # Check for special generators first
@@ -1376,6 +1384,10 @@ apply_background() {
       return 1
       ;;
   esac
+
+  if [[ -w /dev/tty ]]; then
+    printf 'done (%ds)\n' "$((SECONDS - gen_start))" >/dev/tty
+  fi
 
   # Set as desktop background (platform-specific)
   set_desktop_wallpaper "$background_file" || return 1
