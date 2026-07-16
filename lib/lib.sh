@@ -1169,7 +1169,21 @@ set_desktop_wallpaper() {
 # macOS: Set wallpaper via Finder AppleScript
 set_desktop_wallpaper_macos() {
   local background_file="$1"
-  osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$background_file\"" 2>/dev/null
+
+  # Over ssh there is no reachable GUI session, so the Finder AppleScript blocks
+  # forever — there is no desktop to set from a remote shell. Skip it.
+  if [[ -n "$SSH_CONNECTION" ]]; then
+    return 0
+  fi
+
+  # Even locally the call can hang on a first-run macOS automation-permission
+  # prompt (Terminal controlling Finder). Cap it with a timeout so a theme apply
+  # or `theme random` always completes; the wallpaper simply stays unchanged until
+  # permission is granted in System Settings > Privacy & Security > Automation.
+  if ! timeout 5 osascript -e "tell application \"Finder\" to set desktop picture to POSIX file \"$background_file\"" 2>/dev/null; then
+    echo "Warning: could not set wallpaper (grant your terminal Automation access to Finder to enable it)" >&2
+    return 1
+  fi
 }
 
 # Arch/Hyprland: Set wallpaper via hyprpaper IPC
