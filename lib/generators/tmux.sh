@@ -154,6 +154,24 @@ set-option -g status-right "#[fg=${BASE04}]%I:%M%p  %m.%d.%Y "
 # UI accent for command, base0A (yellow) for path
 set-option -g pane-border-format "  #[align=left,fg=${BASE03}](#{pane_index})  #[fg=${UI_ACCENT},align=centre]  #{pane_current_command}  #[fg=${BASE0A},align=right]  #{pane_current_path}  "
 
+# ==============================================================================
+# REMOTE / SSH INDICATOR
+# ==============================================================================
+
+# When this tmux server runs on a box reached over SSH (\$SSH_CONNECTION is set
+# in the launching shell), signal "remote" using the theme's OWN error red as an
+# accent — the background stays base00 so it still reads as this theme, only the
+# left badge (now the hostname), the active window, the active pane border, and
+# the pane path switch to diagnostic_error. Keeps a nested local->ssh->remote stack legible
+# without a jarring foreign-colored bar. Reads \$SSH_CONNECTION from the server's
+# startup environment, so it fires on the normal ssh-then-attach/new flow.
+if-shell '[ -n "\$SSH_CONNECTION" ]' {
+    set-option -g status-left " #[fg=${BASE00},bg=${DIAG_ERROR},bold]  󰢹 #h  #[fg=${GIT_ADD},bg=${BASE00}]  #S  "
+    set-window-option -g window-status-current-style "fg=${DIAG_ERROR},bg=${ANSI_BLACK},bold"
+    set-option -g pane-active-border-style "fg=${DIAG_ERROR}"
+    set-option -g pane-border-format "  #[align=left,fg=${BASE03}](#{pane_index})  #[fg=${UI_ACCENT},align=centre]  #{pane_current_command}  #[fg=${DIAG_ERROR},align=right]  #{pane_current_path}  "
+}
+
 # vim: set ft=tmux tw=0:
 EOF
 }
