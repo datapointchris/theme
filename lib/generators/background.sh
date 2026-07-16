@@ -50,11 +50,22 @@ darken_color() {
 }
 
 generate_plasma() {
-  # Multi-colored nebula clouds using accent palette
+  # Multi-colored nebula clouds using accent palette.
+  #
+  # Generated at quarter resolution then upscaled. Five full-res plasma:fractal
+  # + blur passes at retina resolution take minutes (ImageMagick blur cost scales
+  # with pixel count) and made `theme random` appear to hang whenever plasma was
+  # the randomly-chosen style. Plasma is smooth by nature, so a 4x upscale is
+  # visually indistinguishable while cutting the work ~16x.
   local colors=("$BASE0D" "$BASE0E" "$BASE0C" "$BASE09" "$BASE0B")
 
+  local gen_width=$((width / 4))
+  local gen_height=$((height / 4))
+  [[ "$gen_width" -lt 1 ]] && gen_width=1
+  [[ "$gen_height" -lt 1 ]] && gen_height=1
+
   # Generate base with first plasma
-  convert -size "${width}x${height}" -seed $RANDOM plasma:fractal \
+  convert -size "${gen_width}x${gen_height}" -seed $RANDOM plasma:fractal \
     -grayscale Rec709Luminance \
     -sigmoidal-contrast 12x50% \
     -solarize 50% \
@@ -68,7 +79,7 @@ generate_plasma() {
     local contrast=$((10 + RANDOM % 8))
     local solarize=$((35 + RANDOM % 35))
 
-    convert -size "${width}x${height}" -seed $RANDOM plasma:fractal \
+    convert -size "${gen_width}x${gen_height}" -seed $RANDOM plasma:fractal \
       -grayscale Rec709Luminance \
       -sigmoidal-contrast "${contrast}x50%" \
       -solarize "${solarize}%" \
@@ -80,8 +91,9 @@ generate_plasma() {
       -compose lighten -composite /tmp/plasma_base_$$.png
   done
 
-  mv /tmp/plasma_base_$$.png "$output_file"
-  rm -f /tmp/plasma_layer_$$.png
+  # Upscale the smooth result to the target resolution
+  convert /tmp/plasma_base_$$.png -resize "${width}x${height}!" "$output_file"
+  rm -f /tmp/plasma_base_$$.png /tmp/plasma_layer_$$.png
 }
 
 generate_geometric() {
