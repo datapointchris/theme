@@ -81,11 +81,13 @@ set-window-option -g window-status-bell-style "fg=${BASE00},bg=${DIAG_ERROR},bol
 # PANE BORDERS
 # ==============================================================================
 
-# Inactive pane border - subtle, use UI border color
-set-option -g pane-border-style "fg=${UI_BORDER}"
-
-# Active pane border - use yellow (base0A) for visibility without being harsh
-set-option -g pane-active-border-style "fg=${BASE0A}"
+# Pane border line color. Normally UI border (inactive) / yellow (active); turns
+# the theme's error red when the pane is running ssh — the host-side remote
+# indicator, matching the red SSH badge in pane-border-format below. Set WITHOUT
+# -F so tmux stores the format and re-evaluates it per pane at draw time (with -F
+# it would resolve once at load and never track the pane's command).
+set-option -g pane-border-style "#{?#{==:#{pane_current_command},ssh},fg=${DIAG_ERROR},fg=${UI_BORDER}}"
+set-option -g pane-active-border-style "#{?#{==:#{pane_current_command},ssh},fg=${DIAG_ERROR} bold,fg=${BASE0A}}"
 
 # Pane number display (prefix + q)
 set-option -g display-panes-active-colour "${DIAG_WARNING}"
@@ -150,13 +152,16 @@ set-window-option -g window-status-current-format "\\\\   #W   /"
 # base04 for muted clock/date text
 set-option -g status-right "#[fg=${BASE04}]%I:%M%p  %m.%d.%Y "
 
-# Pane border format: index, command, path (normal) — or a red SSH badge when
-# the pane is running ssh. Host-side remote indicator: the local tmux detects
-# the ssh process via pane_current_command, so any SSH target lights up red
-# (theme's diagnostic_error) with zero setup on the remote — bare servers work.
-# Style attributes are space-separated (not comma) so they don't collide with
-# the #{?...} branch separator.
-set-option -g pane-border-format "#{?#{==:#{pane_current_command},ssh},  #[align=left fg=${DIAG_ERROR} bold](#{pane_index})  #[align=centre fg=${DIAG_ERROR} bold] 󰢹 SSH  #[align=right fg=${DIAG_ERROR}]  #{pane_current_path}  ,  #[align=left fg=${BASE03}](#{pane_index})  #[align=centre fg=${UI_ACCENT}]  #{pane_current_command}  #[align=right fg=${BASE0A}]  #{pane_current_path}  }"
+# Pane border format: index, command, path (normal) — or a red host badge when
+# the pane is running ssh. Host-side remote indicator: the local tmux detects the
+# ssh process via pane_current_command, so any SSH target lights up red (theme's
+# diagnostic_error) with zero setup on the remote — bare servers work. The badge
+# shows pane_title, which a dotfiles remote sets to "host:cwd" via an OSC 2 prompt
+# hook (falling back to the local "ssh: <target>" label, or plain SSH). Style
+# attributes are space-separated (not comma) so they don't collide with the
+# #{?...} branch separator; the nested #{?#{pane_title}...} is brace-scoped so its
+# commas are fine.
+set-option -g pane-border-format "#{?#{==:#{pane_current_command},ssh},  #[align=left fg=${DIAG_ERROR} bold](#{pane_index})  #[align=centre fg=${DIAG_ERROR} bold] 󰢹 #{?#{pane_title},#{pane_title},SSH}  ,  #[align=left fg=${BASE03}](#{pane_index})  #[align=centre fg=${UI_ACCENT}]  #{pane_current_command}  #[align=right fg=${BASE0A}]  #{pane_current_path}  }"
 
 # vim: set ft=tmux tw=0:
 EOF
