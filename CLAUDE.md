@@ -4,9 +4,10 @@
 
 Unified theme generation system that creates consistent color configurations
 across terminal and desktop applications from a single `theme.yml` source file.
-Supports Ghostty, Kitty, tmux, btop, sioyek, JankyBorders, Hyprland, Waybar,
-Rofi, Dunst, Windows Terminal, and more. Each theme in `themes/` provides app
-configs that match a corresponding Neovim colorscheme.
+Supports Ghostty, Kitty, Alacritty, tmux, btop, bat, yazi, sioyek, JankyBorders,
+Hyprland, Waybar, Rofi, Dunst/Mako, Firefox-based and Chromium browsers, Windows
+Terminal, and more. Each theme in `themes/` provides app configs that match a
+corresponding Neovim colorscheme.
 
 ## Directory Structure
 
@@ -16,19 +17,25 @@ apps/common/theme/
 ├── demo/               # Sample code files for generated backgrounds
 ├── lib/                # Core libraries and generators
 │   ├── generators/     # App-specific generators
-│   │   ├── ghostty.sh, kitty.sh     # Terminal emulators (colors)
+│   │   ├── ghostty.sh, kitty.sh, alacritty.sh  # Terminal emulators (colors)
 │   │   ├── ghostty-css.sh           # Ghostty tab custom CSS
 │   │   ├── tmux.sh, btop.sh         # Terminal apps
+│   │   ├── bat.sh                   # bat pager .tmTheme
+│   │   ├── yazi.sh                  # yazi file manager flavor
 │   │   ├── sioyek.sh                # PDF viewer (custom color mode)
+│   │   ├── firefox-based.sh         # Firefox/Zen/Librewolf/Thunderbird userChrome
+│   │   ├── chromium.sh              # Chromium DevTools theme
+│   │   ├── vscode.sh                # VS Code theme
 │   │   ├── borders.sh               # JankyBorders (macOS)
-│   │   ├── background.sh            # Themed backgrounds (macOS)
-│   │   ├── hyprland.sh, hyprlock.sh # Hyprland WM (Arch)
-│   │   ├── waybar.sh, rofi.sh       # Desktop apps (Arch)
+│   │   ├── background*.sh           # Themed backgrounds + transforms (macOS)
+│   │   ├── hyprland.sh, hyprland-picker.sh, hyprlock.sh  # Hyprland WM (Arch)
+│   │   ├── waybar.sh, rofi.sh, walker.sh  # Desktop apps (Arch)
+│   │   ├── swayosd.sh, icons.sh     # OSD + GTK icon theme (Arch)
 │   │   ├── dunst.sh, mako.sh        # Notification daemons
 │   │   └── windows-terminal.sh      # WSL terminal
 │   ├── neovim_generator.py  # Generates Neovim colorscheme plugin
 │   └── theme.sh        # Loads theme.yml into shell variables
-├── themes/             # 40+ themes with theme.yml source and generated configs
+├── themes/             # 20+ themes with theme.yml source and generated configs
 │   ├── gruvbox-dark-hard/  # With generated neovim/
 │   ├── rose-pine-darker/   # With generated neovim/
 │   ├── kanagawa/           # Terminal configs only (uses plugin for Neovim)
@@ -51,23 +58,31 @@ apps/common/theme/
 These themes have generated Neovim colorschemes from theme.yml:
 
 | Directory | display_name | Notes |
-|-----------|-------------|-------|
+| --------- | ------------ | ----- |
+| `charcoal-ember` | Charcoal Ember | Generated |
 | `gruvbox-dark-hard` | Gruvbox Dark Hard | Ghostty-derived, neutral ANSI |
+| `popping-and-locking` | Popping and Locking | Generated |
 | `rose-pine-darker` | Rose Pine Darker | Base16-derived, darker background |
+| `smyck` | Smyck | Generated |
+| `treehouse` | Treehouse | Generated |
 
 ### Plugin Themes (neovim_colorscheme_source: "plugin")
 
 These themes provide terminal configs that match original Neovim plugins:
 
-- `gruvbox` - Gruvbox (`gruvbox`) - ellisonleao/gruvbox.nvim
-- `rose-pine` - Rose Pine (`rose-pine`) - rose-pine/neovim
-- `kanagawa` - Kanagawa (`kanagawa`) - rebelot/kanagawa.nvim
-- `nordic` - Nordic (`nordic`) - AlexvZyl/nordic.nvim
-- `terafox` - Terafox (`terafox`) - EdenEast/nightfox.nvim
-- `oceanic-next` - Oceanic Next (`OceanicNext`) -
-  mhartington/oceanic-next
-- `github-dark-default` - GitHub Dark Default (`github_dark_default`) -
-  projekt0n/github-nvim-theme
+- `gruvbox` - Gruvbox - ellisonleao/gruvbox.nvim
+- `rose-pine` - Rose Pine - rose-pine/neovim
+- `kanagawa` - Kanagawa - rebelot/kanagawa.nvim
+- `nordic` - Nordic - AlexvZyl/nordic.nvim
+- `nightfox` - Nightfox - EdenEast/nightfox.nvim
+- `terafox` - Terafox - EdenEast/nightfox.nvim
+- `everforest-dark-hard` - Everforest Dark Hard - neanias/everforest-nvim
+- `oceanic-next` - Oceanic Next (`OceanicNext`) - mhartington/oceanic-next
+- `github-dark-dimmed` - GitHub Dark Dimmed - projekt0n/github-nvim-theme
+- `solarized-osaka` - Solarized Osaka - craftzdog/solarized-osaka.nvim
+- `flexoki-moon-{black,green,purple,red}` - Flexoki Moon -
+  datapointchris/flexoki-moon-nvim
+- `retrobox` - Retrobox (`retrobox`) - Neovim built-in colorscheme (no plugin)
 
 ## Theme Files
 
@@ -79,15 +94,25 @@ themes/{theme-id}/
 ├── ghostty.conf        # Ghostty terminal colors
 ├── ghostty.css         # Ghostty tab custom CSS
 ├── kitty.conf          # Kitty terminal
+├── alacritty.toml      # Alacritty terminal
 ├── tmux.conf           # tmux status bar
 ├── btop.theme          # btop system monitor
+├── bat.tmTheme         # bat pager syntax theme
+├── flavor.toml         # yazi file manager flavor
 ├── sioyek.config       # sioyek PDF viewer (managed block, spliced on apply)
+├── userChrome.css      # Firefox-based browsers (Zen/Librewolf/Firefox/Thunderbird)
+├── chromium.theme      # Chromium DevTools theme
+├── icons.theme         # GTK icon theme (Arch)
 ├── bordersrc           # JankyBorders (macOS)
 ├── hyprland.conf       # Hyprland WM (Arch)
-├── waybar.css          # Waybar status bar (Arch)
+├── hyprland-picker.css # Hyprland color picker (Arch)
 ├── hyprlock.conf       # Hyprlock lock screen (Arch)
-├── dunst.conf          # Dunst notifications (Arch)
+├── waybar.css          # Waybar status bar (Arch)
+├── walker.css          # Walker launcher (Arch)
+├── swayosd.css         # SwayOSD on-screen display (Arch)
 ├── rofi.rasi           # Rofi launcher (Arch)
+├── dunst.conf          # Dunst notifications (Arch)
+├── mako.conf, mako.ini # Mako notifications (Arch)
 ├── windows-terminal.json  # Windows Terminal (WSL)
 └── neovim/             # Only for generated themes - colorscheme plugin
 ```
@@ -168,17 +193,28 @@ cd apps/common/theme
 bash lib/generators/ghostty.sh themes/{id}/theme.yml themes/{id}/ghostty.conf
 bash lib/generators/ghostty-css.sh themes/{id}/theme.yml themes/{id}/ghostty.css
 bash lib/generators/kitty.sh themes/{id}/theme.yml themes/{id}/kitty.conf
+bash lib/generators/alacritty.sh themes/{id}/theme.yml themes/{id}/alacritty.toml
 bash lib/generators/tmux.sh themes/{id}/theme.yml themes/{id}/tmux.conf
 bash lib/generators/btop.sh themes/{id}/theme.yml themes/{id}/btop.theme
+bash lib/generators/bat.sh themes/{id}/theme.yml themes/{id}/bat.tmTheme
+bash lib/generators/yazi.sh themes/{id}/theme.yml themes/{id}/flavor.toml
 bash lib/generators/sioyek.sh themes/{id}/theme.yml themes/{id}/sioyek.config
+bash lib/generators/firefox-based.sh themes/{id}/theme.yml themes/{id}/userChrome.css
+bash lib/generators/chromium.sh themes/{id}/theme.yml themes/{id}/chromium.theme
 
 # macOS
 bash lib/generators/borders.sh themes/{id}/theme.yml themes/{id}/bordersrc
 
 # Arch/Hyprland
 bash lib/generators/hyprland.sh themes/{id}/theme.yml themes/{id}/hyprland.conf
+bash lib/generators/hyprland-picker.sh themes/{id}/theme.yml themes/{id}/hyprland-picker.css
+bash lib/generators/hyprlock.sh themes/{id}/theme.yml themes/{id}/hyprlock.conf
 bash lib/generators/waybar.sh themes/{id}/theme.yml themes/{id}/waybar.css
+bash lib/generators/walker.sh themes/{id}/theme.yml themes/{id}/walker.css
+bash lib/generators/swayosd.sh themes/{id}/theme.yml themes/{id}/swayosd.css
+bash lib/generators/icons.sh themes/{id}/theme.yml themes/{id}/icons.theme
 bash lib/generators/dunst.sh themes/{id}/theme.yml themes/{id}/dunst.conf
+bash lib/generators/mako.sh themes/{id}/theme.yml themes/{id}/mako.conf
 bash lib/generators/rofi.sh themes/{id}/theme.yml themes/{id}/rofi.rasi
 
 # WSL
@@ -222,7 +258,7 @@ The `colorscheme-manager.lua` plugin:
 ## Files Reference
 
 | File | Purpose |
-|------|---------|
+| ---- | ------- |
 | `bin/theme` | Theme CLI (apply, list, like/dislike, reject, sync) |
 | `lib/lib.sh` | Core functions (get_theme_display_info, apply_theme_to_apps) |
 | `lib/storage.sh` | Unified JSONL history with machine context |
@@ -234,14 +270,27 @@ The `colorscheme-manager.lua` plugin:
 | `lib/generators/ghostty.sh` | Ghostty terminal colors |
 | `lib/generators/ghostty-css.sh` | Ghostty tab custom CSS |
 | `lib/generators/kitty.sh` | Kitty terminal colors |
+| `lib/generators/alacritty.sh` | Alacritty terminal colors |
 | `lib/generators/tmux.sh` | tmux status bar theme |
 | `lib/generators/btop.sh` | btop system monitor theme |
+| `lib/generators/bat.sh` | bat pager .tmTheme |
+| `lib/generators/yazi.sh` | yazi file manager flavor |
 | `lib/generators/sioyek.sh` | sioyek PDF viewer custom-color-mode block |
+| `lib/generators/firefox-based.sh` | Firefox/Zen/Librewolf/Thunderbird userChrome |
+| `lib/generators/chromium.sh` | Chromium DevTools theme |
+| `lib/generators/vscode.sh` | VS Code theme |
 | `lib/generators/borders.sh` | JankyBorders window highlights (macOS) |
 | `lib/generators/background.sh` | Themed background generator (macOS) |
 | `lib/generators/hyprland.sh` | Hyprland WM colors (Arch) |
+| `lib/generators/hyprland-picker.sh` | Hyprland color picker (Arch) |
+| `lib/generators/hyprlock.sh` | Hyprlock lock screen (Arch) |
 | `lib/generators/waybar.sh` | Waybar status bar (Arch) |
+| `lib/generators/walker.sh` | Walker launcher (Arch) |
+| `lib/generators/swayosd.sh` | SwayOSD on-screen display (Arch) |
+| `lib/generators/icons.sh` | GTK icon theme (Arch) |
 | `lib/generators/rofi.sh` | Rofi launcher (Arch) |
 | `lib/generators/dunst.sh` | Dunst notifications (Arch) |
+| `lib/generators/mako.sh` | Mako notifications (Arch) |
 | `lib/generators/windows-terminal.sh` | Windows Terminal (WSL) |
+| `lib/browser-profiles.sh` | Firefox-based browser profile discovery |
 | `lib/theme-preview.sh` | ANSI color-swatch preview for the `theme change` fzf picker |

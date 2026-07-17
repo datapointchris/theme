@@ -1,14 +1,16 @@
 # theme
 
-Unified theme management for terminal and desktop applications. Apply consistent color schemes across Ghostty, Kitty, tmux, btop, Neovim, and more from a single command.
+Unified theme management for terminal and desktop applications. Apply consistent color schemes across Ghostty, Kitty, tmux, btop, Neovim, and more from a single command — with themed backgrounds, opacity control, and cross-machine sync.
 
 ## Features
 
-- **40+ themes** including Gruvbox, Rose Pine, Kanagawa, Nordic, and more
+- **20+ themes** including Gruvbox, Rose Pine, Kanagawa, Nordic, Flexoki, and more
 - **Cross-platform**: macOS, Linux (Arch/Hyprland), WSL
+- **Themed backgrounds**: generated or recolored wallpapers that follow the active theme (macOS)
+- **Opacity control**: adjust terminal transparency across apps from one command
 - **Cross-machine sync**: GitHub Gist synchronization keeps preferences in sync
-- **Smart tracking**: Like/dislike themes, track usage time, filter out rejected themes
-- **Neovim integration**: Themes match Neovim colorschemes (plugin or generated)
+- **Smart tracking**: like/dislike themes, track usage time, filter out rejected themes
+- **Neovim integration**: themes match Neovim colorschemes (plugin or generated)
 
 ## Installation
 
@@ -25,21 +27,33 @@ ln -sf ~/.local/share/theme/bin/theme ~/.local/bin/theme
 
 ### Requirements
 
-- `jq` - JSON processing
-- `yq` - YAML processing ([mikefarah/yq](https://github.com/mikefarah/yq), the Go implementation)
-- `fzf` - Interactive theme picker
-- `gh` - GitHub CLI (for sync feature)
+Core:
+
+- `jq` — JSON processing
+- `yq` — YAML processing ([mikefarah/yq](https://github.com/mikefarah/yq), the Go implementation)
+- `fzf` — interactive theme picker
+- `gh` — GitHub CLI (for the sync feature)
+
+Optional:
+
+- `bat` — syntax-highlighted output in `theme log`
+- `imagemagick` (`convert`) — themed background generation (macOS)
+- `gowall` — recolor source wallpapers to match the active theme (macOS)
 
 ## Usage
+
+Running `theme` with no arguments prints the full help.
 
 ### Basic Commands
 
 ```bash
 theme list                    # List all available themes
-theme change                  # Interactive picker with preview
+theme change                  # Interactive picker with color preview
 theme apply <theme-id>        # Apply a specific theme
 theme current                 # Show current theme and stats
-theme random                  # Apply a random theme
+theme random                  # Apply a random (least-used) theme
+theme info [theme]            # Browse themes and view detailed history
+theme verify                  # Check the theme system is healthy
 ```
 
 ### Rating Themes
@@ -47,9 +61,9 @@ theme random                  # Apply a random theme
 ```bash
 theme like "great contrast"   # Mark current theme as liked
 theme dislike "too dim"       # Mark as disliked
-theme note "good for coding"  # Add a note
+theme note "good for coding"  # Add a freeform note
 theme reject "hurts my eyes"  # Remove from rotation (hidden from list)
-theme unreject                # Restore a rejected theme
+theme unreject                # Restore a rejected theme (interactive picker)
 ```
 
 ### Rankings and History
@@ -60,9 +74,57 @@ theme log                     # View complete history
 theme rejected                # List rejected themes
 ```
 
+### Backgrounds (macOS)
+
+Each theme can drive a matching desktop background — either an algorithmically
+generated wallpaper or a source image recolored to the theme's palette.
+
+```bash
+theme background              # Show background usage/help
+theme background current      # Show the active background
+theme background rotate       # Pick a new background, keep the theme
+theme background list         # List available backgrounds and current mode
+theme background like         # Rate the current background (per theme)
+theme background rank         # Rankings for this theme (--global for all)
+theme background pre-generate # Pre-render all backgrounds for instant switching
+
+# Which kinds of background to draw from
+theme background mode current
+theme background mode set generated:plasma recolor
+theme background mode all
+
+# Source images used by 'recolor' mode
+theme background source add ~/Pictures/wallpapers
+theme background source list
+theme background source verify
+```
+
+### Opacity
+
+```bash
+theme opacity                 # Show opacity usage/help
+theme opacity current         # Show current opacity
+theme opacity set 90          # Set opacity to 90%
+theme opacity up              # Increase by 5%
+theme opacity down            # Decrease by 5%
+```
+
+Restart the terminal to see opacity changes.
+
+### Browser Theming
+
+```bash
+theme browsers                # Show detected browsers and theme status
+```
+
+Firefox-based browsers (Zen, Librewolf, Firefox, Thunderbird) and Chromium are
+themed automatically on `theme apply`. Firefox-based browsers require
+`toolkit.legacyUserProfileCustomizations.stylesheets = true` in `about:config`,
+then a restart, for `userChrome.css` to take effect.
+
 ### Cross-Machine Sync
 
-Sync your theme preferences across machines using GitHub Gist:
+Sync your theme preferences across machines using a GitHub Gist:
 
 ```bash
 theme sync init               # One-time setup (creates gist)
@@ -79,67 +141,96 @@ After initialization, sync happens automatically in the background.
 
 ```bash
 theme --version               # Show current version
-theme upgrade                 # Update to latest release
+theme upgrade                 # Update to the latest tagged release
 ```
 
-Releases are automated via [release-please](https://github.com/googleapis/release-please). The upgrade command only pulls tagged releases, ensuring you always get stable versions.
+Releases are automated via [release-please](https://github.com/googleapis/release-please). The upgrade command only checks out tagged releases, so you always land on a stable version.
 
 ## Supported Applications
 
 ### All Platforms
 
-- **Ghostty** - Terminal emulator
-- **Kitty** - Terminal emulator
-- **tmux** - Terminal multiplexer
-- **btop** - System monitor
-- **sioyek** - PDF viewer (custom color mode)
-- **Neovim** - Text editor (via colorscheme plugins or generated)
+- **Ghostty** — terminal emulator (colors + tab CSS)
+- **Kitty** — terminal emulator
+- **tmux** — terminal multiplexer
+- **btop** — system monitor
+- **bat** — syntax highlighter / pager
+- **yazi** — file manager
+- **sioyek** — PDF viewer (custom color mode)
+- **Neovim** — text editor (via colorscheme plugins or generated)
+- **Browsers** — Firefox-based (Zen, Librewolf, Firefox, Thunderbird) and Chromium
 
 ### macOS
 
-- **JankyBorders** - Window border highlights
-- **Wallpaper** - Themed desktop wallpaper
+- **JankyBorders** — window border highlights
+- **Wallpaper** — themed desktop background (generated or recolored)
 
 ### Arch Linux / Hyprland
 
-- **Hyprland** - Window manager colors
-- **Hyprlock** - Lock screen
-- **Waybar** - Status bar
-- **Rofi** - Application launcher
-- **Dunst** / **Mako** - Notification daemons
+- **Hyprland** — window manager colors
+- **Hyprlock** — lock screen
+- **Waybar** — status bar
+- **Rofi** — application launcher
+- **Dunst** / **Mako** — notification daemons
 
 ### WSL
 
-- **Windows Terminal** - Terminal colors
+- **Windows Terminal** — terminal colors
+
+Additional generators (Alacritty, VS Code, walker, swayosd, GTK icons) live in
+`lib/generators/` and can be run directly when needed.
 
 ## Theme Types
 
 ### Plugin Themes
 
-Most themes use existing Neovim colorscheme plugins. The theme system generates matching terminal configs:
+Most themes pair an existing Neovim colorscheme plugin with generated terminal
+configs:
 
 | Theme | Neovim Plugin |
-|-------|---------------|
+| ----- | ------------- |
 | Gruvbox | ellisonleao/gruvbox.nvim |
 | Rose Pine | rose-pine/neovim |
 | Kanagawa | rebelot/kanagawa.nvim |
 | Nordic | AlexvZyl/nordic.nvim |
-| Terafox | EdenEast/nightfox.nvim |
+| Nightfox / Terafox | EdenEast/nightfox.nvim |
+| Everforest Dark Hard | neanias/everforest-nvim |
+| Flexoki Moon (black/green/purple/red) | datapointchris/flexoki-moon-nvim |
+| GitHub Dark Dimmed | projekt0n/github-nvim-theme |
+| Oceanic Next | mhartington/oceanic-next |
+| Solarized Osaka | craftzdog/solarized-osaka.nvim |
 
 ### Generated Themes
 
-Some themes generate both terminal configs AND a Neovim colorscheme from a single `theme.yml` source file.
+These themes generate both terminal configs **and** a Neovim colorscheme from a
+single `theme.yml` source file:
+
+- Charcoal Ember
+- Gruvbox Dark Hard
+- Popping and Locking
+- Rose Pine Darker
+- Smyck
+- Treehouse
 
 ## Data Storage
 
-All data is stored in XDG-compliant locations:
+Data and configuration live in XDG-compliant locations:
 
 ```text
 ~/.local/state/theme/
-├── history.jsonl      # Usage history (synced)
+├── history.jsonl      # Usage/rating history (synced)
 ├── current            # Current theme ID
 └── sync-state.json    # Sync configuration
+
+~/.config/theme/
+├── background-mode          # Enabled background modes
+└── background-sources.conf  # Source image references for recolor mode
+
+~/.cache/theme/backgrounds/  # Pre-generated background cache
 ```
+
+Opacity is stored per-app under each app's config directory (e.g.
+`~/.config/ghostty/opacity`, `~/.config/tmux/opacity.conf`).
 
 ## Creating New Themes
 
@@ -151,7 +242,7 @@ meta:
   id: "my-theme"
   display_name: "My Theme"
   neovim_colorscheme_source: "plugin"  # or "generated"
-  plugin: "author/nvim-theme"          # if using plugin
+  plugin: "author/nvim-theme"          # if using a plugin
   variant: "dark"
 
 base16:
@@ -170,7 +261,8 @@ special:
   cursor: "#ebdbb2"
 ```
 
-1. Generate app configs using the generators in `lib/generators/`
+1. Generate app configs using the generators in `lib/generators/` (see
+   `CLAUDE.md` for the full per-app generation commands)
 
 ## License
 
