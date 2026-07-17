@@ -22,11 +22,28 @@ _jq_normalize_history() {
       elif . == "Retrobox" then "retrobox"
       else .
       end;
+    # The platform label drifted for the Arch box (arch -> archlinux). Collapse to
+    # "arch", which is what detect_platform emits going forward.
+    def normalize_platform:
+      if . == "archlinux" then "arch" else . end;
+    # Canonicalize .machine to one label per physical machine. Handles the legacy
+    # "platform-host" format (strip a known platform prefix) and the current bare
+    # host format alike, lowercasing so "Macmini" and "macmini" merge. When the
+    # host was recorded as "unknown" (hostname detection failed), fall back to the
+    # platform — the Arch box is the only archlinux machine, so its "unknown"
+    # records merge with its named ones instead of collapsing to a shared bucket.
     def normalize_machine:
-      if . == "arch-unknown" then "arch-archlinux"
-      else .
-      end;
-    def normalize: .theme = (.theme | normalize_theme) | .machine = (.machine | normalize_machine);
+      ascii_downcase as $m
+      | if ($m | test("^(macos|archlinux|arch|wsl|linux|unknown)-")) then
+          ($m | capture("^(?<plat>macos|archlinux|arch|wsl|linux|unknown)-(?<host>.*)$")) as $c
+          | (if $c.plat == "arch" then "archlinux" else $c.plat end) as $plat
+          | (if ($c.host == "" or $c.host == "unknown") then $plat else $c.host end)
+        else $m
+        end;
+    def normalize:
+      .theme = (.theme | normalize_theme)
+      | .platform = (if (.platform // null) == null then .platform else (.platform | normalize_platform) end)
+      | .machine = (if (.machine // null) == null then .machine else (.machine | normalize_machine) end);
 JQ
 }
 
@@ -51,11 +68,15 @@ detect_platform() {
 }
 
 _storage_get_machine_id() {
-  local platform
-  platform=$(detect_platform)
-  local hostname
-  hostname=$(hostname -s 2>/dev/null || echo "unknown")
-  echo "${platform}-${hostname}"
+  # The physical machine's hostname, lowercased. Platform is recorded as its own
+  # field, so prefixing it (the old "platform-host" format) both duplicated the
+  # platform and split one machine across records when the platform label drifted
+  # (arch -> archlinux) or the hostname case changed (Macmini vs macmini). The
+  # read-time normalize_machine shim canonicalizes existing platform-host history.
+  local host
+  host=$(uname -n 2>/dev/null | cut -d. -f1 | tr '[:upper:]' '[:lower:]')
+  [[ -z "$host" ]] && host="unknown"
+  echo "$host"
 }
 
 log_action() {
