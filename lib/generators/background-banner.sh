@@ -38,7 +38,7 @@ eval "$(load_colors "$theme_file")"
 
 # Get display name if text not specified
 if [[ -z "$text" ]]; then
-  text=$(yq -r '.meta.display_name // .meta.id // "THEME"' "$theme_file" 2>/dev/null || echo "THEME")
+  text=$(yq '.meta.display_name // .meta.id // "THEME"' "$theme_file" 2>/dev/null || echo "THEME")
 fi
 
 # Pick a random font from good options

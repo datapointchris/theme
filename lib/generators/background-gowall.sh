@@ -36,7 +36,7 @@ fi
 eval "$(load_colors "$theme_file")"
 
 # Extract theme ID for unique config name
-theme_id=$(yq -r '.meta.id // "custom"' "$theme_file" 2>/dev/null || echo "custom")
+theme_id=$(yq '.meta.id // "custom"' "$theme_file" 2>/dev/null || echo "custom")
 
 # Create gowall config with theme colors
 # Uses base16 palette + key ANSI colors for a rich palette

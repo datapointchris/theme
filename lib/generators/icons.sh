@@ -17,7 +17,7 @@ fi
 input_file="$1"
 output_file="${2:-}"
 
-icon_theme=$(yq -r '.meta.icon_theme // "Yaru-blue"' "$input_file")
+icon_theme=$(yq '.meta.icon_theme // "Yaru-blue"' "$input_file")
 
 generate() {
   echo "$icon_theme"

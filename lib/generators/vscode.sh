@@ -17,8 +17,8 @@ fi
 input_file="$1"
 output_file="${2:-}"
 
-extension=$(yq -r '.meta.vscode_extension // ""' "$input_file")
-name=$(yq -r '.meta.vscode_name // .meta.display_name' "$input_file")
+extension=$(yq '.meta.vscode_extension // ""' "$input_file")
+name=$(yq '.meta.vscode_name // .meta.display_name' "$input_file")
 
 if [[ -z "$extension" ]]; then
   echo "Skipping: meta.vscode_extension not specified in $input_file" >&2

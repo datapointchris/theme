@@ -102,7 +102,7 @@ theme_name_to_canonical() {
     local theme_file="$dir/theme.yml"
     if [[ -f "$theme_file" ]]; then
       local meta_name
-      meta_name=$(yq -r '.meta.display_name // ""' "$theme_file" 2>/dev/null || echo "")
+      meta_name=$(yq '.meta.display_name // ""' "$theme_file" 2>/dev/null || echo "")
       if [[ "${meta_name,,}" == "${input,,}" ]]; then
         basename "$dir"
         return
@@ -132,8 +132,8 @@ get_theme_display_info() {
   fi
 
   local display_name source_type
-  display_name=$(yq -r '.meta.display_name // ""' "$theme_file" 2>/dev/null)
-  source_type=$(yq -r '.meta.neovim_colorscheme_source // ""' "$theme_file" 2>/dev/null)
+  display_name=$(yq '.meta.display_name // ""' "$theme_file" 2>/dev/null)
+  source_type=$(yq '.meta.neovim_colorscheme_source // ""' "$theme_file" 2>/dev/null)
 
   if [[ -z "$display_name" ]]; then
     display_name="$theme"
@@ -2171,9 +2171,9 @@ display_theme_details() {
         # Show Neovim colorscheme info
         if [[ -f "$theme_file" ]]; then
           local nvim_name nvim_source plugin_repo
-          nvim_name=$(yq -r '.meta.neovim_colorscheme_name // .meta.id' "$theme_file")
-          nvim_source=$(yq -r '.meta.neovim_colorscheme_source // "unknown"' "$theme_file")
-          plugin_repo=$(yq -r '.meta.plugin // ""' "$theme_file")
+          nvim_name=$(yq '.meta.neovim_colorscheme_name // .meta.id' "$theme_file")
+          nvim_source=$(yq '.meta.neovim_colorscheme_source // "unknown"' "$theme_file")
+          plugin_repo=$(yq '.meta.plugin // ""' "$theme_file")
           echo "  Neovim colorscheme: $nvim_name ($nvim_source)"
           [[ -n "$plugin_repo" && "$plugin_repo" != "null" ]] && echo "  Plugin: $plugin_repo"
         fi

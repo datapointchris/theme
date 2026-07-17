@@ -26,6 +26,7 @@ ln -sf ~/.local/share/theme/bin/theme ~/.local/bin/theme
 ### Requirements
 
 - `jq` - JSON processing
+- `yq` - YAML processing ([mikefarah/yq](https://github.com/mikefarah/yq), the Go implementation)
 - `fzf` - Interactive theme picker
 - `gh` - GitHub CLI (for sync feature)
 

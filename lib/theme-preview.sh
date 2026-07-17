@@ -23,7 +23,7 @@ WIDTH=56
 declare -A T
 while IFS='=' read -r key value; do
   T["$key"]="$value"
-done < <(yq -r '[
+done < <(yq '[
   "name="               + (.meta.display_name // "Unknown"),
   "author="             + (.meta.author // "Unknown"),
   "variant="            + (.meta.variant // "dark"),

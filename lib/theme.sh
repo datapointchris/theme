@@ -9,7 +9,7 @@ set -euo pipefail
 theme_get() {
   local key="$1"
   local file="$2"
-  yq -r "$key // \"\"" "$file"
+  yq "$key // \"\"" "$file"
 }
 
 # Load all theme colors into shell variables

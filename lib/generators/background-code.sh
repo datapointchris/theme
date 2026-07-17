@@ -53,7 +53,7 @@ if [[ ! -f "$source_file" ]]; then
 fi
 
 # Pick best matching silicon theme based on our theme
-theme_id=$(yq -r '.meta.id // "default"' "$theme_file" 2>/dev/null || echo "default")
+theme_id=$(yq '.meta.id // "default"' "$theme_file" 2>/dev/null || echo "default")
 silicon_theme="base16"
 
 # Map some known themes to silicon built-ins
