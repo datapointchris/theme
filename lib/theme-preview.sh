@@ -28,6 +28,9 @@ done < <(yq '[
   "author="             + (.meta.author // "Unknown"),
   "variant="            + (.meta.variant // "dark"),
   "neovim_cs="          + (.meta.neovim_colorscheme_name // .meta.id // "unknown"),
+  "nvim_source="        + (.meta.neovim_colorscheme_source // "unknown"),
+  "derived="            + (.meta.derived_from // ""),
+  "plugin="             + (.meta.plugin // ""),
   "theme_bg="           + (.special.background // "#1a1a1a"),
   "theme_fg="           + (.special.foreground // "#ffffff"),
   "theme_cursor="       + (.special.cursor // "#ffffff"),
@@ -85,6 +88,9 @@ name="${T[name]}"
 author="${T[author]}"
 variant="${T[variant]}"
 neovim_cs="${T[neovim_cs]}"
+nvim_source="${T[nvim_source]}"
+derived="${T[derived]}"
+plugin="${T[plugin]}"
 
 theme_bg="${T[theme_bg]}"
 theme_fg="${T[theme_fg]}"
@@ -198,10 +204,16 @@ s() {
 }
 
 # Output all lines
+variant_line=" Variant: $variant"
+[[ -n "$derived" && "$derived" != "null" ]] && variant_line="$variant_line  ·  from $derived"
+neovim_line=" Neovim: $neovim_cs ($nvim_source)"
+[[ -n "$plugin" && "$plugin" != "null" ]] && neovim_line="$neovim_line  ·  $plugin"
+
 p ""
 p "${C_FG}${bold} $name${reset}${BG}"
 p "${C_DIM} Author: $author"
-p "${C_DIM} Variant: $variant | Neovim: $neovim_cs"
+p "${C_DIM}$variant_line"
+p "${C_DIM}$neovim_line"
 p ""
 p "${C_FG}${bold} Special${reset}${BG}"
 p " $(s "$theme_bg")${C_DIM}bg $(s "$theme_fg")${C_DIM}fg $(s "$theme_cursor")${C_DIM}cur $(s "$theme_selection_bg")${C_DIM}sel $(s "$theme_border")${C_DIM}bdr"

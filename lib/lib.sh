@@ -1984,6 +1984,19 @@ format_duration() {
   fi
 }
 
+# Format an elapsed number of seconds as a coarse "ago" string for recency.
+format_relative() {
+  local seconds="$1"
+
+  if [[ "$seconds" -lt 3600 ]]; then
+    echo "just now"
+  elif [[ "$seconds" -lt 86400 ]]; then
+    echo "$((seconds / 3600))h ago"
+  else
+    echo "$((seconds / 86400))d ago"
+  fi
+}
+
 reload_tmux() {
   if command -v tmux &> /dev/null && tmux list-sessions &> /dev/null 2>&1; then
     tmux source-file ~/.config/tmux/tmux.conf 2>/dev/null || true
@@ -2056,17 +2069,225 @@ reload_apps() {
   fi
 }
 
-# Display theme details with stats and history
+# Render the "About" block (theme.yml metadata) — the theme's identity. Shown
+# in the full view. The compact picker preview omits it because the color
+# swatch above already carries this same metadata rendered in-palette.
+_render_theme_about() {
+  local theme="$1"
+  local theme_file="$THEMES_DIR/$theme/theme.yml"
+  [[ -f "$theme_file" ]] || return 0
+
+  # Single yq pass — key=value lines. Keys never contain '=', so IFS splits clean.
+  local author variant derived nvim_name nvim_source plugin_repo
+  while IFS='=' read -r key value; do
+    case "$key" in
+      author) author="$value" ;;
+      variant) variant="$value" ;;
+      derived) derived="$value" ;;
+      nvim_name) nvim_name="$value" ;;
+      nvim_source) nvim_source="$value" ;;
+      plugin) plugin_repo="$value" ;;
+    esac
+  done < <(yq '[
+    "author="      + (.meta.author // ""),
+    "variant="     + (.meta.variant // ""),
+    "derived="     + (.meta.derived_from // ""),
+    "nvim_name="   + (.meta.neovim_colorscheme_name // .meta.id // ""),
+    "nvim_source=" + (.meta.neovim_colorscheme_source // ""),
+    "plugin="      + (.meta.plugin // "")
+  ] | .[]' "$theme_file")
+
+  echo "About:"
+  [[ -n "$author" ]] && printf "  Author: %s\n" "$author"
+  local variant_line="$variant"
+  [[ -n "$derived" && "$derived" != "null" ]] && variant_line="${variant_line:+$variant_line · }from $derived"
+  [[ -n "$variant_line" ]] && printf "  %s\n" "$variant_line"
+  [[ -n "$nvim_name" ]] && printf "  Neovim: %s (%s)\n" "$nvim_name" "${nvim_source:-unknown}"
+  [[ -n "$plugin_repo" && "$plugin_repo" != "null" ]] && printf "  Plugin: %s\n" "$plugin_repo"
+  return 0
+}
+
+# Render this theme's action history (the log), oldest to newest.
+# Args: $1 theme, $2 limit (0 = all; N = most recent N entries).
+_render_theme_history() {
+  local theme="$1" limit="$2"
+
+  type -t get_history &>/dev/null || return 0
+
+  local total
+  total=$(get_history | jq --arg theme "$theme" '[.[] | select(.theme == $theme)] | length')
+  [[ "$total" -eq 0 ]] && return 0
+
+  local label="History"
+  if [[ "$limit" -gt 0 && "$total" -gt "$limit" ]]; then
+    label="Recent (last $limit of $total)"
+  fi
+
+  echo ""
+  echo "$label:"
+  get_history | jq -r --arg theme "$theme" --argjson limit "$limit" '
+    ( map(select(.theme == $theme)) | sort_by(.ts) ) as $all |
+    ( if $limit > 0 then $all[-$limit:] else $all end ) |
+    .[] |
+    .action as $act |
+    .ts[0:10] as $date |
+    .message as $msg |
+    if $act == "apply" then "  \($date)  applied"
+    elif $act == "like" then (if $msg then "  \($date)  liked: \($msg)" else "  \($date)  liked" end)
+    elif $act == "dislike" then (if $msg then "  \($date)  disliked: \($msg)" else "  \($date)  disliked" end)
+    elif $act == "note" then "  \($date)  note: \($msg)"
+    elif $act == "reject" then "  \($date)  rejected: \($msg)"
+    elif $act == "unreject" then "  \($date)  unrejected"
+    else "  \($date)  \($act)"
+    end
+  ' 2>/dev/null
+  return 0
+}
+
+# Print a rank line like "<prefix>likes #2 · hours #5 of 40", only if at least
+# one position is known. $prefix is the complete label (e.g. "rank: ", "  Rank: ").
+_render_theme_rank_line() {
+  local prefix="$1" likes_pos="$2" hours_pos="$3" total="$4"
+  [[ -z "$likes_pos" && -z "$hours_pos" ]] && return 0
+
+  local line=""
+  [[ -n "$likes_pos" ]] && line="likes #${likes_pos}"
+  if [[ -n "$hours_pos" ]]; then
+    [[ -n "$line" ]] && line="$line · "
+    line="${line}hours #${hours_pos}"
+  fi
+  [[ -n "$total" ]] && line="$line of $total"
+  printf "%s%s\n" "$prefix" "$line"
+  return 0
+}
+
+# Render the stats footer — the numbers, shown last so they summarize after the
+# description and history have set context.
+_render_theme_stat_footer() {
+  local theme="$1" format="$2"
+
+  type -t get_theme_stats &>/dev/null || return 0
+  local stats
+  stats=$(get_theme_stats "$theme" 2>/dev/null)
+  [[ -z "$stats" || "$stats" == "null" || "$stats" == "{}" ]] && return 0
+
+  local total_actions
+  total_actions=$(echo "$stats" | jq -r '.total_actions // 0')
+  [[ "$total_actions" -eq 0 ]] && return 0
+
+  local score likes dislikes notes applies platforms machines
+  score=$(echo "$stats" | jq -r '.score // 0')
+  likes=$(echo "$stats" | jq -r '.likes // 0')
+  dislikes=$(echo "$stats" | jq -r '.dislikes // 0')
+  notes=$(echo "$stats" | jq -r '.notes // 0')
+  applies=$(echo "$stats" | jq -r '.applies // 0')
+  platforms=$(echo "$stats" | jq -r '.platforms | join(", ") // "none"')
+  machines=$(echo "$stats" | jq -r '.machines | join(", ") // "unknown"')
+
+  # Attributed usage time via the same engine rank uses.
+  local usage_seconds=0 usage_time="not used"
+  if type -t calculate_usage_time &>/dev/null; then
+    local current_theme usage_times
+    current_theme=$(get_current_theme 2>/dev/null || echo "")
+    usage_times=$(calculate_usage_time "$current_theme")
+    usage_seconds=$(echo "$usage_times" | jq -r --arg theme "$theme" '.[$theme] // 0')
+    [[ "$usage_seconds" -gt 0 ]] && usage_time=$(format_duration "$usage_seconds")
+  fi
+
+  # Recency from last apply. Computed in jq (with the same tz-aware parse as
+  # calculate_usage_time) to stay portable across BSD/GNU date.
+  local seconds_since=""
+  seconds_since=$(get_history | jq -r --arg theme "$theme" '
+    def parse_ts:
+      if test("[+-][0-9]{2}:[0-9]{2}$") then
+        gsub("[+-][0-9]{2}:[0-9]{2}$"; "Z") | fromdateiso8601
+      else fromdateiso8601 end;
+    (map(select(.theme == $theme and .action == "apply")) | max_by(.ts) | .ts) as $last |
+    if $last == null then "" else ((now | floor) - ($last | parse_ts)) end
+  ' 2>/dev/null)
+  local recency=""
+  [[ -n "$seconds_since" && "$seconds_since" != "null" ]] && recency=$(format_relative "$seconds_since")
+
+  # Rank positions among available themes (likes list and hours list).
+  local likes_pos="" hours_pos="" rank_total=""
+  if type -t get_theme_rank_positions &>/dev/null; then
+    local positions
+    positions=$(get_theme_rank_positions "$theme" 2>/dev/null)
+    if [[ -n "$positions" ]]; then
+      likes_pos=$(echo "$positions" | jq -r '.likes_pos // empty')
+      hours_pos=$(echo "$positions" | jq -r '.hours_pos // empty')
+      rank_total=$(echo "$positions" | jq -r '.total // empty')
+    fi
+  fi
+
+  echo ""
+  if [[ "$format" == "full" ]]; then
+    echo "Stats:"
+    printf "  Score: %+d (%d likes, %d dislikes)\n" "$score" "$likes" "$dislikes"
+    printf "  Usage time: %s\n" "$usage_time"
+    [[ -n "$recency" ]] && printf "  Last used: %s\n" "$recency"
+    _render_theme_rank_line "  Rank: " "$likes_pos" "$hours_pos" "$rank_total"
+    printf "  Notes: %d\n" "$notes"
+    printf "  Times applied: %d\n" "$applies"
+    printf "  Platforms: %s\n" "$platforms"
+    printf "  Machines: %s\n" "$machines"
+  else
+    printf "%+d · %d↑ %d↓" "$score" "$likes" "$dislikes"
+    [[ "$usage_seconds" -gt 0 ]] && printf " · %s used" "$usage_time"
+    echo ""
+    printf "%d× applied" "$applies"
+    [[ -n "$recency" ]] && printf " · last used %s" "$recency"
+    echo ""
+    _render_theme_rank_line "rank: " "$likes_pos" "$hours_pos" "$rank_total"
+  fi
+  return 0
+}
+
+# Render available app configs and the Neovim colorscheme wiring (full view).
+_render_theme_configs() {
+  local theme="$1"
+  local theme_dir="$THEMES_DIR/$theme"
+  local theme_file="$theme_dir/theme.yml"
+
+  echo ""
+  echo "App Configs:"
+  local configs=""
+  [[ -f "$theme_dir/ghostty.conf" ]] && configs+="Ghostty "
+  [[ -f "$theme_dir/kitty.conf" ]] && configs+="Kitty "
+  [[ -f "$theme_dir/tmux.conf" ]] && configs+="tmux "
+  [[ -f "$theme_dir/btop.theme" ]] && configs+="btop "
+  [[ -f "$theme_dir/bordersrc" ]] && configs+="JankyBorders "
+  [[ -f "$theme_dir/hyprland.conf" ]] && configs+="Hyprland "
+  [[ -f "$theme_dir/waybar.css" ]] && configs+="Waybar "
+  [[ -f "$theme_dir/windows-terminal.json" ]] && configs+="WindowsTerminal "
+  [[ -d "$theme_dir/neovim" ]] && configs+="Neovim(generated) "
+  echo "  Available: ${configs:-none}"
+
+  if [[ -f "$theme_file" ]]; then
+    local nvim_name nvim_source plugin_repo
+    nvim_name=$(yq '.meta.neovim_colorscheme_name // .meta.id' "$theme_file")
+    nvim_source=$(yq '.meta.neovim_colorscheme_source // "unknown"' "$theme_file")
+    plugin_repo=$(yq '.meta.plugin // ""' "$theme_file")
+    echo "  Neovim colorscheme: $nvim_name ($nvim_source)"
+    [[ -n "$plugin_repo" && "$plugin_repo" != "null" ]] && echo "  Plugin: $plugin_repo"
+  fi
+  return 0
+}
+
+# Display theme details. Order mirrors font: About (description) -> History
+# (the log) -> Stats footer. The compact picker preview starts at the log
+# because the color swatch above already carries the About block in-palette.
+# Args: $1 theme id
+#       $2 format ("full" for 'theme current', "compact" for the change picker)
 display_theme_details() {
   local theme="$1"
   local format="${2:-full}"
 
-  # Source storage.sh if needed (for preview script)
+  # Source storage.sh if needed (when invoked from the fzf preview subshell)
   if ! type -t get_theme_stats &>/dev/null; then
-    source "$APP_DIR/lib/storage.sh" 2>/dev/null || true
+    source "$THEME_APP_DIR/lib/storage.sh" 2>/dev/null || true
   fi
 
-  # Get display info
   local display_info
   display_info=$(get_theme_display_info "$theme")
 
@@ -2076,113 +2297,13 @@ display_theme_details() {
     echo "           ID: $theme"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
+    _render_theme_about "$theme"
+    _render_theme_history "$theme" 0
+    _render_theme_stat_footer "$theme" "$format"
+    _render_theme_configs "$theme"
+    echo ""
   else
-    echo "━━━ $display_info ━━━"
-  fi
-
-  # Get stats from history
-  if type -t get_theme_stats &>/dev/null; then
-    local stats
-    stats=$(get_theme_stats "$theme" 2>/dev/null)
-
-    if [[ -n "$stats" ]] && [[ "$stats" != "null" ]] && [[ "$stats" != "{}" ]]; then
-      local score=$(echo "$stats" | jq -r '.score // 0')
-      local likes=$(echo "$stats" | jq -r '.likes // 0')
-      local dislikes=$(echo "$stats" | jq -r '.dislikes // 0')
-      local notes=$(echo "$stats" | jq -r '.notes // 0')
-      local applies=$(echo "$stats" | jq -r '.applies // 0')
-      local platforms=$(echo "$stats" | jq -r '.platforms | join(", ") // "none"')
-
-      # Calculate usage time
-      local usage_time="not used"
-      if type -t calculate_usage_time &>/dev/null; then
-        local current_theme
-        current_theme=$(get_current_theme 2>/dev/null || echo "")
-        local usage_times
-        usage_times=$(calculate_usage_time "$current_theme")
-        local usage_seconds=$(echo "$usage_times" | jq -r --arg theme "$theme" '.[$theme] // 0')
-        if [[ "$usage_seconds" -gt 0 ]] && type -t format_duration &>/dev/null; then
-          usage_time=$(format_duration "$usage_seconds")
-        fi
-      fi
-
-      if [[ "$format" == "full" ]]; then
-        echo "Stats:"
-        printf "  Score: %+d (%d likes, %d dislikes)\n" "$score" "$likes" "$dislikes"
-        printf "  Usage time: %s\n" "$usage_time"
-        printf "  Notes: %d\n" "$notes"
-        printf "  Times applied: %d\n" "$applies"
-        printf "  Platforms: %s\n" "$platforms"
-        local machines=$(echo "$stats" | jq -r '.machines | join(", ") // "unknown"')
-        printf "  Machines: %s\n" "$machines"
-
-        # Show history for this theme (tells the story)
-        if type -t get_history &>/dev/null; then
-          local history_count
-          history_count=$(get_history | jq --arg theme "$theme" '[.[] | select(.theme == $theme)] | length')
-          if [[ "$history_count" -gt 0 ]]; then
-            echo ""
-            echo "History:"
-            get_history | jq -r --arg theme "$theme" '
-              map(select(.theme == $theme)) |
-              sort_by(.ts) |
-              .[] |
-              .action as $act |
-              .ts[0:10] as $date |
-              .message as $msg |
-              if $act == "apply" then
-                "  \($date)  applied"
-              elif $act == "like" then
-                if $msg then "  \($date)  liked: \($msg)" else "  \($date)  liked" end
-              elif $act == "dislike" then
-                if $msg then "  \($date)  disliked: \($msg)" else "  \($date)  disliked" end
-              elif $act == "note" then
-                "  \($date)  note: \($msg)"
-              elif $act == "reject" then
-                "  \($date)  rejected: \($msg)"
-              elif $act == "unreject" then
-                "  \($date)  unrejected"
-              else
-                "  \($date)  \($act)"
-              end
-            ' 2>/dev/null
-          fi
-        fi
-
-        # Show app configs
-        echo ""
-        echo "App Configs:"
-        local theme_dir="$THEMES_DIR/$theme"
-        local theme_file="$theme_dir/theme.yml"
-
-        # Check which config files exist
-        local configs=""
-        [[ -f "$theme_dir/ghostty.conf" ]] && configs+="Ghostty "
-        [[ -f "$theme_dir/kitty.conf" ]] && configs+="Kitty "
-        [[ -f "$theme_dir/tmux.conf" ]] && configs+="tmux "
-        [[ -f "$theme_dir/btop.theme" ]] && configs+="btop "
-        [[ -f "$theme_dir/bordersrc" ]] && configs+="JankyBorders "
-        [[ -f "$theme_dir/hyprland.conf" ]] && configs+="Hyprland "
-        [[ -f "$theme_dir/waybar.css" ]] && configs+="Waybar "
-        [[ -f "$theme_dir/windows-terminal.json" ]] && configs+="WindowsTerminal "
-        [[ -d "$theme_dir/neovim" ]] && configs+="Neovim(generated) "
-        echo "  Available: ${configs:-none}"
-
-        # Show Neovim colorscheme info
-        if [[ -f "$theme_file" ]]; then
-          local nvim_name nvim_source plugin_repo
-          nvim_name=$(yq '.meta.neovim_colorscheme_name // .meta.id' "$theme_file")
-          nvim_source=$(yq '.meta.neovim_colorscheme_source // "unknown"' "$theme_file")
-          plugin_repo=$(yq '.meta.plugin // ""' "$theme_file")
-          echo "  Neovim colorscheme: $nvim_name ($nvim_source)"
-          [[ -n "$plugin_repo" && "$plugin_repo" != "null" ]] && echo "  Plugin: $plugin_repo"
-        fi
-      else
-        # Compact format for preview
-        printf "Score: %+d (%d↑ %d↓)" "$score" "$likes" "$dislikes"
-        printf " | Used: %s" "$usage_time"
-        echo ""
-      fi
-    fi
+    _render_theme_history "$theme" 6
+    _render_theme_stat_footer "$theme" "$format"
   fi
 }

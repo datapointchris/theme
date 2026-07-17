@@ -706,6 +706,9 @@ change_theme() {
     exit 1
   fi
 
+  # Pull latest history before showing picker so stats/log reflect other machines
+  sync_before_read
+
   # Build list with display names and IDs (tab-separated)
   local theme_list=""
   while IFS= read -r theme_id; do
@@ -714,16 +717,30 @@ change_theme() {
     theme_list+="${display_info}"$'\t'"${theme_id}"$'\n'
   done < <(list_themes)
 
-  # Preview pane renders a live ANSI color swatch from theme.yml — no image
-  # toolchain, no cache, just escape codes drawn directly in the fzf window.
+  # Preview pane: the live ANSI color swatch (description + palette drawn in the
+  # theme's own colors) followed by this theme's history log and stats footer.
+  # A temp script lets the fzf subshell source the libs it needs for the stats.
+  local preview_script="/tmp/theme-change-preview-$$.sh"
+  cat >"$preview_script" <<PREVIEW_EOF
+#!/usr/bin/env bash
+source "$THEME_APP_DIR/lib/lib.sh"
+source "$THEME_APP_DIR/lib/storage.sh"
+theme_id="\$1"
+bash "$THEME_APP_DIR/lib/theme-preview.sh" "$THEMES_DIR/\$theme_id"
+display_theme_details "\$theme_id" "compact"
+PREVIEW_EOF
+  chmod +x "$preview_script"
+
   local selected
   selected=$(echo -n "$theme_list" | fzf \
     --prompt="Select theme > " \
     --height=100% \
     --delimiter=$'\t' \
     --with-nth=1 \
-    --preview="bash '$THEME_APP_DIR/lib/theme-preview.sh' '$THEMES_DIR/{2}'" \
+    --preview="$preview_script {2}" \
     --preview-window=right:60%)
+
+  rm -f "$preview_script"
 
   if [[ -n "$selected" ]]; then
     # Extract the theme ID (second field)
@@ -994,107 +1011,125 @@ PREVIEW_EOF
   fi
 }
 
+# Draw a proportional bar of a given width. Args: value, max, width, color.
+# A positive value always shows at least one filled cell; negative/zero values
+# (possible for like-scores) render empty.
+_rank_bar() {
+  local value="$1" max="$2" width="$3" color="$4"
+  local c_reset='\033[0m'
+
+  local filled=0
+  if [[ "$value" -gt 0 ]] && [[ "$max" -gt 0 ]]; then
+    filled=$((value * width / max))
+    [[ $filled -lt 1 ]] && filled=1
+  fi
+  [[ $filled -gt $width ]] && filled=$width
+  local empty=$((width - filled))
+
+  local filled_part="" empty_part=""
+  [[ $filled -gt 0 ]] && filled_part=$(printf '█%.0s' $(seq 1 "$filled"))
+  [[ $empty -gt 0 ]] && empty_part=$(printf '░%.0s' $(seq 1 "$empty"))
+  printf '%b%s%b%s' "$color" "$filled_part" "$c_reset" "$empty_part"
+}
+
+# Render one ranking section (a labeled, sorted bar chart). Reads the pre-resolved
+# ".display" name off each row so it never re-shells yq per theme.
+# Args: $1 title, $2 rankings JSON array, $3 mode (likes|hours), $4 name width.
+_render_rank_section() {
+  local title="$1" rankings="$2" mode="$3" name_width="$4"
+
+  local c_reset='\033[0m'
+  local c_green='\033[0;32m'
+  local c_red='\033[0;31m'
+  local c_white='\033[0;37m'
+  local c_blue='\033[0;34m'
+  local bar_width=10
+
+  # BY LIKES ranks on score (recency breaks ties); BY HOURS USED on usage seconds.
+  local sorted max
+  if [[ "$mode" == "likes" ]]; then
+    sorted=$(echo "$rankings" | jq -c 'sort_by(.score, .sort_key) | reverse | .[]')
+    max=$(echo "$rankings" | jq '[.[].score] | max // 0')
+  else
+    sorted=$(echo "$rankings" | jq -c 'sort_by(.usage_seconds) | reverse | .[]')
+    max=$(echo "$rankings" | jq '[.[].usage_seconds] | max // 0')
+  fi
+
+  echo ""
+  echo -e "${c_blue}${title}${c_reset}"
+
+  local rank=0
+  while IFS= read -r line; do
+    [[ -z "$line" ]] && continue
+    rank=$((rank + 1))
+    local display score usage_seconds
+    display=$(echo "$line" | jq -r '.display // .theme')
+    score=$(echo "$line" | jq -r '.score')
+    usage_seconds=$(echo "$line" | jq -r '.usage_seconds // 0')
+
+    if [[ ${#display} -gt $name_width ]]; then
+      display="${display:0:$((name_width - 3))}..."
+    fi
+
+    local metric bar
+    if [[ "$mode" == "likes" ]]; then
+      local score_color="$c_white"
+      [[ $score -gt 0 ]] && score_color="$c_green"
+      [[ $score -lt 0 ]] && score_color="$c_red"
+      metric=$(printf "${score_color}%+3d${c_reset}" "$score")
+      bar=$(_rank_bar "$score" "$max" "$bar_width" "$c_green")
+    else
+      local usage_time="-"
+      [[ "$usage_seconds" -gt 0 ]] && usage_time=$(format_duration "$usage_seconds")
+      metric=$(printf "%8s" "$usage_time")
+      bar=$(_rank_bar "$usage_seconds" "$max" "$bar_width" "$c_green")
+    fi
+
+    printf "%2d. %-${name_width}s  %b  %b\n" "$rank" "$display" "$metric" "$bar"
+  done <<< "$sorted"
+}
+
 show_rankings() {
   sync_before_read
-  local rankings
-  rankings=$(get_rankings)
 
-  if [[ -z "$rankings" ]] || [[ "$rankings" == "null" ]]; then
+  # Restrict to available themes, then rank the same set two ways (font-style).
+  local available_json rankings count
+  available_json=$(list_themes | jq -R . | jq -s .)
+  rankings=$(get_rankings | jq -s --argjson avail "$available_json" \
+    'map(select(.theme as $t | ($avail | index($t)) != null))')
+
+  count=$(echo "$rankings" | jq 'length')
+  if [[ "$count" -eq 0 ]]; then
     echo "No theme data yet. Start using themes!"
     return
   fi
 
-  # Colors
+  # Resolve display names once (one yq per theme) and fold them into the JSON so
+  # both sections reuse them. Theme ids -> pretty names come only from theme.yml.
+  rankings=$(
+    while IFS= read -r theme; do
+      printf '%s\t%s\n' "$theme" "$(get_theme_display_info "$theme")"
+    done < <(echo "$rankings" | jq -r '.[].theme') \
+    | jq -R -s --argjson r "$rankings" '
+        (split("\n") | map(select(length > 0) | split("\t") | {key: .[0], value: .[1]}) | from_entries) as $dm
+        | $r | map(.display = ($dm[.theme] // .theme))
+      '
+  )
+
   local c_reset='\033[0m'
   local c_gold='\033[0;33m'
-  local c_green='\033[0;32m'
-  local c_red='\033[0;31m'
-  local c_white='\033[0;37m'
+
+  # Shared name width (capped at 40) so both sections align.
+  local name_width
+  name_width=$(echo "$rankings" | jq '[.[].display | length] | max // 0')
+  [[ $name_width -gt 40 ]] && name_width=40
 
   echo ""
   echo -e "${c_gold}Theme Rankings${c_reset}"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-  # Find max display name length and max usage time for alignment and color scaling
-  local max_len=0
-  local max_usage=0
-  local has_usage=false
-  while IFS= read -r line; do
-    local theme=$(echo "$line" | jq -r '.theme')
-    local display_info
-    display_info=$(get_theme_display_info "$theme")
-    local len=${#display_info}
-    [[ $len -gt $max_len ]] && max_len=$len
-    local usage=$(echo "$line" | jq -r '.usage_seconds // 0')
-    if [[ "$usage" -gt 0 ]]; then
-      has_usage=true
-      [[ $usage -gt $max_usage ]] && max_usage=$usage
-    fi
-  done <<< "$rankings"
-
-  # Cap max length at 40 to prevent overly wide output
-  [[ $max_len -gt 40 ]] && max_len=40
-
-  local rank=0
-  while IFS= read -r line; do
-    rank=$((rank + 1))
-    local theme=$(echo "$line" | jq -r '.theme')
-    local score=$(echo "$line" | jq -r '.score')
-    local usage_seconds=$(echo "$line" | jq -r '.usage_seconds // 0')
-
-    # Get display info
-    local display_info
-    display_info=$(get_theme_display_info "$theme")
-
-    # Format usage time
-    local usage_time="-"
-    if [[ "$usage_seconds" -gt 0 ]]; then
-      usage_time=$(format_duration "$usage_seconds")
-    fi
-
-    # Truncate long display names
-    if [[ ${#display_info} -gt 40 ]]; then
-      display_info="${display_info:0:37}..."
-    fi
-
-    # Score color
-    local score_color="$c_white"
-    if [[ $score -gt 0 ]]; then
-      score_color="$c_green"
-    elif [[ $score -lt 0 ]]; then
-      score_color="$c_red"
-    fi
-
-    # Usage bar (visual representation of relative usage)
-    local bar=""
-    local bar_width=10
-    if [[ "$usage_seconds" -gt 0 ]] && [[ "$has_usage" == "true" ]] && [[ $max_usage -gt 0 ]]; then
-      local filled=$((usage_seconds * bar_width / max_usage))
-      [[ $filled -lt 1 ]] && filled=1
-      local empty=$((bar_width - filled))
-
-      # Color gradient based on percentage
-      local percent=$((usage_seconds * 100 / max_usage))
-      local bar_color
-      if [[ $percent -ge 50 ]]; then
-        bar_color="$c_green"
-      else
-        bar_color="$c_red"
-      fi
-
-      local filled_part=$(printf '█%.0s' $(seq 1 $filled))
-      local empty_part=""
-      [[ $empty -gt 0 ]] && empty_part=$(printf '░%.0s' $(seq 1 $empty))
-      bar="${bar_color}${filled_part}${c_reset}${empty_part}"
-    elif [[ "$usage_seconds" -gt 0 ]]; then
-      bar="${c_green}$(printf '█%.0s' $(seq 1 $bar_width))${c_reset}"
-    else
-      bar="$(printf '░%.0s' $(seq 1 $bar_width))"
-    fi
-
-    printf "%2d. %-${max_len}s  ${score_color}%+3d${c_reset}    %b  %s\n" \
-      "$rank" "$display_info" "$score" "$bar" "$usage_time"
-  done <<< "$rankings"
+  _render_rank_section "BY LIKES" "$rankings" likes "$name_width"
+  _render_rank_section "BY HOURS USED" "$rankings" hours "$name_width"
   echo ""
 }
 

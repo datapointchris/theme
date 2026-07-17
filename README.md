@@ -55,7 +55,7 @@ theme unreject                # Restore a rejected theme
 ### Rankings and History
 
 ```bash
-theme rank                    # Show themes ranked by score and usage time
+theme rank                    # Rankings: by likes and by hours used
 theme log                     # View complete history
 theme rejected                # List rejected themes
 ```

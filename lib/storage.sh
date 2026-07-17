@@ -209,6 +209,26 @@ get_rankings() {
   '
 }
 
+# A theme's 1-based position in each ranking (available themes only), plus the
+# total ranked. Positions are null when the theme is not in the ranked set.
+# BY LIKES ranks on score (recency breaks ties); BY HOURS ranks on usage.
+get_theme_rank_positions() {
+  local theme="$1"
+  local available_json
+  available_json=$(list_themes | jq -R . | jq -s .)
+
+  get_rankings | jq -s --argjson avail "$available_json" --arg theme "$theme" '
+    map(select(.theme as $t | ($avail | index($t)) != null)) as $r |
+    ($r | sort_by(.score, .sort_key) | reverse | map(.theme) | index($theme)) as $li |
+    ($r | sort_by(.usage_seconds) | reverse | map(.theme) | index($theme)) as $hi |
+    {
+      total: ($r | length),
+      likes_pos: (if $li == null then null else $li + 1 end),
+      hours_pos: (if $hi == null then null else $hi + 1 end)
+    }
+  '
+}
+
 filter_by_theme() {
   local theme="$1"
   get_history | jq --arg theme "$theme" 'map(select(.theme == $theme))'
