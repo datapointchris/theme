@@ -12,8 +12,8 @@ configs that match a corresponding Neovim colorscheme.
 
 ```text
 apps/common/theme/
-├── bin/theme           # Theme CLI tool (apply, preview, like/dislike)
-├── demo/               # Sample code files for theme preview
+├── bin/theme           # Theme CLI tool (apply, change, like/dislike)
+├── demo/               # Sample code files for generated backgrounds
 ├── lib/                # Core libraries and generators
 │   ├── generators/     # App-specific generators
 │   │   ├── ghostty.sh, kitty.sh     # Terminal emulators (colors)
@@ -25,8 +25,7 @@ apps/common/theme/
 │   │   ├── hyprland.sh, hyprlock.sh # Hyprland WM (Arch)
 │   │   ├── waybar.sh, rofi.sh       # Desktop apps (Arch)
 │   │   ├── dunst.sh, mako.sh        # Notification daemons
-│   │   ├── windows-terminal.sh      # WSL terminal
-│   │   └── preview.sh               # Theme preview images
+│   │   └── windows-terminal.sh      # WSL terminal
 │   ├── neovim_generator.py  # Generates Neovim colorscheme plugin
 │   └── theme.sh        # Loads theme.yml into shell variables
 ├── themes/             # 40+ themes with theme.yml source and generated configs
@@ -245,4 +244,4 @@ The `colorscheme-manager.lua` plugin:
 | `lib/generators/rofi.sh` | Rofi launcher (Arch) |
 | `lib/generators/dunst.sh` | Dunst notifications (Arch) |
 | `lib/generators/windows-terminal.sh` | Windows Terminal (WSL) |
-| `lib/generators/preview.sh` | Theme preview image generator |
+| `lib/theme-preview.sh` | ANSI color-swatch preview for the `theme change` fzf picker |

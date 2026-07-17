@@ -15,73 +15,133 @@ fi
 # Preview width (characters)
 WIDTH=56
 
-# Read metadata
-name=$(yq '.meta.display_name // "Unknown"' "$theme_file")
-author=$(yq '.meta.author // "Unknown"' "$theme_file")
-variant=$(yq '.meta.variant // "dark"' "$theme_file")
-neovim_cs=$(yq '.meta.neovim_colorscheme_name // .meta.id // "unknown"' "$theme_file")
+# Read every value in a SINGLE yq pass. fzf re-runs this preview on each
+# keystroke while navigating the picker, so spawning ~50 separate yq
+# subprocesses (each ~0.1s of interpreter startup) made the pane lag for
+# seconds per theme. One jq program emitting all key=value lines keeps it
+# instant. Keys never contain '=', so IFS='=' splits cleanly into name/value.
+declare -A T
+while IFS='=' read -r key value; do
+  T["$key"]="$value"
+done < <(yq -r '[
+  "name="               + (.meta.display_name // "Unknown"),
+  "author="             + (.meta.author // "Unknown"),
+  "variant="            + (.meta.variant // "dark"),
+  "neovim_cs="          + (.meta.neovim_colorscheme_name // .meta.id // "unknown"),
+  "theme_bg="           + (.special.background // "#1a1a1a"),
+  "theme_fg="           + (.special.foreground // "#ffffff"),
+  "theme_cursor="       + (.special.cursor // "#ffffff"),
+  "theme_selection_bg=" + (.special.selection_bg // "#444444"),
+  "theme_border="       + (.special.border // "#555555"),
+  "black="              + (.ansi.black // "#000000"),
+  "red="                + (.ansi.red // "#ff0000"),
+  "green="              + (.ansi.green // "#00ff00"),
+  "yellow="             + (.ansi.yellow // "#ffff00"),
+  "blue="               + (.ansi.blue // "#0000ff"),
+  "magenta="            + (.ansi.magenta // "#ff00ff"),
+  "cyan="               + (.ansi.cyan // "#00ffff"),
+  "white="              + (.ansi.white // "#ffffff"),
+  "bright_black="       + (.ansi.bright_black // "#808080"),
+  "bright_red="         + (.ansi.bright_red // "#ff8080"),
+  "bright_green="       + (.ansi.bright_green // "#80ff80"),
+  "bright_yellow="      + (.ansi.bright_yellow // "#ffff80"),
+  "bright_blue="        + (.ansi.bright_blue // "#8080ff"),
+  "bright_magenta="     + (.ansi.bright_magenta // "#ff80ff"),
+  "bright_cyan="        + (.ansi.bright_cyan // "#80ffff"),
+  "bright_white="       + (.ansi.bright_white // "#ffffff"),
+  "base00="             + (.base16.base00 // "#000000"),
+  "base01="             + (.base16.base01 // "#111111"),
+  "base02="             + (.base16.base02 // "#222222"),
+  "base03="             + (.base16.base03 // "#333333"),
+  "base04="             + (.base16.base04 // "#444444"),
+  "base05="             + (.base16.base05 // "#555555"),
+  "base06="             + (.base16.base06 // "#666666"),
+  "base07="             + (.base16.base07 // "#777777"),
+  "base08="             + (.base16.base08 // "#ff0000"),
+  "base09="             + (.base16.base09 // "#ff8000"),
+  "base0A="             + (.base16.base0A // "#ffff00"),
+  "base0B="             + (.base16.base0B // "#00ff00"),
+  "base0C="             + (.base16.base0C // "#00ffff"),
+  "base0D="             + (.base16.base0D // "#0080ff"),
+  "base0E="             + (.base16.base0E // "#ff00ff"),
+  "base0F="             + (.base16.base0F // "#804000"),
+  "syntax_comment="     + (.extended.syntax_comment // .ansi.bright_black // "#808080"),
+  "syntax_string="      + (.extended.syntax_string // .ansi.green // "#00ff00"),
+  "syntax_keyword="     + (.extended.syntax_keyword // .ansi.magenta // "#ff00ff"),
+  "syntax_function="    + (.extended.syntax_function // .ansi.blue // "#0000ff"),
+  "syntax_number="      + (.extended.syntax_number // .ansi.cyan // "#00ffff"),
+  "syntax_type="        + (.extended.syntax_type // .ansi.yellow // "#ffff00"),
+  "syntax_operator="    + (.extended.syntax_operator // .ansi.yellow // "#ffff00"),
+  "git_add="            + (.extended.git_add // .ansi.green // "#00ff00"),
+  "git_change="         + (.extended.git_change // .ansi.yellow // "#ffff00"),
+  "git_delete="         + (.extended.git_delete // .ansi.red // "#ff0000"),
+  "diag_error="         + (.extended.diagnostic_error // .ansi.red // "#ff0000"),
+  "diag_warning="       + (.extended.diagnostic_warning // .ansi.yellow // "#ffff00"),
+  "diag_info="          + (.extended.diagnostic_info // .ansi.blue // "#0000ff"),
+  "diag_hint="          + (.extended.diagnostic_hint // .ansi.cyan // "#00ffff")
+] | .[]' "$theme_file")
 
-# Read special colors
-theme_bg=$(yq '.special.background // "#1a1a1a"' "$theme_file")
-theme_fg=$(yq '.special.foreground // "#ffffff"' "$theme_file")
-theme_cursor=$(yq '.special.cursor // "#ffffff"' "$theme_file")
-theme_selection_bg=$(yq '.special.selection_bg // "#444444"' "$theme_file")
-theme_border=$(yq '.special.border // "#555555"' "$theme_file")
+name="${T[name]}"
+author="${T[author]}"
+variant="${T[variant]}"
+neovim_cs="${T[neovim_cs]}"
 
-# Read ANSI colors
-black=$(yq '.ansi.black // "#000000"' "$theme_file")
-red=$(yq '.ansi.red // "#ff0000"' "$theme_file")
-green=$(yq '.ansi.green // "#00ff00"' "$theme_file")
-yellow=$(yq '.ansi.yellow // "#ffff00"' "$theme_file")
-blue=$(yq '.ansi.blue // "#0000ff"' "$theme_file")
-magenta=$(yq '.ansi.magenta // "#ff00ff"' "$theme_file")
-cyan=$(yq '.ansi.cyan // "#00ffff"' "$theme_file")
-white=$(yq '.ansi.white // "#ffffff"' "$theme_file")
+theme_bg="${T[theme_bg]}"
+theme_fg="${T[theme_fg]}"
+theme_cursor="${T[theme_cursor]}"
+theme_selection_bg="${T[theme_selection_bg]}"
+theme_border="${T[theme_border]}"
 
-bright_black=$(yq '.ansi.bright_black // "#808080"' "$theme_file")
-bright_red=$(yq '.ansi.bright_red // "#ff8080"' "$theme_file")
-bright_green=$(yq '.ansi.bright_green // "#80ff80"' "$theme_file")
-bright_yellow=$(yq '.ansi.bright_yellow // "#ffff80"' "$theme_file")
-bright_blue=$(yq '.ansi.bright_blue // "#8080ff"' "$theme_file")
-bright_magenta=$(yq '.ansi.bright_magenta // "#ff80ff"' "$theme_file")
-bright_cyan=$(yq '.ansi.bright_cyan // "#80ffff"' "$theme_file")
-bright_white=$(yq '.ansi.bright_white // "#ffffff"' "$theme_file")
+black="${T[black]}"
+red="${T[red]}"
+green="${T[green]}"
+yellow="${T[yellow]}"
+blue="${T[blue]}"
+magenta="${T[magenta]}"
+cyan="${T[cyan]}"
+white="${T[white]}"
 
-# Read base16 colors
-base00=$(yq '.base16.base00 // "#000000"' "$theme_file")
-base01=$(yq '.base16.base01 // "#111111"' "$theme_file")
-base02=$(yq '.base16.base02 // "#222222"' "$theme_file")
-base03=$(yq '.base16.base03 // "#333333"' "$theme_file")
-base04=$(yq '.base16.base04 // "#444444"' "$theme_file")
-base05=$(yq '.base16.base05 // "#555555"' "$theme_file")
-base06=$(yq '.base16.base06 // "#666666"' "$theme_file")
-base07=$(yq '.base16.base07 // "#777777"' "$theme_file")
-base08=$(yq '.base16.base08 // "#ff0000"' "$theme_file")
-base09=$(yq '.base16.base09 // "#ff8000"' "$theme_file")
-base0A=$(yq '.base16.base0A // "#ffff00"' "$theme_file")
-base0B=$(yq '.base16.base0B // "#00ff00"' "$theme_file")
-base0C=$(yq '.base16.base0C // "#00ffff"' "$theme_file")
-base0D=$(yq '.base16.base0D // "#0080ff"' "$theme_file")
-base0E=$(yq '.base16.base0E // "#ff00ff"' "$theme_file")
-base0F=$(yq '.base16.base0F // "#804000"' "$theme_file")
+bright_black="${T[bright_black]}"
+bright_red="${T[bright_red]}"
+bright_green="${T[bright_green]}"
+bright_yellow="${T[bright_yellow]}"
+bright_blue="${T[bright_blue]}"
+bright_magenta="${T[bright_magenta]}"
+bright_cyan="${T[bright_cyan]}"
+bright_white="${T[bright_white]}"
 
-# Read extended/semantic colors with fallbacks
-syntax_comment=$(yq '.extended.syntax_comment // .ansi.bright_black // "#808080"' "$theme_file")
-syntax_string=$(yq '.extended.syntax_string // .ansi.green // "#00ff00"' "$theme_file")
-syntax_keyword=$(yq '.extended.syntax_keyword // .ansi.magenta // "#ff00ff"' "$theme_file")
-syntax_function=$(yq '.extended.syntax_function // .ansi.blue // "#0000ff"' "$theme_file")
-syntax_number=$(yq '.extended.syntax_number // .ansi.cyan // "#00ffff"' "$theme_file")
-syntax_type=$(yq '.extended.syntax_type // .ansi.yellow // "#ffff00"' "$theme_file")
-syntax_operator=$(yq '.extended.syntax_operator // .ansi.yellow // "#ffff00"' "$theme_file")
+base00="${T[base00]}"
+base01="${T[base01]}"
+base02="${T[base02]}"
+base03="${T[base03]}"
+base04="${T[base04]}"
+base05="${T[base05]}"
+base06="${T[base06]}"
+base07="${T[base07]}"
+base08="${T[base08]}"
+base09="${T[base09]}"
+base0A="${T[base0A]}"
+base0B="${T[base0B]}"
+base0C="${T[base0C]}"
+base0D="${T[base0D]}"
+base0E="${T[base0E]}"
+base0F="${T[base0F]}"
 
-# Git/diagnostic colors
-git_add=$(yq '.extended.git_add // .ansi.green // "#00ff00"' "$theme_file")
-git_change=$(yq '.extended.git_change // .ansi.yellow // "#ffff00"' "$theme_file")
-git_delete=$(yq '.extended.git_delete // .ansi.red // "#ff0000"' "$theme_file")
-diag_error=$(yq '.extended.diagnostic_error // .ansi.red // "#ff0000"' "$theme_file")
-diag_warning=$(yq '.extended.diagnostic_warning // .ansi.yellow // "#ffff00"' "$theme_file")
-diag_info=$(yq '.extended.diagnostic_info // .ansi.blue // "#0000ff"' "$theme_file")
-diag_hint=$(yq '.extended.diagnostic_hint // .ansi.cyan // "#00ffff"' "$theme_file")
+syntax_comment="${T[syntax_comment]}"
+syntax_string="${T[syntax_string]}"
+syntax_keyword="${T[syntax_keyword]}"
+syntax_function="${T[syntax_function]}"
+syntax_number="${T[syntax_number]}"
+syntax_type="${T[syntax_type]}"
+syntax_operator="${T[syntax_operator]}"
+
+git_add="${T[git_add]}"
+git_change="${T[git_change]}"
+git_delete="${T[git_delete]}"
+diag_error="${T[diag_error]}"
+diag_warning="${T[diag_warning]}"
+diag_info="${T[diag_info]}"
+diag_hint="${T[diag_hint]}"
 
 # ANSI escape helpers
 reset=$'\033[0m'

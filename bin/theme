@@ -77,7 +77,6 @@ usage() {
   current              Show currently active theme
   list                 List available themes
   apply <theme>        Apply theme across all platform apps
-  preview [theme]      Preview generated theme in tmux (fzf if no theme)
   random               Apply random theme
   like [message]       Like current theme with optional reason
   dislike [message]    Dislike current theme with optional reason
@@ -91,8 +90,6 @@ usage() {
   verify               Check theme system is working
   browsers             Show browser theme status and setup
   upgrade              Update theme to latest release
-  generate-previews    Pre-generate all preview images
-  clear-cache          Clear preview cache
 EOF
 
     print_section "Subcommands" "blue"
@@ -120,7 +117,6 @@ Commands
   current              Show currently active theme
   list                 List available themes
   apply <theme>        Apply theme across all platform apps
-  preview [theme]      Preview generated theme in tmux (fzf if no theme)
   random               Apply random theme
   like [message]       Like current theme with optional reason
   dislike [message]    Dislike current theme with optional reason
@@ -134,8 +130,6 @@ Commands
   verify               Check theme system is working
   browsers             Show browser theme status and setup
   upgrade              Update theme to latest release
-  generate-previews    Pre-generate all preview images
-  clear-cache          Clear preview cache
 
 Subcommands
 -----------
@@ -712,60 +706,6 @@ change_theme() {
     exit 1
   fi
 
-  if ! command -v convert &>/dev/null; then
-    echo "Error: ImageMagick not found. Install with: brew install imagemagick"
-    exit 1
-  fi
-
-  if ! command -v chafa &>/dev/null && ! command -v viu &>/dev/null; then
-    echo "Note: Install 'chafa' or 'viu' for image preview support"
-    echo "  brew install chafa"
-    echo ""
-    echo "Continuing with text-based preview..."
-    sleep 2
-  fi
-
-  mkdir -p "$PREVIEW_CACHE_DIR"
-
-  local preview_script="/tmp/theme-fzf-preview-$$.sh"
-  local preview_log="/tmp/theme-preview-debug.log"
-  cat >"$preview_script" <<PREVIEW_EOF
-#!/bin/bash
-exec 2>>"$preview_log"
-echo "=== Preview for: \$1 ===" >>"$preview_log"
-
-if ! source "$THEME_APP_DIR/lib/lib.sh" 2>>"$preview_log"; then
-  echo "ERROR: Failed to source lib.sh"
-  exit 1
-fi
-
-theme="\$1"
-
-if [[ -n "\${TMUX:-}" ]]; then
-  display_theme_details "\$theme" "full"
-  echo ""
-  echo "Graphics preview not available in tmux."
-  echo "Open a regular terminal window to see theme preview."
-elif preview_file=\$(get_or_generate_preview "\$theme" 2>>"$preview_log"); then
-  echo "Preview file: \$preview_file" >>"$preview_log"
-  display_theme_details "\$theme" "compact"
-  echo ""
-  if command -v chafa &>/dev/null; then
-    chafa -f kitty --speed 10 --dither none "\$preview_file" 2>>"$preview_log" || echo "Preview: \$theme"
-  elif command -v viu &>/dev/null; then
-    viu -w 80 "\$preview_file" 2>>"$preview_log" || echo "Preview: \$theme"
-  else
-    echo "(Install chafa or viu for image preview)"
-    display_theme_details "\$theme" "full"
-  fi
-else
-  echo "Failed to generate preview"
-  display_theme_details "\$theme" "full"
-fi
-PREVIEW_EOF
-
-  chmod +x "$preview_script"
-
   # Build list with display names and IDs (tab-separated)
   local theme_list=""
   while IFS= read -r theme_id; do
@@ -774,16 +714,16 @@ PREVIEW_EOF
     theme_list+="${display_info}"$'\t'"${theme_id}"$'\n'
   done < <(list_themes)
 
+  # Preview pane renders a live ANSI color swatch from theme.yml — no image
+  # toolchain, no cache, just escape codes drawn directly in the fzf window.
   local selected
   selected=$(echo -n "$theme_list" | fzf \
     --prompt="Select theme > " \
     --height=100% \
     --delimiter=$'\t' \
     --with-nth=1 \
-    --preview="$preview_script {2}" \
+    --preview="bash '$THEME_APP_DIR/lib/theme-preview.sh' '$THEMES_DIR/{2}'" \
     --preview-window=right:60%)
-
-  rm -f "$preview_script"
 
   if [[ -n "$selected" ]]; then
     # Extract the theme ID (second field)
@@ -1324,172 +1264,6 @@ verify_system() {
 }
 
 #==============================================================================
-# PREVIEW
-#==============================================================================
-
-GENERATED_THEMES_DIR="$THEME_APP_DIR/themes"
-DEMO_DIR="$THEME_APP_DIR/demo"
-GHOSTTY_THEME="${HOME}/.config/ghostty/themes/current.conf"
-BTOP_THEME="${HOME}/.config/btop/themes/current.theme"
-TMUX_THEME="${HOME}/.config/tmux/themes/current.conf"
-
-list_generated_themes() {
-  for dir in "$GENERATED_THEMES_DIR"/*/; do
-    [[ -d "$dir" ]] && basename "$dir"
-  done
-}
-
-select_generated_theme() {
-  if command -v fzf &>/dev/null; then
-    list_generated_themes | fzf --prompt="Select theme to preview: "
-  else
-    local themes
-    mapfile -t themes < <(list_generated_themes)
-    select theme in "${themes[@]}"; do
-      [[ -n "$theme" ]] && echo "$theme" && break
-    done
-  fi
-}
-
-apply_preview_themes() {
-  local theme_name="$1"
-  local theme_path="$GENERATED_THEMES_DIR/$theme_name"
-
-  # Ghostty
-  if [[ -f "$theme_path/ghostty.conf" ]]; then
-    cp "$theme_path/ghostty.conf" "$GHOSTTY_THEME"
-    echo "  Applied: ghostty"
-  fi
-
-  # btop
-  if [[ -f "$theme_path/btop.theme" ]]; then
-    mkdir -p "$(dirname "$BTOP_THEME")"
-    cp "$theme_path/btop.theme" "$BTOP_THEME"
-    echo "  Applied: btop"
-  fi
-
-  # tmux
-  if [[ -f "$theme_path/tmux.conf" ]]; then
-    mkdir -p "$(dirname "$TMUX_THEME")"
-    cp "$theme_path/tmux.conf" "$TMUX_THEME"
-    tmux source-file "$TMUX_THEME" 2>/dev/null || true
-    echo "  Applied: tmux"
-  fi
-}
-
-create_preview_window() {
-  local theme_name="$1"
-  local window_name="preview-$theme_name"
-  local theme_path="$GENERATED_THEMES_DIR/$theme_name"
-
-  # Get neovim colorscheme from theme.yml (defaults to theme_name if not specified)
-  local nvim_colorscheme="$theme_name"
-  if [[ -f "$theme_path/theme.yml" ]]; then
-    local yml_colorscheme
-    yml_colorscheme=$(yq -r '.meta.neovim_colorscheme // empty' "$theme_path/theme.yml" 2>/dev/null || true)
-    if [[ -n "$yml_colorscheme" ]]; then
-      nvim_colorscheme="$yml_colorscheme"
-    fi
-  fi
-
-  # Create new window in current session
-  tmux new-window -n "$window_name" -c "$DEMO_DIR"
-
-  # Left: neovim with sample code
-  tmux send-keys "nvim -c 'colorscheme $nvim_colorscheme' sample.py" Enter
-
-  # Split right 40%
-  tmux split-window -h -p 40 -c "$HOME/dotfiles"
-
-  # Right top: btop
-  tmux send-keys "btop" Enter
-
-  # Split bottom right 50%
-  tmux split-window -v -p 50 -c "$HOME/dotfiles"
-
-  # Bottom right: git status + ls
-  tmux send-keys "echo '=== $theme_name ===' && echo '' && git status --short && echo '' && ls --color=always" Enter
-
-  # Focus neovim pane
-  tmux select-pane -L
-}
-
-show_preview() {
-  local theme_name="${1:-}"
-
-  # Select theme if not provided
-  if [[ -z "$theme_name" ]]; then
-    theme_name=$(select_generated_theme)
-    [[ -z "$theme_name" ]] && return 0
-  fi
-
-  # Verify theme exists
-  if [[ ! -d "$GENERATED_THEMES_DIR/$theme_name" ]]; then
-    echo "Error: Theme not found: $theme_name"
-    echo "Available themes:"
-    list_generated_themes | sed 's/^/  /'
-    return 1
-  fi
-
-  echo "Preview: $theme_name"
-  apply_preview_themes "$theme_name"
-  echo ""
-  echo "Reload Ghostty: Cmd+Shift+,"
-  echo "Close preview window: prefix+& or :q in vim, q in btop, exit in shell"
-  echo ""
-
-  if [[ -n "${TMUX:-}" ]]; then
-    create_preview_window "$theme_name"
-  else
-    echo "Error: Must be in tmux to create preview window"
-    return 1
-  fi
-}
-
-generate_all_previews() {
-  echo "Pre-generating all theme previews..."
-  echo "This will take a few minutes but makes browsing instant."
-  echo ""
-
-  if ! command -v convert &>/dev/null; then
-    echo "Error: ImageMagick not found. Install with: brew install imagemagick"
-    exit 1
-  fi
-
-  mkdir -p "$PREVIEW_CACHE_DIR"
-
-  local themes
-  themes=$(list_themes)
-  local total
-  total=$(echo "$themes" | wc -l | xargs)
-  local current=0
-
-  while IFS= read -r theme; do
-    current=$((current + 1))
-    printf "[%d/%d] Generating preview for: %s\n" "$current" "$total" "$theme"
-
-    local cache_file
-    cache_file=$(get_cached_preview_path "$theme")
-
-    if [[ -f "$cache_file" ]] && validate_preview_image "$cache_file" &>/dev/null; then
-      echo "  ✓ Already exists"
-      continue
-    fi
-
-    if generate_theme_preview "$theme" "$cache_file" 2>/dev/null; then
-      echo "  ✓ Generated"
-    else
-      echo "  ✗ Failed"
-    fi
-  done <<<"$themes"
-
-  echo ""
-  echo "✓ All previews generated!"
-  echo "  Cache location: $PREVIEW_CACHE_DIR"
-  echo "  Run 'theme change' for instant browsing"
-}
-
-#==============================================================================
 # BACKGROUND CACHE
 #==============================================================================
 
@@ -1576,9 +1350,6 @@ main() {
   case "${1:-}" in
   change)
     change_theme
-    ;;
-  preview)
-    show_preview "${2:-}"
     ;;
   current)
     show_current
@@ -1703,12 +1474,6 @@ main() {
         exit 1
         ;;
     esac
-    ;;
-  generate-previews)
-    generate_all_previews
-    ;;
-  clear-cache)
-    clear_preview_cache
     ;;
   background)
     case "${2:-}" in
