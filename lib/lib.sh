@@ -24,6 +24,35 @@ THEMES_DIR="$THEME_APP_DIR/themes"
 # Live files - always in production so apps respond to changes
 CURRENT_THEME_FILE="$THEME_LIVE_DIR/current"
 
+# artifact:label pairs used to report which apps a theme carries configs for.
+# Add a row here when adding a generator, or the app stays invisible to
+# `theme current` even though `theme apply` is happily deploying it.
+THEME_APP_ARTIFACTS=(
+  "ghostty.conf:Ghostty"
+  "kitty.conf:Kitty"
+  "alacritty.toml:Alacritty"
+  "tmux.conf:tmux"
+  "btop.theme:btop"
+  "bat.tmTheme:bat"
+  "delta.conf:delta"
+  "flavor.toml:yazi"
+  "sioyek.config:sioyek"
+  "userChrome.css:Firefox-based"
+  "chromium.theme:Chromium"
+  "bordersrc:JankyBorders"
+  "hyprland.conf:Hyprland"
+  "hyprlock.conf:Hyprlock"
+  "waybar.css:Waybar"
+  "walker.css:Walker"
+  "swayosd.css:SwayOSD"
+  "rofi.rasi:Rofi"
+  "dunst.conf:Dunst"
+  "mako.conf:Mako"
+  "icons.theme:Icons"
+  "windows-terminal.json:WindowsTerminal"
+  "neovim:Neovim(generated)"
+)
+
 #==============================================================================
 # THEME ACCESS - scans themes/ directory
 #==============================================================================
@@ -468,10 +497,37 @@ apply_bat() {
 
   # Copy theme as "current.tmTheme" (mirrors ghostty/kitty pattern)
   # Bat config should have: --theme=current
+  # delta reads this same cache and selects it by the filename stem, so renaming
+  # this file silently drops delta back to its bundled default theme.
   cp "$lib_path/bat.tmTheme" "$bat_themes_dir/current.tmTheme"
 
   # Rebuild bat cache to register the updated theme
   bat cache --build >/dev/null 2>&1 || true
+
+  return 0
+}
+
+# Apply delta git pager theme (all platforms)
+# Writes a git config fragment included from the user's gitconfig
+apply_delta() {
+  local theme="$1"
+  local lib_path
+  lib_path=$(get_library_path "$theme")
+
+  if [[ -z "$lib_path" ]] || [[ ! -f "$lib_path/delta.conf" ]]; then
+    return 1
+  fi
+
+  # bat is a hard dependency, not a nicety: the generated fragment selects the
+  # syntax theme by the name bat registers, and delta warns on every single diff
+  # if that cache was never built.
+  if ! command -v delta &>/dev/null || ! command -v bat &>/dev/null; then
+    return 1
+  fi
+
+  local delta_config_dir="$HOME/.config/delta"
+  mkdir -p "$delta_config_dir"
+  cp "$lib_path/delta.conf" "$delta_config_dir/current.gitconfig"
 
   return 0
 }
@@ -1881,6 +1937,15 @@ apply_theme_to_apps() {
     _print_app_status "bat" "false"
   fi
 
+  # delta git pager (all platforms) — must follow bat, whose cache it reads
+  if apply_delta "$theme" 2>/dev/null; then
+    applied+=("delta")
+    _print_app_status "delta" "true"
+  else
+    skipped+=("delta")
+    _print_app_status "delta" "false"
+  fi
+
   # sioyek PDF viewer (all platforms)
   if apply_sioyek "$theme" 2>/dev/null; then
     applied+=("sioyek")
@@ -2252,15 +2317,12 @@ _render_theme_configs() {
   echo ""
   echo "App Configs:"
   local configs=""
-  [[ -f "$theme_dir/ghostty.conf" ]] && configs+="Ghostty "
-  [[ -f "$theme_dir/kitty.conf" ]] && configs+="Kitty "
-  [[ -f "$theme_dir/tmux.conf" ]] && configs+="tmux "
-  [[ -f "$theme_dir/btop.theme" ]] && configs+="btop "
-  [[ -f "$theme_dir/bordersrc" ]] && configs+="JankyBorders "
-  [[ -f "$theme_dir/hyprland.conf" ]] && configs+="Hyprland "
-  [[ -f "$theme_dir/waybar.css" ]] && configs+="Waybar "
-  [[ -f "$theme_dir/windows-terminal.json" ]] && configs+="WindowsTerminal "
-  [[ -d "$theme_dir/neovim" ]] && configs+="Neovim(generated) "
+  local entry artifact label
+  for entry in "${THEME_APP_ARTIFACTS[@]}"; do
+    artifact="${entry%%:*}"
+    label="${entry#*:}"
+    [[ -e "$theme_dir/$artifact" ]] && configs+="$label "
+  done
   echo "  Available: ${configs:-none}"
 
   if [[ -f "$theme_file" ]]; then

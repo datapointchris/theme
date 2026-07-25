@@ -155,6 +155,8 @@ Releases are automated via [release-please](https://github.com/googleapis/releas
 - **tmux** — terminal multiplexer
 - **btop** — system monitor
 - **bat** — syntax highlighter / pager
+- **delta** — git diff pager (requires bat; include
+  `~/.config/delta/current.gitconfig` from your gitconfig)
 - **yazi** — file manager
 - **sioyek** — PDF viewer (custom color mode)
 - **Neovim** — text editor (via colorscheme plugins or generated)

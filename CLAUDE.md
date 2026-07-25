@@ -4,7 +4,7 @@
 
 Unified theme generation system that creates consistent color configurations
 across terminal and desktop applications from a single `theme.yml` source file.
-Supports Ghostty, Kitty, Alacritty, tmux, btop, bat, yazi, sioyek, JankyBorders,
+Supports Ghostty, Kitty, Alacritty, tmux, btop, bat, delta, yazi, sioyek, JankyBorders,
 Hyprland, Waybar, Rofi, Dunst/Mako, Firefox-based and Chromium browsers, Windows
 Terminal, and more. Each theme in `themes/` provides app configs that match a
 corresponding Neovim colorscheme.
@@ -21,6 +21,7 @@ apps/common/theme/
 │   │   ├── ghostty-css.sh           # Ghostty tab custom CSS
 │   │   ├── tmux.sh, btop.sh         # Terminal apps
 │   │   ├── bat.sh                   # bat pager .tmTheme
+│   ├── delta.sh                 # delta git pager (git config fragment)
 │   │   ├── yazi.sh                  # yazi file manager flavor
 │   │   ├── sioyek.sh                # PDF viewer (custom color mode)
 │   │   ├── firefox-based.sh         # Firefox/Zen/Librewolf/Thunderbird userChrome
@@ -98,6 +99,7 @@ themes/{theme-id}/
 ├── tmux.conf           # tmux status bar
 ├── btop.theme          # btop system monitor
 ├── bat.tmTheme         # bat pager syntax theme
+├── delta.conf          # delta git pager (included from gitconfig)
 ├── flavor.toml         # yazi file manager flavor
 ├── sioyek.config       # sioyek PDF viewer (managed block, spliced on apply)
 ├── userChrome.css      # Firefox-based browsers (Zen/Librewolf/Firefox/Thunderbird)
@@ -197,6 +199,7 @@ bash lib/generators/alacritty.sh themes/{id}/theme.yml themes/{id}/alacritty.tom
 bash lib/generators/tmux.sh themes/{id}/theme.yml themes/{id}/tmux.conf
 bash lib/generators/btop.sh themes/{id}/theme.yml themes/{id}/btop.theme
 bash lib/generators/bat.sh themes/{id}/theme.yml themes/{id}/bat.tmTheme
+bash lib/generators/delta.sh themes/{id}/theme.yml themes/{id}/delta.conf
 bash lib/generators/yazi.sh themes/{id}/theme.yml themes/{id}/flavor.toml
 bash lib/generators/sioyek.sh themes/{id}/theme.yml themes/{id}/sioyek.config
 bash lib/generators/firefox-based.sh themes/{id}/theme.yml themes/{id}/userChrome.css
@@ -244,6 +247,14 @@ If creating a new colorscheme (not using a plugin):
   plugin + generated terminal configs
 - **neovim_colorscheme_name may differ from id**: e.g., `oceanic-next`
   directory uses `OceanicNext` colorscheme
+- **delta rides bat's theme cache**: `delta.conf` sets `syntax-theme = current`,
+  which resolves through the bat cache `apply_bat` rebuilds — hence delta applies
+  after bat and requires both binaries. Renaming `current.tmTheme` breaks delta
+  silently, with no error and a stock Monokai fallback.
+- **Change-signal colors are solved, not blended by a fixed fraction**: a fixed
+  fraction lands at a different perceived strength on every palette. `delta.sh`
+  searches for the blend that hits a target contrast ratio against that theme's
+  own background, so every theme gets an equally legible diff.
 
 ## Neovim Integration
 
@@ -274,6 +285,7 @@ The `colorscheme-manager.lua` plugin:
 | `lib/generators/tmux.sh` | tmux status bar theme |
 | `lib/generators/btop.sh` | btop system monitor theme |
 | `lib/generators/bat.sh` | bat pager .tmTheme |
+| `lib/generators/delta.sh` | delta git pager colors (git config fragment) |
 | `lib/generators/yazi.sh` | yazi file manager flavor |
 | `lib/generators/sioyek.sh` | sioyek PDF viewer custom-color-mode block |
 | `lib/generators/firefox-based.sh` | Firefox/Zen/Librewolf/Thunderbird userChrome |
