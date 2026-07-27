@@ -35,20 +35,20 @@ UI_SELECTION="${EXTENDED_UI_SELECTION:-$BASE02}"
 UI_BORDER="${EXTENDED_UI_BORDER:-$BASE01}"
 GIT_ADD="${EXTENDED_GIT_ADD:-$BASE0B}"
 
-# Session tabs (status line 1). Sessions are named "repo·task", so the tab label
-# is split: the repo is muted and the task carries the emphasis, letting a glance
-# land on the task without reading past the repo it belongs to. A session with no
-# "·" is rendered once rather than twice.
-SESSION_REPO='#{s|·.*||:session_name}'
-SESSION_TASK='#{s|^[^·]*·||:session_name}'
-# True only when the name actually split, i.e. the two halves differ.
-SESSION_SPLIT="#{!=:${SESSION_REPO},${SESSION_TASK}}"
+# Session list (status line 1). Entries are separated by whitespace and nothing
+# else. Dividers were tried and dropped: padding and a bar are two separators
+# doing one job, which flattens the spacing so proximity carries no information
+# and the line only looks busier. Gestalt proximity groups on relative distance,
+# so the gap between entries being wider than the gap inside a name is the whole
+# mechanism — see docs/architecture/tmux-sessions.md in dotfiles.
+SESSION_GAP="  "
 
 # Conditionals wrap whole #[...] blocks rather than sitting inside one (no
 # "fg=#{?...}") — tmux resolves a style at draw time and does not expand formats
-# within it. Same idiom as pane-border-style below.
-SESSION_TAB="#[range=session|#{session_id}] #{?${SESSION_SPLIT},#[fg=${BASE03}]${SESSION_REPO}#[fg=${UI_SELECTION}]·,}#{?session_alert,#[fg=${DIAG_ERROR}]#[bold],#[fg=${BASE05}]}${SESSION_TASK}#[nobold] #[norange]#[default]"
-SESSION_TAB_CURRENT="#[range=session|#{session_id} list=focus]#[fg=${BASE00}]#[bg=${GIT_ADD}] #{?${SESSION_SPLIT},${SESSION_REPO}·,}#[bold]${SESSION_TASK}#[nobold] #[norange]#[list=on]#[default]"
+# within it. Same idiom as pane-border-style below. Alert mirrors the window
+# bell style: inverted rather than merely recoloured.
+SESSION_ENTRY="#[range=session|#{session_id}]#{?session_alert,#[fg=${BASE00}]#[bg=${DIAG_ERROR}]#[bold],#[fg=${BASE04}]#[bg=${BASE00}]} #{session_name} #[nobold]#[norange]#[default]${SESSION_GAP}"
+SESSION_ENTRY_CURRENT="#[range=session|#{session_id} list=focus]#[fg=${GIT_ADD}]#[bg=${BASE00}]#[bold] #{session_name} #[nobold]#[norange]#[list=on]#[default]${SESSION_GAP}"
 
 generate() {
   cat << EOF
@@ -152,31 +152,29 @@ set-window-option -g window-active-style "bg=${BASE00}"
 set-option -g status-left-length 100
 set-option -g status-right-length 100
 
-# Status left: the repo half of the session name, with icon. The task half is
-# already the emphasised part of the tab strip above, so repeating the whole
-# "repo·task" here would say it twice and crowd the row.
-# Use git_add/ok color for session icon and name (green = good/active)
-set-option -g status-left " #[fg=${GIT_ADD}]  ${SESSION_REPO}  "
+# Status left: empty. The session name lives in the list on the line above, so
+# naming it again here would say the same thing twice on one screen, and the
+# window format opens with its own space, so a pad here would push line 2 one
+# column right of line 1.
+set-option -g status-left ""
 
-# Window status separator
-set-window-option -g window-status-separator "  "
-
-# Window status format (backslash separators)
-set-window-option -g window-status-format "\\\\   #W   /"
-set-window-option -g window-status-current-format "\\\\   #W   /"
+# Window status: the same shape as the session list above, so the two lines read
+# as one bar. Separation is whitespace only; the current window is told apart by
+# colour and weight, which is preattentive and needs no reading.
+set-window-option -g window-status-separator "${SESSION_GAP}"
+set-window-option -g window-status-format " #W "
+set-window-option -g window-status-current-format " #W "
 
 # Status right: clock and date
 # base04 for muted clock/date text
 set-option -g status-right "#[fg=${BASE04}]%I:%M%p  %m.%d.%Y "
 
-# Session tab strip, drawn on the first status line above the window row. The
-# session accent (green) is deliberately not the window accent (yellow) so the
-# two rows read as different axes at a glance rather than two lists of the same
-# thing. list=focus on the current tab keeps it scrolled into view once the
-# strip outgrows the terminal, with < > markers on the ends.
-# tmux's stock window row is relocated to the second line by \`tmux-tabs
+# Session list, drawn on the first status line above the window row. list=focus
+# on the current session keeps it scrolled into view once the list outgrows the
+# terminal, with < > markers on the ends.
+# tmux's stock window row is relocated to the second line by \`tmux-sessions
 # install-status\`, which dotfiles runs before sourcing this file.
-set-option -g "status-format[0]" "#[align=left]#[list=on]#[list=left-marker]<#[list=right-marker]>#[list=on]#{S:${SESSION_TAB}  ,${SESSION_TAB_CURRENT}  }"
+set-option -g "status-format[0]" "#[align=left]#[list=on]#[list=left-marker]<#[list=right-marker]>#[list=on]#{S:${SESSION_ENTRY},${SESSION_ENTRY_CURRENT}}"
 
 # Pane border format: index, command, path (normal) — or a red host badge when
 # the pane is running ssh. Host-side remote indicator: the local tmux detects the
