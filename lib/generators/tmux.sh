@@ -35,6 +35,21 @@ UI_SELECTION="${EXTENDED_UI_SELECTION:-$BASE02}"
 UI_BORDER="${EXTENDED_UI_BORDER:-$BASE01}"
 GIT_ADD="${EXTENDED_GIT_ADD:-$BASE0B}"
 
+# Session tabs (status line 1). Sessions are named "repo·task", so the tab label
+# is split: the repo is muted and the task carries the emphasis, letting a glance
+# land on the task without reading past the repo it belongs to. A session with no
+# "·" is rendered once rather than twice.
+SESSION_REPO='#{s|·.*||:session_name}'
+SESSION_TASK='#{s|^[^·]*·||:session_name}'
+# True only when the name actually split, i.e. the two halves differ.
+SESSION_SPLIT="#{!=:${SESSION_REPO},${SESSION_TASK}}"
+
+# Conditionals wrap whole #[...] blocks rather than sitting inside one (no
+# "fg=#{?...}") — tmux resolves a style at draw time and does not expand formats
+# within it. Same idiom as pane-border-style below.
+SESSION_TAB="#[range=session|#{session_id}] #{?${SESSION_SPLIT},#[fg=${BASE03}]${SESSION_REPO}#[fg=${UI_SELECTION}]·,}#{?session_alert,#[fg=${DIAG_ERROR}]#[bold],#[fg=${BASE05}]}${SESSION_TASK}#[nobold] #[norange]#[default]"
+SESSION_TAB_CURRENT="#[range=session|#{session_id} list=focus]#[fg=${BASE00}]#[bg=${GIT_ADD}] #{?${SESSION_SPLIT},${SESSION_REPO}·,}#[bold]${SESSION_TASK}#[nobold] #[norange]#[list=on]#[default]"
+
 generate() {
   cat << EOF
 # ${THEME_NAME} - tmux theme
@@ -137,9 +152,11 @@ set-window-option -g window-active-style "bg=${BASE00}"
 set-option -g status-left-length 100
 set-option -g status-right-length 100
 
-# Status left: session name with icon
+# Status left: the repo half of the session name, with icon. The task half is
+# already the emphasised part of the tab strip above, so repeating the whole
+# "repo·task" here would say it twice and crowd the row.
 # Use git_add/ok color for session icon and name (green = good/active)
-set-option -g status-left " #[fg=${GIT_ADD}]  #S  "
+set-option -g status-left " #[fg=${GIT_ADD}]  ${SESSION_REPO}  "
 
 # Window status separator
 set-window-option -g window-status-separator "  "
@@ -151,6 +168,15 @@ set-window-option -g window-status-current-format "\\\\   #W   /"
 # Status right: clock and date
 # base04 for muted clock/date text
 set-option -g status-right "#[fg=${BASE04}]%I:%M%p  %m.%d.%Y "
+
+# Session tab strip, drawn on the first status line above the window row. The
+# session accent (green) is deliberately not the window accent (yellow) so the
+# two rows read as different axes at a glance rather than two lists of the same
+# thing. list=focus on the current tab keeps it scrolled into view once the
+# strip outgrows the terminal, with < > markers on the ends.
+# tmux's stock window row is relocated to the second line by \`tmux-tabs
+# install-status\`, which dotfiles runs before sourcing this file.
+set-option -g "status-format[0]" "#[align=left]#[list=on]#[list=left-marker]<#[list=right-marker]>#[list=on]#{S:${SESSION_TAB}  ,${SESSION_TAB_CURRENT}  }"
 
 # Pane border format: index, command, path (normal) — or a red host badge when
 # the pane is running ssh. Host-side remote indicator: the local tmux detects the
