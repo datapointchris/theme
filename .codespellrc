@@ -1,0 +1,3 @@
+[codespell]
+# noice = the folke/noice.nvim plugin (highlight-group name), not a typo
+ignore-words-list = noice
