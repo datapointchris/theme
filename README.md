@@ -146,6 +146,16 @@ theme upgrade                 # Update to the latest tagged release
 
 Releases are automated via [release-please](https://github.com/googleapis/release-please). The upgrade command only checks out tagged releases, so you always land on a stable version.
 
+theme also checks once a day and prints one line when a newer release exists:
+
+```text
+theme v4.12.0 available (running v4.11.0) — run `theme update`
+```
+
+It never installs anything and never prints an error — a failed check is recorded and swallowed, because an update notice must not break the command you typed. Nothing is printed when either stream is not a terminal, under CI, from a checkout that is not sitting on a release tag, or within the interval. Set `NO_AUTO_UPDATE` or `THEME_NO_AUTO_UPDATE` to turn it off, and `THEME_AUTO_UPDATE_INTERVAL=6h` to change the cadence.
+
+Both commands come from [`bashselfupdate`](https://github.com/datapointchris/bashselfupdate), which `install.sh` installs. theme runs fine without it; only these two features need it.
+
 ## Supported Applications
 
 ### All Platforms

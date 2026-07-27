@@ -24,6 +24,15 @@ source "$THEME_APP_DIR/lib/lib.sh"
 source "$THEME_APP_DIR/lib/storage.sh"
 source "$THEME_APP_DIR/lib/sync.sh"
 
+# Sourced if present rather than required, so an installation predating this
+# dependency still runs every command it ran before. `theme update` says how to
+# get it; the notice simply does not appear. Re-running install.sh installs it.
+BASHSELFUPDATE_LOAD="${XDG_LIB_HOME:-$HOME/.local/lib}/bashselfupdate/load.bash"
+if [[ -f "$BASHSELFUPDATE_LOAD" ]]; then
+  # shellcheck source=/dev/null
+  source "$BASHSELFUPDATE_LOAD"
+fi
+
 get_version() {
   git -C "$THEME_APP_DIR" describe --tags --always 2>/dev/null || echo "dev"
 }
@@ -1382,6 +1391,17 @@ clear_background_cache() {
 #==============================================================================
 
 main() {
+  # Prints inline to stderr before the command runs, which is the call site the
+  # library documents, and the same one font uses so the two bash tools behave
+  # identically. Never fails and never prints an error; `theme update` is where
+  # update failures surface.
+  if declare -F bashselfupdate_notify &>/dev/null; then
+    case "${1:-}" in
+      update | upgrade | --version | -v) ;;
+      *) bashselfupdate_notify theme "$THEME_APP_DIR" ;;
+    esac
+  fi
+
   case "${1:-}" in
   change)
     change_theme
@@ -1436,37 +1456,46 @@ main() {
     fi
     ;;
   upgrade | update)
-    local before_version latest_tag
-    before_version=$(git -C "$THEME_APP_DIR" describe --tags --always 2>/dev/null)
-
-    if ! git -C "$THEME_APP_DIR" fetch --tags --quiet 2>/dev/null; then
-      echo "✗ theme upgrade failed: could not fetch from remote" >&2
+    if ! declare -F bashselfupdate_update &>/dev/null; then
+      echo "✗ theme upgrade failed: bashselfupdate is not installed" >&2
+      echo "  Re-run the installer: bash $THEME_APP_DIR/install.sh" >&2
       exit 1
     fi
 
-    latest_tag=$(git -C "$THEME_APP_DIR" tag -l 'v*' --sort=-v:refname | head -n1)
-
-    if [[ -z "$latest_tag" ]]; then
-      echo "✗ theme upgrade failed: no releases found" >&2
+    # Checked before attempting the update so the far more common cause gets its
+    # own message. bashselfupdate_update returns the same non-zero for a
+    # development checkout, an unreachable remote and a repository with no
+    # releases, and "could not reach the remote" is actively misleading to
+    # someone running theme from a clone.
+    if ! bashselfupdate_current_version "$THEME_APP_DIR" >/dev/null 2>&1; then
+      echo "✗ theme upgrade failed: $THEME_APP_DIR is not on a release tag ($(bashselfupdate_describe "$THEME_APP_DIR"))" >&2
+      echo "  This is a development checkout. Use git to move it." >&2
       exit 1
     fi
 
-    if [[ "$before_version" == "$latest_tag" ]]; then
-      echo "✓ theme already at latest: $latest_tag"
+    local moved
+    if ! moved=$(bashselfupdate_update "$THEME_APP_DIR"); then
+      echo "✗ theme upgrade failed: could not reach the remote or find a release" >&2
+      exit 1
+    fi
+
+    if [[ -z "$moved" ]]; then
+      echo "✓ theme already at latest: $(bashselfupdate_describe "$THEME_APP_DIR")"
       exit 0
     fi
 
-    if ! git -C "$THEME_APP_DIR" checkout --quiet "$latest_tag" 2>/dev/null; then
-      echo "✗ theme upgrade failed: could not checkout $latest_tag" >&2
-      exit 1
-    fi
+    local from to
+    read -r from to <<<"$moved"
+    echo "✓ theme upgraded: $from → $to"
 
-    echo "✓ theme upgraded: $before_version → $latest_tag"
-
-    if [[ "$before_version" =~ ^v[0-9] ]]; then
+    local changes
+    changes=$(bashselfupdate_changelog "$THEME_APP_DIR" "$from" "$to")
+    if [[ -n "$changes" ]]; then
       echo ""
       echo "Changes:"
-      git -C "$THEME_APP_DIR" log --format="  • %s" "${before_version}..${latest_tag}" 2>/dev/null || true
+      while IFS= read -r subject; do
+        echo "  • $subject"
+      done <<<"$changes"
     fi
     ;;
   opacity)
