@@ -42,7 +42,7 @@ for app in "${APPS[@]}"; do
   else
     exit_code=$?
     if [[ $exit_code -eq 124 ]]; then
-      printf "⏰ TIMEOUT (>${TIMEOUT_SECS}s)\n"
+      printf '⏰ TIMEOUT (>%ss)\n' "$TIMEOUT_SECS"
     else
       end_time=$(date +%s.%N)
       elapsed=$(echo "$end_time - $start_time" | bc)

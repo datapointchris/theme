@@ -49,7 +49,7 @@ for i in "${!THEMES[@]}"; do
   else
     exit_code=$?
     if [[ $exit_code -eq 124 ]]; then
-      printf "⏰ TIMEOUT (>${TIMEOUT_SECS}s)\n"
+      printf '⏰ TIMEOUT (>%ss)\n' "$TIMEOUT_SECS"
       TIMEOUT_THEMES+=("$theme")
     else
       end_time=$(date +%s.%N)
