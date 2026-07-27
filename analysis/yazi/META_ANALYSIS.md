@@ -16,7 +16,7 @@ This document presents a comprehensive cross-reference analysis of color choices
 ### Gruvbox
 
 | Source | Repository/Location |
-|--------|---------------------|
+| --- | --- |
 | Official | morhetz/gruvbox, gruvbox-contrib/color.table |
 | Hand-crafted yazi | bennyyip/gruvbox-dark.yazi |
 | Our theme.yml | themes/gruvbox/theme.yml |
@@ -27,7 +27,7 @@ This document presents a comprehensive cross-reference analysis of color choices
 ### Kanagawa
 
 | Source | Repository/Location |
-|--------|---------------------|
+| --- | --- |
 | Official | rebelot/kanagawa.nvim/lua/kanagawa/colors.lua |
 | Hand-crafted yazi | dangooddd/kanagawa.yazi |
 | Our theme.yml | themes/kanagawa/theme.yml |
@@ -38,7 +38,7 @@ This document presents a comprehensive cross-reference analysis of color choices
 ### Rose Pine
 
 | Source | Repository/Location |
-|--------|---------------------|
+| --- | --- |
 | Official | rosepinetheme.com, rose-pine/palette |
 | Hand-crafted yazi | Mintass/rose-pine.yazi |
 | Our theme.yml | themes/rose-pine/theme.yml |
@@ -49,7 +49,7 @@ This document presents a comprehensive cross-reference analysis of color choices
 ### Nord vs Nordic (IMPORTANT DISTINCTION)
 
 | Source | Repository/Location |
-|--------|---------------------|
+| --- | --- |
 | Nord Official | nordtheme.com, arcticicestudio/nord |
 | Hand-crafted yazi | AdithyanA2005/nord.yazi |
 | Our theme.yml | themes/nordic/ (DIFFERENT THEME!) |
@@ -62,7 +62,7 @@ This document presents a comprehensive cross-reference analysis of color choices
 ### Catppuccin Mocha (Reference Only)
 
 | Source | Repository/Location |
-|--------|---------------------|
+| --- | --- |
 | Official | catppuccin.com/palette |
 | Hand-crafted yazi | yazi-rs/flavors/catppuccin-mocha.yazi |
 | Our theme.yml | (none - not in our system) |
@@ -91,7 +91,7 @@ fg0:            #fbf1c7
 #### Comparison Table
 
 | Element | Hand-crafted | Our Generated | Match? | Notes |
-|---------|-------------|---------------|--------|-------|
+| --- | --- | --- | --- | --- |
 | cwd | #83a598 (bright_blue) | #83a598 | YES | |
 | marker_copied | #8ec07c (bright_aqua) | #8ec07c | YES | |
 | marker_cut | #d3869b (bright_purple) | #d3869b | YES | |
@@ -133,7 +133,7 @@ fujiGray:       #727169    waveAqua2:    #7aa89f
 #### Comparison Table
 
 | Element | Hand-crafted | Our Generated | Match? | Notes |
-|---------|-------------|---------------|--------|-------|
+| --- | --- | --- | --- | --- |
 | cwd | #e6c384 (carpYellow) | #e6c384 | YES | |
 | marker_copied | #98bb6c (springGreen) | #98bb6c | YES | |
 | **marker_cut** | **#e46876 (waveRed)** | **#c34043 (autumnRed)** | **NO** | Hand uses EXTENDED color |
@@ -181,7 +181,7 @@ text:     #e0def4    iris:    #c4a7e7
 #### Comparison Table
 
 | Element | Hand-crafted | Our Generated | Match? | Notes |
-|---------|-------------|---------------|--------|-------|
+| --- | --- | --- | --- | --- |
 | cwd | #9ccfd8 (foam) | #9ccfd8 | YES | |
 | **marker_copied** | **#31748f (pine)** | **#f6c177 (gold)** | **NO** | Hand uses pine for positive |
 | marker_cut | #eb6f92 (love) | #eb6f92 | YES | |
@@ -233,7 +233,7 @@ Aurora:      nord11 #bf616a, nord12 #d08770, nord13 #ebcb8b, nord14 #a3be8c, nor
 #### Hand-crafted Nord Yazi Patterns
 
 | Element | Color | Nord Name |
-|---------|-------|-----------|
+| --- | --- | --- |
 | cwd | #88c0d0 | nord8 (frost light blue) |
 | marker_copied | #a3be8c | nord14 (aurora green) |
 | marker_cut | #bf616a | nord11 (aurora red) |
@@ -264,7 +264,7 @@ Our Nordic is based on AlexvZyl/nordic.nvim which has:
 #### Hand-crafted catppuccin-mocha.yazi Patterns
 
 | Semantic Role | Color | Catppuccin Name |
-|---------------|-------|-----------------|
+| --- | --- | --- |
 | Navigation (cwd, dirs) | #89b4fa | blue |
 | Positive (copied, exec, info) | #a6e3a1 | green |
 | Negative (cut, write, error) | #f38ba8 | red |
@@ -284,7 +284,7 @@ Our Nordic is based on AlexvZyl/nordic.nvim which has:
 ### Universal Semantic Colors (ALL themes agree)
 
 | Semantic Role | Color Family | Why |
-|---------------|--------------|-----|
+| --- | --- | --- |
 | perm_write | RED | Danger - can modify/destroy |
 | perm_exec | GREEN | Safe/go - execute permission |
 | notify_error | RED | Danger state |
@@ -298,7 +298,7 @@ Our Nordic is based on AlexvZyl/nordic.nvim which has:
 ### Theme-Specific Philosophies
 
 | Theme | Philosophy | Key Characteristic |
-|-------|------------|-------------------|
+| --- | --- | --- |
 | Gruvbox | Cool/Gray | Gray mode indicator, orange select |
 | Kanagawa | Extended Colors | Uses waveRed/peachRed for danger |
 | Rose Pine | Named Colors | pine=positive, foam=mode, gold=selection |
@@ -310,7 +310,7 @@ Our Nordic is based on AlexvZyl/nordic.nvim which has:
 ## Omarchy Observations
 
 | Theme | Omarchy Variant | Notes |
-|-------|-----------------|-------|
+| --- | --- | --- |
 | Gruvbox | gruvbox-material | Different palette! Uses #ea6962 not #fb4934 for red |
 | Kanagawa | Standard | Matches our theme.yml |
 | Rose Pine | Dawn (light) | Not comparable to our dark variants |

@@ -25,7 +25,7 @@ Catppuccin uses 26 colors but maps only 16 to base16:
 ### 3. Consistent Patterns Across Themes
 
 | Property Type | Base16 Mapping | Consistency |
-|--------------|----------------|-------------|
+| --- | --- | --- |
 | background | base00 | 100% |
 | foreground | base05 | 100% |
 | ANSI colors | base08-0F | 95%+ |

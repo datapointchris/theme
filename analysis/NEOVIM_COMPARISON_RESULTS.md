@@ -9,26 +9,26 @@ Analyzed 38 colorscheme palettes.
 How consistently do themes use the same colors for semantic roles?
 
 | Semantic Role | Themes | Hue Mean | Hue Std | Sat Mean | Light Mean | Consistency |
-|---------------|--------|----------|---------|----------|------------|-------------|
-| function      |     38 |    203.7 |    16.2 |     63.7 |       51.8 |        83.8 |
-| info          |     38 |    203.7 |    16.2 |     63.7 |       51.8 |        83.8 |
-| type          |     38 |     43.2 |    22.9 |     86.1 |       49.8 |        77.1 |
-| warning       |     38 |     43.2 |    22.9 |     86.1 |       49.8 |        77.1 |
-| hint          |     38 |    174.3 |    25.0 |     47.6 |       50.6 |        75.0 |
-| string        |     38 |    121.2 |    51.3 |     56.1 |       44.3 |        48.7 |
-| success       |     38 |    121.2 |    51.3 |     56.1 |       44.3 |        48.7 |
-| number        |     38 |     37.7 |    59.3 |     78.0 |       49.7 |        40.7 |
-| constant      |     38 |     37.7 |    59.3 |     78.0 |       49.7 |        40.7 |
-| variable      |     38 |    171.2 |    84.2 |     23.9 |       64.7 |        15.8 |
-| operator      |     38 |    171.2 |    84.2 |     23.9 |       64.7 |        15.8 |
-| comment       |     38 |    154.4 |    91.1 |     12.1 |       43.9 |         8.9 |
-| punctuation   |     38 |    167.0 |    92.8 |     12.7 |       52.8 |         7.2 |
-| foreground    |     38 |    123.0 |    94.9 |     30.9 |       87.5 |         5.1 |
-| selection     |     38 |    151.3 |    97.2 |     30.2 |       40.2 |         2.8 |
-| keyword       |     38 |    188.1 |   171.5 |     74.8 |       55.6 |         0.0 |
-| error         |     38 |    188.1 |   171.5 |     74.8 |       55.6 |         0.0 |
-| background    |     38 |    136.9 |   111.9 |     18.0 |       29.1 |         0.0 |
-| cursor_line   |     38 |    134.7 |   109.2 |     23.7 |       40.3 |         0.0 |
+| --- | --- | --- | --- | --- | --- | --- |
+| function | 38 | 203.7 | 16.2 | 63.7 | 51.8 | 83.8 |
+| info | 38 | 203.7 | 16.2 | 63.7 | 51.8 | 83.8 |
+| type | 38 | 43.2 | 22.9 | 86.1 | 49.8 | 77.1 |
+| warning | 38 | 43.2 | 22.9 | 86.1 | 49.8 | 77.1 |
+| hint | 38 | 174.3 | 25.0 | 47.6 | 50.6 | 75.0 |
+| string | 38 | 121.2 | 51.3 | 56.1 | 44.3 | 48.7 |
+| success | 38 | 121.2 | 51.3 | 56.1 | 44.3 | 48.7 |
+| number | 38 | 37.7 | 59.3 | 78.0 | 49.7 | 40.7 |
+| constant | 38 | 37.7 | 59.3 | 78.0 | 49.7 | 40.7 |
+| variable | 38 | 171.2 | 84.2 | 23.9 | 64.7 | 15.8 |
+| operator | 38 | 171.2 | 84.2 | 23.9 | 64.7 | 15.8 |
+| comment | 38 | 154.4 | 91.1 | 12.1 | 43.9 | 8.9 |
+| punctuation | 38 | 167.0 | 92.8 | 12.7 | 52.8 | 7.2 |
+| foreground | 38 | 123.0 | 94.9 | 30.9 | 87.5 | 5.1 |
+| selection | 38 | 151.3 | 97.2 | 30.2 | 40.2 | 2.8 |
+| keyword | 38 | 188.1 | 171.5 | 74.8 | 55.6 | 0.0 |
+| error | 38 | 188.1 | 171.5 | 74.8 | 55.6 | 0.0 |
+| background | 38 | 136.9 | 111.9 | 18.0 | 29.1 | 0.0 |
+| cursor_line | 38 | 134.7 | 109.2 | 23.7 | 40.3 | 0.0 |
 
 ## Key Findings
 
@@ -72,7 +72,7 @@ How do flexoki-moon variants compare to popular themes?
 Expected mappings based on base16 conventions:
 
 | Role | Expected Slot | Description |
-|------|---------------|-------------|
+| --- | --- | --- |
 | keyword | base08 | Keywords and control flow |
 | function | base0D | Function names and calls |
 | string | base0B | String literals |

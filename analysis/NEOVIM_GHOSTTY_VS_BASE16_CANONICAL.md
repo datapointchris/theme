@@ -7,7 +7,7 @@ Comparing Neovim colorschemes and Ghostty terminal themes against base16 canonic
 Different projects make different choices about how to map colorscheme colors:
 
 | Source | Approach |
-|--------|----------|
+| --- | --- |
 | **Base16 (tinted-theming)** | Uses "bright" color variants for accents |
 | **Ghostty** | Uses "neutral" for ANSI 1-7, "bright" for ANSI 9-15 |
 | **Neovim plugins** | Use the original colorscheme's palette directly |
@@ -21,7 +21,7 @@ This means the same colorscheme (e.g., Gruvbox) can look different across termin
 ### Summary
 
 | Theme | Exact | Close | Different | Avg ΔE | Verdict |
-|-------|-------|-------|-----------|--------|---------|
+| --- | --- | --- | --- | --- | --- |
 | Oceanic Next | 13 | 1 | 0 | 0.1 | ✅ Same source |
 | Nord | 12 | 1 | 1 | 1.0 | 🟡 Very close |
 | Gruvbox Light | 7 | 0 | 7 | 7.1 | 🟠 Different |
@@ -38,7 +38,7 @@ This means the same colorscheme (e.g., Gruvbox) can look different across termin
 Gruvbox defines multiple color sets:
 
 | Set | Red | Green | Yellow | Usage |
-|-----|-----|-------|--------|-------|
+| --- | --- | --- | --- | --- |
 | Neutral | #cc241d | #98971a | #d79921 | Ghostty ANSI 1-6 |
 | Bright | #fb4934 | #b8bb26 | #fabd2f | Ghostty ANSI 9-14, Base16 accents |
 | Faded | #9d0006 | #79740e | #b57614 | Light theme variants |
@@ -50,7 +50,7 @@ Base16 uses only the bright colors, while Ghostty uses neutral for normal and br
 Rose-Pine base16 maps colors to completely different slots than Ghostty:
 
 | Role | Ghostty (ANSI) | Base16 Slot |
-|------|----------------|-------------|
+| --- | --- | --- |
 | Yellow | Gold (#f6c177) | base0E (purple slot) |
 | Blue | Pine (#31748f) | base0B (green slot) |
 | Magenta | Iris (#c4a7e7) | base0D (blue slot) |
@@ -63,7 +63,7 @@ Rose-Pine base16 maps colors to completely different slots than Ghostty:
 ### Summary
 
 | Theme | Exact | Close | Moderate | Significant | Avg ΔE | Verdict |
-|-------|-------|-------|----------|-------------|--------|---------|
+| --- | --- | --- | --- | --- | --- | --- |
 | Oceanic-Next (VimL) | 15 | 1 | 0 | 0 | 0.1 | ✅ Identical |
 | Gruvbox.nvim (light hard) | 13 | 0 | 2 | 1 | 2.0 | ✅ Identical |
 | Gruvbox.nvim (light medium) | 13 | 0 | 2 | 1 | 2.0 | ✅ Identical |
@@ -104,7 +104,7 @@ Rose-Pine base16 maps colors to completely different slots than Ghostty:
 ### Most Variable Slots
 
 | Slot | Role | Avg ΔE | Max ΔE | Commonly Modified? |
-|------|------|--------|--------|-------------------|
+| --- | --- | --- | --- | --- |
 | base00 | Background | 1.5 | 12.6 | No |
 | base01 | Lighter BG | 1.9 | 10.7 | No |
 | base02 | Selection | 3.2 | 25.8 | No |
@@ -131,7 +131,7 @@ Rose-Pine base16 maps colors to completely different slots than Ghostty:
 Nordic.nvim adds a darker background and modifies foreground shades:
 
 | Slot | Neovim | Base16 | ΔE | Note |
-|------|--------|--------|-----|------|
+| --- | --- | --- | --- | --- |
 | base00 | #242933 | #2E3440 | 5.2 | Darker background |
 | base04 | #60728A | #D8DEE9 | 41.9 | Different fg shade |
 | base07 | #ECEFF4 | #8FBCBB | 26.0 | Different mapping |
@@ -143,7 +143,7 @@ Nordic.nvim adds a darker background and modifies foreground shades:
 Nearly identical - only foreground shade ordering differs:
 
 | Slot | Neovim | Base16 | ΔE | Note |
-|------|--------|--------|-----|------|
+| --- | --- | --- | --- | --- |
 | base04 | #928374 | #BDAE93 | 17.1 | Swapped with base05 |
 | base05 | #EBDBB2 | #D5C4A1 | 8.5 | Swapped with base06 |
 | base06 | #D5C4A1 | #EBDBB2 | 8.5 | Swapped with base05 |
@@ -154,7 +154,7 @@ Nearly identical - only foreground shade ordering differs:
 Fundamentally different slot assignments:
 
 | Slot | Role | Neovim | Base16 | ΔE |
-|------|------|--------|--------|-----|
+| --- | --- | --- | --- | --- |
 | base07 | Lightest | #E0DEF4 (text) | #524F67 (muted) | 54.6 |
 | base09 | Orange | #EBBCBA (rose) | #F6C177 (gold) | 37.4 |
 | base0A | Yellow | #F6C177 (gold) | #EBBCBA (rose) | 37.4 |

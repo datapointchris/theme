@@ -12,7 +12,7 @@ follows **three distinct philosophies**, not random hardcoding.
 Uses blue/cyan/purple palette for a softer, less aggressive look.
 
 | Semantic Role | Color Slot | Rationale |
-|---------------|------------|-----------|
+| --- | --- | --- |
 | cwd | BASE0D (blue) | Navigation = blue |
 | marker_copied | BASE0C (cyan) | Positive = cool cyan |
 | marker_cut | BASE0E (purple) | Negative = muted purple (not red!) |
@@ -29,7 +29,7 @@ Uses blue/cyan/purple palette for a softer, less aggressive look.
 Uses yellow/green/red with bright variants for traditional semantic meaning.
 
 | Semantic Role | Color Slot | Rationale |
-|---------------|------------|-----------|
+| --- | --- | --- |
 | cwd | ANSI_BRIGHT_YELLOW | Highlight/attention |
 | marker_copied | ANSI_BRIGHT_GREEN | Positive = green |
 | marker_cut | BASE08 (red) | Negative = red |
@@ -46,7 +46,7 @@ Uses yellow/green/red with bright variants for traditional semantic meaning.
 Uses theme's brand/named colors for distinctive identity.
 
 | Semantic Role | Color Slot | Rationale |
-|---------------|------------|-----------|
+| --- | --- | --- |
 | cwd | BASE0C (foam) | Theme's cyan |
 | marker_copied | BASE09 (gold) | Theme's positive color |
 | marker_cut | BASE08 (love) | Theme's negative color |
@@ -108,7 +108,7 @@ tab_inactive = BASE02 (always)
 Some themes use extended palette colors not in base16:
 
 | Theme | Extended Color | Used For |
-|-------|---------------|----------|
+| --- | --- | --- |
 | Kanagawa | waveRed (#e46876) | marker_cut |
 | Kanagawa | peachRed (#ff5d62) | perm_write |
 | Rose-Pine | darker love (#B4637A) | marker_cut (muted) |
@@ -121,7 +121,7 @@ Some themes use extended palette colors not in base16:
 ## Match Rates Achieved
 
 | Theme | Hand-Crafted Elements | Algorithmic Match |
-|-------|----------------------|-------------------|
+| --- | --- | --- |
 | Gruvbox | 20 | 20/20 (100%) |
 | Kanagawa | 21 | 20/21 (95%) |
 | Rose-Pine | 19 | 16/19 (84%) |

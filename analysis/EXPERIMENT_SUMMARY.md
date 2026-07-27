@@ -20,7 +20,7 @@
 ### Results
 
 | Target | Best Model | R² | Notes |
-|--------|-----------|-----|-------|
+| --- | --- | --- | --- |
 | CIELAB L* | ExtraTrees | **0.791** | Best overall |
 | OKLCH Lightness | ExtraTrees | 0.785 | |
 | RGB Green | ExtraTrees | 0.722 | |
@@ -46,7 +46,7 @@ Delta E measures human-perceptible color difference:
 ### Approach Comparison
 
 | Metric | RGB Regression | Classification |
-|--------|---------------|----------------|
+| --- | --- | --- |
 | ΔE < 1 (imperceptible) | 5.6% | **29.7%** |
 | ΔE < 5 (acceptable) | 22.6% | **33.0%** |
 
@@ -55,7 +55,7 @@ Delta E measures human-perceptible color difference:
 ### By Category
 
 | Category | Samples | Mean ΔE | Acceptable (<5) |
-|----------|---------|---------|-----------------|
+| --- | --- | --- | --- |
 | Background | 36 | 10.69 | **61.1%** |
 | Foreground | 49 | 11.89 | **46.9%** |
 | Border | 30 | 21.48 | 33.3% |
@@ -81,7 +81,7 @@ Delta E measures human-perceptible color difference:
 ### Omarchy Accuracy vs Canonical
 
 | Theme | kitty | alacritty | Notes |
-|-------|-------|-----------|-------|
+| --- | --- | --- | --- |
 | **Everforest** | **100%** | **100%** | Perfect match |
 | **Rose-Pine** | **89%** | **98%** | Uses Dawn (light) variant |
 | **Nord** | 86% | 72% | Deviates on dim/selection colors |
@@ -94,7 +94,7 @@ Omarchy's "rose-pine" theme uses the **Dawn (light)** variant, not the dark main
 ### Consistent Property → Base16 Mappings
 
 | Property | Base16 Key | Consistency |
-|----------|------------|-------------|
+| --- | --- | --- |
 | background | base00 | **100%** |
 | foreground | base05 | **100%** |
 | color1 (red) | base08 | **100%** |
@@ -162,7 +162,7 @@ Subtexts:     subtext0(71.0) → subtext1(78.6) → text(85.8)
 ## Omarchy vs Canonical Base16 Usage
 
 | Key | Canonical | Omarchy | Difference |
-|-----|-----------|---------|------------|
+| --- | --- | --- | --- |
 | base00 | 24 | 46 | +22 (more bg) |
 | base01 | 24 | 48 | +24 (more bg_alt) |
 | base04 | 8 | 35 | +27 (more subtle) |
@@ -258,7 +258,7 @@ The "worse" results are actually **more honest**:
 ## Files Generated
 
 | File | Description |
-|------|-------------|
+| --- | --- |
 | `ML_EXPERIMENT_RESULTS.md` | ML training results summary |
 | `CANONICAL_COMPARISON_RESULTS.md` | Omarchy vs canonical comparison |
 | `CANONICAL_ML_EXPERIMENT.md` | Canonical ML experiment report |

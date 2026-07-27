@@ -13,7 +13,7 @@ We compared three versions:
 ### Syntax Color Comparison
 
 | Element | Original Generated | Updated Generated | Author's Intent | Match Improved? |
-|---------|-------------------|-------------------|-----------------|-----------------|
+| --- | --- | --- | --- | --- |
 | comment | #727169 (fujiGray) | #727169 | #727169 | ✓ Already correct |
 | string | #76946a (autumnGreen) | #98bb6c (springGreen) | #98bb6c | ✓ **FIXED** |
 | number | #957fb8 (oniViolet) | #d27e99 (sakuraPink) | #d27e99 | ✓ **FIXED** |
@@ -35,7 +35,7 @@ We compared three versions:
 ### Syntax Color Comparison
 
 | Element | Original Generated | Updated Generated | Author's Intent | Match Improved? |
-|---------|-------------------|-------------------|-----------------|-----------------|
+| --- | --- | --- | --- | --- |
 | comment | #6e6a86 (muted) | #6e6a86 | #6e6a86 | ✓ Already correct |
 | string | #31748f (pine) | #f6c177 (gold) | #f6c177 | ✓ **FIXED** |
 | number | #eb6f92 (love) | #ebbcba (rose) | #ebbcba | ✓ **FIXED** |
@@ -58,7 +58,7 @@ We compared three versions:
 ### Syntax Color Comparison
 
 | Element | Original Generated | Updated Generated | Author's Intent | Match Improved? |
-|---------|-------------------|-------------------|-----------------|-----------------|
+| --- | --- | --- | --- | --- |
 | comment | #665c54 (dark3) | #928374 (gray) | #928374 | ✓ **FIXED** |
 | string | #b8bb26 | #b8bb26 | #b8bb26 | ✓ Already correct |
 | number | #d3869b | #d3869b | #d3869b | ✓ Already correct |
@@ -97,7 +97,7 @@ We compared three versions:
 The core insight - **use extended palette fields instead of fixed base16 mappings** - transferred perfectly to the neovim generator.
 
 | Theme | Original Match | Updated Match | Improvement |
-|-------|---------------|---------------|-------------|
+| --- | --- | --- | --- |
 | Kanagawa | 14% | 100% | +86% |
 | Rose-Pine | 29% | 100% | +71% |
 | Gruvbox | 86% | 100% | +14% |

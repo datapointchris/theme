@@ -9,7 +9,7 @@ Three experiments to understand Neovim colorscheme patterns and create predictiv
 ## Results Summary
 
 | Experiment | Status | Key Finding |
-|------------|--------|-------------|
+| --- | --- | --- |
 | 1. Palette Extraction | ✅ Complete | 38 palettes extracted, 25 with full base16 mapping |
 | 2. Highlight Extraction | ✅ Complete | Script ready, requires Neovim shell environment |
 | 3. Cross-Comparison | ✅ Complete | Function colors most consistent (18° hue std), keywords most variable (171° hue std) |
@@ -156,7 +156,7 @@ Analyze patterns across all colorschemes to find universal rules.
 ### Semantic Groups to Compare
 
 | Category | Highlight Groups |
-|----------|-----------------|
+| --- | --- |
 | Variables | `@variable`, `@variable.builtin`, `@variable.parameter`, `@variable.member` |
 | Functions | `@function`, `@function.builtin`, `@function.method` |
 | Keywords | `@keyword`, `@keyword.return`, `@keyword.conditional` |

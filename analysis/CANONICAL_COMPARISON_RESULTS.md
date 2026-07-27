@@ -22,7 +22,7 @@ Canonical palette: `nord`
 **kitty**: 19 exact, 0 close out of 22 colors
 
 | Property | Color | Closest Base | ΔE |
-|----------|-------|--------------|----|
+| --- | --- | --- | --- |
 | selection_background | #FFFACD | base06 | 25.8 |
 | selection_foreground | #000000 | base00 | 23.2 |
 | url_color | #0087BD | base0F | 14.4 |
@@ -30,7 +30,7 @@ Canonical palette: `nord`
 **alacritty**: 23 exact, 1 close out of 32 colors
 
 | Property | Color | Closest Base | ΔE |
-|----------|-------|--------------|----|
+| --- | --- | --- | --- |
 | colors_dim_yellow | #B29E75 | base09 | 24.3 |
 | colors_dim_magenta | #8C738C | base0F | 22.4 |
 | colors_dim_cyan | #6D96A5 | base0F | 18.5 |
@@ -49,7 +49,7 @@ Canonical palette: `rose-pine-dawn`
 **kitty**: 31 exact, 0 close out of 35 colors
 
 | Property | Color | Closest Base | ΔE |
-|----------|-------|--------------|----|
+| --- | --- | --- | --- |
 | active_border_color | #595959 | base05 | 24.3 |
 | inactive_border_color | #595959 | base05 | 24.3 |
 | bell_border_color | #595959 | base05 | 24.3 |
@@ -58,7 +58,7 @@ Canonical palette: `rose-pine-dawn`
 **alacritty**: 43 exact, 0 close out of 44 colors
 
 | Property | Color | Closest Base | ΔE |
-|----------|-------|--------------|----|
+| --- | --- | --- | --- |
 | colors_selection_background | #DFDAD9 | base02 | 6.7 |
 
 ### tokyo-night
@@ -70,7 +70,7 @@ Canonical palette: `kanagawa`
 **kitty**: 19 exact, 0 close out of 28 colors
 
 | Property | Color | Closest Base | ΔE |
-|----------|-------|--------------|----|
+| --- | --- | --- | --- |
 | color17 | #FF5D62 | base09 | 36.9 |
 | color9 | #E82424 | base08 | 29.7 |
 | color10 | #98BB6C | base0A | 29.3 |
@@ -84,7 +84,7 @@ Canonical palette: `kanagawa`
 **alacritty**: 12 exact, 0 close out of 21 colors
 
 | Property | Color | Closest Base | ΔE |
-|----------|-------|--------------|----|
+| --- | --- | --- | --- |
 | colors_indexed_colors_color | #FF5D62 | base09 | 36.9 |
 | colors_bright_red | #E82424 | base08 | 29.7 |
 | colors_bright_green | #98BB6C | base0A | 29.3 |
@@ -108,7 +108,7 @@ Canonical palette: `everforest`
 Catppuccin uses 26 named colors but maps them to 16 base16 slots:
 
 | Base16 | Catppuccin Name | Semantic Role |
-|--------|-----------------|---------------|
+| --- | --- | --- |
 | base00 | base | Background |
 | base01 | mantle | Darker background |
 | base02 | surface0 | Selection background |

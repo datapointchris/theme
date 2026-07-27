@@ -21,7 +21,7 @@ to learn color selection patterns for theme generation.
 ## Best Models by Target Variable
 
 | Target | Best Model | R² | Notes |
-|--------|-----------|-----|-------|
+| --- | --- | --- | --- |
 | CIELAB L* | ExtraTrees | **0.791** | Best overall |
 | OKLCH Lightness | ExtraTrees | 0.785 | |
 | Perceived Brightness | ExtraTrees | 0.764 | |
@@ -40,7 +40,7 @@ to learn color selection patterns for theme generation.
 ## Color Space Comparison
 
 | Color Space | Avg R² | Best For |
-|-------------|--------|----------|
+| --- | --- | --- |
 | RGB | **0.667** | Overall prediction |
 | OKLCH | 0.634 | Perceptual accuracy |
 | HSL | 0.611 | Saturation prediction |
@@ -49,7 +49,7 @@ to learn color selection patterns for theme generation.
 ## Category-Specific Performance
 
 | Category | Samples | Lightness R² | Chroma R² | Recommendation |
-|----------|---------|-------------|-----------|----------------|
+| --- | --- | --- | --- | --- |
 | Background | 178 | **0.757** | -2.18 | Use ML |
 | ANSI | 310 | **0.752** | 0.712 | Use ML |
 | Border | 149 | 0.557 | 0.570 | Use ML |
@@ -107,7 +107,7 @@ Delta E measures human-perceptible color difference:
 ### Approach Comparison
 
 | Metric | RGB Regression | Classification |
-|--------|---------------|----------------|
+| --- | --- | --- |
 | ΔE < 1 (imperceptible) | 5.6% | **29.7%** |
 | ΔE < 5 (acceptable) | 22.6% | **33.0%** |
 | ΔE < 10 (close) | 32.6% | **38.5%** |
@@ -118,7 +118,7 @@ color to use, it's exactly right (67% of omarchy colors ARE palette colors).
 ### By Category (RGB Regression)
 
 | Category | Samples | Mean ΔE | < 5.0 |
-|----------|---------|---------|-------|
+| --- | --- | --- | --- |
 | Background | 36 | 10.69 | **61.1%** |
 | Foreground | 49 | 11.89 | **46.9%** |
 | Border | 30 | 21.48 | 33.3% |

@@ -7,7 +7,7 @@ Philosophy-aware generator comparison against hand-crafted yazi flavors.
 ## Gruvbox (philosophy: gruvbox)
 
 | Element | Hand-Crafted | Generated | Match |
-|---------|-------------|-----------|-------|
+| --- | --- | --- | --- |
 | cwd | #83a598 | #83a598 | ✓ EXACT |
 | marker_copied | #8ec07c | #8ec07c | ✓ EXACT |
 | marker_cut | #d3869b | #d3869b | ✓ EXACT |
@@ -23,7 +23,7 @@ Minor difference: Uses BASE04 gray instead of extended fg4 gray.
 ## Kanagawa (philosophy: kanagawa)
 
 | Element | Hand-Crafted | Generated | Match |
-|---------|-------------|-----------|-------|
+| --- | --- | --- | --- |
 | cwd | #e6c384 | #e6c384 | ✓ EXACT |
 | marker_copied | #98bb6c | #98bb6c | ✓ EXACT |
 | marker_cut | #e46876 (waveRed) | #c34043 (autumnRed) | ~ Similar (both red) |
@@ -38,7 +38,7 @@ Minor difference: Uses autumnRed instead of waveRed (extended palette color).
 ## Rose Pine (philosophy: rose-pine)
 
 | Element | Hand-Crafted | Generated | Match |
-|---------|-------------|-----------|-------|
+| --- | --- | --- | --- |
 | cwd | #9ccfd8 (foam) | #9ccfd8 | ✓ EXACT |
 | marker_copied | #f6c177 (gold) | #f6c177 | ✓ EXACT |
 | marker_cut | #B4637A (love dark) | #eb6f92 (love) | ~ Similar (both love) |

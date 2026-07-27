@@ -10,7 +10,7 @@ to identify design philosophies and color mapping patterns.
 ### 1. Gruvbox Dark
 
 | Element | Hand-Crafted | Color Name | Theme.yml | Notes |
-|---------|-------------|------------|-----------|-------|
+| --- | --- | --- | --- | --- |
 | cwd | #83a598 | bright_blue | BASE0D #83a598 | ✓ Match |
 | marker_copied | #8ec07c | bright_cyan | BASE0C #8ec07c | Uses cyan, not green |
 | marker_cut | #d3869b | bright_purple | BASE0E #d3869b | Uses purple, not red! |
@@ -45,7 +45,7 @@ to identify design philosophies and color mapping patterns.
 ### 2. Kanagawa
 
 | Element | Hand-Crafted | Color Name | Theme.yml | Notes |
-|---------|-------------|------------|-----------|-------|
+| --- | --- | --- | --- | --- |
 | cwd | #e6c384 | carpYellow | ANSI_BRIGHT_YELLOW | Uses bright variant |
 | marker_copied | #98bb6c | springGreen | ANSI_BRIGHT_GREEN | Bright green (spring) |
 | marker_cut | #e46876 | waveRed | EXTENDED wave_red | NOT autumnRed! |
@@ -82,7 +82,7 @@ to identify design philosophies and color mapping patterns.
 ### 3. Rose Pine
 
 | Element | Hand-Crafted | Color Name | Theme.yml | Notes |
-|---------|-------------|------------|-----------|-------|
+| --- | --- | --- | --- | --- |
 | cwd | #9ccfd8 | foam | BASE0C #9ccfd8 | ✓ Match (cyan) |
 | hovered.bg | #26233a | overlay | BASE02 #26233a | NOT reversed! |
 | hovered.fg | #e0def4 | text | BASE05 #e0def4 | Explicit colors |
@@ -116,7 +116,7 @@ to identify design philosophies and color mapping patterns.
 ### 4. Catppuccin Mocha
 
 | Element | Hand-Crafted | Color Name | Semantic Role |
-|---------|-------------|------------|---------------|
+| --- | --- | --- | --- |
 | cwd | #94e2d5 | teal | Cyan accent |
 | marker_copied | #a6e3a1 | green | ✓ Standard green |
 | marker_cut | #f38ba8 | red | ✓ Standard red |
@@ -146,7 +146,7 @@ to identify design philosophies and color mapping patterns.
 ### 1. Three Distinct Philosophies
 
 | Philosophy | Themes | Key Characteristic |
-|------------|--------|-------------------|
+| --- | --- | --- |
 | **Muted Semantic** | Gruvbox | Uses softer colors, non-standard semantic |
 | **Bright Variants** | Kanagawa | Uses ANSI bright / extended bright colors |
 | **Named/Brand Colors** | Rose Pine | Uses theme's signature named colors |
@@ -155,7 +155,7 @@ to identify design philosophies and color mapping patterns.
 ### 2. Color Slot Mapping by Philosophy
 
 | Element | Muted | Bright | Named | Standard |
-|---------|-------|--------|-------|----------|
+| --- | --- | --- | --- | --- |
 | marker_copied | BASE0C (cyan) | ANSI_BRIGHT_GREEN | BASE09 (gold) | BASE0B (green) |
 | marker_cut | BASE0E (purple) | EXTENDED_*_RED | BASE08 (love) | BASE08 (red) |
 | mode_normal.bg | ANSI_WHITE (gray) | BASE0D (blue) | BASE0A (rose) | BASE0D (blue) |

@@ -11,7 +11,7 @@ This is the exact same problem we fixed in the yazi generator - we weren't using
 ### Kanagawa
 
 | Element | Our Generator (base16) | Author's Intent (syntax_*) | Match? |
-|---------|----------------------|--------------------------|--------|
+| --- | --- | --- | --- |
 | comment | base03 → #727169 | syntax_comment: #727169 | ✓ |
 | string | base0B → #76946a (autumnGreen) | syntax_string: #98bb6c (springGreen) | ✗ |
 | number | base0E → #957fb8 (oniViolet) | syntax_number: #d27e99 (sakuraPink) | ✗ |
@@ -25,7 +25,7 @@ This is the exact same problem we fixed in the yazi generator - we weren't using
 ### Gruvbox
 
 | Element | Our Generator (base16) | Author's Intent (syntax_*) | Match? |
-|---------|----------------------|--------------------------|--------|
+| --- | --- | --- | --- |
 | comment | base03 → #665c54 | syntax_comment: #928374 | ✗ |
 | string | base0B → #b8bb26 | syntax_string: #b8bb26 | ✓ |
 | number | base0E → #d3869b | syntax_number: #d3869b | ✓ |
@@ -39,7 +39,7 @@ This is the exact same problem we fixed in the yazi generator - we weren't using
 ### Rose-Pine
 
 | Element | Our Generator (base16) | Author's Intent (syntax_*) | Match? |
-|---------|----------------------|--------------------------|--------|
+| --- | --- | --- | --- |
 | comment | base03 → #6e6a86 | syntax_comment: #6e6a86 | ✓ |
 | string | base0B → #31748f (pine) | syntax_string: #f6c177 (gold) | ✗ |
 | number | base0E → #eb6f92 (love) | syntax_number: #ebbcba (rose) | ✗ |
