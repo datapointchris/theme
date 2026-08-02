@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["pyyaml"]
+# ///
 """Compare Ghostty terminal themes to base16 canonical schemes.
 
 ANSI Terminal Palette (Ghostty format):

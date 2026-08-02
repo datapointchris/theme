@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["pyyaml"]
+# ///
 """Compare Neovim colorscheme palettes against canonical base16 schemes.
 
 Answers: Do Neovim colorscheme authors follow the original base16 specifications,
