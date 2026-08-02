@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Generate themed backgrounds by recoloring source images using gowall
-# Usage: background-gowall.sh <theme.yml> <source-image> <output-file>
+# Usage: background-recolor.sh <theme.yml> <source-image> <output-file>
 #
 # Recolors any image to match the theme's color palette using gowall.
 # Requires: gowall (go install github.com/Achno/gowall@latest)

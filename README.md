@@ -6,7 +6,7 @@ Unified theme management for terminal and desktop applications. Apply consistent
 
 - **20+ themes** including Gruvbox, Rose Pine, Kanagawa, Nordic, Flexoki, and more
 - **Cross-platform**: macOS, Linux (Arch/Hyprland), WSL
-- **Themed backgrounds**: generated or recolored wallpapers that follow the active theme (macOS)
+- **Themed backgrounds**: generated or recolored wallpapers that follow the active theme
 - **Opacity control**: adjust terminal transparency across apps from one command
 - **Cross-machine sync**: GitHub Gist synchronization keeps preferences in sync
 - **Smart tracking**: like/dislike themes, track usage time, filter out rejected themes
@@ -37,8 +37,9 @@ Core:
 Optional:
 
 - `bat` — syntax-highlighted output in `theme log`
-- `imagemagick` (`convert`) — themed background generation (macOS)
-- `gowall` — recolor source wallpapers to match the active theme (macOS)
+- `imagemagick` (`convert`) — the `plasma` and `lowpoly` backgrounds
+- `gowall` — the `recolor` background
+- `ascii-image-converter` — the `ascii` background
 
 ## Usage
 
@@ -74,10 +75,12 @@ theme log                     # View complete history
 theme rejected                # List rejected themes
 ```
 
-### Backgrounds (macOS)
+### Backgrounds
 
-Each theme can drive a matching desktop background — either an algorithmically
-generated wallpaper or a source image recolored to the theme's palette.
+Each theme can drive a matching desktop background. Four modes: `plasma` draws a
+fractal cloud from the palette alone, while `ascii`, `lowpoly` and `recolor`
+transform one of your own photos — into characters, into triangles, or into the
+theme's colors.
 
 ```bash
 theme background              # Show background usage/help
@@ -171,11 +174,12 @@ Both commands come from [`bashselfupdate`](https://github.com/datapointchris/bas
 - **sioyek** — PDF viewer (custom color mode)
 - **Neovim** — text editor (via colorscheme plugins or generated)
 - **Browsers** — Firefox-based (Zen, Librewolf, Firefox, Thunderbird) and Chromium
+- **Wallpaper** — themed desktop background, set through Finder on macOS,
+  hyprpaper on Hyprland, and the Windows host on WSL
 
 ### macOS
 
 - **JankyBorders** — window border highlights
-- **Wallpaper** — themed desktop background (generated or recolored)
 
 ### Arch Linux / Hyprland
 

@@ -772,7 +772,7 @@ BACKGROUND_WIDTH=3840
 BACKGROUND_HEIGHT=2160
 
 # All available generated styles (no source image needed)
-BACKGROUND_GENERATED_STYLES=("plasma" "geometric" "hexagons" "circles" "swirl" "spotlight" "sphere" "spheres" "code" "banner")
+BACKGROUND_GENERATED_STYLES=("plasma")
 
 # Source-based transform types (need source images like recolor)
 BACKGROUND_SOURCE_TYPES=("recolor" "ascii" "lowpoly")
@@ -1316,6 +1316,34 @@ set_desktop_wallpaper_wsl() {
 
 # Apply background
 # Returns: background_id (e.g., "generated:plasma" or "recolor:/path/to/image.jpg")
+# Render one background. Every mode maps to generators/background-<mode>.sh;
+# the only difference is that a generated style is drawn from the palette alone
+# and takes a target size, while a source type transforms an image it is handed.
+# Args: theme.yml, theme_id, bg_type, bg_value, output_file
+render_background() {
+  local theme_yml="$1" theme_id="$2" bg_type="$3" bg_value="$4" output_file="$5"
+  local generators_dir
+  generators_dir="$(dirname "${BASH_SOURCE[0]}")/generators"
+
+  if [[ "$bg_type" == "generated" ]]; then
+    # Full-resolution renders are slow, so `theme pre-generate` fills a cache and
+    # apply copies from it; a miss falls through to rendering on the spot.
+    local cache_file="$BACKGROUND_CACHE_DIR/$theme_id/${bg_value}.png"
+    if [[ -f "$cache_file" ]]; then
+      cp "$cache_file" "$output_file"
+      return 0
+    fi
+    local generator="$generators_dir/background-${bg_value}.sh"
+    [[ -f "$generator" ]] || { echo "Error: no generator for style: $bg_value" >&2; return 1; }
+    bash "$generator" "$theme_yml" "$output_file" "$BACKGROUND_WIDTH" "$BACKGROUND_HEIGHT" >/dev/null 2>&1
+    return $?
+  fi
+
+  local generator="$generators_dir/background-${bg_type}.sh"
+  [[ -f "$generator" ]] || { echo "Error: unknown background type: $bg_type" >&2; return 1; }
+  bash "$generator" "$theme_yml" "$bg_value" "$output_file" >/dev/null 2>&1
+}
+
 apply_background() {
   local theme="$1"
   local lib_path
@@ -1338,8 +1366,6 @@ apply_background() {
 
   # Build list of available backgrounds based on mode settings
   local available=()
-  local generators_dir
-  generators_dir="$(dirname "${BASH_SOURCE[0]}")/generators"
 
   # Add enabled generated styles
   while IFS= read -r style; do
@@ -1364,7 +1390,7 @@ apply_background() {
   local selected="${available[$((RANDOM % ${#available[@]}))]}"
   local bg_type="${selected%%:*}"
   local bg_value="${selected#*:}"
-  local background_id=""
+  local background_id="$selected"
 
   # Progress to the terminal (this function's stdout is captured by the caller).
   # A cache hit copies in ~0s; an on-the-fly render at 4K can take a while, so the
@@ -1374,72 +1400,7 @@ apply_background() {
     printf '  Background: %s (%s) ... ' "$bg_value" "$bg_type" >/dev/tty
   fi
 
-  case "$bg_type" in
-    generated)
-      # Check for special generators first
-      case "$bg_value" in
-        code)
-          local code_gen="$generators_dir/background-code.sh"
-          if [[ -f "$code_gen" ]]; then
-            bash "$code_gen" "$lib_path/theme.yml" "$background_file" >/dev/null 2>&1 || return 1
-          else
-            return 1
-          fi
-          ;;
-        banner)
-          local banner_gen="$generators_dir/background-banner.sh"
-          if [[ -f "$banner_gen" ]]; then
-            bash "$banner_gen" "$lib_path/theme.yml" "$background_file" >/dev/null 2>&1 || return 1
-          else
-            return 1
-          fi
-          ;;
-        *)
-          # Standard ImageMagick styles
-          local cache_file="$BACKGROUND_CACHE_DIR/$theme/${bg_value}.png"
-          if [[ -f "$cache_file" ]]; then
-            cp "$cache_file" "$background_file"
-          else
-            local generator_script="$generators_dir/background.sh"
-            [[ ! -f "$generator_script" ]] && return 1
-            bash "$generator_script" "$lib_path/theme.yml" "$background_file" "$bg_value" "$BACKGROUND_WIDTH" "$BACKGROUND_HEIGHT" >/dev/null 2>&1 || return 1
-          fi
-          ;;
-      esac
-      background_id="generated:$bg_value"
-      ;;
-    recolor)
-      local gowall_gen="$generators_dir/background-gowall.sh"
-      if [[ -f "$gowall_gen" ]]; then
-        bash "$gowall_gen" "$lib_path/theme.yml" "$bg_value" "$background_file" >/dev/null 2>&1 || return 1
-        background_id="recolor:$bg_value"
-      else
-        return 1
-      fi
-      ;;
-    ascii)
-      local ascii_gen="$generators_dir/background-ascii.sh"
-      if [[ -f "$ascii_gen" ]]; then
-        bash "$ascii_gen" "$lib_path/theme.yml" "$bg_value" "$background_file" >/dev/null 2>&1 || return 1
-        background_id="ascii:$bg_value"
-      else
-        return 1
-      fi
-      ;;
-    lowpoly)
-      local lowpoly_gen="$generators_dir/background-lowpoly.sh"
-      if [[ -f "$lowpoly_gen" ]]; then
-        bash "$lowpoly_gen" "$lib_path/theme.yml" "$bg_value" "$background_file" >/dev/null 2>&1 || return 1
-        background_id="lowpoly:$bg_value"
-      else
-        return 1
-      fi
-      ;;
-    *)
-      echo "Error: Unknown background type: $bg_type" >&2
-      return 1
-      ;;
-  esac
+  render_background "$lib_path/theme.yml" "$theme" "$bg_type" "$bg_value" "$background_file" || return 1
 
   if [[ -w /dev/tty ]]; then
     printf 'done (%ds)\n' "$((SECONDS - gen_start))" >/dev/tty
@@ -1572,71 +1533,8 @@ rotate_background() {
 
   local bg_type="${selected%%:*}"
   local bg_value="${selected#*:}"
-  local generators_dir
-  generators_dir="$(dirname "${BASH_SOURCE[0]}")/generators"
 
-  case "$bg_type" in
-    generated)
-      # Check for special generators first
-      case "$bg_value" in
-        code)
-          local code_gen="$generators_dir/background-code.sh"
-          if [[ -f "$code_gen" ]]; then
-            bash "$code_gen" "$lib_path/theme.yml" "$background_file" >/dev/null 2>&1 || return 1
-          else
-            return 1
-          fi
-          ;;
-        banner)
-          local banner_gen="$generators_dir/background-banner.sh"
-          if [[ -f "$banner_gen" ]]; then
-            bash "$banner_gen" "$lib_path/theme.yml" "$background_file" >/dev/null 2>&1 || return 1
-          else
-            return 1
-          fi
-          ;;
-        *)
-          # Standard ImageMagick styles
-          local cache_file="$BACKGROUND_CACHE_DIR/$theme/${bg_value}.png"
-          if [[ -f "$cache_file" ]]; then
-            cp "$cache_file" "$background_file"
-          else
-            local generator_script="$generators_dir/background.sh"
-            [[ ! -f "$generator_script" ]] && return 1
-            bash "$generator_script" "$lib_path/theme.yml" "$background_file" "$bg_value" "$BACKGROUND_WIDTH" "$BACKGROUND_HEIGHT" >/dev/null 2>&1 || return 1
-          fi
-          ;;
-      esac
-      ;;
-    recolor)
-      local gowall_gen="$generators_dir/background-gowall.sh"
-      if [[ -f "$gowall_gen" ]]; then
-        bash "$gowall_gen" "$lib_path/theme.yml" "$bg_value" "$background_file" >/dev/null 2>&1 || return 1
-      else
-        return 1
-      fi
-      ;;
-    ascii)
-      local ascii_gen="$generators_dir/background-ascii.sh"
-      if [[ -f "$ascii_gen" ]]; then
-        bash "$ascii_gen" "$lib_path/theme.yml" "$bg_value" "$background_file" >/dev/null 2>&1 || return 1
-      else
-        return 1
-      fi
-      ;;
-    lowpoly)
-      local lowpoly_gen="$generators_dir/background-lowpoly.sh"
-      if [[ -f "$lowpoly_gen" ]]; then
-        bash "$lowpoly_gen" "$lib_path/theme.yml" "$bg_value" "$background_file" >/dev/null 2>&1 || return 1
-      else
-        return 1
-      fi
-      ;;
-    *)
-      echo "Error: Unknown background type: $bg_type" >&2
-      return 1
-      ;;
-  esac
+  render_background "$lib_path/theme.yml" "$theme" "$bg_type" "$bg_value" "$background_file" || return 1
 
   set_desktop_wallpaper "$background_file" || return 1
 

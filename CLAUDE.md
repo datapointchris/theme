@@ -26,7 +26,6 @@ Dev source is `~/tools/theme`; the installed copy everything actually reads is
 │   └── browser-profiles.sh, theme-preview.sh
 ├── themes/{id}/           # theme.yml source + every generated app config
 │   └── neovim/            # Present only for generated themes
-├── demo/                  # Sample code files for generated backgrounds
 ├── scripts/               # Migration and test utilities
 ├── analysis/              # Why the rules are what they are; see analysis/README.md
 └── install.sh
@@ -327,7 +326,7 @@ against `theme.yml`.
 | `lib/generators/delta.sh` | Resolves through bat's theme cache — see Key Insights |
 | `lib/generators/sioyek.sh` | Emits a managed block spliced into the user's config, not a whole file |
 | `lib/generators/firefox-based.sh` | One userChrome.css covering Firefox, Zen, Librewolf and Thunderbird |
-| `lib/generators/background*.sh` | Wallpaper generation and recolouring modes (macOS); `background.sh` dispatches |
+| `lib/generators/background-*.sh` | One per background mode: `plasma` draws from the palette, `ascii`/`lowpoly`/`recolor` transform a source photo |
 | `lib/generators/vscode.sh` | Not wired into `theme apply`; run directly when needed |
 | `lib/browser-profiles.sh` | Firefox-based browser profile discovery |
 | `lib/theme-preview.sh` | ANSI color-swatch preview for the `theme change` fzf picker |

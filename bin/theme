@@ -256,7 +256,7 @@ EOF
 
     print_section "Examples" "yellow"
     echo "  $(print_cyan "theme background mode current")"
-    echo "  $(print_cyan "theme background mode set generated:plasma recolor")"
+    echo "  $(print_cyan "theme background mode set generated:plasma ascii")"
     echo "  $(print_cyan "theme background mode add ascii")"
     echo "  $(print_cyan "theme background mode remove lowpoly")"
     echo "  $(print_cyan "theme background mode all")"
@@ -278,7 +278,7 @@ Commands
 Examples
 --------
   theme background mode current
-  theme background mode set generated:plasma recolor
+  theme background mode set generated:plasma ascii
   theme background mode add ascii
   theme background mode remove lowpoly
   theme background mode all
@@ -1321,13 +1321,7 @@ generate_all_backgrounds() {
     exit 1
   fi
 
-  local styles=("plasma" "geometric" "hexagons" "circles" "swirl" "spotlight" "sphere" "spheres")
-  local generator_script="$THEME_APP_DIR/lib/generators/background.sh"
-
-  if [[ ! -f "$generator_script" ]]; then
-    echo "Error: Background generator not found"
-    exit 1
-  fi
+  local styles=("${BACKGROUND_GENERATED_STYLES[@]}")
 
   local themes
   themes=$(list_themes)
@@ -1359,7 +1353,12 @@ generate_all_backgrounds() {
       fi
 
       local style_start=$SECONDS
-      if bash "$generator_script" "$lib_path/theme.yml" "$cache_file" "$style" "$BACKGROUND_WIDTH" "$BACKGROUND_HEIGHT" 2>/dev/null; then
+      local generator_script="$THEME_APP_DIR/lib/generators/background-${style}.sh"
+      if [[ ! -f "$generator_script" ]]; then
+        printf "  %-10s ✗ no generator\n" "$style"
+        continue
+      fi
+      if bash "$generator_script" "$lib_path/theme.yml" "$cache_file" "$BACKGROUND_WIDTH" "$BACKGROUND_HEIGHT" 2>/dev/null; then
         printf "  %-10s ✓ generated (%ds)\n" "$style" "$((SECONDS - style_start))"
       else
         printf "  %-10s ✗ failed\n" "$style"
