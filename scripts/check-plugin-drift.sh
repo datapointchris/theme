@@ -106,8 +106,11 @@ for id in "${themes[@]}"; do
     fi
   fi
 
-  # No shipped terminal config: fall back to asking whether upstream touched
-  # anything palette-shaped since we wrote our copy.
+  # No shipped terminal config: fall back to asking whether upstream changed a
+  # colour since we wrote our copy. Test the patch content, not the filename --
+  # guessing which paths hold a palette is wrong in both directions. flexoki's
+  # colors/*.lua matched a path filter while containing no colours at all (they
+  # are two-line loaders), and a repo can keep its palette anywhere.
   base="${since:-$(git log -1 --format=%ad --date=short -- "$yml")T00:00:00Z}"
   [[ "$base" == *T* ]] || base="${base}T00:00:00Z"
   sha=$(gh api "repos/$repo/commits?until=$base&per_page=1" --jq '.[0].sha' 2>/dev/null || true)
@@ -115,23 +118,29 @@ for id in "${themes[@]}"; do
     printf "  ?  %-22s could not resolve a baseline commit in %s\n" "$id" "$repo"
     ((++skipped)); continue
   fi
-  line=$(gh api "repos/$repo/compare/${sha}...HEAD" --jq '"\(.ahead_by)|\([.files[].filename] | join(" "))"' 2>/dev/null || echo "?|")
-  ahead="${line%%|*}"
-  all_rel=$(echo "${line#*|}" | tr ' ' '\n' | { rg -i "palette|colou?rs?/|extras?/" || true; })
-  # A repo hosting several colorschemes (flexoki ships one file per variant)
-  # would otherwise flag every theme it publishes whenever any one changes. If a
-  # changed file names this variant that is the signal; if only other variants
-  # moved, this theme is unaffected.
-  mine=$(printf '%s' "$all_rel" | { rg -F "$variant" || true; })
 
-  if [[ -z "$all_rel" ]]; then
-    printf "  ok %-22s %s commits upstream since %s, none touching a palette\n" "$id" "$ahead" "${base%%T*}"
+  # jq uses Oniguruma, where ^ anchors to the start of the *string* and the "m"
+  # flag means "dot matches newline" rather than enabling line anchors. Hence the
+  # explicit (^|\n). Colours appear as #rrggbb and as 0xrrggbb (alacritty), and
+  # [^+\-\n] keeps the +++/--- file headers out.
+  out=$(gh api "repos/$repo/compare/${sha}...HEAD" \
+        --jq '"\(.ahead_by)\n" + ([.files[] | select((.patch // "") | test("(^|\n)[+-][^+\\-\n]*(#|0x)[0-9a-fA-F]{6}")) | .filename] | join("\n"))' \
+        2>/dev/null || echo "?")
+  ahead=$(printf '%s' "$out" | head -1)
+  changed=$(printf '%s' "$out" | tail -n +2 | { rg -v '^$' || true; })
+
+  # A repo can host several colorschemes (flexoki ships one file per variant), so
+  # a change to one would otherwise flag every theme the repo publishes.
+  mine=$(printf '%s' "$changed" | { rg -F "$variant" || true; })
+
+  if [[ -z "$changed" ]]; then
+    printf "  ok %-22s %s commits upstream since %s, no colour changed\n" "$id" "$ahead" "${base%%T*}"
     ((++exact))
   elif [[ -z "$mine" ]]; then
-    printf "  ok %-22s upstream changed only other variants\n" "$id"
+    printf "  ok %-22s upstream changed colours only in other variants\n" "$id"
     ((++exact))
   else
-    printf "  !! %-22s palette files changed upstream since %s\n" "$id" "${base%%T*}"
+    printf "  !! %-22s colours changed upstream since %s\n" "$id" "${base%%T*}"
     printf "     %s\n" "$(printf '%s' "$mine" | head -4 | tr '\n' ' ')"
     ((++flagged))
   fi
