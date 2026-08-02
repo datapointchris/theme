@@ -194,36 +194,26 @@ Additional generators (Alacritty, VS Code, walker, swayosd, GTK icons) live in
 
 ## Theme Types
 
-### Plugin Themes
+**Plugin themes** pair an existing Neovim colorscheme with generated app configs.
+The plugin's author tuned the editor colors by hand and this tool matches
+everything else to them, which in practice beats generating a colorscheme from
+the same palette.
 
-Most themes pair an existing Neovim colorscheme plugin with generated terminal
-configs:
+**Generated themes** build both the app configs *and* a Neovim colorscheme from a
+single `theme.yml`, for palettes with no Neovim plugin behind them.
 
-| Theme | Neovim Plugin |
-| ----- | ------------- |
-| Cendre (hard/medium/soft) | Aejkatappaja/cendre |
-| Gruvbox | ellisonleao/gruvbox.nvim |
-| Rose Pine | rose-pine/neovim |
-| Kanagawa | rebelot/kanagawa.nvim |
-| Nordic | AlexvZyl/nordic.nvim |
-| Nightfox / Terafox | EdenEast/nightfox.nvim |
-| Everforest Dark Hard | neanias/everforest-nvim |
-| Flexoki Moon (black/green/purple/red) | datapointchris/flexoki-moon-nvim |
-| GitHub Dark Dimmed | projekt0n/github-nvim-theme |
-| Oceanic Next | mhartington/oceanic-next |
-| Solarized Osaka | craftzdog/solarized-osaka.nvim |
+A plugin theme's `theme.yml` is a snapshot of that plugin's palette taken by
+hand. Nothing re-reads the plugin, so if you update a colorscheme plugin and its
+author has changed a color, Neovim moves and the other apps do not — re-check the
+palette after updating one.
 
-### Generated Themes
+`theme list` shows every theme. To see which kind each one is, and which upstream
+plugin a theme matches, read it from the source of truth:
 
-These themes generate both terminal configs **and** a Neovim colorscheme from a
-single `theme.yml` source file:
-
-- Charcoal Ember
-- Gruvbox Dark Hard
-- Popping and Locking
-- Rose Pine Darker
-- Smyck
-- Treehouse
+```bash
+yq -r '[.meta.display_name, .meta.neovim_colorscheme_source, (.meta.plugin // "-")] | @tsv' \
+  themes/*/theme.yml | column -t -s$'\t'
+```
 
 ## Data Storage
 
@@ -274,8 +264,15 @@ special:
   cursor: "#ebdbb2"
 ```
 
-1. Generate app configs using the generators in `lib/generators/` (see
-   `CLAUDE.md` for the full per-app generation commands)
+1. Generate every app config in one call:
+
+   ```bash
+   lib/generate-all.sh --themes my-theme
+   ```
+
+   Then `theme apply my-theme`. Plugin themes also need a lazy.nvim entry in
+   `colorscheme-manager.lua` — `CLAUDE.md` covers the Neovim side and how to map
+   an upstream palette into the base16 slots.
 
 ## License
 
