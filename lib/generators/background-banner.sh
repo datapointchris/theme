@@ -71,19 +71,31 @@ echo "$banner_text" > "$temp_text"
 accent_colors=("$BASE0D" "$BASE0E" "$BASE0C" "$BASE09" "$BASE0B")
 text_color="${accent_colors[$((RANDOM % ${#accent_colors[@]}))]}"
 
-# Generate image with ImageMagick
+# A font *name* only resolves if ImageMagick was built with a font list, and the
+# Homebrew build ships none — `convert -list font` is empty, so -font "Menlo"
+# failed and the whole render died. A path always works, so resolve one and only
+# fall back to the name on systems where fontconfig does answer.
+font_file=""
+for candidate in \
+  /System/Library/Fonts/Menlo.ttc \
+  /System/Library/Fonts/SFNSMono.ttf \
+  /usr/share/fonts/TTF/DejaVuSansMono.ttf \
+  /usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf \
+  /usr/share/fonts/liberation/LiberationMono-Regular.ttf; do
+  [[ -f "$candidate" ]] && font_file="$candidate" && break
+done
+[[ -z "$font_file" ]] && font_file="Menlo"
+
 convert -size "${img_width}x${img_height}" "xc:${BASE00}" \
   -gravity center \
-  -font "Menlo" \
+  -font "$font_file" \
   -pointsize 20 \
   -fill "$text_color" \
   -annotate +0+0 "@${temp_text}" \
   "$output_file"
 
-# Clean up
 rm -f "$temp_text"
 
-# Verify output
 if [[ ! -f "$output_file" ]]; then
   echo "Error: Failed to create output file" >&2
   exit 1

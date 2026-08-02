@@ -52,22 +52,18 @@ if [[ ! -f "$source_file" ]]; then
   exit 1
 fi
 
-# Pick best matching silicon theme based on our theme
-theme_id=$(yq '.meta.id // "default"' "$theme_file" 2>/dev/null || echo "default")
-silicon_theme="base16"
+# silicon's --theme takes a .tmTheme path as well as a built-in name, and every
+# theme already generates one for bat, so the code render uses the theme's own
+# colors rather than whichever built-in came closest. This previously defaulted
+# to silicon's "base16", which renders every token at the background colour: the
+# output was a blank canvas for every theme that missed the built-in mapping,
+# and silicon still exited 0.
+silicon_theme="$(dirname "$theme_file")/bat.tmTheme"
+if [[ ! -f "$silicon_theme" ]]; then
+  echo "Error: no bat.tmTheme beside $theme_file — run lib/generate-all.sh first" >&2
+  exit 1
+fi
 
-# Map some known themes to silicon built-ins
-case "$theme_id" in
-  gruvbox*) silicon_theme="gruvbox-dark" ;;
-  nord*) silicon_theme="Nord" ;;
-  dracula*) silicon_theme="Dracula" ;;
-  solarized-dark*) silicon_theme="Solarized (dark)" ;;
-  solarized-light*) silicon_theme="Solarized (light)" ;;
-  one-dark*|onedark*) silicon_theme="TwoDark" ;;
-  github-dark*) silicon_theme="GitHub" ;;
-esac
-
-# Generate code screenshot with theme background
 silicon "$source_file" \
   --output "$output_file" \
   --background "$BASE00" \
@@ -75,11 +71,16 @@ silicon "$source_file" \
   --pad-horiz 80 \
   --pad-vert 100 \
   --shadow-blur-radius 0 \
-  --no-window-controls \
-  2>/dev/null
+  --no-window-controls
 
-# Verify output
 if [[ ! -f "$output_file" ]]; then
   echo "Error: silicon failed to create output file" >&2
+  exit 1
+fi
+
+# silicon reports success on a render that produced nothing, so the only
+# reliable check is the pixels: a wallpaper of one flat colour is a failure.
+if [[ "$(magick "$output_file" -format %k info: 2>/dev/null || echo 2)" -lt 2 ]]; then
+  echo "Error: silicon rendered a blank image from $silicon_theme" >&2
   exit 1
 fi
