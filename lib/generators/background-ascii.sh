@@ -73,9 +73,12 @@ if [[ ! -f "$generated_file" ]]; then
 fi
 
 # --save-bg themes the ground but the glyphs keep the photo's colours, so the
-# result only half-matched the theme. Same treatment as lowpoly: hand it to the
-# recolor generator.
-bash "$SCRIPT_DIR/background-recolor.sh" "$theme_file" "$generated_file" "$output_file"
+# result only half-matched the theme. Hand it to the recolor generator, but not
+# on the settings lowpoly and recolor use: ASCII output is mostly ground, so it
+# arrives dark already (mean ~20 of 100) and the darkening pass crushes it to
+# near-black. The trimmed palette lowers the glyphs instead.
+bash "$SCRIPT_DIR/background-recolor.sh" "$theme_file" "$generated_file" "$output_file" \
+  --palette dark --no-darken
 rm -rf "$temp_dir"
 
 if [[ ! -f "$output_file" ]]; then
