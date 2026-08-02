@@ -28,7 +28,7 @@ Dev source is `~/tools/theme`; the installed copy everything actually reads is
 │   └── neovim/            # Present only for generated themes
 ├── demo/                  # Sample code files for generated backgrounds
 ├── scripts/               # Migration and test utilities
-├── analysis/              # Research from the original palette investigation
+├── analysis/              # Why the rules are what they are; see analysis/README.md
 └── install.sh
 
 # Data locations (XDG-compliant):

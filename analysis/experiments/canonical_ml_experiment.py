@@ -462,7 +462,7 @@ def run_catppuccin_deep_dive():
 
 def generate_report():
     """Generate comprehensive experiment report."""
-    report_path = Path(__file__).parent / "CANONICAL_ML_EXPERIMENT.md"
+    report_path = Path(__file__).parent / "canonical-ml-experiment.md"
 
     with open(report_path, "w") as f:
         f.write("# Canonical Palette ML Experiment Results\n\n")

@@ -621,7 +621,7 @@ def analyze_semantic_patterns(all_results: dict):
 
 def generate_experiment_report(all_results: dict):
     """Generate a markdown report of experiment findings."""
-    report_path = Path(__file__).parent / "CANONICAL_COMPARISON_RESULTS.md"
+    report_path = Path(__file__).parent / "canonical-comparison-results.md"
 
     with open(report_path, "w") as f:
         f.write("# Canonical vs Omarchy Theme Comparison\n\n")

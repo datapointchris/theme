@@ -257,12 +257,14 @@ The "worse" results are actually **more honest**:
 
 ## Files Generated
 
+The reports and data below are written by the scripts, not kept in the
+repo — this document is the distilled version of them. Re-run a script to
+get its report back.
+
 | File | Description |
 | --- | --- |
-| `ML_EXPERIMENT_RESULTS.md` | ML training results summary |
-| `CANONICAL_COMPARISON_RESULTS.md` | Omarchy vs canonical comparison |
-| `CANONICAL_ML_EXPERIMENT.md` | Canonical ML experiment report |
-| `training_data_enhanced.json` | 1,347 omarchy color samples |
+| `canonical-comparison-results.md` | Omarchy vs canonical comparison |
+| `canonical-ml-experiment.md` | Canonical ML experiment report |
 | `ml_enhanced_predictor.py` | ML training on omarchy data |
 | `perceptual_analysis.py` | Delta E analysis |
 | `canonical_comparison.py` | Canonical vs omarchy comparison |

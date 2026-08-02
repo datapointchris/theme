@@ -477,7 +477,7 @@ def main():
 
     # Generate and save report
     report = generate_report(palettes, comparisons, consistency, flexoki_comparison)
-    report_path = Path(__file__).parent / "NEOVIM_COMPARISON_RESULTS.md"
+    report_path = Path(__file__).parent / "neovim-comparison-results.md"
     with open(report_path, "w") as f:
         f.write(report)
     print(f"Saved report: {report_path}")
