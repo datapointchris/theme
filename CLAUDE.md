@@ -301,13 +301,50 @@ theme also needs its lazy.nvim entry adding to `colorscheme-manager.lua`, or
 `:colorscheme` finds nothing and the apply silently leaves the old theme up.
 
 **Plugin palettes are a snapshot, and the seam is silent.** `theme.yml` is a
-one-time transcription of the plugin's palette; nothing re-reads the plugin, and
-`analysis/experiments/neovim_palette_extractor.py` is research code from the
-original investigation, not a pipeline. The plugin is pinned in `lazy-lock.json`,
-so neither side drifts on its own — but `:Lazy update` moves Neovim to a re-tuned
-upstream palette while every other app keeps the old values, with nothing to
-report the divergence. After updating a colorscheme plugin, re-check its palette
-against `theme.yml`.
+one-time transcription of the plugin's palette; nothing re-reads the plugin, so
+Neovim follows upstream while every other app keeps whatever was transcribed.
+`scripts/check-plugin-drift.sh` is the check — see below.
+
+## Checking Plugin Themes Against Upstream
+
+`scripts/check-plugin-drift.sh [theme-id ...]` compares every plugin theme with
+the colorscheme it claims to mirror. Development tooling, deliberately not a
+`theme` subcommand: it is a maintenance question, not something the CLI needs at
+runtime. Worth running once or twice a year, and after adding a plugin theme.
+
+Two things it can find, and the second is the common one:
+
+- **Upstream changed a colour** after the transcription.
+- **The transcription was wrong from the start.** Both real findings so far were
+  this. `nightfox` had a bright-black of `#475072`, a blue-purple, where upstream
+  computes `#575860`, a grey — `Shade.new("#393b44", 0.15)`. `solarized-osaka`
+  was transcribed as *classic* Solarized rather than craftzdog's variant, which
+  tweaks every ANSI value (`#dc322f` vs `#db302d`, `#268bd2` vs `#268bd3`).
+
+It picks its method per theme:
+
+- Repos shipping a terminal config (`extras/ghostty`, `extra/<v>/<v>.ghostty`,
+  `extras/alacritty/…`) get an **exact** check — that file is generated from the
+  same palette the colorscheme uses, so comparing colour sets settles it without
+  parsing Lua. Only colours *we* have and upstream lacks are errors; the reverse
+  is normally an extended slot past the 16 ANSI that we do not generate.
+- Everything else gets a **history** check: did upstream touch anything
+  palette-shaped since `theme.yml` was last written? That only says "look at
+  this", never "this is wrong".
+
+Two traps it exists to encode:
+
+- **Do not baseline against `lazy-lock.json`.** It pins the plugin, but the pin
+  moves on every `:Lazy update` — weekly here — so comparing against it reports
+  nothing. The baseline is the date `theme.yml` was last committed.
+- **A repo can host several colorschemes.** flexoki ships one file per variant,
+  so a change to one would otherwise flag all four. The check keeps only changed
+  files naming this theme's variant.
+
+When it flags something, read the upstream palette and fix `theme.yml`, then
+`lib/generate-all.sh --themes <id>`. Adopting upstream verbatim is not always
+right: solarized-osaka's own extra sets bright-black to its *background*, which
+would make bright-black terminal text invisible.
 
 ## Files Reference
 
@@ -321,6 +358,7 @@ against `theme.yml`.
 | `lib/neovim_generator.py` | Generates Neovim colorscheme from theme.yml |
 | `install.sh` | Installation script for fresh installs |
 | `scripts/migrate-history.sh` | One-time migration from old format |
+| `scripts/check-plugin-drift.sh` | Compares plugin themes against upstream; see Checking Plugin Themes Against Upstream |
 | `lib/generate-all.sh` | Runs every generator over every theme in parallel; owns the generator-to-filename map |
 | `lib/generators/*.sh` | One per app. `ls lib/generators/` enumerates them; each takes `<theme.yml> [output]` |
 | `lib/generators/delta.sh` | Resolves through bat's theme cache — see Key Insights |

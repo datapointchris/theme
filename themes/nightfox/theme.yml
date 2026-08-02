@@ -38,8 +38,8 @@ ansi:
   magenta: "#9d79d6"
   cyan: "#63cdcf"
   white: "#dfdfe0"
-  bright_black: "#475072"
-  bright_red: "#d6616b"
+  bright_black: "#575860"  # black.bright — Shade.new("#393b44", 0.15) per upstream
+  bright_red: "#d16983"    # red.bright — Shade.new("#c94f6d", 0.15) per upstream
   bright_green: "#8ebaa4"
   bright_yellow: "#e0c989"
   bright_blue: "#86abdc"
