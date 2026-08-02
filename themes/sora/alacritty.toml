@@ -1,0 +1,35 @@
+# Sora - alacritty theme
+# Generated from theme.yml
+# Author: Aejkatappaja
+
+[colors.primary]
+background = "#0e1018"
+foreground = "#c8d0e0"
+
+[colors.cursor]
+text = "#0e1018"
+cursor = "#80c8e0"
+
+[colors.selection]
+text = "#dce4f0"
+background = "#1e2430"
+
+[colors.normal]
+black = "#0e1018"
+red = "#c46c78"
+green = "#90c8a0"
+yellow = "#d4b878"
+blue = "#80c8e0"
+magenta = "#b0a0d8"
+cyan = "#78b8b0"
+white = "#c8d0e0"
+
+[colors.bright]
+black = "#4a5468"
+red = "#d88898"
+green = "#a8d8b4"
+yellow = "#e0c888"
+blue = "#98d8f0"
+magenta = "#c4b4e8"
+cyan = "#90d0c8"
+white = "#dce4f0"

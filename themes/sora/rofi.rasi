@@ -1,0 +1,55 @@
+/* Sora - Rofi colors */
+/* Generated from theme.yml */
+/* Author: Aejkatappaja */
+
+* {
+    /* Base16 palette */
+    base00: #0e1018;  /* Main background */
+    base01: #14161e;  /* Lighter background */
+    base02: #1e2430;  /* Selection background */
+    base03: #586478;  /* Comments, muted */
+    base04: #9aa4b8;  /* Dark foreground */
+    base05: #c8d0e0;  /* Default foreground */
+    base06: #dce4f0;  /* Light foreground */
+    base07: #dce4f0;  /* Brightest foreground */
+    base08: #d0909c;  /* Red */
+    base09: #d0a888;  /* Orange */
+    base0A: #d4b878;  /* Yellow */
+    base0B: #90c8a0;  /* Green */
+    base0C: #78b8b0;  /* Cyan */
+    base0D: #80c8e0;  /* Blue */
+    base0E: #b0a0d8;  /* Magenta */
+    base0F: #8898b8;  /* Brown */
+
+    /* Semantic colors */
+    bg: #0e1018;
+    bg-alt: #14161e;
+    bg-selected: #1e2430;
+    fg: #c8d0e0;
+    fg-alt: #9aa4b8;
+    fg-muted: #586478;
+    fg-bright: #dce4f0;
+    border: #222838;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #c46c78;
+    active: #68a888;
+    selected: #80c8e0;
+
+    /* Named accent colors */
+    red: #c46c78;
+    green: #90c8a0;
+    yellow: #d4b878;
+    blue: #80c8e0;
+    magenta: #b0a0d8;
+    cyan: #78b8b0;
+    orange: #d0a888;
+
+    /* Bright variants */
+    bright-red: #d88898;
+    bright-green: #a8d8b4;
+    bright-yellow: #e0c888;
+    bright-blue: #98d8f0;
+    bright-magenta: #c4b4e8;
+    bright-cyan: #90d0c8;
+}

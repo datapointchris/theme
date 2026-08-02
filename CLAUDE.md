@@ -292,6 +292,7 @@ silently rather than loudly:
 | `neovim_colorscheme_source` | `plugin` or `generated`; also the picker's label suffix |
 | `variant` | Sets `vim.o.background` before applying |
 | `neovim_plugin_background` | Optional. Passed to `require(<colorscheme>).setup({background = ...})` before applying, for plugins whose variants are setup options rather than separate colorscheme names (cendre's three depths) |
+| `plugin` | Not read by Neovim, but it names the repo that needs a lazy.nvim entry |
 | `display_name` | Picker label |
 | `id` | Breaks the tie when several themes share one colorscheme name |
 

@@ -1,0 +1,35 @@
+/* Sora - SwayOSD colors */
+/* Generated from theme.yml */
+/* Author: Aejkatappaja */
+
+/* Base16 palette */
+@define-color base00 #0e1018;
+@define-color base01 #14161e;
+@define-color base02 #1e2430;
+@define-color base03 #586478;
+@define-color base04 #9aa4b8;
+@define-color base05 #c8d0e0;
+@define-color base06 #dce4f0;
+@define-color base07 #dce4f0;
+@define-color base08 #d0909c;
+@define-color base09 #d0a888;
+@define-color base0A #d4b878;
+@define-color base0B #90c8a0;
+@define-color base0C #78b8b0;
+@define-color base0D #80c8e0;
+@define-color base0E #b0a0d8;
+@define-color base0F #8898b8;
+
+/* OSD element colors */
+@define-color background-color #0e1018;
+@define-color border-color #1e2430;
+@define-color label #c8d0e0;
+@define-color image #80c8e0;
+@define-color progress #80c8e0;
+@define-color progress-bg #14161e;
+
+/* Status colors for volume/brightness */
+@define-color muted #d0909c;
+@define-color low #78b8b0;
+@define-color normal #80c8e0;
+@define-color high #d0a888;

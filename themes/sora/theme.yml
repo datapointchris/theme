@@ -1,0 +1,121 @@
+meta:
+  id: "sora"
+  display_name: "Sora"
+  neovim_colorscheme_name: "sora"
+  neovim_colorscheme_source: "plugin"
+  plugin: "Aejkatappaja/sora"
+  derived_from: "neovim-plugin"
+  variant: "dark"
+  author: "Aejkatappaja"
+
+# Deep blue-black near-OLED ground under eight named accents. The signature is
+# the ethereal cyan on functions, which is also the theme's own UI accent, and a
+# single warm gold that acts as the one warm point in an otherwise cool palette.
+
+base16:
+  base00: "#0e1018"  # bg - editor background
+  base01: "#14161e"  # bg_elevated - lighter background
+  base02: "#1e2430"  # bg_selection
+  base03: "#586478"  # fg_comment
+  base04: "#9aa4b8"  # fg_dim
+  base05: "#c8d0e0"  # fg - default foreground
+  base06: "#dce4f0"  # fg_bright
+  base07: "#dce4f0"  # fg_bright - no lighter ink exists in the palette
+  base08: "#d0909c"  # rose - booleans, builtins, exceptions
+  base09: "#d0a888"  # peach - types, constructors, params
+  base0A: "#d4b878"  # gold - constants, numbers (the warm "star")
+  base0B: "#90c8a0"  # sage - strings
+  base0C: "#78b8b0"  # teal - tags, regex, escapes
+  base0D: "#80c8e0"  # cyan - functions, and the theme's own UI accent
+  base0E: "#b0a0d8"  # purple - keywords
+  base0F: "#8898b8"  # steel - operators, properties
+
+ansi:
+  black: "#0e1018"          # bg
+  red: "#c46c78"            # error
+  green: "#90c8a0"          # sage
+  yellow: "#d4b878"         # gold
+  blue: "#80c8e0"           # cyan
+  magenta: "#b0a0d8"        # purple
+  cyan: "#78b8b0"           # teal
+  white: "#c8d0e0"          # fg
+  bright_black: "#4a5468"
+  bright_red: "#d88898"
+  bright_green: "#a8d8b4"
+  bright_yellow: "#e0c888"
+  bright_blue: "#98d8f0"
+  bright_magenta: "#c4b4e8"
+  bright_cyan: "#90d0c8"
+  bright_white: "#dce4f0"   # fg_bright
+
+special:
+  background: "#0e1018"     # bg
+  foreground: "#c8d0e0"     # fg
+  cursor: "#80c8e0"         # cyan
+  cursor_text: "#0e1018"    # bg
+  selection_bg: "#1e2430"   # bg_selection
+  selection_fg: "#dce4f0"   # fg_bright
+  border: "#222838"         # border
+  panel: "#0a0c12"          # bg_float
+
+extended_source: plugin
+extended:
+  # Backgrounds
+  bg: "#0e1018"
+  bg_float: "#0a0c12"
+  bg_elevated: "#14161e"
+  bg_cursorline: "#171a24"
+  bg_selection: "#1e2430"
+  bg_search: "#1a3050"
+  bg_statusline: "#0a0c12"
+  # Foregrounds
+  fg: "#c8d0e0"
+  fg_dim: "#9aa4b8"
+  fg_bright: "#dce4f0"
+  fg_gutter: "#364050"
+  fg_gutter_active: "#6a7890"
+  # The eight named accents
+  cyan: "#80c8e0"
+  purple: "#b0a0d8"
+  sage: "#90c8a0"
+  rose: "#d0909c"
+  gold: "#d4b878"
+  peach: "#d0a888"
+  teal: "#78b8b0"
+  steel: "#8898b8"
+  # Diff backgrounds
+  tint_add: "#0e1c16"
+  tint_modify: "#101828"
+  tint_delete: "#1c1014"
+  tint_visual: "#1e2430"
+  # Semantic colors
+  syntax_comment: "#586478"
+  syntax_string: "#90c8a0"
+  syntax_number: "#d4b878"
+  syntax_constant: "#d4b878"
+  syntax_variable: "#b4bcd0"
+  syntax_parameter: "#d0a888"
+  syntax_function: "#80c8e0"
+  syntax_keyword: "#b0a0d8"
+  syntax_type: "#d0a888"
+  syntax_operator: "#8898b8"
+  syntax_punctuation: "#9aa4b8"
+  syntax_tag: "#78b8b0"
+  syntax_attribute: "#d0a888"
+  syntax_preproc: "#b0a0d8"
+  syntax_special: "#b0a0d8"
+  diagnostic_error: "#c46c78"
+  diagnostic_warning: "#c8a860"
+  diagnostic_info: "#5ca8c8"
+  diagnostic_hint: "#78b0a0"
+  diagnostic_ok: "#68a888"
+  git_add: "#68b080"
+  git_change: "#6898b8"
+  git_delete: "#b86068"
+  git_ignored: "#586478"
+  ui_border: "#222838"
+  ui_panel: "#0a0c12"
+  ui_float: "#0a0c12"
+  ui_accent: "#80c8e0"
+  ui_selection: "#1e2430"
+  ui_match: "#d4b878"

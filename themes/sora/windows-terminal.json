@@ -1,0 +1,23 @@
+{
+  "name": "Sora",
+  "background": "#0e1018",
+  "foreground": "#c8d0e0",
+  "cursorColor": "#80c8e0",
+  "selectionBackground": "#1e2430",
+  "black": "#0e1018",
+  "red": "#c46c78",
+  "green": "#90c8a0",
+  "yellow": "#d4b878",
+  "blue": "#80c8e0",
+  "purple": "#b0a0d8",
+  "cyan": "#78b8b0",
+  "white": "#c8d0e0",
+  "brightBlack": "#4a5468",
+  "brightRed": "#d88898",
+  "brightGreen": "#a8d8b4",
+  "brightYellow": "#e0c888",
+  "brightBlue": "#98d8f0",
+  "brightPurple": "#c4b4e8",
+  "brightCyan": "#90d0c8",
+  "brightWhite": "#dce4f0"
+}

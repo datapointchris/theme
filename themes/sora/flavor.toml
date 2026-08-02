@@ -1,0 +1,129 @@
+# Sora - Yazi flavor
+# Generated algorithmically from theme.yml
+# Author: Aejkatappaja
+
+[mgr]
+cwd = { fg = "#e0c888" }
+find_keyword = { fg = "#d0a888", bg = "#0e1018" }
+find_position = {}
+marker_copied = { fg = "#a8d8b4", bg = "#a8d8b4" }
+marker_cut = { fg = "#d0909c", bg = "#d0909c" }
+marker_marked = { fg = "#b0a0d8", bg = "#b0a0d8" }
+marker_selected = { fg = "#d0a888", bg = "#d0a888" }
+count_copied = { fg = "#0e1018", bg = "#a8d8b4" }
+count_cut = { fg = "#0e1018", bg = "#d0909c" }
+count_selected = { fg = "#0e1018", bg = "#d0a888" }
+border_symbol = "│"
+border_style = { fg = "#586478" }
+
+[indicator]
+current = { reversed = true, bold = true }
+preview = { underline = true }
+
+[tabs]
+active = { fg = "#0e1018", bg = "#80c8e0", bold = true }
+inactive = { fg = "#80c8e0", bg = "#1e2430" }
+sep_inner = { open = "", close = "" }
+sep_outer = { open = "", close = "" }
+
+[mode]
+normal_main = { fg = "#0e1018", bg = "#80c8e0", bold = true }
+normal_alt = { fg = "#80c8e0", bg = "#1e2430" }
+select_main = { fg = "#0e1018", bg = "#d0a888", bold = true }
+select_alt = { fg = "#d0a888", bg = "#1e2430" }
+unset_main = { fg = "#0e1018", bg = "#e0c888", bold = true }
+unset_alt = { fg = "#e0c888", bg = "#1e2430" }
+
+[status]
+sep_left = { open = "", close = "" }
+sep_right = { open = "", close = "" }
+overall = { fg = "#9aa4b8", bg = "#14161e" }
+progress_label = { fg = "#80c8e0", bold = true }
+progress_normal = { fg = "#1e2430", bg = "#0e1018" }
+progress_error = { fg = "#1e2430", bg = "#0e1018" }
+perm_type = { fg = "#a8d8b4" }
+perm_read = { fg = "#e0c888" }
+perm_write = { fg = "#d0909c" }
+perm_exec = { fg = "#90d0c8" }
+perm_sep = { fg = "#b0a0d8" }
+
+[pick]
+border = { fg = "#98d8f0" }
+active = { fg = "#b0a0d8", bold = true }
+inactive = {}
+
+[input]
+border = { fg = "#98d8f0" }
+title = {}
+value = {}
+selected = { reversed = true }
+
+[cmp]
+border = { fg = "#98d8f0" }
+active = { reversed = true }
+inactive = {}
+
+[tasks]
+border = { fg = "#98d8f0" }
+title = {}
+hovered = { fg = "#b0a0d8" }
+
+[which]
+cols = 2
+separator = " - "
+separator_style = { fg = "#586478" }
+mask = { bg = "#14161e" }
+rest = { fg = "#586478" }
+cand = { fg = "#80c8e0" }
+desc = { fg = "#1e2430" }
+
+[help]
+on = { fg = "#90d0c8" }
+run = { fg = "#b0a0d8" }
+desc = {}
+hovered = { reversed = true, bold = true }
+footer = { fg = "#0e1018", bg = "#c8d0e0" }
+
+[notify]
+title_info = { fg = "#a8d8b4" }
+title_warn = { fg = "#e0c888" }
+title_error = { fg = "#d0909c" }
+
+[confirm]
+border = { fg = "#9aa4b8" }
+title = { fg = "#80c8e0" }
+body = { fg = "#dce4f0" }
+list = { fg = "#c8d0e0" }
+btn_yes = { reversed = true, fg = "#c8d0e0" }
+btn_no = {}
+
+[spot]
+border = { fg = "#1e2430" }
+title = { fg = "#586478", bold = true }
+tbl_col = { fg = "#9aa4b8" }
+tbl_cell = { bg = "#14161e" }
+
+[filetype]
+rules = [
+  # Images
+  { mime = "image/*", fg = "#e0c888" },
+
+  # Media
+  { mime = "{audio,video}/*", fg = "#b0a0d8" },
+
+  # Archives
+  { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "#d0909c" },
+
+  # Documents
+  { mime = "application/{pdf,doc,rtf,vnd.*}", fg = "#90d0c8" },
+
+  # Broken symlinks
+  { url = "*", is = "orphan", fg = "#d0909c" },
+
+  # Executables
+  { url = "*", is = "exec", fg = "#90c8a0" },
+
+  # Fallback
+  { url = "*", fg = "#c8d0e0" },
+  { url = "*/", fg = "#80c8e0" },
+]

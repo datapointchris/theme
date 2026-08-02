@@ -1,0 +1,85 @@
+# Sora - btop theme
+# Generated from theme.yml
+# Author: Aejkatappaja
+
+# Main background, empty for terminal default
+theme[main_bg]="#0E1018"
+
+# Main text color
+theme[main_fg]="#C8D0E0"
+
+# Title color for boxes - use accent color
+theme[title]="#78B8B0"
+
+# Highlight color for keyboard shortcuts - use UI accent
+theme[hi_fg]="#80C8E0"
+
+# Background color of selected item in processes box - use UI selection
+theme[selected_bg]="#1E2430"
+
+# Foreground color of selected item in processes box
+theme[selected_fg]="#DCE4F0"
+
+# Color of inactive/disabled text
+theme[inactive_fg]="#586478"
+
+# Misc colors for processes box
+theme[proc_misc]="#80C8E0"
+
+# Box outline colors - use UI border
+theme[cpu_box]="#222838"
+theme[mem_box]="#222838"
+theme[net_box]="#222838"
+theme[proc_box]="#222838"
+theme[div_line]="#222838"
+
+# Temperature graph colors (gradient: info -> warning -> error for heat)
+theme[temp_start]="#5CA8C8"
+theme[temp_mid]="#C8A860"
+theme[temp_end]="#C46C78"
+
+# CPU graph colors (gradient: info -> accent -> bright)
+theme[cpu_start]="#5CA8C8"
+theme[cpu_mid]="#78B8B0"
+theme[cpu_end]="#DCE4F0"
+
+# Memory free meter (green = good/available)
+theme[free_start]="#68A888"
+theme[free_mid]="#78B8B0"
+theme[free_end]="#DCE4F0"
+
+# Memory cached meter (yellow/orange = cached/warning)
+theme[cached_start]="#D4B878"
+theme[cached_mid]="#C8A860"
+theme[cached_end]="#DCE4F0"
+
+# Memory available meter (blue = info/available)
+theme[available_start]="#5CA8C8"
+theme[available_mid]="#78B8B0"
+theme[available_end]="#DCE4F0"
+
+# Memory used meter (gradient: warning -> error as usage increases)
+theme[used_start]="#C8A860"
+theme[used_mid]="#C46C78"
+theme[used_end]="#D4B878"
+
+# Download graph colors (green = incoming/good)
+theme[download_start]="#68A888"
+theme[download_mid]="#78B8B0"
+theme[download_end]="#DCE4F0"
+
+# Upload graph colors (magenta/purple for outgoing)
+theme[upload_start]="#B0A0D8"
+theme[upload_mid]="#80C8E0"
+theme[upload_end]="#DCE4F0"
+
+# Process tree colors
+theme[process_start]="#80C8E0"
+theme[process_mid]="#8898B8"
+theme[process_end]="#C46C78"
+
+# Meter background
+theme[meter_bg]="#9AA4B8"
+
+# Graph text (brightest for readability)
+theme[graph_text]="#DCE4F0"
