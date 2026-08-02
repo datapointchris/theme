@@ -9,23 +9,23 @@
     base02: #073642;  /* Selection background */
     base03: #586e75;  /* Comments, muted */
     base04: #657b83;  /* Dark foreground */
-    base05: #93a1a1;  /* Default foreground */
+    base05: #839395;  /* Default foreground */
     base06: #a9b1b1;  /* Light foreground */
     base07: #eee8d5;  /* Brightest foreground */
-    base08: #dc322f;  /* Red */
-    base09: #cb4b16;  /* Orange */
-    base0A: #b58900;  /* Yellow */
-    base0B: #859900;  /* Green */
-    base0C: #2aa198;  /* Cyan */
-    base0D: #268bd2;  /* Blue */
-    base0E: #6c71c4;  /* Magenta */
-    base0F: #d33682;  /* Brown */
+    base08: #db302d;  /* Red */
+    base09: #c94c16;  /* Orange */
+    base0A: #b28500;  /* Yellow */
+    base0B: #849900;  /* Green */
+    base0C: #29a298;  /* Cyan */
+    base0D: #268bd3;  /* Blue */
+    base0E: #d23681;  /* Magenta */
+    base0F: #f55350;  /* Brown */
 
     /* Semantic colors */
     bg: #001419;
     bg-alt: #002b36;
-    bg-selected: #073642;
-    fg: #93a1a1;
+    bg-selected: #1a6397;
+    fg: #839395;
     fg-alt: #657b83;
     fg-muted: #586e75;
     fg-bright: #a9b1b1;
@@ -34,22 +34,22 @@
     /* Status colors - use extended diagnostic colors when available */
     urgent: #db302d;
     active: #859900;
-    selected: #268bd2;
+    selected: #268bd3;
 
     /* Named accent colors */
-    red: #dc322f;
-    green: #859900;
-    yellow: #b58900;
-    blue: #268bd2;
-    magenta: #d33682;
-    cyan: #2aa198;
-    orange: #cb4b16;
+    red: #db302d;
+    green: #849900;
+    yellow: #b28500;
+    blue: #268bd3;
+    magenta: #d23681;
+    cyan: #29a298;
+    orange: #c94c16;
 
     /* Bright variants */
-    bright-red: #cb4b16;
-    bright-green: #859900;
-    bright-yellow: #b58900;
-    bright-blue: #268bd2;
-    bright-magenta: #6c71c4;
-    bright-cyan: #2aa198;
+    bright-red: #f55350;
+    bright-green: #b7f900;
+    bright-yellow: #ffbf00;
+    bright-blue: #46acf5;
+    bright-magenta: #f254a0;
+    bright-cyan: #2aeddd;
 }

@@ -14,19 +14,19 @@
 /* Foreground tones */
 @define-color base03 #586e75;  /* Comments, muted */
 @define-color base04 #657b83;  /* Dark foreground */
-@define-color base05 #93a1a1;  /* Default foreground */
+@define-color base05 #839395;  /* Default foreground */
 @define-color base06 #a9b1b1;  /* Light foreground */
 @define-color base07 #eee8d5;  /* Brightest foreground */
 
 /* Accent colors */
-@define-color base08 #dc322f;  /* Red */
-@define-color base09 #cb4b16;  /* Orange */
-@define-color base0A #b58900;  /* Yellow */
-@define-color base0B #859900;  /* Green */
-@define-color base0C #2aa198;  /* Cyan */
-@define-color base0D #268bd2;  /* Blue */
-@define-color base0E #6c71c4;  /* Magenta */
-@define-color base0F #d33682;  /* Brown */
+@define-color base08 #db302d;  /* Red */
+@define-color base09 #c94c16;  /* Orange */
+@define-color base0A #b28500;  /* Yellow */
+@define-color base0B #849900;  /* Green */
+@define-color base0C #29a298;  /* Cyan */
+@define-color base0D #268bd3;  /* Blue */
+@define-color base0E #d23681;  /* Magenta */
+@define-color base0F #f55350;  /* Brown */
 
 /* =============================================================================
    SEMANTIC ALIASES
@@ -36,10 +36,10 @@
 @define-color bg #001419;
 @define-color bg-dark #002b36;
 @define-color bg-highlight #073642;
-@define-color bg-selection #073642;
+@define-color bg-selection #1a6397;
 
 /* Foregrounds */
-@define-color fg #93a1a1;
+@define-color fg #839395;
 @define-color fg-dark #657b83;
 @define-color fg-muted #586e75;
 @define-color fg-bright #a9b1b1;
@@ -51,21 +51,21 @@
 @define-color info #268bd3;
 
 /* Named accent colors */
-@define-color red #dc322f;
-@define-color green #859900;
-@define-color yellow #b58900;
-@define-color blue #268bd2;
-@define-color magenta #d33682;
-@define-color cyan #2aa198;
-@define-color orange #cb4b16;
+@define-color red #db302d;
+@define-color green #849900;
+@define-color yellow #b28500;
+@define-color blue #268bd3;
+@define-color magenta #d23681;
+@define-color cyan #29a298;
+@define-color orange #c94c16;
 
 /* Bright variants */
-@define-color bright-red #cb4b16;
-@define-color bright-green #859900;
-@define-color bright-yellow #b58900;
-@define-color bright-blue #268bd2;
-@define-color bright-magenta #6c71c4;
-@define-color bright-cyan #2aa198;
+@define-color bright-red #f55350;
+@define-color bright-green #b7f900;
+@define-color bright-yellow #ffbf00;
+@define-color bright-blue #46acf5;
+@define-color bright-magenta #f254a0;
+@define-color bright-cyan #2aeddd;
 
 /* Border - use extended UI border when available */
 @define-color border #073642;

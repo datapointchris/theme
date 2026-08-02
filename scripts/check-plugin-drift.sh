@@ -55,15 +55,20 @@ declare -A UPSTREAM_TERMINAL=(
   [EdenEast/nightfox.nvim]="extra/{variant}/{variant}.ghostty"
   [Aejkatappaja/cendre]="extras/ghostty/{variant}"
   [Aejkatappaja/sora]="extras/ghostty/{variant}"
-  [rebelot/kanagawa.nvim]="extras/alacritty/kanagawa_{variant}.toml"
-  [craftzdog/solarized-osaka.nvim]="extras/alacritty/solarized_osaka_{variant}.toml"
+  [craftzdog/solarized-osaka.nvim]="extras/ghostty/solarized_osaka_{variant}"
 )
+# A shipped extra can itself be stale, so prefer the freshest format a repo
+# publishes and drop any that contradicts the plugin. kanagawa is deliberately
+# absent: its extras/alacritty gives terminal black as #090618, a colour that
+# appears nowhere in its lua source, while themes.lua sets term[1] to
+# palette.sumiInk0 (#16161d) -- what we already have. That file was last touched
+# in Feb 2025. solarized-osaka is pointed at ghostty rather than alacritty for
+# the same reason: the two disagree and alacritty is the older of them.
 # The upstream file is named for its own variant, which is not always our id.
 declare -A VARIANT_OF=(
   [nightfox]="nightfox" [terafox]="terafox"
   [cendre]="cendre" [cendre-medium]="cendre-medium" [cendre-soft]="cendre-soft"
   [sora]="sora"
-  [kanagawa]="wave"
   [solarized-osaka]="dark"
 )
 

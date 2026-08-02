@@ -18,77 +18,77 @@
 :root {
   /* Toolbar and chrome backgrounds */
   --toolbar-bgcolor: #001419 !important;
-  --toolbar-color: #93a1a1 !important;
+  --toolbar-color: #839395 !important;
   --lwt-accent-color: #002b36 !important;
-  --lwt-text-color: #93a1a1 !important;
+  --lwt-text-color: #839395 !important;
 
   /* Tab colors */
-  --tab-selected-bgcolor: #073642 !important;
-  --tab-selected-textcolor: #93a1a1 !important;
-  --tab-line-color: #268bd2 !important;
+  --tab-selected-bgcolor: #1a6397 !important;
+  --tab-selected-textcolor: #839395 !important;
+  --tab-line-color: #268bd3 !important;
   --tabs-border-color: #002b36 !important;
   --tabpanel-background-color: #001419 !important;
 
   /* URL bar */
   --urlbar-box-bgcolor: #002b36 !important;
-  --urlbar-box-text-color: #93a1a1 !important;
+  --urlbar-box-text-color: #839395 !important;
   --urlbar-box-hover-bgcolor: #073642 !important;
   --urlbar-box-active-bgcolor: #073642 !important;
   --urlbar-box-focus-bgcolor: #002b36 !important;
   --autocomplete-popup-background: #002b36 !important;
-  --autocomplete-popup-color: #93a1a1 !important;
-  --autocomplete-popup-highlight-background: #073642 !important;
-  --autocomplete-popup-highlight-color: #93a1a1 !important;
+  --autocomplete-popup-color: #839395 !important;
+  --autocomplete-popup-highlight-background: #1a6397 !important;
+  --autocomplete-popup-highlight-color: #839395 !important;
 
   /* Sidebar */
   --sidebar-background-color: #001419 !important;
-  --sidebar-text-color: #93a1a1 !important;
+  --sidebar-text-color: #839395 !important;
   --sidebar-border-color: #002b36 !important;
 
   /* Panels and popups */
   --arrowpanel-background: #002b36 !important;
-  --arrowpanel-color: #93a1a1 !important;
+  --arrowpanel-color: #839395 !important;
   --arrowpanel-border-color: #002b36 !important;
   --panel-separator-color: #073642 !important;
 
   /* Focus and selection */
-  --focus-outline-color: #268bd2 !important;
+  --focus-outline-color: #268bd3 !important;
   --input-bgcolor: #002b36 !important;
-  --input-color: #93a1a1 !important;
+  --input-color: #839395 !important;
   --input-border-color: #002b36 !important;
 
   /* Buttons */
   --button-bgcolor: #002b36 !important;
-  --button-color: #93a1a1 !important;
+  --button-color: #839395 !important;
   --button-hover-bgcolor: #073642 !important;
   --button-active-bgcolor: #586e75 !important;
-  --button-primary-bgcolor: #268bd2 !important;
+  --button-primary-bgcolor: #268bd3 !important;
   --button-primary-color: #001419 !important;
-  --button-primary-hover-bgcolor: #268bd2 !important;
-  --button-primary-active-bgcolor: #268bd2 !important;
+  --button-primary-hover-bgcolor: #46acf5 !important;
+  --button-primary-active-bgcolor: #268bd3 !important;
 
   /* Scrollbars (Firefox 64+) */
   scrollbar-color: #586e75 #002b36;
 
   /* Link colors */
-  --lwt-toolbarbutton-icon-fill: #93a1a1 !important;
+  --lwt-toolbarbutton-icon-fill: #839395 !important;
 
   /* Lightweight theme colors */
   --lwt-toolbar-field-background-color: #002b36 !important;
-  --lwt-toolbar-field-color: #93a1a1 !important;
+  --lwt-toolbar-field-color: #839395 !important;
   --lwt-toolbar-field-border-color: #002b36 !important;
   --lwt-toolbar-field-focus: #073642 !important;
-  --lwt-toolbar-field-highlight: #073642 !important;
-  --lwt-toolbar-field-highlight-text: #93a1a1 !important;
+  --lwt-toolbar-field-highlight: #1a6397 !important;
+  --lwt-toolbar-field-highlight-text: #839395 !important;
 
   /* Context menu */
   --menu-background-color: #002b36 !important;
-  --menu-color: #93a1a1 !important;
-  --menuitem-hover-background-color: #073642 !important;
+  --menu-color: #839395 !important;
+  --menuitem-hover-background-color: #1a6397 !important;
 
   /* Findbar */
   --toolbar-field-focus-background-color: #002b36 !important;
-  --toolbar-field-focus-color: #93a1a1 !important;
+  --toolbar-field-focus-color: #839395 !important;
 }
 
 /*==============================================================================
@@ -98,11 +98,11 @@
 
 :root {
   /* Zen accent colors */
-  --zen-primary-color: #268bd2 !important;
-  --zen-accent-color: #268bd2 !important;
-  --zen-colors-primary: #268bd2 !important;
-  --zen-colors-secondary: #6c71c4 !important;
-  --zen-colors-tertiary: #2aa198 !important;
+  --zen-primary-color: #268bd3 !important;
+  --zen-accent-color: #268bd3 !important;
+  --zen-colors-primary: #268bd3 !important;
+  --zen-colors-secondary: #d23681 !important;
+  --zen-colors-tertiary: #29a298 !important;
 
   /* Zen backgrounds */
   --zen-colors-bg: #001419 !important;
@@ -110,7 +110,7 @@
   --zen-themed-toolbar-bg: #001419 !important;
 
   /* Zen text colors */
-  --zen-colors-text: #93a1a1 !important;
+  --zen-colors-text: #839395 !important;
   --zen-colors-text-secondary: #657b83 !important;
 
   /* Zen borders */
@@ -126,7 +126,7 @@
 /* Thunderbird message pane */
 :root {
   --foldertree-background: #001419 !important;
-  --folderpane-unread-count-background: #268bd2 !important;
+  --folderpane-unread-count-background: #268bd3 !important;
   --thread-pane-background: #001419 !important;
   --messagepane-background-color: #001419 !important;
 }
@@ -142,7 +142,7 @@
 #PersonalToolbar,
 #toolbar-menubar {
   background-color: #001419 !important;
-  color: #93a1a1 !important;
+  color: #839395 !important;
 }
 
 /* Tab bar background */
@@ -160,8 +160,8 @@
 
 /* Active/selected tab */
 .tabbrowser-tab[selected="true"] {
-  background-color: #073642 !important;
-  color: #93a1a1 !important;
+  background-color: #1a6397 !important;
+  color: #839395 !important;
 }
 
 /* Tab hover state */
@@ -172,31 +172,31 @@
 /* New tab button */
 #tabs-newtab-button,
 .tabs-newtab-button {
-  fill: #93a1a1 !important;
+  fill: #839395 !important;
 }
 
 /* URL bar */
 #urlbar {
   background-color: #002b36 !important;
-  color: #93a1a1 !important;
+  color: #839395 !important;
   border-color: #002b36 !important;
 }
 
 #urlbar:focus-within,
 #urlbar[focused="true"] {
   background-color: #002b36 !important;
-  border-color: #268bd2 !important;
+  border-color: #268bd3 !important;
 }
 
 /* URL bar results popup */
 #urlbar-results,
 .urlbarView {
   background-color: #002b36 !important;
-  color: #93a1a1 !important;
+  color: #839395 !important;
 }
 
 .urlbarView-row[selected] {
-  background-color: #073642 !important;
+  background-color: #1a6397 !important;
 }
 
 /* Navigation buttons */
@@ -211,7 +211,7 @@
 }
 
 .bookmark-item {
-  color: #93a1a1 !important;
+  color: #839395 !important;
 }
 
 /* Context menus */
@@ -219,12 +219,12 @@ menupopup,
 menu,
 menuitem {
   background-color: #002b36 !important;
-  color: #93a1a1 !important;
+  color: #839395 !important;
 }
 
 menuitem:hover,
 menu:hover {
-  background-color: #073642 !important;
+  background-color: #1a6397 !important;
 }
 
 menuseparator {
@@ -236,24 +236,24 @@ menuseparator {
 #sidebar,
 #sidebar-header {
   background-color: #001419 !important;
-  color: #93a1a1 !important;
+  color: #839395 !important;
 }
 
 /* Findbar */
 findbar {
   background-color: #002b36 !important;
-  color: #93a1a1 !important;
+  color: #839395 !important;
 }
 
 findbar textbox {
   background-color: #002b36 !important;
-  color: #93a1a1 !important;
+  color: #839395 !important;
 }
 
 /* Status bar */
 #statuspanel-label {
   background-color: #002b36 !important;
-  color: #93a1a1 !important;
+  color: #839395 !important;
   border-color: #002b36 !important;
 }
 
@@ -263,27 +263,27 @@ findbar textbox {
 
 /* Links */
 a:link {
-  color: #268bd2 !important;
+  color: #268bd3 !important;
 }
 
 a:visited {
-  color: #6c71c4 !important;
+  color: #d23681 !important;
 }
 
 /* Selection highlighting */
 ::selection {
-  background-color: #073642 !important;
-  color: #93a1a1 !important;
+  background-color: #1a6397 !important;
+  color: #839395 !important;
 }
 
 ::-moz-selection {
-  background-color: #073642 !important;
-  color: #93a1a1 !important;
+  background-color: #1a6397 !important;
+  color: #839395 !important;
 }
 
 /* Focus ring */
 :focus-visible {
-  outline-color: #268bd2 !important;
+  outline-color: #268bd3 !important;
 }
 
 /*==============================================================================

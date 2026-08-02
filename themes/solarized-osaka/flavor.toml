@@ -3,16 +3,16 @@
 # Author: Takuya Matsuyama (craftzdog)
 
 [mgr]
-cwd = { fg = "#268bd2" }
-find_keyword = { fg = "#cb4b16", bg = "#001419" }
+cwd = { fg = "#ffbf00" }
+find_keyword = { fg = "#c94c16", bg = "#001419" }
 find_position = {}
-marker_copied = { fg = "#2aa198", bg = "#2aa198" }
-marker_cut = { fg = "#6c71c4", bg = "#6c71c4" }
-marker_marked = { fg = "#268bd2", bg = "#268bd2" }
-marker_selected = { fg = "#eee8d5", bg = "#eee8d5" }
-count_copied = { fg = "#001419", bg = "#2aa198" }
-count_cut = { fg = "#001419", bg = "#6c71c4" }
-count_selected = { fg = "#001419", bg = "#eee8d5" }
+marker_copied = { fg = "#b7f900", bg = "#b7f900" }
+marker_cut = { fg = "#db302d", bg = "#db302d" }
+marker_marked = { fg = "#d23681", bg = "#d23681" }
+marker_selected = { fg = "#c94c16", bg = "#c94c16" }
+count_copied = { fg = "#001419", bg = "#b7f900" }
+count_cut = { fg = "#001419", bg = "#db302d" }
+count_selected = { fg = "#001419", bg = "#c94c16" }
 border_symbol = "│"
 border_style = { fg = "#586e75" }
 
@@ -21,52 +21,52 @@ current = { reversed = true, bold = true }
 preview = { underline = true }
 
 [tabs]
-active = { fg = "#001419", bg = "#93a1a1", bold = true }
-inactive = { fg = "#93a1a1", bg = "#073642" }
+active = { fg = "#001419", bg = "#268bd3", bold = true }
+inactive = { fg = "#268bd3", bg = "#073642" }
 sep_inner = { open = "", close = "" }
 sep_outer = { open = "", close = "" }
 
 [mode]
-normal_main = { fg = "#001419", bg = "#93a1a1", bold = true }
-normal_alt = { fg = "#93a1a1", bg = "#073642" }
-select_main = { fg = "#001419", bg = "#cb4b16", bold = true }
-select_alt = { fg = "#cb4b16", bg = "#073642" }
-unset_main = { fg = "#001419", bg = "#859900", bold = true }
-unset_alt = { fg = "#859900", bg = "#073642" }
+normal_main = { fg = "#001419", bg = "#268bd3", bold = true }
+normal_alt = { fg = "#268bd3", bg = "#073642" }
+select_main = { fg = "#001419", bg = "#c94c16", bold = true }
+select_alt = { fg = "#c94c16", bg = "#073642" }
+unset_main = { fg = "#001419", bg = "#ffbf00", bold = true }
+unset_alt = { fg = "#ffbf00", bg = "#073642" }
 
 [status]
 sep_left = { open = "", close = "" }
 sep_right = { open = "", close = "" }
 overall = { fg = "#657b83", bg = "#002b36" }
-progress_label = { fg = "#268bd2", bold = true }
+progress_label = { fg = "#268bd3", bold = true }
 progress_normal = { fg = "#073642", bg = "#001419" }
 progress_error = { fg = "#073642", bg = "#001419" }
-perm_type = { fg = "#073642" }
-perm_read = { fg = "#859900" }
-perm_write = { fg = "#dc322f" }
-perm_exec = { fg = "#859900" }
-perm_sep = { fg = "#6c71c4" }
+perm_type = { fg = "#b7f900" }
+perm_read = { fg = "#ffbf00" }
+perm_write = { fg = "#db302d" }
+perm_exec = { fg = "#2aeddd" }
+perm_sep = { fg = "#d23681" }
 
 [pick]
-border = { fg = "#268bd2" }
-active = { fg = "#6c71c4", bold = true }
+border = { fg = "#46acf5" }
+active = { fg = "#d23681", bold = true }
 inactive = {}
 
 [input]
-border = { fg = "#268bd2" }
+border = { fg = "#46acf5" }
 title = {}
 value = {}
 selected = { reversed = true }
 
 [cmp]
-border = { fg = "#268bd2" }
+border = { fg = "#46acf5" }
 active = { reversed = true }
 inactive = {}
 
 [tasks]
-border = { fg = "#268bd2" }
+border = { fg = "#46acf5" }
 title = {}
-hovered = { fg = "#6c71c4" }
+hovered = { fg = "#d23681" }
 
 [which]
 cols = 2
@@ -74,27 +74,27 @@ separator = " - "
 separator_style = { fg = "#586e75" }
 mask = { bg = "#002b36" }
 rest = { fg = "#586e75" }
-cand = { fg = "#268bd2" }
+cand = { fg = "#268bd3" }
 desc = { fg = "#073642" }
 
 [help]
-on = { fg = "#2aa198" }
-run = { fg = "#6c71c4" }
+on = { fg = "#2aeddd" }
+run = { fg = "#d23681" }
 desc = {}
 hovered = { reversed = true, bold = true }
-footer = { fg = "#001419", bg = "#93a1a1" }
+footer = { fg = "#001419", bg = "#839395" }
 
 [notify]
-title_info = { fg = "#2aa198" }
-title_warn = { fg = "#eee8d5" }
-title_error = { fg = "#6c71c4" }
+title_info = { fg = "#b7f900" }
+title_warn = { fg = "#ffbf00" }
+title_error = { fg = "#db302d" }
 
 [confirm]
 border = { fg = "#657b83" }
-title = { fg = "#268bd2" }
+title = { fg = "#268bd3" }
 body = { fg = "#eee8d5" }
-list = { fg = "#93a1a1" }
-btn_yes = { reversed = true, fg = "#93a1a1" }
+list = { fg = "#839395" }
+btn_yes = { reversed = true, fg = "#839395" }
 btn_no = {}
 
 [spot]
@@ -106,24 +106,24 @@ tbl_cell = { bg = "#002b36" }
 [filetype]
 rules = [
   # Images
-  { mime = "image/*", fg = "#6c71c4" },
+  { mime = "image/*", fg = "#ffbf00" },
 
   # Media
-  { mime = "{audio,video}/*", fg = "#b58900" },
+  { mime = "{audio,video}/*", fg = "#d23681" },
 
   # Archives
-  { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "#dc322f" },
+  { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "#db302d" },
 
   # Documents
-  { mime = "application/{pdf,doc,rtf,vnd.*}", fg = "#2aa198" },
+  { mime = "application/{pdf,doc,rtf,vnd.*}", fg = "#2aeddd" },
 
   # Broken symlinks
-  { url = "*", is = "orphan", fg = "#dc322f" },
+  { url = "*", is = "orphan", fg = "#db302d" },
 
   # Executables
-  { url = "*", is = "exec", fg = "#859900" },
+  { url = "*", is = "exec", fg = "#849900" },
 
   # Fallback
-  { url = "*", fg = "#93a1a1" },
-  { url = "*/", fg = "#268bd2" },
+  { url = "*", fg = "#839395" },
+  { url = "*/", fg = "#268bd3" },
 ]
