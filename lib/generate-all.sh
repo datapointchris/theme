@@ -25,6 +25,7 @@ fi
 # Generator -> output filename mapping
 declare -A GENERATOR_OUTPUT=(
   [ghostty]="ghostty.conf"
+  [ghostty-css]="ghostty.css"
   [kitty]="kitty.conf"
   [alacritty]="alacritty.toml"
   [tmux]="tmux.conf"
@@ -45,6 +46,10 @@ declare -A GENERATOR_OUTPUT=(
   [firefox-based]="userChrome.css"
   [bat]="bat.tmTheme"
   [sioyek]="sioyek.config"
+  [yazi]="flavor.toml"
+  # delta resolves its syntax theme through bat's cache, but the config fragment
+  # itself is generated from theme.yml alone — no ordering constraint here.
+  [delta]="delta.conf"
 )
 
 # Parse arguments
