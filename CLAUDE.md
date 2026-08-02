@@ -34,7 +34,14 @@ Dev source is `~/tools/theme`; the installed copy everything actually reads is
 # ~/.local/state/theme/history.jsonl   - Unified history (synced via gist)
 # ~/.local/state/theme/current         - Current theme ID
 # ~/.local/state/theme/sync-state.json - Sync configuration
+# ~/.cache/theme/backgrounds/          - Pre-rendered backgrounds per theme
+# ~/.cache/theme/gowall/               - Per-theme gowall palettes, as JSON
 ```
+
+Generated state belongs in those two cache directories and nowhere else. The
+gowall palettes were previously appended to `~/.config/gowall/config.yml`, which
+is a symlink into the dotfiles repo — so every theme apply dirtied dotfiles, and
+entries for deleted themes accumulated for months.
 
 ## Theme Categories
 
@@ -328,9 +335,9 @@ It picks its method per theme:
   same palette the colorscheme uses, so comparing colour sets settles it without
   parsing Lua. Only colours *we* have and upstream lacks are errors; the reverse
   is normally an extended slot past the 16 ANSI that we do not generate.
-- Everything else gets a **history** check: did upstream touch anything
-  palette-shaped since `theme.yml` was last written? That only says "look at
-  this", never "this is wrong".
+- Everything else gets a **history** check: did any added or removed line in
+  upstream carry a colour since `theme.yml` was last written? That only says
+  "look at this", never "this is wrong".
 
 Two traps it exists to encode:
 
@@ -340,11 +347,18 @@ Two traps it exists to encode:
 - **A repo can host several colorschemes.** flexoki ships one file per variant,
   so a change to one would otherwise flag all four. The check keeps only changed
   files naming this theme's variant.
+- **Judge by colours changed, never by filename.** flexoki's `colors/*.lua` are
+  two-line loaders holding no colours, and a repo may keep its palette anywhere.
+  Filtering on paths produced three false positives out of five on the first run.
+- **A shipped extra can be as stale as our own copy.** kanagawa's
+  `extras/alacritty` calls terminal black `#090618`, a colour in none of its Lua
+  source, while `themes.lua` sets `term[1]` to `sumiInk0` (`#16161d`) — ours was
+  right. It is out of the exact-check map for that reason. Where a repo ships
+  several formats that disagree, prefer the freshest and check it against the
+  plugin's source before believing it.
 
 When it flags something, read the upstream palette and fix `theme.yml`, then
-`lib/generate-all.sh --themes <id>`. Adopting upstream verbatim is not always
-right: solarized-osaka's own extra sets bright-black to its *background*, which
-would make bright-black terminal text invisible.
+`lib/generate-all.sh --themes <id>`.
 
 ## Files Reference
 
