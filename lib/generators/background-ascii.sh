@@ -45,13 +45,13 @@ hex_to_rgb() {
   echo "$r,$g,$b"
 }
 
-# Get background and foreground RGB values
 bg_rgb=$(hex_to_rgb "$BASE00")
-fg_rgb=$(hex_to_rgb "$BASE05")
 
-# Generate ASCII art with theme colors
-# -C: use colors from image, --save-bg: set background color (RGBA, alpha is 0-100)
-# -s takes a directory path, output filename is auto-generated as <basename>-ascii-art.png
+# -C colors each glyph from the source pixel underneath it, which also makes
+# --font-color a no-op — passing both produced byte-identical output. Keep the
+# per-glyph colour, since recoloring below maps it into the palette and a single
+# flat font colour would throw the image away entirely.
+# -s takes a directory; the filename is auto-generated as <basename>-ascii-art.png
 temp_dir="/tmp/ascii_$$"
 mkdir -p "$temp_dir"
 
@@ -59,27 +59,26 @@ ascii-image-converter "$source_image" \
   -C \
   -s "$temp_dir" \
   --save-bg "${bg_rgb},100" \
-  --font-color "${fg_rgb}" \
   --width 200 \
   --only-save \
   2>/dev/null
 
-# Find the generated file (format: <basename>-ascii-art.png)
 source_basename=$(basename "$source_image" | sed 's/\.[^.]*$//')
 generated_file="$temp_dir/${source_basename}-ascii-art.png"
 
-# Move to final location
-if [[ -f "$generated_file" ]]; then
-  mv "$generated_file" "$output_file"
-  rm -rf "$temp_dir"
-else
+if [[ ! -f "$generated_file" ]]; then
   rm -rf "$temp_dir"
   echo "Error: ascii-image-converter failed to create output" >&2
   exit 1
 fi
 
-# Verify output
+# --save-bg themes the ground but the glyphs keep the photo's colours, so the
+# result only half-matched the theme. Same treatment as lowpoly: hand it to the
+# recolor generator.
+bash "$SCRIPT_DIR/background-recolor.sh" "$theme_file" "$generated_file" "$output_file"
+rm -rf "$temp_dir"
+
 if [[ ! -f "$output_file" ]]; then
-  echo "Error: Failed to create output file" >&2
+  echo "Error: recolor failed to create output file" >&2
   exit 1
 fi

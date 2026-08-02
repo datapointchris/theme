@@ -40,14 +40,14 @@ eval "$(load_colors "$theme_file")"
 scaled_image="/tmp/lowpoly_scaled_$$.png"
 convert "$source_image" -resize 3840x2160^ -gravity center -extent 3840x2160 "$scaled_image"
 
-# Generate low-poly version with theme background
 # -pts: number of points (more = more detail)
-# -bg: background color for transparent areas
+# -bg: background color, which only shows through transparent areas
 # -st: stroke width
 # -wf: wireframe mode (0=filled, 1=with stroke, 2=stroke only)
+triangulated="/tmp/lowpoly_raw_$$.png"
 triangle \
   -in "$scaled_image" \
-  -out "$output_file" \
+  -out "$triangulated" \
   -bg "$BASE00" \
   -pts 2500 \
   -st 0.5 \
@@ -55,11 +55,22 @@ triangle \
   -bl 2 \
   2>/dev/null
 
-# Clean up
 rm -f "$scaled_image"
 
-# Verify output
-if [[ ! -f "$output_file" ]]; then
+if [[ ! -f "$triangulated" ]]; then
   echo "Error: triangle failed to create output file" >&2
+  exit 1
+fi
+
+# triangle fills each triangle by averaging the source pixels under it, so the
+# result carries the photo's palette and -bg only ever shows through
+# transparency. On an opaque photo that left the theme contributing nothing.
+# Map it into the palette with the recolor generator rather than restating
+# gowall's wiring here.
+bash "$SCRIPT_DIR/background-recolor.sh" "$theme_file" "$triangulated" "$output_file"
+rm -f "$triangulated"
+
+if [[ ! -f "$output_file" ]]; then
+  echo "Error: recolor failed to create output file" >&2
   exit 1
 fi
