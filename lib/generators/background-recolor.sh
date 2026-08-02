@@ -66,11 +66,13 @@ eval "$(load_colors "$theme_file")"
 # Extract theme ID for unique config name
 theme_id=$(yq '.meta.id // "custom"' "$theme_file" 2>/dev/null || echo "custom")
 
-# Create gowall config with theme colors
-# Uses base16 palette + key ANSI colors for a rich palette
-gowall_config_dir="$HOME/.config/gowall"
-gowall_config="$gowall_config_dir/config.yml"
-mkdir -p "$gowall_config_dir"
+# gowall's -t takes a path to a JSON theme as well as a name from its config, so
+# each palette is written to the cache instead of appended to
+# ~/.config/gowall/config.yml. That file is a tracked dotfile, so appending to it
+# meant every theme apply dirtied the dotfiles repo, and entries accumulated
+# forever — it was still carrying themes deleted months ago.
+palette_dir="$HOME/.cache/theme/gowall"
+mkdir -p "$palette_dir"
 
 # Build color list from theme
 colors=(
@@ -99,29 +101,20 @@ if [[ "$palette_variant" == "full" ]]; then
   palette_name="theme-$theme_id"
 fi
 
-# Generate YAML for the theme
-# Check if theme already exists in config, if not add it
-if [[ -f "$gowall_config" ]] && grep -q "name: \"$palette_name\"" "$gowall_config" 2>/dev/null; then
-  # Theme exists, use it
-  :
-else
-  # Create or append theme to config
-  if [[ ! -s "$gowall_config" ]]; then
-    echo "themes:" > "$gowall_config"
-  fi
+# Rewritten on every run rather than reused when present. The old config-append
+# skipped regeneration once a name existed, so editing a colour in theme.yml
+# never reached gowall and the wallpaper kept the palette from first use.
+palette_file="$palette_dir/${palette_name}.json"
+{
+  printf '{ "name": "%s", "colors": [' "$palette_name"
+  for i in "${!colors[@]}"; do
+    [[ $i -gt 0 ]] && printf ', '
+    printf '"%s"' "${colors[$i]}"
+  done
+  printf '] }\n'
+} > "$palette_file"
 
-  # Append the theme
-  {
-    echo "  - name: \"$palette_name\""
-    echo "    colors:"
-    for color in "${colors[@]}"; do
-      echo "      - \"$color\""
-    done
-  } >> "$gowall_config"
-fi
-
-# Run gowall to convert the image
-gowall convert "$source_image" --output "$output_file" -t "$palette_name" 2>/dev/null
+gowall convert "$source_image" --output "$output_file" -t "$palette_file" 2>/dev/null
 
 # Verify output was created
 if [[ ! -f "$output_file" ]]; then
