@@ -802,7 +802,7 @@ def compute_color_relationships(palette: dict[str, str], target_hex: str) -> dic
 def extract_all_training_data():
     """Extract training data from ALL omarchy themes."""
     omarchy_dir = Path.home() / "code/hypr/omarchy/themes"
-    our_themes_dir = Path.home() / "dotfiles/apps/common/theme/library"
+    our_themes_dir = Path.home() / "tools/theme/themes"
 
     # Map all omarchy themes to our palette names where possible
     theme_mapping = {
@@ -852,7 +852,7 @@ def extract_all_training_data():
         extractors = [
             ("btop", "btop.theme", extract_btop_colors),
             ("walker", "walker.css", extract_walker_colors),
-            ("mako", "mako.ini", extract_mako_colors),
+            ("mako", "mako.conf", extract_mako_colors),
             ("swayosd", "swayosd.css", extract_swayosd_colors),
             ("hyprlock", "hyprlock.conf", extract_hyprlock_colors),
             ("kitty", "kitty.conf", extract_kitty_colors),
