@@ -1454,16 +1454,21 @@ def generate_colorscheme(theme_path: Path, output_dir: Path) -> None:
         colors_dir / f"{slug}.lua": generate_colors_lua(module_name),
     }
 
-    for filepath, content in files.items():
+    # Templates end without a trailing newline, which end-of-file-fixer adds back
+    # on commit. Left alone, every regeneration reports a one-line diff that is
+    # only the hook and the generator disagreeing.
+    def write_file(filepath, content):
         with open(filepath, "w") as f:
-            f.write(content)
+            f.write(content.rstrip("\n") + "\n")
+
+    for filepath, content in files.items():
+        write_file(filepath, content)
         print(f"  Created: {filepath.relative_to(output_dir)}")
 
     # Generate overrides.lua only if it doesn't exist (preserve user customizations)
     overrides_path = lua_dir / "overrides.lua"
     if not overrides_path.exists():
-        with open(overrides_path, "w") as f:
-            f.write(generate_overrides_lua(name))
+        write_file(overrides_path, generate_overrides_lua(name))
         print(f"  Created: {overrides_path.relative_to(output_dir)}")
     else:
         print(f"  Preserved: {overrides_path.relative_to(output_dir)} (user customizations)")
