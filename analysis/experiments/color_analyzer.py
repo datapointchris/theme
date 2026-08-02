@@ -243,7 +243,7 @@ def print_analysis_summary(results: list[dict]):
 
 def main():
     omarchy_dir = Path.home() / "code/hypr/omarchy/themes"
-    our_themes_dir = Path.home() / "dotfiles/apps/common/theme/library"
+    our_themes_dir = Path.home() / "tools/theme/themes"
 
     # Themes that exist in both
     common_themes = {

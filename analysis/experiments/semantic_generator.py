@@ -324,8 +324,8 @@ theme[upload_end]="{color("base06")}"
 
 
 def main():
-    themes_dir = Path.home() / "dotfiles/apps/common/theme/library"
-    output_dir = Path.home() / "dotfiles/apps/common/theme/analysis/generated"
+    themes_dir = Path.home() / "tools/theme/themes"
+    output_dir = Path.home() / "tools/theme/analysis/generated"
     output_dir.mkdir(exist_ok=True)
 
     # Generate for themes we have

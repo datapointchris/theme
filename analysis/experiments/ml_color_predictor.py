@@ -219,7 +219,7 @@ PROPERTY_CATEGORIES = {
 def extract_training_data():
     """Extract training data from omarchy themes."""
     omarchy_dir = Path.home() / "code/hypr/omarchy/themes"
-    our_themes_dir = Path.home() / "dotfiles/apps/common/theme/library"
+    our_themes_dir = Path.home() / "tools/theme/themes"
 
     # Map omarchy theme names to our palette names
     theme_mapping = {

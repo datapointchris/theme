@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Constants
-readonly THEME_DIR="${HOME}/dotfiles/apps/common/theme"
+readonly THEME_DIR="${HOME}/tools/theme"
 readonly CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/ghostty/config"
 # shellcheck disable=SC2034
 MAX_RETRIES=3

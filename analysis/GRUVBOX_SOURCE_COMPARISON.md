@@ -152,7 +152,7 @@ All three are recognizably "Gruvbox" but with perceptible differences in:
 ## Files Created
 
 ```text
-apps/common/theme/themes/
+tools/theme/themes/
 ├── gruvbox-dark-hard-base16/
 │   └── theme.yml
 ├── gruvbox-dark-hard-ghostty/

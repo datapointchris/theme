@@ -190,7 +190,7 @@ target = [L, C, H]  # OKLCH of omarchy's chosen color
 ## Data Sources
 
 - omarchy themes: ~/code/hypr/omarchy/themes/ (14 themes)
-- Our themes: ~/dotfiles/apps/common/theme/library/ (27 themes)
+- Our themes: ~/tools/theme/themes/ (27 themes)
 - Base16 schemes: <https://github.com/tinted-theming/base16-schemes>
 
 ## References
