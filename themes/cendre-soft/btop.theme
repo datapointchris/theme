@@ -1,0 +1,85 @@
+# Cendre Soft - btop theme
+# Generated from theme.yml
+# Author: Aejkatappaja
+
+# Main background, empty for terminal default
+theme[main_bg]="#231F1D"
+
+# Main text color
+theme[main_fg]="#E6D5C2"
+
+# Title color for boxes - use accent color
+theme[title]="#20C9CB"
+
+# Highlight color for keyboard shortcuts - use UI accent
+theme[hi_fg]="#EA9875"
+
+# Background color of selected item in processes box - use UI selection
+theme[selected_bg]="#3D2B23"
+
+# Foreground color of selected item in processes box
+theme[selected_fg]="#E6D5C2"
+
+# Color of inactive/disabled text
+theme[inactive_fg]="#73665B"
+
+# Misc colors for processes box
+theme[proc_misc]="#EA9875"
+
+# Box outline colors - use UI border
+theme[cpu_box]="#443C39"
+theme[mem_box]="#443C39"
+theme[net_box]="#443C39"
+theme[proc_box]="#443C39"
+theme[div_line]="#443C39"
+
+# Temperature graph colors (gradient: info -> warning -> error for heat)
+theme[temp_start]="#58BDFF"
+theme[temp_mid]="#F4A21C"
+theme[temp_end]="#D25780"
+
+# CPU graph colors (gradient: info -> accent -> bright)
+theme[cpu_start]="#58BDFF"
+theme[cpu_mid]="#20C9CB"
+theme[cpu_end]="#E6D5C2"
+
+# Memory free meter (green = good/available)
+theme[free_start]="#43B16A"
+theme[free_mid]="#20C9CB"
+theme[free_end]="#E6D5C2"
+
+# Memory cached meter (yellow/orange = cached/warning)
+theme[cached_start]="#FCBA81"
+theme[cached_mid]="#F4A21C"
+theme[cached_end]="#E6D5C2"
+
+# Memory available meter (blue = info/available)
+theme[available_start]="#58BDFF"
+theme[available_mid]="#20C9CB"
+theme[available_end]="#E6D5C2"
+
+# Memory used meter (gradient: warning -> error as usage increases)
+theme[used_start]="#F4A21C"
+theme[used_mid]="#D25780"
+theme[used_end]="#FCBA81"
+
+# Download graph colors (green = incoming/good)
+theme[download_start]="#43B16A"
+theme[download_mid]="#20C9CB"
+theme[download_end]="#E6D5C2"
+
+# Upload graph colors (magenta/purple for outgoing)
+theme[upload_start]="#9480BA"
+theme[upload_mid]="#EA9875"
+theme[upload_end]="#E6D5C2"
+
+# Process tree colors
+theme[process_start]="#EA9875"
+theme[process_mid]="#EA9875"
+theme[process_end]="#D25780"
+
+# Meter background
+theme[meter_bg]="#A09384"
+
+# Graph text (brightest for readability)
+theme[graph_text]="#E6D5C2"

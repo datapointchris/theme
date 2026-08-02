@@ -1,0 +1,129 @@
+# Cendre Medium - Yazi flavor
+# Generated algorithmically from theme.yml
+# Author: Aejkatappaja
+
+[mgr]
+cwd = { fg = "#4e89a2" }
+find_keyword = { fg = "#ea9875", bg = "#1d1917" }
+find_position = {}
+marker_copied = { fg = "#20c9cb", bg = "#20c9cb" }
+marker_cut = { fg = "#9480ba", bg = "#9480ba" }
+marker_marked = { fg = "#4e89a2", bg = "#4e89a2" }
+marker_selected = { fg = "#e6d5c2", bg = "#e6d5c2" }
+count_copied = { fg = "#1d1917", bg = "#20c9cb" }
+count_cut = { fg = "#1d1917", bg = "#9480ba" }
+count_selected = { fg = "#1d1917", bg = "#e6d5c2" }
+border_symbol = "│"
+border_style = { fg = "#73665b" }
+
+[indicator]
+current = { reversed = true, bold = true }
+preview = { underline = true }
+
+[tabs]
+active = { fg = "#1d1917", bg = "#a09384", bold = true }
+inactive = { fg = "#a09384", bg = "#312a28" }
+sep_inner = { open = "", close = "" }
+sep_outer = { open = "", close = "" }
+
+[mode]
+normal_main = { fg = "#1d1917", bg = "#a09384", bold = true }
+normal_alt = { fg = "#a09384", bg = "#312a28" }
+select_main = { fg = "#1d1917", bg = "#ea9875", bold = true }
+select_alt = { fg = "#ea9875", bg = "#312a28" }
+unset_main = { fg = "#1d1917", bg = "#99af6b", bold = true }
+unset_alt = { fg = "#99af6b", bg = "#312a28" }
+
+[status]
+sep_left = { open = "", close = "" }
+sep_right = { open = "", close = "" }
+overall = { fg = "#a09384", bg = "#26211f" }
+progress_label = { fg = "#4e89a2", bold = true }
+progress_normal = { fg = "#312a28", bg = "#1d1917" }
+progress_error = { fg = "#312a28", bg = "#1d1917" }
+perm_type = { fg = "#312a28" }
+perm_read = { fg = "#99af6b" }
+perm_write = { fg = "#d1766e" }
+perm_exec = { fg = "#99af6b" }
+perm_sep = { fg = "#9480ba" }
+
+[pick]
+border = { fg = "#8bcfff" }
+active = { fg = "#9480ba", bold = true }
+inactive = {}
+
+[input]
+border = { fg = "#8bcfff" }
+title = {}
+value = {}
+selected = { reversed = true }
+
+[cmp]
+border = { fg = "#8bcfff" }
+active = { reversed = true }
+inactive = {}
+
+[tasks]
+border = { fg = "#8bcfff" }
+title = {}
+hovered = { fg = "#9480ba" }
+
+[which]
+cols = 2
+separator = " - "
+separator_style = { fg = "#73665b" }
+mask = { bg = "#26211f" }
+rest = { fg = "#73665b" }
+cand = { fg = "#4e89a2" }
+desc = { fg = "#312a28" }
+
+[help]
+on = { fg = "#20c9cb" }
+run = { fg = "#9480ba" }
+desc = {}
+hovered = { reversed = true, bold = true }
+footer = { fg = "#1d1917", bg = "#e6d5c2" }
+
+[notify]
+title_info = { fg = "#20c9cb" }
+title_warn = { fg = "#e6d5c2" }
+title_error = { fg = "#9480ba" }
+
+[confirm]
+border = { fg = "#a09384" }
+title = { fg = "#4e89a2" }
+body = { fg = "#e6d5c2" }
+list = { fg = "#e6d5c2" }
+btn_yes = { reversed = true, fg = "#e6d5c2" }
+btn_no = {}
+
+[spot]
+border = { fg = "#312a28" }
+title = { fg = "#73665b", bold = true }
+tbl_col = { fg = "#a09384" }
+tbl_cell = { bg = "#26211f" }
+
+[filetype]
+rules = [
+  # Images
+  { mime = "image/*", fg = "#9480ba" },
+
+  # Media
+  { mime = "{audio,video}/*", fg = "#fcba81" },
+
+  # Archives
+  { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "#d1766e" },
+
+  # Documents
+  { mime = "application/{pdf,doc,rtf,vnd.*}", fg = "#4e89a2" },
+
+  # Broken symlinks
+  { url = "*", is = "orphan", fg = "#d1766e" },
+
+  # Executables
+  { url = "*", is = "exec", fg = "#99af6b" },
+
+  # Fallback
+  { url = "*", fg = "#e6d5c2" },
+  { url = "*/", fg = "#4e89a2" },
+]

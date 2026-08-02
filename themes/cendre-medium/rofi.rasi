@@ -1,0 +1,55 @@
+/* Cendre Medium - Rofi colors */
+/* Generated from theme.yml */
+/* Author: Aejkatappaja */
+
+* {
+    /* Base16 palette */
+    base00: #1d1917;  /* Main background */
+    base01: #26211f;  /* Lighter background */
+    base02: #312a28;  /* Selection background */
+    base03: #73665b;  /* Comments, muted */
+    base04: #a09384;  /* Dark foreground */
+    base05: #e6d5c2;  /* Default foreground */
+    base06: #e6d5c2;  /* Light foreground */
+    base07: #e6d5c2;  /* Brightest foreground */
+    base08: #d1766e;  /* Red */
+    base09: #ea9875;  /* Orange */
+    base0A: #fcba81;  /* Yellow */
+    base0B: #99af6b;  /* Green */
+    base0C: #20c9cb;  /* Cyan */
+    base0D: #4e89a2;  /* Blue */
+    base0E: #9480ba;  /* Magenta */
+    base0F: #ea9875;  /* Brown */
+
+    /* Semantic colors */
+    bg: #1d1917;
+    bg-alt: #26211f;
+    bg-selected: #36241d;
+    fg: #e6d5c2;
+    fg-alt: #a09384;
+    fg-muted: #73665b;
+    fg-bright: #e6d5c2;
+    border: #3d3633;
+
+    /* Status colors - use extended diagnostic colors when available */
+    urgent: #d25780;
+    active: #43b16a;
+    selected: #ea9875;
+
+    /* Named accent colors */
+    red: #d1766e;
+    green: #99af6b;
+    yellow: #fcba81;
+    blue: #58bdff;
+    magenta: #9480ba;
+    cyan: #4e89a2;
+    orange: #ea9875;
+
+    /* Bright variants */
+    bright-red: #d25780;
+    bright-green: #43b16a;
+    bright-yellow: #f4a21c;
+    bright-blue: #8bcfff;
+    bright-magenta: #a692cd;
+    bright-cyan: #20c9cb;
+}

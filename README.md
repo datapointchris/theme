@@ -201,6 +201,7 @@ configs:
 
 | Theme | Neovim Plugin |
 | ----- | ------------- |
+| Cendre (hard/medium/soft) | Aejkatappaja/cendre |
 | Gruvbox | ellisonleao/gruvbox.nvim |
 | Rose Pine | rose-pine/neovim |
 | Kanagawa | rebelot/kanagawa.nvim |

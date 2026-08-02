@@ -1,0 +1,35 @@
+/* Cendre - SwayOSD colors */
+/* Generated from theme.yml */
+/* Author: Aejkatappaja */
+
+/* Base16 palette */
+@define-color base00 #171311;
+@define-color base01 #201b19;
+@define-color base02 #2a2422;
+@define-color base03 #73665b;
+@define-color base04 #a09384;
+@define-color base05 #e6d5c2;
+@define-color base06 #e6d5c2;
+@define-color base07 #e6d5c2;
+@define-color base08 #d1766e;
+@define-color base09 #ea9875;
+@define-color base0A #fcba81;
+@define-color base0B #99af6b;
+@define-color base0C #20c9cb;
+@define-color base0D #4e89a2;
+@define-color base0E #9480ba;
+@define-color base0F #ea9875;
+
+/* OSD element colors */
+@define-color background-color #171311;
+@define-color border-color #2a2422;
+@define-color label #e6d5c2;
+@define-color image #4e89a2;
+@define-color progress #4e89a2;
+@define-color progress-bg #201b19;
+
+/* Status colors for volume/brightness */
+@define-color muted #d1766e;
+@define-color low #20c9cb;
+@define-color normal #4e89a2;
+@define-color high #ea9875;

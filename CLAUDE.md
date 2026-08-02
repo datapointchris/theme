@@ -71,6 +71,8 @@ These themes have generated Neovim colorschemes from theme.yml:
 
 These themes provide terminal configs that match original Neovim plugins:
 
+- `cendre` / `cendre-medium` / `cendre-soft` - Cendre - Aejkatappaja/cendre
+  (one colorscheme, three background depths — see `neovim_plugin_background`)
 - `gruvbox` - Gruvbox - ellisonleao/gruvbox.nvim
 - `rose-pine` - Rose Pine - rose-pine/neovim
 - `kanagawa` - Kanagawa - rebelot/kanagawa.nvim
@@ -128,6 +130,10 @@ meta:
   neovim_colorscheme_name: "gruvbox-dark-hard"  # What :colorscheme uses
   neovim_colorscheme_source: "generated"  # "generated" or "plugin"
   plugin: null                         # "author/repo" or null
+  neovim_plugin_background: null       # Optional. Plugin variant that has no
+                                       # colorscheme name of its own — passed to
+                                       # require(<colorscheme>).setup{background=}
+                                       # before applying (cendre's three depths)
   derived_from: "ghostty-builtin"      # Where colors came from
   variant: "dark"
   author: "morhetz"

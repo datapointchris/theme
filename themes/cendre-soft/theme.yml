@@ -1,0 +1,124 @@
+meta:
+  id: "cendre-soft"
+  display_name: "Cendre Soft"
+  neovim_colorscheme_name: "cendre"
+  neovim_colorscheme_source: "plugin"
+  plugin: "Aejkatappaja/cendre"
+  # All three depths share one colors/cendre.lua, so they cannot be told apart by
+  # colorscheme name. colorscheme-manager.lua reads this and calls the plugin's
+  # setup({background = ...}) before applying, which is the only way Neovim ends
+  # up at the same depth as the terminal.
+  neovim_plugin_background: "soft"
+  derived_from: "neovim-plugin"
+  variant: "dark"
+  author: "Aejkatappaja"
+
+# Cendre ships three background depths (hard/medium/soft) over one fixed set of
+# pigments. This is the "soft" depth.
+
+base16:
+  base00: "#231f1d"  # bg0 - editor background
+  base01: "#2d2725"  # bg1 - cursorline, lighter background
+  base02: "#37312e"  # bg2 - statusline, selection background
+  base03: "#73665b"  # comment
+  base04: "#a09384"  # fg_dim - operators, delimiters
+  base05: "#e6d5c2"  # fg - default foreground
+  base06: "#e6d5c2"  # fg - no lighter ink exists in the palette
+  base07: "#e6d5c2"  # fg
+  base08: "#d1766e"  # cinder - keywords, control flow, storage
+  base09: "#ea9875"  # ember - properties, fields, params
+  base0A: "#fcba81"  # brass - functions, methods, calls
+  base0B: "#99af6b"  # sap - every literal value
+  base0C: "#20c9cb"  # hint - the palette's true cyan (196°)
+  base0D: "#4e89a2"  # frost - types, classes, constructors (227°)
+  base0E: "#9480ba"  # potassium - ANSI slot 5, never used on code
+  base0F: "#ea9875"  # ember - secondary accent
+
+ansi:
+  black: "#2d2725"          # bg1
+  red: "#d1766e"            # cinder
+  green: "#99af6b"          # sap
+  yellow: "#fcba81"         # brass
+  blue: "#58bdff"           # info
+  magenta: "#9480ba"        # potassium
+  cyan: "#4e89a2"           # frost
+  white: "#a09384"          # fg_dim
+  bright_black: "#73665b"   # comment
+  bright_red: "#d25780"     # error
+  bright_green: "#43b16a"   # ok
+  bright_yellow: "#f4a21c"  # warn
+  bright_blue: "#8bcfff"    # info, L +0.06
+  bright_magenta: "#a692cd" # potassium, L +0.06
+  bright_cyan: "#20c9cb"    # hint
+  bright_white: "#e6d5c2"   # fg
+
+special:
+  background: "#231f1d"     # bg0
+  foreground: "#e6d5c2"     # fg
+  cursor: "#ea9875"         # ember
+  cursor_text: "#231f1d"    # bg0
+  selection_bg: "#3d2b23"   # vis tint
+  selection_fg: "#e6d5c2"   # fg
+  border: "#443c39"         # bg3 - borders, splits
+  panel: "#1a1716"          # bg_deep - floats, sidebars
+
+extended_source: plugin
+extended:
+  # Grounds - hue 43°, wood ash under a 1300 K flame
+  bg_deep: "#1a1716"
+  bg0: "#231f1d"
+  bg1: "#2d2725"
+  bg2: "#37312e"
+  bg3: "#443c39"
+  bg4: "#554c48"
+  bg5: "#695e5a"
+  # Ink
+  fg: "#e6d5c2"
+  fg_dim: "#a09384"
+  comment: "#73665b"
+  gutter: "#4e4641"
+  # Pigments
+  brass: "#fcba81"
+  ember: "#ea9875"
+  sap: "#99af6b"
+  cinder: "#d1766e"
+  frost: "#4e89a2"
+  potassium: "#9480ba"
+  # Tinted grounds for diff and visual
+  tint_visual: "#3d2b23"
+  tint_add: "#2d3221"
+  tint_delete: "#3e2a28"
+  tint_modify: "#1f333b"
+  # Semantic colors
+  syntax_comment: "#73665b"
+  syntax_string: "#99af6b"
+  syntax_number: "#99af6b"
+  syntax_constant: "#e6d5c2"
+  syntax_variable: "#e6d5c2"
+  syntax_parameter: "#ea9875"
+  syntax_function: "#fcba81"
+  syntax_keyword: "#d1766e"
+  syntax_type: "#4e89a2"
+  syntax_operator: "#a09384"
+  syntax_punctuation: "#a09384"
+  syntax_tag: "#d1766e"
+  syntax_attribute: "#ea9875"
+  syntax_preproc: "#d1766e"
+  syntax_special: "#ea9875"
+  # Diagnostics carry more chroma than any pigment, so an error never wears the
+  # same red as a keyword
+  diagnostic_error: "#d25780"
+  diagnostic_warning: "#f4a21c"
+  diagnostic_info: "#58bdff"
+  diagnostic_hint: "#20c9cb"
+  diagnostic_ok: "#43b16a"
+  git_add: "#43b16a"
+  git_change: "#58bdff"
+  git_delete: "#d25780"
+  git_ignored: "#73665b"
+  ui_border: "#443c39"
+  ui_panel: "#1a1716"
+  ui_float: "#1a1716"
+  ui_accent: "#ea9875"
+  ui_selection: "#3d2b23"
+  ui_match: "#fcba81"

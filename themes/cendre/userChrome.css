@@ -1,0 +1,316 @@
+/* Theme: Cendre */
+/* Generated from theme.yml - Firefox-based browsers */
+/* Compatible with: Zen Browser, Librewolf, Firefox, Thunderbird */
+/*
+ * Setup: Enable in about:config:
+ *   toolkit.legacyUserProfileCustomizations.stylesheets = true
+ * Then restart browser to apply changes.
+ */
+
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+@namespace html url("http://www.w3.org/1999/xhtml");
+
+/*==============================================================================
+ * FIREFOX BUILT-IN CSS VARIABLES
+ * These are stable APIs that Firefox exposes for theming
+ *============================================================================*/
+
+:root {
+  /* Toolbar and chrome backgrounds */
+  --toolbar-bgcolor: #171311 !important;
+  --toolbar-color: #e6d5c2 !important;
+  --lwt-accent-color: #201b19 !important;
+  --lwt-text-color: #e6d5c2 !important;
+
+  /* Tab colors */
+  --tab-selected-bgcolor: #2f1e17 !important;
+  --tab-selected-textcolor: #e6d5c2 !important;
+  --tab-line-color: #4e89a2 !important;
+  --tabs-border-color: #362f2c !important;
+  --tabpanel-background-color: #171311 !important;
+
+  /* URL bar */
+  --urlbar-box-bgcolor: #201b19 !important;
+  --urlbar-box-text-color: #e6d5c2 !important;
+  --urlbar-box-hover-bgcolor: #2a2422 !important;
+  --urlbar-box-active-bgcolor: #2a2422 !important;
+  --urlbar-box-focus-bgcolor: #201b19 !important;
+  --autocomplete-popup-background: #201b19 !important;
+  --autocomplete-popup-color: #e6d5c2 !important;
+  --autocomplete-popup-highlight-background: #2f1e17 !important;
+  --autocomplete-popup-highlight-color: #e6d5c2 !important;
+
+  /* Sidebar */
+  --sidebar-background-color: #171311 !important;
+  --sidebar-text-color: #e6d5c2 !important;
+  --sidebar-border-color: #362f2c !important;
+
+  /* Panels and popups */
+  --arrowpanel-background: #201b19 !important;
+  --arrowpanel-color: #e6d5c2 !important;
+  --arrowpanel-border-color: #362f2c !important;
+  --panel-separator-color: #2a2422 !important;
+
+  /* Focus and selection */
+  --focus-outline-color: #4e89a2 !important;
+  --input-bgcolor: #201b19 !important;
+  --input-color: #e6d5c2 !important;
+  --input-border-color: #362f2c !important;
+
+  /* Buttons */
+  --button-bgcolor: #201b19 !important;
+  --button-color: #e6d5c2 !important;
+  --button-hover-bgcolor: #2a2422 !important;
+  --button-active-bgcolor: #73665b !important;
+  --button-primary-bgcolor: #4e89a2 !important;
+  --button-primary-color: #171311 !important;
+  --button-primary-hover-bgcolor: #8bcfff !important;
+  --button-primary-active-bgcolor: #4e89a2 !important;
+
+  /* Scrollbars (Firefox 64+) */
+  scrollbar-color: #73665b #201b19;
+
+  /* Link colors */
+  --lwt-toolbarbutton-icon-fill: #e6d5c2 !important;
+
+  /* Lightweight theme colors */
+  --lwt-toolbar-field-background-color: #201b19 !important;
+  --lwt-toolbar-field-color: #e6d5c2 !important;
+  --lwt-toolbar-field-border-color: #362f2c !important;
+  --lwt-toolbar-field-focus: #2a2422 !important;
+  --lwt-toolbar-field-highlight: #2f1e17 !important;
+  --lwt-toolbar-field-highlight-text: #e6d5c2 !important;
+
+  /* Context menu */
+  --menu-background-color: #201b19 !important;
+  --menu-color: #e6d5c2 !important;
+  --menuitem-hover-background-color: #2f1e17 !important;
+
+  /* Findbar */
+  --toolbar-field-focus-background-color: #201b19 !important;
+  --toolbar-field-focus-color: #e6d5c2 !important;
+}
+
+/*==============================================================================
+ * ZEN BROWSER SPECIFIC VARIABLES
+ * Zen extends Firefox with its own theming system
+ *============================================================================*/
+
+:root {
+  /* Zen accent colors */
+  --zen-primary-color: #4e89a2 !important;
+  --zen-accent-color: #4e89a2 !important;
+  --zen-colors-primary: #4e89a2 !important;
+  --zen-colors-secondary: #9480ba !important;
+  --zen-colors-tertiary: #20c9cb !important;
+
+  /* Zen backgrounds */
+  --zen-colors-bg: #171311 !important;
+  --zen-colors-bg-secondary: #201b19 !important;
+  --zen-themed-toolbar-bg: #171311 !important;
+
+  /* Zen text colors */
+  --zen-colors-text: #e6d5c2 !important;
+  --zen-colors-text-secondary: #a09384 !important;
+
+  /* Zen borders */
+  --zen-colors-border: #362f2c !important;
+  --zen-dialog-background: #201b19 !important;
+}
+
+/*==============================================================================
+ * THUNDERBIRD SPECIFIC
+ * Email client specific overrides
+ *============================================================================*/
+
+/* Thunderbird message pane */
+:root {
+  --foldertree-background: #171311 !important;
+  --folderpane-unread-count-background: #4e89a2 !important;
+  --thread-pane-background: #171311 !important;
+  --messagepane-background-color: #171311 !important;
+}
+
+/*==============================================================================
+ * ADDITIONAL ELEMENT COLORS
+ * Direct styling for common elements (more fragile but fills gaps)
+ *============================================================================*/
+
+/* Window background for areas not covered by variables */
+#main-window,
+#navigator-toolbox,
+#PersonalToolbar,
+#toolbar-menubar {
+  background-color: #171311 !important;
+  color: #e6d5c2 !important;
+}
+
+/* Tab bar background */
+#titlebar,
+#TabsToolbar,
+.tabbrowser-tabs {
+  background-color: #171311 !important;
+}
+
+/* Inactive tabs */
+.tabbrowser-tab:not([selected="true"]) {
+  background-color: #171311 !important;
+  color: #a09384 !important;
+}
+
+/* Active/selected tab */
+.tabbrowser-tab[selected="true"] {
+  background-color: #2f1e17 !important;
+  color: #e6d5c2 !important;
+}
+
+/* Tab hover state */
+.tabbrowser-tab:hover:not([selected="true"]) {
+  background-color: #201b19 !important;
+}
+
+/* New tab button */
+#tabs-newtab-button,
+.tabs-newtab-button {
+  fill: #e6d5c2 !important;
+}
+
+/* URL bar */
+#urlbar {
+  background-color: #201b19 !important;
+  color: #e6d5c2 !important;
+  border-color: #362f2c !important;
+}
+
+#urlbar:focus-within,
+#urlbar[focused="true"] {
+  background-color: #201b19 !important;
+  border-color: #4e89a2 !important;
+}
+
+/* URL bar results popup */
+#urlbar-results,
+.urlbarView {
+  background-color: #201b19 !important;
+  color: #e6d5c2 !important;
+}
+
+.urlbarView-row[selected] {
+  background-color: #2f1e17 !important;
+}
+
+/* Navigation buttons */
+#nav-bar {
+  background-color: #171311 !important;
+}
+
+/* Bookmark toolbar */
+#PersonalToolbar {
+  background-color: #171311 !important;
+  border-color: #362f2c !important;
+}
+
+.bookmark-item {
+  color: #e6d5c2 !important;
+}
+
+/* Context menus */
+menupopup,
+menu,
+menuitem {
+  background-color: #201b19 !important;
+  color: #e6d5c2 !important;
+}
+
+menuitem:hover,
+menu:hover {
+  background-color: #2f1e17 !important;
+}
+
+menuseparator {
+  border-color: #2a2422 !important;
+}
+
+/* Sidebar */
+#sidebar-box,
+#sidebar,
+#sidebar-header {
+  background-color: #171311 !important;
+  color: #e6d5c2 !important;
+}
+
+/* Findbar */
+findbar {
+  background-color: #201b19 !important;
+  color: #e6d5c2 !important;
+}
+
+findbar textbox {
+  background-color: #201b19 !important;
+  color: #e6d5c2 !important;
+}
+
+/* Status bar */
+#statuspanel-label {
+  background-color: #201b19 !important;
+  color: #e6d5c2 !important;
+  border-color: #362f2c !important;
+}
+
+/*==============================================================================
+ * ACCENT COLORS FOR INTERACTIVE ELEMENTS
+ *============================================================================*/
+
+/* Links */
+a:link {
+  color: #4e89a2 !important;
+}
+
+a:visited {
+  color: #9480ba !important;
+}
+
+/* Selection highlighting */
+::selection {
+  background-color: #2f1e17 !important;
+  color: #e6d5c2 !important;
+}
+
+::-moz-selection {
+  background-color: #2f1e17 !important;
+  color: #e6d5c2 !important;
+}
+
+/* Focus ring */
+:focus-visible {
+  outline-color: #4e89a2 !important;
+}
+
+/*==============================================================================
+ * SCROLLBAR STYLING
+ *============================================================================*/
+
+/* Thin scrollbars with theme colors */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #73665b #201b19;
+}
+
+/* WebKit-style scrollbars (for content areas) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #201b19;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #73665b;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a09384;
+}

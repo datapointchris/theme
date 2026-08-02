@@ -1,0 +1,35 @@
+# Cendre Soft - alacritty theme
+# Generated from theme.yml
+# Author: Aejkatappaja
+
+[colors.primary]
+background = "#231f1d"
+foreground = "#e6d5c2"
+
+[colors.cursor]
+text = "#231f1d"
+cursor = "#ea9875"
+
+[colors.selection]
+text = "#e6d5c2"
+background = "#3d2b23"
+
+[colors.normal]
+black = "#2d2725"
+red = "#d1766e"
+green = "#99af6b"
+yellow = "#fcba81"
+blue = "#58bdff"
+magenta = "#9480ba"
+cyan = "#4e89a2"
+white = "#a09384"
+
+[colors.bright]
+black = "#73665b"
+red = "#d25780"
+green = "#43b16a"
+yellow = "#f4a21c"
+blue = "#8bcfff"
+magenta = "#a692cd"
+cyan = "#20c9cb"
+white = "#e6d5c2"
