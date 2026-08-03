@@ -411,6 +411,7 @@ apply_firefox_based() {
   if [[ ! -f "$browser_profiles_lib" ]]; then
     return 1
   fi
+  # shellcheck source=browser-profiles.sh
   source "$browser_profiles_lib"
 
   local applied=0

@@ -77,8 +77,9 @@ is_brighter() {
   local a="$1"
   local b="$2"
   local threshold="${3:-5}"
-  local la=$(hex_to_lightness "$a")
-  local lb=$(hex_to_lightness "$b")
+  local la lb
+  la=$(hex_to_lightness "$a")
+  lb=$(hex_to_lightness "$b")
   [[ $((la - lb)) -ge $threshold ]]
 }
 
@@ -103,8 +104,9 @@ is_gray_color() {
 # Check if a color is a dark teal/cyan (like rose-pine's pine)
 is_dark_teal() {
   local hex="$1"
-  local hue=$(hex_to_hue "$hex")
-  local lightness=$(hex_to_lightness "$hex")
+  local hue lightness
+  hue=$(hex_to_hue "$hex")
+  lightness=$(hex_to_lightness "$hex")
 
   # Teal/cyan hue range: 160-200, dark: lightness < 45
   [[ $hue -ge 160 && $hue -le 200 && $lightness -lt 45 ]]
@@ -113,8 +115,9 @@ is_dark_teal() {
 # Check if a color is orange (distinct from yellow/red)
 is_orange() {
   local hex="$1"
-  local hue=$(hex_to_hue "$hex")
-  local lightness=$(hex_to_lightness "$hex")
+  local hue lightness
+  hue=$(hex_to_hue "$hex")
+  lightness=$(hex_to_lightness "$hex")
 
   # Orange hue range: 15-45
   [[ $hue -ge 15 && $hue -le 45 && $lightness -gt 40 ]]

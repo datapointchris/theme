@@ -4,6 +4,43 @@
 
 set -euo pipefail
 
+# The variable contract every generator consumes after
+# `eval "$(load_colors ...)"`. Named, never assigned: `export` on its own leaves
+# a name unset, so `set -u` still catches a generator that runs without the
+# eval, while static analysis can see these are produced here for consumers
+# elsewhere — rather than reading them as typos of the lowercase locals below,
+# or as dead names in this file.
+export \
+  ANSI_BLACK \
+  ANSI_BLUE \
+  ANSI_BRIGHT_BLACK \
+  ANSI_BRIGHT_BLUE \
+  ANSI_BRIGHT_CYAN \
+  ANSI_BRIGHT_GREEN \
+  ANSI_BRIGHT_MAGENTA \
+  ANSI_BRIGHT_RED \
+  ANSI_BRIGHT_WHITE \
+  ANSI_BRIGHT_YELLOW \
+  ANSI_CYAN \
+  ANSI_GREEN \
+  ANSI_MAGENTA \
+  ANSI_RED \
+  ANSI_WHITE \
+  ANSI_YELLOW \
+  SPECIAL_BG \
+  SPECIAL_BORDER \
+  SPECIAL_CURSOR \
+  SPECIAL_CURSOR_TEXT \
+  SPECIAL_FG \
+  SPECIAL_PANEL \
+  SPECIAL_SELECTION_BG \
+  SPECIAL_SELECTION_FG \
+  THEME_AUTHOR \
+  THEME_NAME \
+  THEME_SLUG \
+  THEME_SOURCE \
+  THEME_VARIANT
+
 # Read a value from theme.yml using yq
 # Usage: theme_get <key> <theme_file>
 theme_get() {

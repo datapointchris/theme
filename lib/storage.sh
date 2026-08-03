@@ -60,6 +60,8 @@ detect_platform() {
   elif [[ -f /etc/arch-release ]]; then
     echo "arch"
   elif [[ -f /etc/os-release ]]; then
+    # A Linux system file, absent wherever this lints on macOS.
+    # shellcheck source=/dev/null
     . /etc/os-release
     echo "${ID:-linux}"
   else
