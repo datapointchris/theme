@@ -27,9 +27,18 @@ darken=1
 positional=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --palette) palette_variant="${2:-}"; shift 2 ;;
-    --no-darken) darken=0; shift ;;
-    *) positional+=("$1"); shift ;;
+    --palette)
+      palette_variant="${2:-}"
+      shift 2
+      ;;
+    --no-darken)
+      darken=0
+      shift
+      ;;
+    *)
+      positional+=("$1")
+      shift
+      ;;
   esac
 done
 
@@ -46,8 +55,11 @@ source_image="${positional[1]}"
 output_file="${positional[2]}"
 
 case "$palette_variant" in
-  full|dark) ;;
-  *) echo "Error: --palette must be full or dark, got: $palette_variant" >&2; exit 1 ;;
+  full | dark) ;;
+  *)
+    echo "Error: --palette must be full or dark, got: $palette_variant" >&2
+    exit 1
+    ;;
 esac
 
 if ! command -v gowall &>/dev/null; then
@@ -76,18 +88,18 @@ mkdir -p "$palette_dir"
 
 # Build color list from theme
 colors=(
-  "$BASE00"  # Background
-  "$BASE01"  # Lighter bg
-  "$BASE02"  # Selection bg
-  "$BASE03"  # Comments
-  "$BASE04"  # Dark fg
-  "$BASE08"  # Red
-  "$BASE09"  # Orange
-  "$BASE0B"  # Green
-  "$BASE0C"  # Cyan
-  "$BASE0D"  # Blue
-  "$BASE0E"  # Purple
-  "$BASE0F"  # Brown
+  "$BASE00" # Background
+  "$BASE01" # Lighter bg
+  "$BASE02" # Selection bg
+  "$BASE03" # Comments
+  "$BASE04" # Dark fg
+  "$BASE08" # Red
+  "$BASE09" # Orange
+  "$BASE0B" # Green
+  "$BASE0C" # Cyan
+  "$BASE0D" # Blue
+  "$BASE0E" # Purple
+  "$BASE0F" # Brown
 )
 palette_name="theme-$theme_id-dark"
 
@@ -112,7 +124,7 @@ palette_file="$palette_dir/${palette_name}.json"
     printf '"%s"' "${colors[$i]}"
   done
   printf '] }\n'
-} > "$palette_file"
+} >"$palette_file"
 
 gowall convert "$source_image" --output "$output_file" -t "$palette_file" 2>/dev/null
 

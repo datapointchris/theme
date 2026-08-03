@@ -7,8 +7,6 @@
 
 set -euo pipefail
 
-
-
 if [[ $# -lt 1 ]]; then
   echo "Usage: $0 <theme.yml> [output-file]"
   exit 1
@@ -24,7 +22,7 @@ generate() {
 }
 
 if [[ -n "$output_file" ]]; then
-  generate > "$output_file"
+  generate >"$output_file"
   echo "Generated: $output_file"
 else
   generate

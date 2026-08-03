@@ -24,7 +24,7 @@ output_file="${2:-}"
 eval "$(load_colors "$input_file")"
 
 generate() {
-  cat << EOF
+  cat <<EOF
 /* ${THEME_NAME} - Ghostty tab CSS
  * Generated from theme.yml
  *
@@ -75,7 +75,7 @@ EOF
 }
 
 if [[ -n "$output_file" ]]; then
-  generate > "$output_file"
+  generate >"$output_file"
   echo "Generated: $output_file"
 else
   generate

@@ -39,9 +39,9 @@ hex_to_lightness() {
   local r=$((16#${hex:0:2}))
   local g=$((16#${hex:2:2}))
   local b=$((16#${hex:4:2}))
-  local max=$(( r > g ? (r > b ? r : b) : (g > b ? g : b) ))
-  local min=$(( r < g ? (r < b ? r : b) : (g < b ? g : b) ))
-  echo $(( (max + min) * 100 / 510 ))
+  local max=$((r > g ? (r > b ? r : b) : (g > b ? g : b)))
+  local min=$((r < g ? (r < b ? r : b) : (g < b ? g : b)))
+  echo $(((max + min) * 100 / 510))
 }
 
 # Calculate hue (0-360) from hex
@@ -51,8 +51,8 @@ hex_to_hue() {
   local g=$((16#${hex:2:2}))
   local b=$((16#${hex:4:2}))
 
-  local max=$(( r > g ? (r > b ? r : b) : (g > b ? g : b) ))
-  local min=$(( r < g ? (r < b ? r : b) : (g < b ? g : b) ))
+  local max=$((r > g ? (r > b ? r : b) : (g > b ? g : b)))
+  local min=$((r < g ? (r < b ? r : b) : (g < b ? g : b)))
   local diff=$((max - min))
 
   if [[ $diff -eq 0 ]]; then
@@ -62,11 +62,11 @@ hex_to_hue() {
 
   local hue
   if [[ $max -eq $r ]]; then
-    hue=$(( (60 * (g - b) / diff + 360) % 360 ))
+    hue=$(((60 * (g - b) / diff + 360) % 360))
   elif [[ $max -eq $g ]]; then
-    hue=$(( 60 * (b - r) / diff + 120 ))
+    hue=$((60 * (b - r) / diff + 120))
   else
-    hue=$(( 60 * (r - g) / diff + 240 ))
+    hue=$((60 * (r - g) / diff + 240))
   fi
 
   echo "$hue"
@@ -89,9 +89,9 @@ is_gray_color() {
   local g=$((16#${hex:2:2}))
   local b=$((16#${hex:4:2}))
 
-  local max=$(( r > g ? (r > b ? r : b) : (g > b ? g : b) ))
-  local min=$(( r < g ? (r < b ? r : b) : (g < b ? g : b) ))
-  local lightness=$(( (max + min) / 2 ))
+  local max=$((r > g ? (r > b ? r : b) : (g > b ? g : b)))
+  local min=$((r < g ? (r < b ? r : b) : (g < b ? g : b)))
+  local lightness=$(((max + min) / 2))
   local diff=$((max - min))
 
   # Gray if saturation is low and lightness is in mid range
@@ -525,7 +525,7 @@ has_extended_peach_red && DETECTED_TRAITS="${DETECTED_TRAITS}ext-peach-red "
 HOVERED_STYLE="reversed = true, bold = true"
 
 generate() {
-  cat << EOF
+  cat <<EOF
 # ${THEME_NAME} - Yazi flavor
 # Generated algorithmically from theme.yml
 # Author: ${THEME_AUTHOR}
@@ -659,7 +659,7 @@ EOF
 }
 
 if [[ -n "$output_file" ]]; then
-  generate > "$output_file"
+  generate >"$output_file"
   echo "Generated: $output_file (detected: ${DETECTED_TRAITS})"
 else
   generate

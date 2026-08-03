@@ -21,7 +21,7 @@ output_file="${2:-}"
 eval "$(load_colors "$input_file")"
 
 generate() {
-  cat << EOF
+  cat <<EOF
 {
   "name": "${THEME_NAME}",
   "background": "${SPECIAL_BG}",
@@ -49,7 +49,7 @@ EOF
 }
 
 if [[ -n "$output_file" ]]; then
-  generate > "$output_file"
+  generate >"$output_file"
   echo "Generated: $output_file"
 else
   generate

@@ -20,7 +20,7 @@ output_file="${2:-}"
 eval "$(load_colors "$input_file")"
 
 generate() {
-  cat << EOF
+  cat <<EOF
 @define-color foreground ${SPECIAL_FG};
 @define-color background ${SPECIAL_BG};
 @define-color accent ${BASE09};
@@ -119,7 +119,7 @@ EOF
 }
 
 if [[ -n "$output_file" ]]; then
-  generate > "$output_file"
+  generate >"$output_file"
   echo "Generated: $output_file"
 else
   generate

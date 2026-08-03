@@ -18,18 +18,18 @@ get_browser_profiles_dir() {
   case "$platform" in
     Darwin)
       case "$browser" in
-        zen)         echo "$HOME/Library/Application Support/zen/Profiles" ;;
-        librewolf)   echo "$HOME/Library/Application Support/librewolf/Profiles" ;;
-        firefox)     echo "$HOME/Library/Application Support/Firefox/Profiles" ;;
+        zen) echo "$HOME/Library/Application Support/zen/Profiles" ;;
+        librewolf) echo "$HOME/Library/Application Support/librewolf/Profiles" ;;
+        firefox) echo "$HOME/Library/Application Support/Firefox/Profiles" ;;
         thunderbird) echo "$HOME/Library/Thunderbird/Profiles" ;;
         *) return 1 ;;
       esac
       ;;
     Linux)
       case "$browser" in
-        zen)         echo "$HOME/.zen" ;;
-        librewolf)   echo "$HOME/.librewolf" ;;
-        firefox)     echo "$HOME/.mozilla/firefox" ;;
+        zen) echo "$HOME/.zen" ;;
+        librewolf) echo "$HOME/.librewolf" ;;
+        firefox) echo "$HOME/.mozilla/firefox" ;;
         thunderbird) echo "$HOME/.thunderbird" ;;
         *) return 1 ;;
       esac
@@ -50,18 +50,18 @@ get_profiles_ini() {
   case "$platform" in
     Darwin)
       case "$browser" in
-        zen)         echo "$HOME/Library/Application Support/zen/profiles.ini" ;;
-        librewolf)   echo "$HOME/Library/Application Support/librewolf/profiles.ini" ;;
-        firefox)     echo "$HOME/Library/Application Support/Firefox/profiles.ini" ;;
+        zen) echo "$HOME/Library/Application Support/zen/profiles.ini" ;;
+        librewolf) echo "$HOME/Library/Application Support/librewolf/profiles.ini" ;;
+        firefox) echo "$HOME/Library/Application Support/Firefox/profiles.ini" ;;
         thunderbird) echo "$HOME/Library/Thunderbird/profiles.ini" ;;
         *) return 1 ;;
       esac
       ;;
     Linux)
       case "$browser" in
-        zen)         echo "$HOME/.zen/profiles.ini" ;;
-        librewolf)   echo "$HOME/.librewolf/profiles.ini" ;;
-        firefox)     echo "$HOME/.mozilla/firefox/profiles.ini" ;;
+        zen) echo "$HOME/.zen/profiles.ini" ;;
+        librewolf) echo "$HOME/.librewolf/profiles.ini" ;;
+        firefox) echo "$HOME/.mozilla/firefox/profiles.ini" ;;
         thunderbird) echo "$HOME/.thunderbird/profiles.ini" ;;
         *) return 1 ;;
       esac
@@ -130,12 +130,12 @@ parse_default_profile() {
 
       # shellcheck disable=SC2034  # current_is_relative may be used in future
       case "$key" in
-        Path)      current_path="$value" ;;
+        Path) current_path="$value" ;;
         IsRelative) current_is_relative="$value" ;;
-        Default)   current_is_default="$value" ;;
+        Default) current_is_default="$value" ;;
       esac
     fi
-  done < "$ini_file"
+  done <"$ini_file"
 
   # Check last section
   if [[ "$current_is_default" == "1" ]] && [[ -n "$current_path" ]]; then

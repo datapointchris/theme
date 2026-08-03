@@ -51,7 +51,7 @@ SESSION_ENTRY="#[range=session|#{session_id}]#{?session_alert,#[fg=${BASE00}]#[b
 SESSION_ENTRY_CURRENT="#[range=session|#{session_id} list=focus]#[fg=${GIT_ADD}]#[bg=${BASE00}]#[bold] #{session_name} #[nobold]#[norange]#[list=on]#[default]${SESSION_GAP}"
 
 generate() {
-  cat << EOF
+  cat <<EOF
 # ${THEME_NAME} - tmux theme
 # Generated from theme.yml
 # Author: ${THEME_AUTHOR}
@@ -192,7 +192,7 @@ EOF
 }
 
 if [[ -n "$output_file" ]]; then
-  generate > "$output_file"
+  generate >"$output_file"
   echo "Generated: $output_file"
 else
   generate

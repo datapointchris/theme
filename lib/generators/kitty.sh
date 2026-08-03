@@ -19,7 +19,7 @@ output_file="${2:-}"
 eval "$(load_colors "$input_file")"
 
 generate() {
-  cat << EOF
+  cat <<EOF
 # ${THEME_NAME} - kitty theme
 # Generated from theme.yml
 # Author: ${THEME_AUTHOR}
@@ -76,7 +76,7 @@ EOF
 }
 
 if [[ -n "$output_file" ]]; then
-  generate > "$output_file"
+  generate >"$output_file"
   echo "Generated: $output_file"
 else
   generate

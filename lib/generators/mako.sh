@@ -31,7 +31,7 @@ DIAG_HINT="${EXTENDED_DIAGNOSTIC_HINT:-$BASE0C}"
 UI_ACCENT="${EXTENDED_UI_ACCENT:-$BASE0D}"
 
 generate() {
-  cat << EOF
+  cat <<EOF
 # ${THEME_NAME} - Mako notification colors
 # Generated from theme.yml
 # Author: ${THEME_AUTHOR}
@@ -63,7 +63,7 @@ EOF
 }
 
 if [[ -n "$output_file" ]]; then
-  generate > "$output_file"
+  generate >"$output_file"
   echo "Generated: $output_file"
 else
   generate

@@ -35,7 +35,7 @@ UI_BORDER="${EXTENDED_UI_BORDER:-$BASE01}"
 
 # btop needs uppercase hex colors
 generate() {
-  cat << EOF
+  cat <<EOF
 # ${THEME_NAME} - btop theme
 # Generated from theme.yml
 # Author: ${THEME_AUTHOR}
@@ -125,7 +125,7 @@ EOF
 }
 
 if [[ -n "$output_file" ]]; then
-  generate > "$output_file"
+  generate >"$output_file"
   echo "Generated: $output_file"
 else
   generate

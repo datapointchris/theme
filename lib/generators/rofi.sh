@@ -31,7 +31,7 @@ UI_ACCENT="${EXTENDED_UI_ACCENT:-$BASE0D}"
 UI_BORDER="${EXTENDED_UI_BORDER:-$SPECIAL_BORDER}"
 
 generate() {
-  cat << EOF
+  cat <<EOF
 /* ${THEME_NAME} - Rofi colors */
 /* Generated from theme.yml */
 /* Author: ${THEME_AUTHOR} */
@@ -91,7 +91,7 @@ EOF
 }
 
 if [[ -n "$output_file" ]]; then
-  generate > "$output_file"
+  generate >"$output_file"
   echo "Generated: $output_file"
 else
   generate

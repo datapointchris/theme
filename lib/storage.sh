@@ -118,7 +118,7 @@ log_action() {
       '{ts: $ts, platform: $platform, machine: $machine, theme: $theme, action: $act}')
   fi
 
-  echo "$record" >> "$THEME_HISTORY_FILE"
+  echo "$record" >>"$THEME_HISTORY_FILE"
 }
 
 get_history() {
@@ -481,7 +481,7 @@ log_background_action() {
       '{ts: $ts, platform: $platform, machine: $machine, theme: $theme, background: $background, action: $act}')
   fi
 
-  echo "$record" >> "$BACKGROUND_HISTORY_FILE"
+  echo "$record" >>"$BACKGROUND_HISTORY_FILE"
 }
 
 # Get all background history as sorted JSON array

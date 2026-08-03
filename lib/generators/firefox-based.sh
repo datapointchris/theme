@@ -26,7 +26,7 @@ output_file="${2:-}"
 eval "$(load_colors "$input_file")"
 
 generate() {
-  cat << EOF
+  cat <<EOF
 /* Theme: ${THEME_NAME} */
 /* Generated from theme.yml - Firefox-based browsers */
 /* Compatible with: Zen Browser, Librewolf, Firefox, Thunderbird */
@@ -347,7 +347,7 @@ EOF
 }
 
 if [[ -n "$output_file" ]]; then
-  generate > "$output_file"
+  generate >"$output_file"
   echo "Generated: $output_file"
 else
   generate

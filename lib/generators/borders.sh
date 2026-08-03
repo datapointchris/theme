@@ -36,7 +36,7 @@ hex_to_argb() {
 }
 
 generate() {
-  cat << EOF
+  cat <<EOF
 #!/bin/bash
 # ${THEME_NAME} - JankyBorders theme
 # Generated from theme.yml
@@ -64,7 +64,7 @@ EOF
 }
 
 if [[ -n "$output_file" ]]; then
-  generate > "$output_file"
+  generate >"$output_file"
   chmod +x "$output_file"
   echo "Generated: $output_file"
 else

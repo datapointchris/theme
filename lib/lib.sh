@@ -211,7 +211,7 @@ get_current_theme() {
 set_current_theme() {
   local theme="$1"
   mkdir -p "$(dirname "$CURRENT_THEME_FILE")"
-  echo "$theme" > "$CURRENT_THEME_FILE"
+  echo "$theme" >"$CURRENT_THEME_FILE"
 }
 
 #==============================================================================
@@ -559,7 +559,7 @@ get_ghostty_opacity() {
 set_ghostty_opacity() {
   local opacity="$1"
   mkdir -p "$GHOSTTY_OPACITY_DIR"
-  echo "background-opacity = $opacity" > "$GHOSTTY_OPACITY_FILE"
+  echo "background-opacity = $opacity" >"$GHOSTTY_OPACITY_FILE"
 }
 
 # Get current opacity from kitty opacity config
@@ -575,7 +575,7 @@ get_kitty_opacity() {
 set_kitty_opacity() {
   local opacity="$1"
   mkdir -p "$KITTY_OPACITY_DIR"
-  echo "background_opacity $opacity" > "$KITTY_OPACITY_FILE"
+  echo "background_opacity $opacity" >"$KITTY_OPACITY_FILE"
 }
 
 # Get current opacity from windows terminal opacity config
@@ -595,7 +595,7 @@ set_windows_terminal_opacity() {
   local pct
   pct=$(awk "BEGIN {printf \"%.0f\", $opacity * 100}")
   mkdir -p "$(dirname "$WINDOWS_TERMINAL_OPACITY_FILE")"
-  echo "{\"opacity\": $pct}" > "$WINDOWS_TERMINAL_OPACITY_FILE"
+  echo "{\"opacity\": $pct}" >"$WINDOWS_TERMINAL_OPACITY_FILE"
 
   _apply_windows_terminal_opacity "$pct"
 }
@@ -609,8 +609,8 @@ _apply_windows_terminal_opacity() {
   [[ -z "$windows_user" ]] && return 1
 
   for path in "/mnt/c/Users/$windows_user/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json" \
-              "/mnt/c/Users/$windows_user/AppData/Local/Packages/Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe/LocalState/settings.json" \
-              "/mnt/c/Users/$windows_user/AppData/Local/Microsoft/Windows Terminal/settings.json"; do
+    "/mnt/c/Users/$windows_user/AppData/Local/Packages/Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe/LocalState/settings.json" \
+    "/mnt/c/Users/$windows_user/AppData/Local/Microsoft/Windows Terminal/settings.json"; do
     [[ -f "$path" ]] && wt_settings="$path" && break
   done
   [[ -z "$wt_settings" ]] && return 1
@@ -619,11 +619,11 @@ _apply_windows_terminal_opacity() {
 
   if [[ "$opacity_pct" == "100" ]]; then
     jq 'del(.profiles.defaults.opacity) | .profiles.list = [.profiles.list[] | del(.opacity)]' \
-      "$wt_settings" > "${wt_settings}.tmp" && mv "${wt_settings}.tmp" "$wt_settings"
+      "$wt_settings" >"${wt_settings}.tmp" && mv "${wt_settings}.tmp" "$wt_settings"
   else
     jq --argjson opacity "$opacity_pct" \
       '.profiles.defaults.opacity = $opacity | .profiles.list = [.profiles.list[] | .opacity = $opacity]' \
-      "$wt_settings" > "${wt_settings}.tmp" && mv "${wt_settings}.tmp" "$wt_settings"
+      "$wt_settings" >"${wt_settings}.tmp" && mv "${wt_settings}.tmp" "$wt_settings"
   fi
 }
 
@@ -636,14 +636,14 @@ set_tmux_opacity() {
 
   if awk "BEGIN {exit !($opacity < 1.0)}"; then
     # Transparent - use default background
-    cat > "$TMUX_OPACITY_FILE" << 'EOF'
+    cat >"$TMUX_OPACITY_FILE" <<'EOF'
 # Transparent background (inherits from terminal)
 set -g window-style 'bg=default'
 set -g window-active-style 'bg=default'
 EOF
   else
     # Opaque - use theme background (empty file, theme controls bg)
-    cat > "$TMUX_OPACITY_FILE" << 'EOF'
+    cat >"$TMUX_OPACITY_FILE" <<'EOF'
 # Opaque background (uses theme colors)
 # No overrides needed - theme controls background
 EOF
@@ -668,7 +668,7 @@ get_waybar_opacity() {
 set_waybar_opacity() {
   local opacity="$1"
   mkdir -p "$WAYBAR_OPACITY_DIR"
-  cat > "$WAYBAR_OPACITY_FILE" << EOF
+  cat >"$WAYBAR_OPACITY_FILE" <<EOF
 /* Waybar opacity - managed by theme tool */
 /* opacity: $opacity */
 @define-color waybar-bg alpha(@bg, $opacity);
@@ -817,13 +817,13 @@ set_background_mode() {
   mkdir -p "$(dirname "$BACKGROUND_MODE_FILE")"
 
   if [[ "$1" == "all" ]]; then
-    echo "all" > "$BACKGROUND_MODE_FILE"
+    echo "all" >"$BACKGROUND_MODE_FILE"
     return
   fi
 
-  : > "$BACKGROUND_MODE_FILE"
+  : >"$BACKGROUND_MODE_FILE"
   for mode in "$@"; do
-    echo "$mode" >> "$BACKGROUND_MODE_FILE"
+    echo "$mode" >>"$BACKGROUND_MODE_FILE"
   done
 }
 
@@ -844,7 +844,7 @@ add_background_mode() {
   fi
 
   mkdir -p "$(dirname "$BACKGROUND_MODE_FILE")"
-  echo "$mode" >> "$BACKGROUND_MODE_FILE"
+  echo "$mode" >>"$BACKGROUND_MODE_FILE"
   echo "Added: $mode"
 }
 
@@ -856,9 +856,9 @@ remove_background_mode() {
 
   if [[ "$current" == "all" ]]; then
     # Switch from "all" to explicit list minus the removed mode
-    : > "$BACKGROUND_MODE_FILE"
+    : >"$BACKGROUND_MODE_FILE"
     while IFS= read -r available; do
-      [[ "$available" != "$mode" ]] && echo "$available" >> "$BACKGROUND_MODE_FILE"
+      [[ "$available" != "$mode" ]] && echo "$available" >>"$BACKGROUND_MODE_FILE"
     done < <(list_available_background_modes)
     echo "Removed: $mode (expanded from 'all')"
     return
@@ -869,7 +869,7 @@ remove_background_mode() {
     return
   fi
 
-  { grep -vxF "$mode" "$BACKGROUND_MODE_FILE" || true; } > "${BACKGROUND_MODE_FILE}.tmp"
+  { grep -vxF "$mode" "$BACKGROUND_MODE_FILE" || true; } >"${BACKGROUND_MODE_FILE}.tmp"
   mv "${BACKGROUND_MODE_FILE}.tmp" "$BACKGROUND_MODE_FILE"
   echo "Removed: $mode"
 }
@@ -985,7 +985,7 @@ add_background_source() {
     local count
     count=$(find "$abs_path" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) 2>/dev/null | wc -l | xargs)
 
-    echo "$entry" >> "$BACKGROUND_SOURCES_FILE"
+    echo "$entry" >>"$BACKGROUND_SOURCES_FILE"
     echo "Added directory: $abs_path ($count images)"
   else
     # Single file
@@ -1004,7 +1004,7 @@ add_background_source() {
       return 0
     fi
 
-    echo "$entry" >> "$BACKGROUND_SOURCES_FILE"
+    echo "$entry" >>"$BACKGROUND_SOURCES_FILE"
     echo "Added file: $abs_path"
   fi
 }
@@ -1042,7 +1042,7 @@ get_all_background_images() {
         fi
         ;;
     esac
-  done < "$BACKGROUND_SOURCES_FILE"
+  done <"$BACKGROUND_SOURCES_FILE"
 }
 
 # Remove a background source entry
@@ -1056,7 +1056,7 @@ remove_background_source() {
 
   # Try exact match first (with prefix)
   if grep -qF "$input" "$BACKGROUND_SOURCES_FILE" 2>/dev/null; then
-    { grep -vF "$input" "$BACKGROUND_SOURCES_FILE" || true; } > "${BACKGROUND_SOURCES_FILE}.tmp"
+    { grep -vF "$input" "$BACKGROUND_SOURCES_FILE" || true; } >"${BACKGROUND_SOURCES_FILE}.tmp"
     mv "${BACKGROUND_SOURCES_FILE}.tmp" "$BACKGROUND_SOURCES_FILE"
     echo "Removed: $input"
     return 0
@@ -1066,7 +1066,7 @@ remove_background_source() {
   local match
   match=$(grep -E "(file:|dir:).*${input}" "$BACKGROUND_SOURCES_FILE" 2>/dev/null | head -1 || true)
   if [[ -n "$match" ]]; then
-    { grep -vF "$match" "$BACKGROUND_SOURCES_FILE" || true; } > "${BACKGROUND_SOURCES_FILE}.tmp"
+    { grep -vF "$match" "$BACKGROUND_SOURCES_FILE" || true; } >"${BACKGROUND_SOURCES_FILE}.tmp"
     mv "${BACKGROUND_SOURCES_FILE}.tmp" "$BACKGROUND_SOURCES_FILE"
     echo "Removed: $match"
     return 0
@@ -1119,7 +1119,7 @@ verify_background_sources() {
         broken=$((broken + 1))
         ;;
     esac
-  done < "$BACKGROUND_SOURCES_FILE"
+  done <"$BACKGROUND_SOURCES_FILE"
 
   echo ""
   echo "Valid: $valid, Broken: $broken"
@@ -1135,11 +1135,14 @@ clean_background_sources() {
 
   local cleaned=0
   local temp_file="${BACKGROUND_SOURCES_FILE}.tmp"
-  : > "$temp_file"
+  : >"$temp_file"
 
   while IFS= read -r entry; do
     [[ -z "$entry" ]] && continue
-    [[ "$entry" =~ ^# ]] && { echo "$entry" >> "$temp_file"; continue; }
+    [[ "$entry" =~ ^# ]] && {
+      echo "$entry" >>"$temp_file"
+      continue
+    }
 
     local type="${entry%%:*}"
     local path="${entry#*:}"
@@ -1162,8 +1165,8 @@ clean_background_sources() {
         ;;
     esac
 
-    [[ "$keep" == "true" ]] && echo "$entry" >> "$temp_file"
-  done < "$BACKGROUND_SOURCES_FILE"
+    [[ "$keep" == "true" ]] && echo "$entry" >>"$temp_file"
+  done <"$BACKGROUND_SOURCES_FILE"
 
   mv "$temp_file" "$BACKGROUND_SOURCES_FILE"
   echo ""
@@ -1196,7 +1199,7 @@ get_current_background() {
 set_current_background() {
   local background_id="$1"
   mkdir -p "$(dirname "$BACKGROUND_CURRENT_FILE")"
-  echo "$background_id" > "$BACKGROUND_CURRENT_FILE"
+  echo "$background_id" >"$BACKGROUND_CURRENT_FILE"
 }
 
 # Set desktop wallpaper (platform-specific dispatcher)
@@ -1334,13 +1337,19 @@ render_background() {
       return 0
     fi
     local generator="$generators_dir/background-${bg_value}.sh"
-    [[ -f "$generator" ]] || { echo "Error: no generator for style: $bg_value" >&2; return 1; }
+    [[ -f "$generator" ]] || {
+      echo "Error: no generator for style: $bg_value" >&2
+      return 1
+    }
     bash "$generator" "$theme_yml" "$output_file" "$BACKGROUND_WIDTH" "$BACKGROUND_HEIGHT" >/dev/null 2>&1
     return $?
   fi
 
   local generator="$generators_dir/background-${bg_type}.sh"
-  [[ -f "$generator" ]] || { echo "Error: unknown background type: $bg_type" >&2; return 1; }
+  [[ -f "$generator" ]] || {
+    echo "Error: unknown background type: $bg_type" >&2
+    return 1
+  }
   bash "$generator" "$theme_yml" "$bg_value" "$output_file" >/dev/null 2>&1
 }
 
@@ -1464,7 +1473,7 @@ rotate_background() {
   if [[ -n "$rejected_list" ]]; then
     while IFS= read -r bg; do
       [[ -n "$bg" ]] && rejected_map["$bg"]=1
-    done <<< "$rejected_list"
+    done <<<"$rejected_list"
   fi
 
   local available=()
@@ -1689,13 +1698,13 @@ apply_windows_terminal() {
   # Remove existing scheme with same name and add new one
   jq --argjson scheme "$theme_json" \
     '.schemes = [.schemes[] | select(.name != $scheme.name)] + [$scheme]' \
-    "$wt_settings" > "${wt_settings}.tmp" && mv "${wt_settings}.tmp" "$wt_settings"
+    "$wt_settings" >"${wt_settings}.tmp" && mv "${wt_settings}.tmp" "$wt_settings"
 
   # Set as active colorScheme for defaults AND all profiles
   jq --arg theme "$theme_name" '
     .profiles.defaults.colorScheme = $theme |
     .profiles.list = [.profiles.list[] | .colorScheme = $theme]
-  ' "$wt_settings" > "${wt_settings}.tmp" && mv "${wt_settings}.tmp" "$wt_settings"
+  ' "$wt_settings" >"${wt_settings}.tmp" && mv "${wt_settings}.tmp" "$wt_settings"
 
   # Also apply opacity if configured (to all profiles)
   if [[ -f "$WINDOWS_TERMINAL_OPACITY_FILE" ]]; then
@@ -1705,7 +1714,7 @@ apply_windows_terminal() {
       jq --argjson opacity "$opacity_pct" '
         .profiles.defaults.opacity = $opacity |
         .profiles.list = [.profiles.list[] | .opacity = $opacity]
-      ' "$wt_settings" > "${wt_settings}.tmp" && mv "${wt_settings}.tmp" "$wt_settings"
+      ' "$wt_settings" >"${wt_settings}.tmp" && mv "${wt_settings}.tmp" "$wt_settings"
     fi
   fi
 
@@ -1961,7 +1970,7 @@ format_relative() {
 }
 
 reload_tmux() {
-  if command -v tmux &> /dev/null && tmux list-sessions &> /dev/null 2>&1; then
+  if command -v tmux &>/dev/null && tmux list-sessions &>/dev/null 2>&1; then
     tmux source-file ~/.config/tmux/tmux.conf 2>/dev/null || true
     return 0
   fi
@@ -1969,7 +1978,7 @@ reload_tmux() {
 }
 
 reload_kitty() {
-  if command -v pkill &> /dev/null; then
+  if command -v pkill &>/dev/null; then
     pkill -USR1 kitty 2>/dev/null || true
     return 0
   fi
@@ -1977,7 +1986,7 @@ reload_kitty() {
 }
 
 reload_hyprland() {
-  if command -v hyprctl &> /dev/null; then
+  if command -v hyprctl &>/dev/null; then
     hyprctl reload 2>/dev/null || true
     return 0
   fi
@@ -1989,9 +1998,9 @@ reload_hyprland() {
 # callbacks, occasionally segfaulting in libplayerctl during teardown.
 # A clean process restart sidesteps the race entirely.
 reload_waybar() {
-  if pgrep -x waybar &> /dev/null; then
-    pkill -x waybar 2> /dev/null || true
-    setsid waybar > /dev/null 2>&1 < /dev/null &
+  if pgrep -x waybar &>/dev/null; then
+    pkill -x waybar 2>/dev/null || true
+    setsid waybar >/dev/null 2>&1 </dev/null &
     disown
     return 0
   fi
@@ -1999,10 +2008,10 @@ reload_waybar() {
 }
 
 reload_dunst() {
-  if command -v killall &> /dev/null; then
+  if command -v killall &>/dev/null; then
     killall dunst 2>/dev/null || true
     # Dunst auto-restarts on next notification, or start it explicitly
-    if command -v dunst &> /dev/null; then
+    if command -v dunst &>/dev/null; then
       dunst &>/dev/null &
       disown
     fi

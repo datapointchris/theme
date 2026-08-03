@@ -52,14 +52,14 @@ GIT_DELETE="${EXTENDED_GIT_DELETE:-$BASE08}"
 GIT_CHANGE="${EXTENDED_GIT_CHANGE:-$BASE0A}"
 
 generate() {
-  cat << 'HEADER'
+  cat <<'HEADER'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 HEADER
 
-  cat << EOF
+  cat <<EOF
 	<key>name</key>
 	<string>${THEME_NAME}</string>
 	<key>author</key>
@@ -780,7 +780,7 @@ EOF
 }
 
 if [[ -n "$output_file" ]]; then
-  generate > "$output_file"
+  generate >"$output_file"
   echo "Generated: $output_file"
 else
   generate

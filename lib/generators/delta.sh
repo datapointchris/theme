@@ -59,7 +59,7 @@ MINUS_EMPH_BG="$(band "$RED" "$BG" 2.2)"
 PLUS_EMPH_BG="$(band "$GREEN" "$BG" 2.2)"
 
 generate() {
-  cat << EOF
+  cat <<EOF
 # ${THEME_NAME} - delta theme
 # Generated from theme.yml — do not edit; run 'theme apply' to regenerate
 
@@ -92,7 +92,7 @@ EOF
 }
 
 if [[ -n "$output_file" ]]; then
-  generate > "$output_file"
+  generate >"$output_file"
   echo "Generated: $output_file"
 else
   generate

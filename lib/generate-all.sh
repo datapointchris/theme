@@ -25,7 +25,7 @@ fi
 # Generator -> output filename mapping
 declare -A GENERATOR_OUTPUT=(
   [ghostty]="ghostty.conf"
-  [ghostty-css]="ghostty.css"
+  [ghostty - css]="ghostty.css"
   [kitty]="kitty.conf"
   [alacritty]="alacritty.toml"
   [tmux]="tmux.conf"
@@ -39,11 +39,11 @@ declare -A GENERATOR_OUTPUT=(
   [mako]="mako.conf"
   [walker]="walker.css"
   [swayosd]="swayosd.css"
-  [windows-terminal]="windows-terminal.json"
+  [windows - terminal]="windows-terminal.json"
   [icons]="icons.theme"
-  [hyprland-picker]="hyprland-picker.css"
+  [hyprland - picker]="hyprland-picker.css"
   [chromium]="chromium.theme"
-  [firefox-based]="userChrome.css"
+  [firefox - based]="userChrome.css"
   [bat]="bat.tmTheme"
   [sioyek]="sioyek.config"
   [yazi]="flavor.toml"
@@ -66,7 +66,7 @@ while [[ $# -gt 0 ]]; do
       GENERATOR_PATTERN="$2"
       shift 2
       ;;
-    -h|--help)
+    -h | --help)
       echo "Usage: $0 [--themes <pattern>] [--generators <pattern>]"
       echo ""
       echo "Options:"
@@ -140,9 +140,9 @@ for theme in "${themes[@]}"; do
       echo "$generator_script|$theme_yml|$output_file|$theme|$gen|$results_dir|$total_jobs"
     fi
   done
-done > "$job_list"
+done >"$job_list"
 
-actual_jobs=$(wc -l < "$job_list" | tr -d ' ')
+actual_jobs=$(wc -l <"$job_list" | tr -d ' ')
 
 # Use all available cores
 cores=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
@@ -152,7 +152,7 @@ echo ""
 
 # Job runner function
 run_job() {
-  IFS='|' read -r script input output theme gen results_dir total <<< "$1"
+  IFS='|' read -r script input output theme gen results_dir total <<<"$1"
   result_file="$results_dir/${theme}__${gen}"
 
   job_start=$EPOCHREALTIME
@@ -160,14 +160,14 @@ run_job() {
   if "$script" "$input" "$output" >/dev/null 2>&1; then
     job_end=$EPOCHREALTIME
     elapsed=$(awk "BEGIN {printf \"%.2f\", $job_end - $job_start}")
-    echo "ok|$elapsed" > "$result_file"
+    echo "ok|$elapsed" >"$result_file"
     done=$(find "$results_dir" -maxdepth 1 -type f | wc -l | tr -d ' ')
     pct=$((done * 100 / total))
     printf "✓ %-30s %-18s %6.2fs  [%d/%d %3d%%]\n" "$theme" "$gen" "$elapsed" "$done" "$total" "$pct"
   else
     job_end=$EPOCHREALTIME
     elapsed=$(awk "BEGIN {printf \"%.2f\", $job_end - $job_start}")
-    echo "fail|$elapsed" > "$result_file"
+    echo "fail|$elapsed" >"$result_file"
     done=$(find "$results_dir" -maxdepth 1 -type f | wc -l | tr -d ' ')
     pct=$((done * 100 / total))
     printf "✗ %-30s %-18s %6.2fs  [%d/%d %3d%%] FAILED\n" "$theme" "$gen" "$elapsed" "$done" "$total" "$pct"
@@ -178,7 +178,7 @@ export -f run_job
 started=$(date +%s.%N)
 
 # Run with GNU parallel
-parallel --jobs "$cores" run_job < "$job_list"
+parallel --jobs "$cores" run_job <"$job_list"
 
 ended=$(date +%s.%N)
 total_elapsed=$(awk "BEGIN {printf \"%.2f\", $ended - $started}")
@@ -196,7 +196,7 @@ for result_file in "$results_dir"/*; do
   theme="${name%__*}"
   gen="${name#*__}"
 
-  IFS='|' read -r status elapsed < "$result_file"
+  IFS='|' read -r status elapsed <"$result_file"
 
   if [[ "$status" == "ok" ]]; then
     ((++success))

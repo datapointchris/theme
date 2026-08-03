@@ -29,8 +29,8 @@ _sync_check_gh() {
 # Check if sync is enabled (disabled in dev mode)
 is_sync_enabled() {
   [[ "${THEME_ENV:-}" == "development" ]] && return 1
-  [[ -f "$THEME_SYNC_STATE_FILE" ]] && \
-    jq -e '.enabled == true' "$THEME_SYNC_STATE_FILE" &>/dev/null
+  [[ -f "$THEME_SYNC_STATE_FILE" ]] \
+    && jq -e '.enabled == true' "$THEME_SYNC_STATE_FILE" &>/dev/null
 }
 
 _sync_get_gist_id() {
@@ -53,21 +53,21 @@ _sync_update_state() {
     --arg last_sync "$timestamp" \
     --argjson enabled "$enabled" \
     '{gist_id: $gist_id, last_sync: $last_sync, enabled: $enabled}' \
-    > "$THEME_SYNC_STATE_FILE"
+    >"$THEME_SYNC_STATE_FILE"
 }
 
 _sync_find_gist() {
-  gh gist list --limit 100 2>/dev/null | \
-    grep -F "$THEME_GIST_DESCRIPTION" | \
-    head -1 | \
-    awk '{print $1}' || true
+  gh gist list --limit 100 2>/dev/null \
+    | grep -F "$THEME_GIST_DESCRIPTION" \
+    | head -1 \
+    | awk '{print $1}' || true
 }
 
 _sync_create_gist() {
   local history_file="$THEME_HISTORY_FILE"
 
   if [[ ! -f "$history_file" ]] || [[ ! -s "$history_file" ]]; then
-    echo "{}" > /tmp/theme-history-init.jsonl
+    echo "{}" >/tmp/theme-history-init.jsonl
     history_file="/tmp/theme-history-init.jsonl"
   fi
 
@@ -170,7 +170,7 @@ sync_pull() {
   merged=$(_sync_merge_histories "$THEME_HISTORY_FILE" "$remote_content")
 
   if [[ -n "$merged" ]]; then
-    echo "$merged" > "$THEME_HISTORY_FILE"
+    echo "$merged" >"$THEME_HISTORY_FILE"
   fi
 
   if [[ -f "$THEME_SYNC_STATE_FILE" ]]; then
@@ -178,7 +178,7 @@ sync_pull() {
     timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
     local state
     state=$(cat "$THEME_SYNC_STATE_FILE")
-    echo "$state" | jq --arg ts "$timestamp" '.last_sync = $ts' > "$THEME_SYNC_STATE_FILE"
+    echo "$state" | jq --arg ts "$timestamp" '.last_sync = $ts' >"$THEME_SYNC_STATE_FILE"
   fi
 
   return 0
@@ -208,7 +208,7 @@ sync_push() {
       timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
       local state
       state=$(cat "$THEME_SYNC_STATE_FILE")
-      echo "$state" | jq --arg ts "$timestamp" '.last_sync = $ts' > "$THEME_SYNC_STATE_FILE"
+      echo "$state" | jq --arg ts "$timestamp" '.last_sync = $ts' >"$THEME_SYNC_STATE_FILE"
     fi
     return 0
   else
@@ -267,7 +267,7 @@ sync_status() {
 
   if [[ -f "$THEME_HISTORY_FILE" ]]; then
     local entry_count
-    entry_count=$(wc -l < "$THEME_HISTORY_FILE" | xargs)
+    entry_count=$(wc -l <"$THEME_HISTORY_FILE" | xargs)
     echo "Local entries: $entry_count"
   fi
 }
@@ -276,7 +276,7 @@ sync_off() {
   if [[ -f "$THEME_SYNC_STATE_FILE" ]]; then
     local state
     state=$(cat "$THEME_SYNC_STATE_FILE")
-    echo "$state" | jq '.enabled = false' > "$THEME_SYNC_STATE_FILE"
+    echo "$state" | jq '.enabled = false' >"$THEME_SYNC_STATE_FILE"
     echo "✓ Sync disabled"
     echo ""
     echo "Run 'theme sync on' to re-enable."
@@ -289,7 +289,7 @@ sync_on() {
   if [[ -f "$THEME_SYNC_STATE_FILE" ]]; then
     local state
     state=$(cat "$THEME_SYNC_STATE_FILE")
-    echo "$state" | jq '.enabled = true' > "$THEME_SYNC_STATE_FILE"
+    echo "$state" | jq '.enabled = true' >"$THEME_SYNC_STATE_FILE"
     echo "✓ Sync enabled"
 
     sync_pull

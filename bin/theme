@@ -591,7 +591,7 @@ show_browsers() {
     echo ""
     echo "Chromium Theme:"
     local chromium_colors
-    chromium_colors=$(tr '\n' ' ' < "$chromium_theme_file" 2>/dev/null)
+    chromium_colors=$(tr '\n' ' ' <"$chromium_theme_file" 2>/dev/null)
     echo "  Colors: $chromium_colors"
   fi
 
@@ -1095,7 +1095,7 @@ _render_rank_section() {
     fi
 
     printf "%2d. %-${name_width}s  %b  %b\n" "$rank" "$display" "$metric" "$bar"
-  done <<< "$sorted"
+  done <<<"$sorted"
 }
 
 show_rankings() {
@@ -1119,7 +1119,7 @@ show_rankings() {
     while IFS= read -r theme; do
       printf '%s\t%s\n' "$theme" "$(get_theme_display_info "$theme")"
     done < <(echo "$rankings" | jq -r '.[].theme') \
-    | jq -R -s --argjson r "$rankings" '
+      | jq -R -s --argjson r "$rankings" '
         (split("\n") | map(select(length > 0) | split("\t") | {key: .[0], value: .[1]}) | from_entries) as $dm
         | $r | map(.display = ($dm[.theme] // .theme))
       '
@@ -1192,7 +1192,7 @@ show_info() {
     sync_before_read
 
     local preview_script="/tmp/theme-info-preview-$$.sh"
-    cat > "$preview_script" <<PREVIEW_EOF
+    cat >"$preview_script" <<PREVIEW_EOF
 #!/bin/bash
 source "$THEME_APP_DIR/lib/lib.sh"
 source "$THEME_APP_DIR/lib/storage.sh"
@@ -1402,627 +1402,627 @@ main() {
   fi
 
   case "${1:-}" in
-  change)
-    change_theme
-    ;;
-  current)
-    show_current
-    ;;
-  list | ls)
-    show_list
-    ;;
-  apply)
-    apply_theme "${2:-}"
-    ;;
-  random | rand)
-    apply_random
-    ;;
-  like)
-    mark_liked "${@:2}"
-    ;;
-  dislike)
-    mark_disliked "${@:2}"
-    ;;
-  note)
-    add_note "${@:2}"
-    ;;
-  rank | ranks | ranking)
-    show_rankings
-    ;;
-  log | history)
-    show_log
-    ;;
-  info)
-    show_info "${2:-}"
-    ;;
-  reject)
-    mark_rejected "${@:2}"
-    ;;
-  rejected)
-    show_rejected
-    ;;
-  unreject)
-    unreject_theme_interactive
-    ;;
-  verify)
-    verify_system
-    ;;
-  browsers)
-    if [[ "${2:-}" == "--help" ]] || [[ "${2:-}" == "-h" ]]; then
-      browsers_usage
-    else
-      show_browsers
-    fi
-    ;;
-  upgrade | update)
-    if ! declare -F bashselfupdate_update &>/dev/null; then
-      echo "✗ theme upgrade failed: bashselfupdate is not installed" >&2
-      echo "  Re-run the installer: bash $THEME_APP_DIR/install.sh" >&2
-      exit 1
-    fi
-
-    # Checked before attempting the update so the far more common cause gets its
-    # own message. bashselfupdate_update returns the same non-zero for a
-    # development checkout, an unreachable remote and a repository with no
-    # releases, and "could not reach the remote" is actively misleading to
-    # someone running theme from a clone.
-    if ! bashselfupdate_current_version "$THEME_APP_DIR" >/dev/null 2>&1; then
-      echo "✗ theme upgrade failed: $THEME_APP_DIR is not on a release tag ($(bashselfupdate_describe "$THEME_APP_DIR"))" >&2
-      echo "  This is a development checkout. Use git to move it." >&2
-      exit 1
-    fi
-
-    local moved
-    if ! moved=$(bashselfupdate_update "$THEME_APP_DIR"); then
-      echo "✗ theme upgrade failed: could not reach the remote or find a release" >&2
-      exit 1
-    fi
-
-    if [[ -z "$moved" ]]; then
-      echo "✓ theme already at latest: $(bashselfupdate_describe "$THEME_APP_DIR")"
-      exit 0
-    fi
-
-    local from to
-    read -r from to <<<"$moved"
-    echo "✓ theme upgraded: $from → $to"
-
-    local changes
-    changes=$(bashselfupdate_changelog "$THEME_APP_DIR" "$from" "$to")
-    if [[ -n "$changes" ]]; then
-      echo ""
-      echo "Changes:"
-      while IFS= read -r subject; do
-        echo "  • $subject"
-      done <<<"$changes"
-    fi
-    ;;
-  opacity)
-    case "${2:-}" in
-      "" | --help | -h)
-        opacity_usage
-        ;;
-      current)
-        echo "Background opacity: $(get_current_opacity)"
-        ;;
-      up)
-        if result=$(change_opacity 0.05); then
-          echo "Opacity: $result"
-          echo ""
-          echo "Restart terminal to see changes."
-        fi
-        ;;
-      down)
-        if result=$(change_opacity -0.05); then
-          echo "Opacity: $result"
-          echo ""
-          echo "Restart terminal to see changes."
-        fi
-        ;;
-      set)
-        if [[ -z "${3:-}" ]]; then
-          echo "Error: opacity value required" >&2
-          echo "Usage: theme opacity set <0-100>" >&2
-          exit 1
-        fi
-        if result=$(set_opacity "$3"); then
-          echo "Opacity: $result"
-          echo ""
-          echo "Restart terminal to see changes."
-        fi
-        ;;
-      *)
-        echo "Unknown opacity command: ${2:-}" >&2
-        echo "Usage: theme opacity [current|set|up|down]" >&2
-        exit 1
-        ;;
-    esac
-    ;;
-  background)
-    case "${2:-}" in
-    "" | --help | -h)
-      background_usage
+    change)
+      change_theme
       ;;
     current)
-      # Show current background info
-      local current_bg current_theme
-      current_bg=$(get_current_background)
-      current_theme=$(get_current_theme)
-
-      if [[ -z "$current_bg" ]]; then
-        echo "No background tracked yet."
-        echo ""
-        echo "Apply a theme to set background: theme apply <name>"
-      else
-        echo ""
-        echo "Current Background"
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        local bg_type="${current_bg%%:*}"
-        local bg_value="${current_bg#*:}"
-        echo "  Type: $bg_type"
-        if [[ "$bg_type" == "recolor" ]]; then
-          echo "  Source: $bg_value"
-          echo "  File: $(basename "$bg_value")"
-        else
-          echo "  Style: $bg_value"
-        fi
-        echo "  Theme: $current_theme"
-        echo ""
-        echo "Rotate background: theme background rotate"
-      fi
+      show_current
       ;;
-    rotate)
-      echo "Rotating background..."
-
-      # Get current theme for filtering
-      local current_theme
-      current_theme=$(get_current_theme)
-
-      # Get rejected backgrounds and weights for this theme
-      local rejected_list weights_json
-      rejected_list=$(get_rejected_background_ids "$current_theme")
-      weights_json=$(compute_background_weights "$current_theme")
-
-      local new_style
-      if new_style=$(rotate_background "$rejected_list" "$weights_json"); then
-        echo "  ✓ background ($new_style)"
-        # Log the background action
-        local background_id
-        background_id=$(get_current_background)
-        log_background_action "apply" "$background_id" "$current_theme"
-        sync_after_action
-      else
-        echo "  ✗ background rotation failed" >&2
-        exit 1
-      fi
+    list | ls)
+      show_list
       ;;
-    list)
-      local filter="${3:-}"
-      echo ""
-      echo "Available Backgrounds"
-      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-      echo ""
-
-      local current_mode
-      current_mode=$(get_background_mode)
-      echo "Mode: $current_mode"
-      echo ""
-
-      if [[ "$filter" != "--recolor" ]]; then
-        echo "Generated Styles:"
-        for style in "${BACKGROUND_GENERATED_STYLES[@]}"; do
-          local enabled=""
-          if is_background_type_enabled "generated:$style"; then
-            enabled="✓"
-          else
-            enabled="✗"
-          fi
-          echo "  [$enabled] generated:$style"
-        done
-        echo ""
-      fi
-
-      if [[ "$filter" != "--generated" ]]; then
-        echo "Source Transforms:"
-        for source_type in "${BACKGROUND_SOURCE_TYPES[@]}"; do
-          local type_enabled=""
-          if is_source_type_enabled "$source_type"; then
-            type_enabled="✓"
-          else
-            type_enabled="✗"
-          fi
-          echo "  [$type_enabled] $source_type"
-        done
-
-        local images
-        images=$(get_all_background_images)
-        if [[ -n "$images" ]]; then
-          local img_count
-          img_count=$(echo "$images" | wc -l | xargs)
-          echo ""
-          echo "  $img_count source images available:"
-          echo "$images" | head -10 | while IFS= read -r img; do
-            echo "    - $(basename "$img")"
-          done
-          if [[ $img_count -gt 10 ]]; then
-            echo "    ... and $((img_count - 10)) more"
-          fi
-        else
-          echo ""
-          echo "  No source images configured"
-          echo "  Add with: theme background source add <path>"
-        fi
-        echo ""
-      fi
-
-      local total_count
-      total_count=$(get_enabled_generated_styles | wc -l | xargs)
-      local img_count
-      img_count=$(get_all_background_images | wc -l | xargs)
-      for source_type in "${BACKGROUND_SOURCE_TYPES[@]}"; do
-        if is_source_type_enabled "$source_type"; then
-          total_count=$((total_count + img_count))
-        fi
-      done
-      echo "Total enabled: $total_count backgrounds"
+    apply)
+      apply_theme "${2:-}"
       ;;
-    mode)
-      case "${3:-}" in
-      "" | --help | -h)
-        background_mode_usage
-        ;;
-      list)
-        echo ""
-        echo "Available Background Modes"
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        echo ""
-        echo "Generated styles (no source image needed):"
-        for style in "${BACKGROUND_GENERATED_STYLES[@]}"; do
-          echo "  generated:$style"
-        done
-        echo ""
-        echo "Source transforms (need source images):"
-        echo "  recolor        - Recolor images with gowall"
-        echo "  ascii          - Convert images to ASCII art"
-        echo "  lowpoly        - Convert images to low-poly triangles"
-        echo ""
-        echo "Shortcuts:"
-        echo "  generated      - All generated styles"
-        echo "  all            - Everything (default)"
-        ;;
-      current)
-        echo ""
-        echo "Current Background Mode"
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        echo ""
-        local current_mode
-        current_mode=$(get_background_mode)
-        if [[ "$current_mode" == "all" ]]; then
-          echo "Mode: all (everything enabled)"
-        else
-          echo "Enabled modes:"
-          echo "$current_mode" | while IFS= read -r mode; do
-            echo "  - $mode"
-          done
-        fi
-        ;;
-      all)
-        set_background_mode "all"
-        echo "Set mode: all (everything enabled)"
-        ;;
-      add)
-        if [[ -z "${4:-}" ]]; then
-          echo "Error: mode name required" >&2
-          echo "Usage: theme background mode add <mode>" >&2
-          exit 1
-        fi
-        add_background_mode "$4"
-        ;;
-      remove)
-        if [[ -z "${4:-}" ]]; then
-          echo "Error: mode name required" >&2
-          echo "Usage: theme background mode remove <mode>" >&2
-          exit 1
-        fi
-        remove_background_mode "$4"
-        ;;
-      set)
-        if [[ -z "${4:-}" ]]; then
-          echo "Error: at least one mode required" >&2
-          echo "Usage: theme background mode set <mode> [mode...]" >&2
-          exit 1
-        fi
-        set_background_mode "${@:4}"
-        echo "Set modes:"
-        for mode in "${@:4}"; do
-          echo "  - $mode"
-        done
-        ;;
-      *)
-        echo "Unknown mode command: ${3:-}" >&2
-        echo "Usage: theme background mode [current|list|set|add|remove|all]" >&2
-        exit 1
-        ;;
-      esac
+    random | rand)
+      apply_random
       ;;
     like)
-      local message="${*:3}"
-      local background_id current_theme
-      background_id=$(get_current_background)
-      current_theme=$(get_current_theme)
-
-      if [[ -z "$background_id" ]]; then
-        echo "Error: No background currently set" >&2
-        exit 1
-      fi
-
-      log_background_action "like" "$background_id" "$current_theme" "$message"
-      sync_after_action
-
-      local bg_type="${background_id%%:*}"
-      local bg_value="${background_id#*:}"
-      echo "Liked background for theme: $current_theme"
-      if [[ "$bg_type" == "recolor" ]]; then
-        echo "  Background: recolor ($(basename "$bg_value"))"
-      else
-        echo "  Background: $bg_value"
-      fi
-      [[ -n "$message" ]] && echo "  Note: $message"
+      mark_liked "${@:2}"
       ;;
     dislike)
-      local message="${*:3}"
-      local background_id current_theme
-      background_id=$(get_current_background)
-      current_theme=$(get_current_theme)
-
-      if [[ -z "$background_id" ]]; then
-        echo "Error: No background currently set" >&2
-        exit 1
-      fi
-
-      log_background_action "dislike" "$background_id" "$current_theme" "$message"
-      sync_after_action
-
-      local bg_type="${background_id%%:*}"
-      local bg_value="${background_id#*:}"
-      echo "Disliked background for theme: $current_theme"
-      if [[ "$bg_type" == "recolor" ]]; then
-        echo "  Background: recolor ($(basename "$bg_value"))"
-      else
-        echo "  Background: $bg_value"
-      fi
-      [[ -n "$message" ]] && echo "  Note: $message"
+      mark_disliked "${@:2}"
+      ;;
+    note)
+      add_note "${@:2}"
+      ;;
+    rank | ranks | ranking)
+      show_rankings
+      ;;
+    log | history)
+      show_log
+      ;;
+    info)
+      show_info "${2:-}"
       ;;
     reject)
-      local message="${*:3}"
-      local background_id current_theme
-      background_id=$(get_current_background)
-      current_theme=$(get_current_theme)
-
-      if [[ -z "$background_id" ]]; then
-        echo "Error: No background currently set" >&2
-        exit 1
-      fi
-
-      if [[ -z "$message" ]]; then
-        echo "Error: Rejection reason required" >&2
-        echo "Usage: theme background reject <reason>" >&2
-        exit 1
-      fi
-
-      log_background_action "reject" "$background_id" "$current_theme" "$message"
-      sync_after_action
-
-      local bg_type="${background_id%%:*}"
-      local bg_value="${background_id#*:}"
-      echo "Rejected background for theme: $current_theme"
-      if [[ "$bg_type" == "recolor" ]]; then
-        echo "  Background: recolor ($(basename "$bg_value"))"
+      mark_rejected "${@:2}"
+      ;;
+    rejected)
+      show_rejected
+      ;;
+    unreject)
+      unreject_theme_interactive
+      ;;
+    verify)
+      verify_system
+      ;;
+    browsers)
+      if [[ "${2:-}" == "--help" ]] || [[ "${2:-}" == "-h" ]]; then
+        browsers_usage
       else
-        echo "  Background: $bg_value"
+        show_browsers
       fi
-      echo "  Reason: $message"
-      echo ""
-      echo "This background will be skipped for this theme."
       ;;
-    history)
-      sync_before_read
-      local history
-      history=$(get_background_history)
-
-      if [[ -z "$history" ]] || [[ "$history" == "[]" ]]; then
-        echo "No background history yet."
-        return
-      fi
-
-      echo ""
-      echo "Background History"
-      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-      echo ""
-
-      echo "$history" | jq -r '.[] | "\(.ts) | \(.machine) | \(.theme) | \(.action) | \(.background)" + (if .message then " | \(.message)" else "" end)' | tail -20
-      ;;
-    rank)
-      sync_before_read
-      local current_theme global_flag
-      current_theme=$(get_current_theme)
-      global_flag="${3:-}"
-
-      local rankings
-      if [[ "$global_flag" == "--global" ]]; then
-        echo ""
-        echo "Global Background Rankings"
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        rankings=$(get_background_rankings)
-      else
-        echo ""
-        echo "Background Rankings for: $current_theme"
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        rankings=$(get_background_rankings "$current_theme")
-      fi
-
-      if [[ -z "$rankings" ]]; then
-        echo ""
-        echo "No rankings yet. Apply and rate some backgrounds!"
-        return
-      fi
-
-      echo ""
-      local rank=0
-      while IFS= read -r line; do
-        rank=$((rank + 1))
-        local background score likes dislikes applies
-        background=$(echo "$line" | jq -r '.background')
-        score=$(echo "$line" | jq -r '.score')
-        likes=$(echo "$line" | jq -r '.likes')
-        dislikes=$(echo "$line" | jq -r '.dislikes')
-        applies=$(echo "$line" | jq -r '.applies')
-
-        local bg_type="${background%%:*}"
-        local bg_value="${background#*:}"
-        local display_name
-        if [[ "$bg_type" == "recolor" ]]; then
-          display_name="recolor: $(basename "$bg_value")"
-        else
-          display_name="$background"
-        fi
-
-        printf "%2d. %s\n" "$rank" "$display_name"
-        printf "    Score: %+d (%d likes, %d dislikes) | Applied: %d times\n" "$score" "$likes" "$dislikes" "$applies"
-      done <<< "$rankings"
-      echo ""
-      ;;
-    pre-generate)
-      generate_all_backgrounds
-      ;;
-    cache-clear)
-      clear_background_cache
-      ;;
-    source)
-      case "${3:-}" in
-      "" | --help | -h)
-        background_source_usage
-        ;;
-      add)
-        if [[ -z "${4:-}" ]]; then
-          echo "Usage: theme background source add <path>" >&2
-          exit 1
-        fi
-        add_background_source "$4"
-        ;;
-      list)
-        local entries
-        entries=$(list_background_source_entries)
-        if [[ -z "$entries" ]]; then
-          echo "No background sources configured."
-          echo ""
-          echo "Add sources with: theme background source add <path>"
-          echo "You can add individual files or entire directories."
-          echo ""
-          echo "Sources are stored as path references in:"
-          echo "  $BACKGROUND_SOURCES_FILE"
-        else
-          echo "Background Sources"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo ""
-          while IFS= read -r entry; do
-            local type="${entry%%:*}"
-            local path="${entry#*:}"
-            if [[ "$type" == "dir" ]]; then
-              local count
-              count=$(find "$path" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) 2>/dev/null | wc -l | xargs)
-              echo "  [dir]  $path ($count images)"
-            else
-              echo "  [file] $path"
-            fi
-          done <<< "$entries"
-          echo ""
-          echo "Total images: $(get_all_background_images | wc -l | xargs)"
-          echo ""
-          echo "When 'recolor' style is selected, gowall converts these to match your theme."
-        fi
-        ;;
-      remove)
-        if [[ -z "${4:-}" ]]; then
-          echo "Usage: theme background source remove <path>" >&2
-          exit 1
-        fi
-        remove_background_source "$4"
-        ;;
-      verify)
-        echo "Verifying background sources..."
-        echo ""
-        verify_background_sources
-        ;;
-      clean)
-        echo "Cleaning broken background sources..."
-        echo ""
-        clean_background_sources
-        ;;
-      *)
-        echo "Unknown background source command: ${3:-}"
-        echo "Usage: theme background source [add|list|remove|verify|clean]"
+    upgrade | update)
+      if ! declare -F bashselfupdate_update &>/dev/null; then
+        echo "✗ theme upgrade failed: bashselfupdate is not installed" >&2
+        echo "  Re-run the installer: bash $THEME_APP_DIR/install.sh" >&2
         exit 1
-        ;;
+      fi
+
+      # Checked before attempting the update so the far more common cause gets its
+      # own message. bashselfupdate_update returns the same non-zero for a
+      # development checkout, an unreachable remote and a repository with no
+      # releases, and "could not reach the remote" is actively misleading to
+      # someone running theme from a clone.
+      if ! bashselfupdate_current_version "$THEME_APP_DIR" >/dev/null 2>&1; then
+        echo "✗ theme upgrade failed: $THEME_APP_DIR is not on a release tag ($(bashselfupdate_describe "$THEME_APP_DIR"))" >&2
+        echo "  This is a development checkout. Use git to move it." >&2
+        exit 1
+      fi
+
+      local moved
+      if ! moved=$(bashselfupdate_update "$THEME_APP_DIR"); then
+        echo "✗ theme upgrade failed: could not reach the remote or find a release" >&2
+        exit 1
+      fi
+
+      if [[ -z "$moved" ]]; then
+        echo "✓ theme already at latest: $(bashselfupdate_describe "$THEME_APP_DIR")"
+        exit 0
+      fi
+
+      local from to
+      read -r from to <<<"$moved"
+      echo "✓ theme upgraded: $from → $to"
+
+      local changes
+      changes=$(bashselfupdate_changelog "$THEME_APP_DIR" "$from" "$to")
+      if [[ -n "$changes" ]]; then
+        echo ""
+        echo "Changes:"
+        while IFS= read -r subject; do
+          echo "  • $subject"
+        done <<<"$changes"
+      fi
+      ;;
+    opacity)
+      case "${2:-}" in
+        "" | --help | -h)
+          opacity_usage
+          ;;
+        current)
+          echo "Background opacity: $(get_current_opacity)"
+          ;;
+        up)
+          if result=$(change_opacity 0.05); then
+            echo "Opacity: $result"
+            echo ""
+            echo "Restart terminal to see changes."
+          fi
+          ;;
+        down)
+          if result=$(change_opacity -0.05); then
+            echo "Opacity: $result"
+            echo ""
+            echo "Restart terminal to see changes."
+          fi
+          ;;
+        set)
+          if [[ -z "${3:-}" ]]; then
+            echo "Error: opacity value required" >&2
+            echo "Usage: theme opacity set <0-100>" >&2
+            exit 1
+          fi
+          if result=$(set_opacity "$3"); then
+            echo "Opacity: $result"
+            echo ""
+            echo "Restart terminal to see changes."
+          fi
+          ;;
+        *)
+          echo "Unknown opacity command: ${2:-}" >&2
+          echo "Usage: theme opacity [current|set|up|down]" >&2
+          exit 1
+          ;;
       esac
       ;;
+    background)
+      case "${2:-}" in
+        "" | --help | -h)
+          background_usage
+          ;;
+        current)
+          # Show current background info
+          local current_bg current_theme
+          current_bg=$(get_current_background)
+          current_theme=$(get_current_theme)
+
+          if [[ -z "$current_bg" ]]; then
+            echo "No background tracked yet."
+            echo ""
+            echo "Apply a theme to set background: theme apply <name>"
+          else
+            echo ""
+            echo "Current Background"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            local bg_type="${current_bg%%:*}"
+            local bg_value="${current_bg#*:}"
+            echo "  Type: $bg_type"
+            if [[ "$bg_type" == "recolor" ]]; then
+              echo "  Source: $bg_value"
+              echo "  File: $(basename "$bg_value")"
+            else
+              echo "  Style: $bg_value"
+            fi
+            echo "  Theme: $current_theme"
+            echo ""
+            echo "Rotate background: theme background rotate"
+          fi
+          ;;
+        rotate)
+          echo "Rotating background..."
+
+          # Get current theme for filtering
+          local current_theme
+          current_theme=$(get_current_theme)
+
+          # Get rejected backgrounds and weights for this theme
+          local rejected_list weights_json
+          rejected_list=$(get_rejected_background_ids "$current_theme")
+          weights_json=$(compute_background_weights "$current_theme")
+
+          local new_style
+          if new_style=$(rotate_background "$rejected_list" "$weights_json"); then
+            echo "  ✓ background ($new_style)"
+            # Log the background action
+            local background_id
+            background_id=$(get_current_background)
+            log_background_action "apply" "$background_id" "$current_theme"
+            sync_after_action
+          else
+            echo "  ✗ background rotation failed" >&2
+            exit 1
+          fi
+          ;;
+        list)
+          local filter="${3:-}"
+          echo ""
+          echo "Available Backgrounds"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+
+          local current_mode
+          current_mode=$(get_background_mode)
+          echo "Mode: $current_mode"
+          echo ""
+
+          if [[ "$filter" != "--recolor" ]]; then
+            echo "Generated Styles:"
+            for style in "${BACKGROUND_GENERATED_STYLES[@]}"; do
+              local enabled=""
+              if is_background_type_enabled "generated:$style"; then
+                enabled="✓"
+              else
+                enabled="✗"
+              fi
+              echo "  [$enabled] generated:$style"
+            done
+            echo ""
+          fi
+
+          if [[ "$filter" != "--generated" ]]; then
+            echo "Source Transforms:"
+            for source_type in "${BACKGROUND_SOURCE_TYPES[@]}"; do
+              local type_enabled=""
+              if is_source_type_enabled "$source_type"; then
+                type_enabled="✓"
+              else
+                type_enabled="✗"
+              fi
+              echo "  [$type_enabled] $source_type"
+            done
+
+            local images
+            images=$(get_all_background_images)
+            if [[ -n "$images" ]]; then
+              local img_count
+              img_count=$(echo "$images" | wc -l | xargs)
+              echo ""
+              echo "  $img_count source images available:"
+              echo "$images" | head -10 | while IFS= read -r img; do
+                echo "    - $(basename "$img")"
+              done
+              if [[ $img_count -gt 10 ]]; then
+                echo "    ... and $((img_count - 10)) more"
+              fi
+            else
+              echo ""
+              echo "  No source images configured"
+              echo "  Add with: theme background source add <path>"
+            fi
+            echo ""
+          fi
+
+          local total_count
+          total_count=$(get_enabled_generated_styles | wc -l | xargs)
+          local img_count
+          img_count=$(get_all_background_images | wc -l | xargs)
+          for source_type in "${BACKGROUND_SOURCE_TYPES[@]}"; do
+            if is_source_type_enabled "$source_type"; then
+              total_count=$((total_count + img_count))
+            fi
+          done
+          echo "Total enabled: $total_count backgrounds"
+          ;;
+        mode)
+          case "${3:-}" in
+            "" | --help | -h)
+              background_mode_usage
+              ;;
+            list)
+              echo ""
+              echo "Available Background Modes"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo ""
+              echo "Generated styles (no source image needed):"
+              for style in "${BACKGROUND_GENERATED_STYLES[@]}"; do
+                echo "  generated:$style"
+              done
+              echo ""
+              echo "Source transforms (need source images):"
+              echo "  recolor        - Recolor images with gowall"
+              echo "  ascii          - Convert images to ASCII art"
+              echo "  lowpoly        - Convert images to low-poly triangles"
+              echo ""
+              echo "Shortcuts:"
+              echo "  generated      - All generated styles"
+              echo "  all            - Everything (default)"
+              ;;
+            current)
+              echo ""
+              echo "Current Background Mode"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo ""
+              local current_mode
+              current_mode=$(get_background_mode)
+              if [[ "$current_mode" == "all" ]]; then
+                echo "Mode: all (everything enabled)"
+              else
+                echo "Enabled modes:"
+                echo "$current_mode" | while IFS= read -r mode; do
+                  echo "  - $mode"
+                done
+              fi
+              ;;
+            all)
+              set_background_mode "all"
+              echo "Set mode: all (everything enabled)"
+              ;;
+            add)
+              if [[ -z "${4:-}" ]]; then
+                echo "Error: mode name required" >&2
+                echo "Usage: theme background mode add <mode>" >&2
+                exit 1
+              fi
+              add_background_mode "$4"
+              ;;
+            remove)
+              if [[ -z "${4:-}" ]]; then
+                echo "Error: mode name required" >&2
+                echo "Usage: theme background mode remove <mode>" >&2
+                exit 1
+              fi
+              remove_background_mode "$4"
+              ;;
+            set)
+              if [[ -z "${4:-}" ]]; then
+                echo "Error: at least one mode required" >&2
+                echo "Usage: theme background mode set <mode> [mode...]" >&2
+                exit 1
+              fi
+              set_background_mode "${@:4}"
+              echo "Set modes:"
+              for mode in "${@:4}"; do
+                echo "  - $mode"
+              done
+              ;;
+            *)
+              echo "Unknown mode command: ${3:-}" >&2
+              echo "Usage: theme background mode [current|list|set|add|remove|all]" >&2
+              exit 1
+              ;;
+          esac
+          ;;
+        like)
+          local message="${*:3}"
+          local background_id current_theme
+          background_id=$(get_current_background)
+          current_theme=$(get_current_theme)
+
+          if [[ -z "$background_id" ]]; then
+            echo "Error: No background currently set" >&2
+            exit 1
+          fi
+
+          log_background_action "like" "$background_id" "$current_theme" "$message"
+          sync_after_action
+
+          local bg_type="${background_id%%:*}"
+          local bg_value="${background_id#*:}"
+          echo "Liked background for theme: $current_theme"
+          if [[ "$bg_type" == "recolor" ]]; then
+            echo "  Background: recolor ($(basename "$bg_value"))"
+          else
+            echo "  Background: $bg_value"
+          fi
+          [[ -n "$message" ]] && echo "  Note: $message"
+          ;;
+        dislike)
+          local message="${*:3}"
+          local background_id current_theme
+          background_id=$(get_current_background)
+          current_theme=$(get_current_theme)
+
+          if [[ -z "$background_id" ]]; then
+            echo "Error: No background currently set" >&2
+            exit 1
+          fi
+
+          log_background_action "dislike" "$background_id" "$current_theme" "$message"
+          sync_after_action
+
+          local bg_type="${background_id%%:*}"
+          local bg_value="${background_id#*:}"
+          echo "Disliked background for theme: $current_theme"
+          if [[ "$bg_type" == "recolor" ]]; then
+            echo "  Background: recolor ($(basename "$bg_value"))"
+          else
+            echo "  Background: $bg_value"
+          fi
+          [[ -n "$message" ]] && echo "  Note: $message"
+          ;;
+        reject)
+          local message="${*:3}"
+          local background_id current_theme
+          background_id=$(get_current_background)
+          current_theme=$(get_current_theme)
+
+          if [[ -z "$background_id" ]]; then
+            echo "Error: No background currently set" >&2
+            exit 1
+          fi
+
+          if [[ -z "$message" ]]; then
+            echo "Error: Rejection reason required" >&2
+            echo "Usage: theme background reject <reason>" >&2
+            exit 1
+          fi
+
+          log_background_action "reject" "$background_id" "$current_theme" "$message"
+          sync_after_action
+
+          local bg_type="${background_id%%:*}"
+          local bg_value="${background_id#*:}"
+          echo "Rejected background for theme: $current_theme"
+          if [[ "$bg_type" == "recolor" ]]; then
+            echo "  Background: recolor ($(basename "$bg_value"))"
+          else
+            echo "  Background: $bg_value"
+          fi
+          echo "  Reason: $message"
+          echo ""
+          echo "This background will be skipped for this theme."
+          ;;
+        history)
+          sync_before_read
+          local history
+          history=$(get_background_history)
+
+          if [[ -z "$history" ]] || [[ "$history" == "[]" ]]; then
+            echo "No background history yet."
+            return
+          fi
+
+          echo ""
+          echo "Background History"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+
+          echo "$history" | jq -r '.[] | "\(.ts) | \(.machine) | \(.theme) | \(.action) | \(.background)" + (if .message then " | \(.message)" else "" end)' | tail -20
+          ;;
+        rank)
+          sync_before_read
+          local current_theme global_flag
+          current_theme=$(get_current_theme)
+          global_flag="${3:-}"
+
+          local rankings
+          if [[ "$global_flag" == "--global" ]]; then
+            echo ""
+            echo "Global Background Rankings"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            rankings=$(get_background_rankings)
+          else
+            echo ""
+            echo "Background Rankings for: $current_theme"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            rankings=$(get_background_rankings "$current_theme")
+          fi
+
+          if [[ -z "$rankings" ]]; then
+            echo ""
+            echo "No rankings yet. Apply and rate some backgrounds!"
+            return
+          fi
+
+          echo ""
+          local rank=0
+          while IFS= read -r line; do
+            rank=$((rank + 1))
+            local background score likes dislikes applies
+            background=$(echo "$line" | jq -r '.background')
+            score=$(echo "$line" | jq -r '.score')
+            likes=$(echo "$line" | jq -r '.likes')
+            dislikes=$(echo "$line" | jq -r '.dislikes')
+            applies=$(echo "$line" | jq -r '.applies')
+
+            local bg_type="${background%%:*}"
+            local bg_value="${background#*:}"
+            local display_name
+            if [[ "$bg_type" == "recolor" ]]; then
+              display_name="recolor: $(basename "$bg_value")"
+            else
+              display_name="$background"
+            fi
+
+            printf "%2d. %s\n" "$rank" "$display_name"
+            printf "    Score: %+d (%d likes, %d dislikes) | Applied: %d times\n" "$score" "$likes" "$dislikes" "$applies"
+          done <<<"$rankings"
+          echo ""
+          ;;
+        pre-generate)
+          generate_all_backgrounds
+          ;;
+        cache-clear)
+          clear_background_cache
+          ;;
+        source)
+          case "${3:-}" in
+            "" | --help | -h)
+              background_source_usage
+              ;;
+            add)
+              if [[ -z "${4:-}" ]]; then
+                echo "Usage: theme background source add <path>" >&2
+                exit 1
+              fi
+              add_background_source "$4"
+              ;;
+            list)
+              local entries
+              entries=$(list_background_source_entries)
+              if [[ -z "$entries" ]]; then
+                echo "No background sources configured."
+                echo ""
+                echo "Add sources with: theme background source add <path>"
+                echo "You can add individual files or entire directories."
+                echo ""
+                echo "Sources are stored as path references in:"
+                echo "  $BACKGROUND_SOURCES_FILE"
+              else
+                echo "Background Sources"
+                echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                echo ""
+                while IFS= read -r entry; do
+                  local type="${entry%%:*}"
+                  local path="${entry#*:}"
+                  if [[ "$type" == "dir" ]]; then
+                    local count
+                    count=$(find "$path" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) 2>/dev/null | wc -l | xargs)
+                    echo "  [dir]  $path ($count images)"
+                  else
+                    echo "  [file] $path"
+                  fi
+                done <<<"$entries"
+                echo ""
+                echo "Total images: $(get_all_background_images | wc -l | xargs)"
+                echo ""
+                echo "When 'recolor' style is selected, gowall converts these to match your theme."
+              fi
+              ;;
+            remove)
+              if [[ -z "${4:-}" ]]; then
+                echo "Usage: theme background source remove <path>" >&2
+                exit 1
+              fi
+              remove_background_source "$4"
+              ;;
+            verify)
+              echo "Verifying background sources..."
+              echo ""
+              verify_background_sources
+              ;;
+            clean)
+              echo "Cleaning broken background sources..."
+              echo ""
+              clean_background_sources
+              ;;
+            *)
+              echo "Unknown background source command: ${3:-}"
+              echo "Usage: theme background source [add|list|remove|verify|clean]"
+              exit 1
+              ;;
+          esac
+          ;;
+        *)
+          echo "Unknown background command: ${2:-}"
+          echo "Usage: theme background [rotate|list|mode|like|dislike|reject|history|rank|pre-generate|cache-clear|source]"
+          exit 1
+          ;;
+      esac
+      ;;
+    sync)
+      case "${2:-}" in
+        "" | --help | -h)
+          sync_usage
+          ;;
+        init)
+          sync_init
+          ;;
+        status)
+          sync_status
+          ;;
+        push)
+          if sync_push; then
+            echo "✓ Pushed to remote"
+          else
+            echo "✗ Push failed" >&2
+            exit 1
+          fi
+          ;;
+        pull)
+          if sync_pull; then
+            echo "✓ Pulled from remote"
+          else
+            echo "✗ Pull failed" >&2
+            exit 1
+          fi
+          ;;
+        off)
+          sync_off
+          ;;
+        on)
+          sync_on
+          ;;
+        *)
+          echo "Usage: theme sync <init|status|push|pull|on|off>"
+          exit 1
+          ;;
+      esac
+      ;;
+    --version | -v)
+      echo "theme $(get_version)"
+      exit 0
+      ;;
+    help | --help | -h)
+      usage
+      ;;
     *)
-      echo "Unknown background command: ${2:-}"
-      echo "Usage: theme background [rotate|list|mode|like|dislike|reject|history|rank|pre-generate|cache-clear|source]"
+      usage
       exit 1
       ;;
-    esac
-    ;;
-  sync)
-    case "${2:-}" in
-    "" | --help | -h)
-      sync_usage
-      ;;
-    init)
-      sync_init
-      ;;
-    status)
-      sync_status
-      ;;
-    push)
-      if sync_push; then
-        echo "✓ Pushed to remote"
-      else
-        echo "✗ Push failed" >&2
-        exit 1
-      fi
-      ;;
-    pull)
-      if sync_pull; then
-        echo "✓ Pulled from remote"
-      else
-        echo "✗ Pull failed" >&2
-        exit 1
-      fi
-      ;;
-    off)
-      sync_off
-      ;;
-    on)
-      sync_on
-      ;;
-    *)
-      echo "Usage: theme sync <init|status|push|pull|on|off>"
-      exit 1
-      ;;
-    esac
-    ;;
-  --version | -v)
-    echo "theme $(get_version)"
-    exit 0
-    ;;
-  help | --help | -h)
-    usage
-    ;;
-  *)
-    usage
-    exit 1
-    ;;
   esac
 }
 
