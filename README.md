@@ -147,7 +147,7 @@ theme --version               # Show current version
 theme update                  # Update to the latest tagged release
 ```
 
-Releases are automated via [release-please](https://github.com/googleapis/release-please). The update command only checks out tagged releases, so you always land on a stable version.
+Releases are automated via [go-semantic-release](https://github.com/go-semantic-release/semantic-release). The update command only checks out tagged releases, so you always land on a stable version.
 
 theme also checks once a day and prints one line when a newer release exists:
 
