@@ -144,10 +144,10 @@ After initialization, sync happens automatically in the background.
 
 ```bash
 theme --version               # Show current version
-theme upgrade                 # Update to the latest tagged release
+theme update                  # Update to the latest tagged release
 ```
 
-Releases are automated via [release-please](https://github.com/googleapis/release-please). The upgrade command only checks out tagged releases, so you always land on a stable version.
+Releases are automated via [release-please](https://github.com/googleapis/release-please). The update command only checks out tagged releases, so you always land on a stable version.
 
 theme also checks once a day and prints one line when a newer release exists:
 

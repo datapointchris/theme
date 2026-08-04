@@ -152,7 +152,7 @@ theme apply gruvbox-dark-hard    # Apply by id
 theme current                    # Show current theme
 theme like "great contrast"      # Rate current theme
 theme reject "too bright"        # Remove from rotation
-theme upgrade                    # Update to latest version
+theme update                     # Update to latest version
 
 # Background management
 theme background                 # Show background usage
@@ -209,7 +209,7 @@ every app config is derived from it.
 
 5. **Deploy.** The installed tool reads `~/.local/share/theme`, not this repo, so
    nothing takes effect until a release ships: commit, push (the Release workflow
-   tags it), then `theme upgrade`, then `theme apply {id}`.
+   tags it), then `theme update`, then `theme apply {id}`.
 
 ### Mapping a Palette into theme.yml
 
@@ -287,7 +287,7 @@ Neovim exists — it writes state, and Neovim pulls:
   rejected theme also disappears from the Telescope picker.
 
 **It reads the installed copy** (`~/.local/share/theme/themes`), never this repo.
-A new theme is invisible to Neovim until `theme upgrade` has run.
+A new theme is invisible to Neovim until `theme update` has run.
 
 **meta fields the manager reads** — these are the contract, so a typo here fails
 silently rather than loudly:

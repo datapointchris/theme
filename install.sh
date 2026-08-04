@@ -82,7 +82,7 @@ if [[ ! -d "$INSTALL_DIR/.git" ]]; then
 fi
 
 # Moving to the newest tag, not `git pull`. The previous version pulled, which
-# fails outright once `theme upgrade` has run: a plain `git checkout <tag>`
+# fails outright once `theme update` has run: a plain `git checkout <tag>`
 # leaves a detached HEAD, a detached HEAD has no upstream, and git answers with
 # "You are not currently on a branch". Re-running the installer then meant
 # reinstalling from scratch.
