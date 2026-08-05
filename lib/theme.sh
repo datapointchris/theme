@@ -60,41 +60,101 @@ load_theme() {
     return 1
   fi
 
-  # Metadata (from meta section)
-  echo "THEME_NAME=\"$(theme_get '.meta.display_name' "$file")\""
-  echo "THEME_AUTHOR=\"$(theme_get '.meta.author' "$file")\""
-  echo "THEME_VARIANT=\"$(theme_get '.meta.variant' "$file")\""
-  echo "THEME_SOURCE=\"$(theme_get '.meta.derived_from' "$file")\""
-  echo "THEME_SLUG=\"$(theme_get '.meta.id' "$file")\""
+  # One yq process for the whole file.
+  #
+  # This was one `theme_get` — one yq spawn — per key, about eighty per theme.
+  # yq itself takes 30ms, so the reads were nothing and the process spawns were
+  # everything: five seconds per load on the Intel machines, paid once by every
+  # generator, which is 600 loads in a full regeneration. Adding a key here costs
+  # nothing now; adding one as a separate call cost another spawn.
+  local raw
+  if ! raw=$(yq -r '
+    [
+      ["THEME_NAME", .meta.display_name],
+      ["THEME_AUTHOR", .meta.author],
+      ["THEME_VARIANT", .meta.variant],
+      ["THEME_SOURCE", .meta.derived_from],
+      ["THEME_SLUG", .meta.id],
+      ["BASE00", .base16.base00],
+      ["BASE01", .base16.base01],
+      ["BASE02", .base16.base02],
+      ["BASE03", .base16.base03],
+      ["BASE04", .base16.base04],
+      ["BASE05", .base16.base05],
+      ["BASE06", .base16.base06],
+      ["BASE07", .base16.base07],
+      ["BASE08", .base16.base08],
+      ["BASE09", .base16.base09],
+      ["BASE0A", .base16.base0A],
+      ["BASE0B", .base16.base0B],
+      ["BASE0C", .base16.base0C],
+      ["BASE0D", .base16.base0D],
+      ["BASE0E", .base16.base0E],
+      ["BASE0F", .base16.base0F],
+      ["ansi_black", .ansi.black],
+      ["ansi_red", .ansi.red],
+      ["ansi_green", .ansi.green],
+      ["ansi_yellow", .ansi.yellow],
+      ["ansi_blue", .ansi.blue],
+      ["ansi_magenta", .ansi.magenta],
+      ["ansi_cyan", .ansi.cyan],
+      ["ansi_white", .ansi.white],
+      ["bright_black", .ansi.bright_black],
+      ["bright_red", .ansi.bright_red],
+      ["bright_green", .ansi.bright_green],
+      ["bright_yellow", .ansi.bright_yellow],
+      ["bright_blue", .ansi.bright_blue],
+      ["bright_magenta", .ansi.bright_magenta],
+      ["bright_cyan", .ansi.bright_cyan],
+      ["bright_white", .ansi.bright_white],
+      ["bg", .special.background],
+      ["fg", .special.foreground],
+      ["cursor", .special.cursor],
+      ["cursor_text", .special.cursor_text],
+      ["sel_bg", .special.selection_bg],
+      ["sel_fg", .special.selection_fg],
+      ["border", .special.border],
+      ["panel", .special.panel]
+    ]
+    + ((.extended // {}) | to_entries | map(["EXTENDED_" + (.key | upcase), .value]))
+    | map([.[0], (.[1] // "")]) | .[] | @tsv
+  ' "$file" 2>&1); then
+    echo "Error: could not read theme file: $file" >&2
+    echo "$raw" >&2
+    return 1
+  fi
 
-  # Base16 palette (from base16 section, not palette)
-  echo "BASE00=\"$(theme_get '.base16.base00' "$file")\""
-  echo "BASE01=\"$(theme_get '.base16.base01' "$file")\""
-  echo "BASE02=\"$(theme_get '.base16.base02' "$file")\""
-  echo "BASE03=\"$(theme_get '.base16.base03' "$file")\""
-  echo "BASE04=\"$(theme_get '.base16.base04' "$file")\""
-  echo "BASE05=\"$(theme_get '.base16.base05' "$file")\""
-  echo "BASE06=\"$(theme_get '.base16.base06' "$file")\""
-  echo "BASE07=\"$(theme_get '.base16.base07' "$file")\""
-  echo "BASE08=\"$(theme_get '.base16.base08' "$file")\""
-  echo "BASE09=\"$(theme_get '.base16.base09' "$file")\""
-  echo "BASE0A=\"$(theme_get '.base16.base0A' "$file")\""
-  echo "BASE0B=\"$(theme_get '.base16.base0B' "$file")\""
-  echo "BASE0C=\"$(theme_get '.base16.base0C' "$file")\""
-  echo "BASE0D=\"$(theme_get '.base16.base0D' "$file")\""
-  echo "BASE0E=\"$(theme_get '.base16.base0E' "$file")\""
-  echo "BASE0F=\"$(theme_get '.base16.base0F' "$file")\""
+  local -A field=()
+  local key value
+  while IFS=$'\t' read -r key value; do
+    [[ -n "$key" ]] && field["$key"]="$value"
+  done <<<"$raw"
+
+  # Metadata (from meta section)
+  echo "THEME_NAME=\"${field[THEME_NAME]}\""
+  echo "THEME_AUTHOR=\"${field[THEME_AUTHOR]}\""
+  echo "THEME_VARIANT=\"${field[THEME_VARIANT]}\""
+  echo "THEME_SOURCE=\"${field[THEME_SOURCE]}\""
+  echo "THEME_SLUG=\"${field[THEME_SLUG]}\""
+
+  # Base16 palette. Emitted before everything below, because the fallbacks are
+  # literal "$BASE08" strings that the caller's eval resolves in order.
+  local slot
+  for slot in BASE00 BASE01 BASE02 BASE03 BASE04 BASE05 BASE06 BASE07 \
+    BASE08 BASE09 BASE0A BASE0B BASE0C BASE0D BASE0E BASE0F; do
+    echo "$slot=\"${field[$slot]}\""
+  done
 
   # ANSI colors (same structure as palette.yml)
   local ansi_black ansi_red ansi_green ansi_yellow ansi_blue ansi_magenta ansi_cyan ansi_white
-  ansi_black=$(theme_get '.ansi.black' "$file")
-  ansi_red=$(theme_get '.ansi.red' "$file")
-  ansi_green=$(theme_get '.ansi.green' "$file")
-  ansi_yellow=$(theme_get '.ansi.yellow' "$file")
-  ansi_blue=$(theme_get '.ansi.blue' "$file")
-  ansi_magenta=$(theme_get '.ansi.magenta' "$file")
-  ansi_cyan=$(theme_get '.ansi.cyan' "$file")
-  ansi_white=$(theme_get '.ansi.white' "$file")
+  ansi_black="${field[ansi_black]}"
+  ansi_red="${field[ansi_red]}"
+  ansi_green="${field[ansi_green]}"
+  ansi_yellow="${field[ansi_yellow]}"
+  ansi_blue="${field[ansi_blue]}"
+  ansi_magenta="${field[ansi_magenta]}"
+  ansi_cyan="${field[ansi_cyan]}"
+  ansi_white="${field[ansi_white]}"
 
   echo "ANSI_BLACK=\"${ansi_black:-\$BASE00}\""
   echo "ANSI_RED=\"${ansi_red:-\$BASE08}\""
@@ -107,14 +167,14 @@ load_theme() {
 
   # Bright ANSI colors
   local bright_black bright_red bright_green bright_yellow bright_blue bright_magenta bright_cyan bright_white
-  bright_black=$(theme_get '.ansi.bright_black' "$file")
-  bright_red=$(theme_get '.ansi.bright_red' "$file")
-  bright_green=$(theme_get '.ansi.bright_green' "$file")
-  bright_yellow=$(theme_get '.ansi.bright_yellow' "$file")
-  bright_blue=$(theme_get '.ansi.bright_blue' "$file")
-  bright_magenta=$(theme_get '.ansi.bright_magenta' "$file")
-  bright_cyan=$(theme_get '.ansi.bright_cyan' "$file")
-  bright_white=$(theme_get '.ansi.bright_white' "$file")
+  bright_black="${field[bright_black]}"
+  bright_red="${field[bright_red]}"
+  bright_green="${field[bright_green]}"
+  bright_yellow="${field[bright_yellow]}"
+  bright_blue="${field[bright_blue]}"
+  bright_magenta="${field[bright_magenta]}"
+  bright_cyan="${field[bright_cyan]}"
+  bright_white="${field[bright_white]}"
 
   echo "ANSI_BRIGHT_BLACK=\"${bright_black:-\$BASE03}\""
   echo "ANSI_BRIGHT_RED=\"${bright_red:-\$BASE08}\""
@@ -127,14 +187,14 @@ load_theme() {
 
   # Special colors (with fallbacks)
   local bg fg cursor cursor_text sel_bg sel_fg border panel
-  bg=$(theme_get '.special.background' "$file")
-  fg=$(theme_get '.special.foreground' "$file")
-  cursor=$(theme_get '.special.cursor' "$file")
-  cursor_text=$(theme_get '.special.cursor_text' "$file")
-  sel_bg=$(theme_get '.special.selection_bg' "$file")
-  sel_fg=$(theme_get '.special.selection_fg' "$file")
-  border=$(theme_get '.special.border' "$file")
-  panel=$(theme_get '.special.panel' "$file")
+  bg="${field[bg]}"
+  fg="${field[fg]}"
+  cursor="${field[cursor]}"
+  cursor_text="${field[cursor_text]}"
+  sel_bg="${field[sel_bg]}"
+  sel_fg="${field[sel_fg]}"
+  border="${field[border]}"
+  panel="${field[panel]}"
 
   echo "SPECIAL_BG=\"${bg:-\$BASE00}\""
   echo "SPECIAL_FG=\"${fg:-\$BASE05}\""
@@ -145,18 +205,14 @@ load_theme() {
   echo "SPECIAL_BORDER=\"${border:-\$BASE03}\""
   echo "SPECIAL_PANEL=\"${panel:-\$BASE01}\""
 
-  # Extended colors (new in theme.yml)
-  # These are optional and used by some generators
-  local extended_keys
-  extended_keys=$(theme_get '.extended | keys | .[]' "$file" 2>/dev/null || echo "")
-
-  for key in $extended_keys; do
-    local value
-    value=$(theme_get ".extended.${key}" "$file")
-    local var_name
-    var_name=$(echo "EXTENDED_${key}" | tr '[:lower:]' '[:upper:]')
-    echo "${var_name}=\"${value}\""
-  done
+  # Extended colors, optional and read by name by individual generators. Already
+  # upcased and prefixed by the yq pass above; sorted here only so the emitted
+  # block is stable to read, since nothing consumes them in order.
+  local extended_key
+  while read -r extended_key; do
+    [[ -n "$extended_key" ]] || continue
+    echo "${extended_key}=\"${field[$extended_key]}\""
+  done < <(printf '%s\n' "${!field[@]}" | grep '^EXTENDED_' | sort)
 }
 
 # Load colors from theme.yml (alias for load_theme)
