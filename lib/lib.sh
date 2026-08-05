@@ -7,16 +7,20 @@ set -euo pipefail
 THEME_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 THEME_APP_DIR="$(cd "$THEME_LIB_DIR/.." && pwd)"
 
-# State directories:
-# - THEME_LIVE_DIR: Always production - for files that apps watch (current theme, background)
-# - THEME_STATE_DIR: Respects dev mode - for history files that shouldn't be polluted during dev
-THEME_LIVE_DIR="$HOME/.local/state/theme"
+# Sourced here rather than left to the caller, so this file is self-sufficient
+# and there is one definition of detect_platform in play. Both files used to
+# define it and they disagreed about Arch's label — storage.sh emits "arch",
+# this file emitted "archlinux" — so whichever was sourced last decided what
+# every platform comparison below compared against. bin/theme took storage.sh's
+# answer while scripts/test-all-themes.sh, which sources only this file, took
+# the other, and on Arch that silently skipped Hyprland, Waybar, ghostty, kitty
+# and the wallpaper. storage.sh also owns THEME_STATE_DIR and the history paths.
+# shellcheck source=./storage.sh
+source "$THEME_LIB_DIR/storage.sh"
 
-if [[ "${THEME_ENV:-}" == "development" ]]; then
-  THEME_STATE_DIR="$THEME_APP_DIR/.dev-data"
-else
-  THEME_STATE_DIR="$HOME/.local/state/theme"
-fi
+# Always production, unlike THEME_STATE_DIR: apps watch this directory, so dev
+# mode must not point them at .dev-data.
+THEME_LIVE_DIR="$HOME/.local/state/theme"
 
 # Configuration - themes/ is the single source of truth
 THEMES_DIR="$THEME_APP_DIR/themes"
@@ -212,27 +216,6 @@ set_current_theme() {
   local theme="$1"
   mkdir -p "$(dirname "$CURRENT_THEME_FILE")"
   echo "$theme" >"$CURRENT_THEME_FILE"
-}
-
-#==============================================================================
-# PLATFORM DETECTION
-#==============================================================================
-
-detect_platform() {
-  if [[ -n "${PLATFORM:-}" ]]; then
-    echo "$PLATFORM"
-    return
-  fi
-
-  if [[ "$OSTYPE" == "darwin"* ]]; then
-    echo "macos"
-  elif [[ -f /proc/version ]] && grep -qi microsoft /proc/version; then
-    echo "wsl"
-  elif [[ -f /etc/arch-release ]]; then
-    echo "archlinux"
-  else
-    echo "linux"
-  fi
 }
 
 #==============================================================================
@@ -1213,7 +1196,7 @@ set_desktop_wallpaper() {
     macos)
       set_desktop_wallpaper_macos "$background_file"
       ;;
-    archlinux)
+    arch)
       set_desktop_wallpaper_hyprland "$background_file"
       ;;
     wsl)
@@ -1754,7 +1737,7 @@ apply_theme_to_apps() {
   fi
 
   # Ghostty (macOS and Arch)
-  if [[ "$platform" == "macos" ]] || [[ "$platform" == "archlinux" ]]; then
+  if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]]; then
     if apply_ghostty "$theme" 2>/dev/null; then
       applied+=("ghostty")
       _print_app_status "ghostty" "true"
@@ -1765,7 +1748,7 @@ apply_theme_to_apps() {
   fi
 
   # Kitty (macOS and Arch)
-  if [[ "$platform" == "macos" ]] || [[ "$platform" == "archlinux" ]]; then
+  if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]]; then
     if apply_kitty "$theme" 2>/dev/null; then
       applied+=("kitty")
       _print_app_status "kitty" "true"
@@ -1788,7 +1771,7 @@ apply_theme_to_apps() {
 
   # Background (macOS, Arch, WSL)
   local background_id=""
-  if [[ "$platform" == "macos" ]] || [[ "$platform" == "archlinux" ]] || [[ "$platform" == "wsl" ]]; then
+  if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]] || [[ "$platform" == "wsl" ]]; then
     local background_style
     if background_style=$(apply_background "$theme" 2>/dev/null); then
       applied+=("background")
@@ -1864,7 +1847,7 @@ apply_theme_to_apps() {
   fi
 
   # Hyprland (Arch only)
-  if [[ "$platform" == "archlinux" ]]; then
+  if [[ "$platform" == "arch" ]]; then
     if apply_hyprland "$theme" 2>/dev/null; then
       applied+=("hyprland")
       _print_app_status "hyprland" "true"
@@ -2031,7 +2014,7 @@ reload_apps() {
   [[ "$applied_apps" == *"tmux"* ]] && reload_tmux
 
   # Platform-specific reloads
-  if [[ "$platform" == "archlinux" ]]; then
+  if [[ "$platform" == "arch" ]]; then
     [[ "$applied_apps" == *"kitty"* ]] && reload_kitty
     [[ "$applied_apps" == *"hyprland"* ]] && reload_hyprland
     [[ "$applied_apps" == *"waybar"* ]] && reload_waybar
@@ -2252,11 +2235,6 @@ _render_theme_configs() {
 display_theme_details() {
   local theme="$1"
   local format="${2:-full}"
-
-  # Source storage.sh if needed (when invoked from the fzf preview subshell)
-  if ! type -t get_theme_stats &>/dev/null; then
-    source "$THEME_APP_DIR/lib/storage.sh" 2>/dev/null || true
-  fi
 
   local display_info
   display_info=$(get_theme_display_info "$theme")

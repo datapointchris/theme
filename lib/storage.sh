@@ -4,6 +4,11 @@
 
 set -euo pipefail
 
+# lib.sh sources this file, and every entry point sources both — so without a
+# guard the tail of this file re-runs init_storage on each source.
+[[ -n "${_THEME_STORAGE_SOURCED:-}" ]] && return 0
+_THEME_STORAGE_SOURCED=1
+
 _STORAGE_APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Dev mode: use THEME_ENV=development (set via direnv in ~/tools/theme/.envrc)
