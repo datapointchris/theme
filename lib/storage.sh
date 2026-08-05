@@ -316,7 +316,11 @@ count_themes_tracked() {
 }
 
 list_tracked_themes() {
-  get_history | jq -r 'group_by(.theme) | .[].theme' | sort -u
+  # Not group_by: its output is an array of groups, so `.[].theme` indexed an
+  # array with a string and jq refused. The error went to stderr behind the pipe
+  # to sort, which exited 0 — so this reported success while printing nothing.
+  # unique sorts, which is what the trailing `sort -u` was there for.
+  get_history | jq -r '[.[].theme] | unique | .[]'
 }
 
 get_all_apply_counts() {
@@ -331,6 +335,13 @@ get_all_apply_counts() {
 
 validate_history_file() {
   if [[ ! -f "$THEME_HISTORY_FILE" ]]; then
+    return 0
+  fi
+
+  # An empty history is valid — it is what init_storage creates on a fresh
+  # machine. Checked separately because `jq -e` exits 4 when it produced no
+  # output at all, which is indistinguishable from malformed JSON below.
+  if [[ ! -s "$THEME_HISTORY_FILE" ]]; then
     return 0
   fi
 
