@@ -114,11 +114,20 @@ get_theme_mapping() {
 theme_name_to_canonical() {
   local input="$1"
 
-  # Check if directory exists directly
-  if [[ -d "$THEMES_DIR/$input" ]]; then
-    echo "$input"
-    return
-  fi
+  # Exact match against the listing, not `[[ -d "$THEMES_DIR/$input" ]]`. macOS
+  # is case-insensitive, so the -d test accepted "Gruvbox-Dark-Hard" as already
+  # canonical and returned the user's spelling — which then reached the state
+  # file and history.jsonl. History is gist-synced, so the Arch box received
+  # entries under an id it cannot resolve, and stats split one theme across two
+  # names. That is the damage normalize_theme in storage.sh exists to undo.
+  for dir in "$THEMES_DIR"/*/; do
+    local exact_name
+    exact_name=$(basename "$dir")
+    if [[ "$exact_name" == "$input" ]]; then
+      echo "$exact_name"
+      return
+    fi
+  done
 
   # Try case-insensitive match
   for dir in "$THEMES_DIR"/*/; do
