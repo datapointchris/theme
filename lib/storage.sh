@@ -160,7 +160,12 @@ get_theme_stats() {
       notes: map(select(.action == "note")) | length,
       applies: map(select(.action == "apply")) | length,
       score: ((map(select(.action == "like")) | length) - (map(select(.action == "dislike")) | length)),
-      last_used: map(select(.action == "apply")) | max_by(.ts) | .ts // "never",
+      # Parenthesized, like the three other last_used sites. Without them the
+      # alternative operator binds looser than the object construction and jq 1.7
+      # rejects the whole program as a syntax error, not just this field. jq 1.8
+      # accepts it, so this parsed on a workstation and failed on any machine
+      # still on 1.7, which includes the CI runner.
+      last_used: (map(select(.action == "apply")) | max_by(.ts) | .ts // "never"),
       platforms: [.[].platform] | unique,
       machines: [.[].machine // "unknown"] | unique
     }
