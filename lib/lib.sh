@@ -968,8 +968,10 @@ add_background_source() {
     local prefix="dir:"
     local entry="${prefix}${abs_path}"
 
-    # Check if already exists
-    if [[ -f "$BACKGROUND_SOURCES_FILE" ]] && grep -qF "$entry" "$BACKGROUND_SOURCES_FILE" 2>/dev/null; then
+    # -x, so the match is the whole line. Without it this is a substring test:
+    # adding ~/pics while ~/pics-old was already a source reported "already
+    # added" and silently dropped the new directory.
+    if [[ -f "$BACKGROUND_SOURCES_FILE" ]] && grep -qxF "$entry" "$BACKGROUND_SOURCES_FILE" 2>/dev/null; then
       echo "Directory already added: $abs_path"
       return 0
     fi
@@ -991,8 +993,9 @@ add_background_source() {
 
     local entry="file:${abs_path}"
 
-    # Check if already exists
-    if [[ -f "$BACKGROUND_SOURCES_FILE" ]] && grep -qF "$entry" "$BACKGROUND_SOURCES_FILE" 2>/dev/null; then
+    # -x for the same reason as the directory branch above: one.png must not
+    # match an already-listed one.png.bak.
+    if [[ -f "$BACKGROUND_SOURCES_FILE" ]] && grep -qxF "$entry" "$BACKGROUND_SOURCES_FILE" 2>/dev/null; then
       echo "File already added: $abs_path"
       return 0
     fi
@@ -1047,9 +1050,12 @@ remove_background_source() {
     return 1
   fi
 
-  # Try exact match first (with prefix)
-  if grep -qF "$input" "$BACKGROUND_SOURCES_FILE" 2>/dev/null; then
-    { grep -vF "$input" "$BACKGROUND_SOURCES_FILE" || true; } >"${BACKGROUND_SOURCES_FILE}.tmp"
+  # A full entry removes exactly that line. Anything else falls through to the
+  # fragment match below, which is deliberately loose — but only once the exact
+  # reading has been ruled out, so removing "dir:~/pics" cannot also take
+  # "dir:~/pics-old" with it.
+  if grep -qxF "$input" "$BACKGROUND_SOURCES_FILE" 2>/dev/null; then
+    { grep -vxF "$input" "$BACKGROUND_SOURCES_FILE" || true; } >"${BACKGROUND_SOURCES_FILE}.tmp"
     mv "${BACKGROUND_SOURCES_FILE}.tmp" "$BACKGROUND_SOURCES_FILE"
     echo "Removed: $input"
     return 0
