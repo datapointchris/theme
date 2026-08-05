@@ -22,34 +22,42 @@ if ! command -v parallel &>/dev/null; then
   exit 1
 fi
 
-# Generator -> output filename mapping
+# Generator -> output filename mapping.
+#
+# Every subscript is quoted, and must stay quoted. Unquoted, shfmt reads a
+# subscript as an arithmetic expression and reformats [ghostty-css] into
+# [ghostty - css] — a legal associative key, spaces and all, whose generator path
+# then resolves to "lib/generators/ghostty - css.sh". That file does not exist, so
+# the job was dropped by the existence check below and four generators
+# (ghostty-css, windows-terminal, firefox-based, hyprland-picker) stopped running
+# with the script still reporting every job successful.
 declare -A GENERATOR_OUTPUT=(
-  [ghostty]="ghostty.conf"
-  [ghostty - css]="ghostty.css"
-  [kitty]="kitty.conf"
-  [alacritty]="alacritty.toml"
-  [tmux]="tmux.conf"
-  [btop]="btop.theme"
-  [borders]="bordersrc"
-  [hyprland]="hyprland.conf"
-  [hyprlock]="hyprlock.conf"
-  [waybar]="waybar.css"
-  [rofi]="rofi.rasi"
-  [dunst]="dunst.conf"
-  [mako]="mako.conf"
-  [walker]="walker.css"
-  [swayosd]="swayosd.css"
-  [windows - terminal]="windows-terminal.json"
-  [icons]="icons.theme"
-  [hyprland - picker]="hyprland-picker.css"
-  [chromium]="chromium.theme"
-  [firefox - based]="userChrome.css"
-  [bat]="bat.tmTheme"
-  [sioyek]="sioyek.config"
-  [yazi]="flavor.toml"
+  ["ghostty"]="ghostty.conf"
+  ["ghostty-css"]="ghostty.css"
+  ["kitty"]="kitty.conf"
+  ["alacritty"]="alacritty.toml"
+  ["tmux"]="tmux.conf"
+  ["btop"]="btop.theme"
+  ["borders"]="bordersrc"
+  ["hyprland"]="hyprland.conf"
+  ["hyprlock"]="hyprlock.conf"
+  ["waybar"]="waybar.css"
+  ["rofi"]="rofi.rasi"
+  ["dunst"]="dunst.conf"
+  ["mako"]="mako.conf"
+  ["walker"]="walker.css"
+  ["swayosd"]="swayosd.css"
+  ["windows-terminal"]="windows-terminal.json"
+  ["icons"]="icons.theme"
+  ["hyprland-picker"]="hyprland-picker.css"
+  ["chromium"]="chromium.theme"
+  ["firefox-based"]="userChrome.css"
+  ["bat"]="bat.tmTheme"
+  ["sioyek"]="sioyek.config"
+  ["yazi"]="flavor.toml"
   # delta resolves its syntax theme through bat's cache, but the config fragment
   # itself is generated from theme.yml alone — no ordering constraint here.
-  [delta]="delta.conf"
+  ["delta"]="delta.conf"
 )
 
 # Parse arguments
@@ -136,9 +144,15 @@ for theme in "${themes[@]}"; do
   for gen in "${generators[@]}"; do
     output_file="$THEMES_DIR/$theme/${GENERATOR_OUTPUT[$gen]}"
     generator_script="$GENERATORS_DIR/${gen}.sh"
-    if [[ -f "$generator_script" ]]; then
-      echo "$generator_script|$theme_yml|$output_file|$theme|$gen|$results_dir|$total_jobs"
+    # A mapped generator with no script is a broken map, not a job to skip.
+    # Skipping is how four generators went missing for a month while every run
+    # reported success: the totals above are computed from the map, so even the
+    # job count looked right.
+    if [[ ! -f "$generator_script" ]]; then
+      echo "Error: generator '$gen' is in GENERATOR_OUTPUT but $generator_script does not exist" >&2
+      exit 1
     fi
+    echo "$generator_script|$theme_yml|$output_file|$theme|$gen|$results_dir|$total_jobs"
   done
 done >"$job_list"
 

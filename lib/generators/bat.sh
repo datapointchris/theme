@@ -51,6 +51,25 @@ GIT_ADD="${EXTENDED_GIT_ADD:-$BASE0B}"
 GIT_DELETE="${EXTENDED_GIT_DELETE:-$BASE08}"
 GIT_CHANGE="${EXTENDED_GIT_CHANGE:-$BASE0A}"
 
+# A UUID derived from the theme id rather than a fresh uuidgen. bat needs it
+# unique per theme, not unique per run — and a random one rewrote all of the
+# committed tmTheme files on every regeneration with nothing in the diff but the
+# UUID, which is how a reader learns to skip the file a real palette change would
+# have shown up in.
+#
+# sha1sum on Linux, shasum where coreutils is absent; both print "<hash>  -".
+theme_uuid() {
+  local sha_tool hash
+  if command -v sha1sum &>/dev/null; then
+    sha_tool=sha1sum
+  else
+    sha_tool=shasum
+  fi
+  hash=$(printf '%s' "${THEME_SLUG:-unknown}" | "$sha_tool" | cut -c1-32)
+  printf '%s-%s-%s-%s-%s\n' \
+    "${hash:0:8}" "${hash:8:4}" "${hash:12:4}" "${hash:16:4}" "${hash:20:12}"
+}
+
 generate() {
   cat <<'HEADER'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -773,7 +792,7 @@ HEADER
 
 	</array>
 	<key>uuid</key>
-	<string>$(uuidgen 2>/dev/null || echo "00000000-0000-0000-0000-000000000000")</string>
+	<string>$(theme_uuid)</string>
 </dict>
 </plist>
 EOF
