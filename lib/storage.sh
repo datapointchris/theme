@@ -471,9 +471,14 @@ log_background_action() {
   local machine
   machine=$(_storage_get_machine_id)
 
-  # Get current theme if not provided
+  # Get current theme if not provided. Through get_current_theme rather than by
+  # reading "$THEME_STATE_DIR/current": the current-theme file deliberately lives
+  # in THEME_LIVE_DIR, which does not move in development mode, so this read was
+  # the only one pointed at .dev-data — where it found a stale copy and recorded
+  # backgrounds against whatever theme was current the last time dev mode ran.
   if [[ -z "$theme" ]]; then
-    theme=$(cat "$THEME_STATE_DIR/current" 2>/dev/null || echo "unknown")
+    theme=$(get_current_theme)
+    [[ -z "$theme" ]] && theme="unknown"
   fi
 
   # Build record with all available context
