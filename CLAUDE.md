@@ -432,8 +432,9 @@ is not deterministic.
 | `lib/theme.sh` | Loads theme.yml into shell variables for generators |
 | `lib/neovim_generator.py` | Generates Neovim colorscheme from theme.yml |
 | `install.sh` | Installation script for fresh installs |
-| `scripts/migrate-history.sh` | One-time migration from old format |
 | `scripts/check-plugin-drift.sh` | Compares plugin themes against upstream; see Checking Plugin Themes Against Upstream |
+| `scripts/test-all-themes.sh` | Generates and validates every theme |
+| `scripts/test-theme-apps.sh` | Checks each app's generated output |
 | `tests/helpers.bash` | Suite isolation, fixture builders, command stubs — see Tests |
 | `tests/*.bats` | One file per concern; `bats tests/` runs them all |
 | `lib/generate-all.sh` | Runs every generator over every theme in parallel; owns the generator-to-filename map |
