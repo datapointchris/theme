@@ -16,7 +16,6 @@ setup() {
   use_fixture_themes_dir
   # theme.sh stands alone — no lib.sh, no storage.sh. Generators source only
   # this, which is why it must not grow a dependency on them.
-  # shellcheck source=../lib/theme.sh
   source "$THEME_ROOT/lib/theme.sh"
   FIXTURE=$(make_fixture_theme fixture-dark "Fixture Dark")
 }

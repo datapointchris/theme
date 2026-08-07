@@ -30,9 +30,7 @@ isolate_theme_state() {
 # itself; the redundant second source is deliberate, mirroring the CLI so the
 # suite exercises the same load order and the source guard stays covered.
 source_theme_libs() {
-  # shellcheck source=../lib/lib.sh
   source "$THEME_ROOT/lib/lib.sh"
-  # shellcheck source=../lib/storage.sh
   source "$THEME_ROOT/lib/storage.sh"
 }
 

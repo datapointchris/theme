@@ -29,7 +29,6 @@ source "$THEME_APP_DIR/lib/sync.sh"
 # get it; the notice simply does not appear. Re-running install.sh installs it.
 BASHSELFUPDATE_LOAD="${XDG_LIB_HOME:-$HOME/.local/lib}/bashselfupdate/load.bash"
 if [[ -f "$BASHSELFUPDATE_LOAD" ]]; then
-  # shellcheck source=/dev/null
   source "$BASHSELFUPDATE_LOAD"
 fi
 

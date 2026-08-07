@@ -15,7 +15,6 @@ THEME_APP_DIR="$(cd "$THEME_LIB_DIR/.." && pwd)"
 # answer while scripts/test-all-themes.sh, which sources only this file, took
 # the other, and on Arch that silently skipped Hyprland, Waybar, ghostty, kitty
 # and the wallpaper. storage.sh also owns THEME_STATE_DIR and the history paths.
-# shellcheck source=./storage.sh
 source "$THEME_LIB_DIR/storage.sh"
 
 # Always production, unlike THEME_STATE_DIR: apps watch this directory, so dev
@@ -403,7 +402,6 @@ apply_firefox_based() {
   if [[ ! -f "$browser_profiles_lib" ]]; then
     return 1
   fi
-  # shellcheck source=browser-profiles.sh
   source "$browser_profiles_lib"
 
   local applied=0

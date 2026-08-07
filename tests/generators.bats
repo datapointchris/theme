@@ -251,7 +251,6 @@ count_theme_artifacts() {
   # THEME_APP_ARTIFACTS is what `theme current` lists. A generator added without
   # a row there stays invisible even though apply is deploying it, so the two
   # lists have to name the same set.
-  # shellcheck source=../lib/lib.sh
   source "$THEME_ROOT/lib/lib.sh"
 
   local produced=" neovim ${MAP_ARTIFACT[*]} "
