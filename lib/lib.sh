@@ -749,6 +749,15 @@ set_opacity() {
 # Background cache directory
 BACKGROUND_CACHE_DIR="${BACKGROUND_CACHE_DIR:-$HOME/.cache/theme/backgrounds}"
 
+# Where the wallpaper handed to the compositor is rendered. Regenerable and
+# deleted a minute later — the timestamp in the name exists only to defeat
+# macOS's wallpaper cache — so it is cache, not data. It used to be written to
+# ~/.local/share/theme, which is the installed git checkout, so every apply left
+# an untracked PNG in that repo's `git status`. The stable
+# ~/.local/share/theme/background.png is deliberate and stays: hyprpaper.conf in
+# dotfiles names that exact path for its restart fallback.
+BACKGROUND_RENDER_DIR="${BACKGROUND_RENDER_DIR:-$HOME/.cache/theme/current}"
+
 # Background sources config file (path references, not copies)
 BACKGROUND_SOURCES_FILE="${BACKGROUND_SOURCES_FILE:-$HOME/.config/theme/background-sources.conf}"
 
@@ -1359,7 +1368,7 @@ apply_background() {
     return 1
   fi
 
-  local background_dir="$HOME/.local/share/theme"
+  local background_dir="$BACKGROUND_RENDER_DIR"
   mkdir -p "$background_dir"
 
   # Use unique filename to bypass macOS background cache
@@ -1452,7 +1461,7 @@ rotate_background() {
     return 1
   fi
 
-  local background_dir="$HOME/.local/share/theme"
+  local background_dir="$BACKGROUND_RENDER_DIR"
   mkdir -p "$background_dir"
 
   local timestamp
