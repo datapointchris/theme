@@ -88,11 +88,22 @@ declare -A VARIANT_OF=(
   ["solarized-osaka"]="dark"
 )
 
+# Comparisons whose answer is already decided, and why. A drift check that keeps
+# re-raising a settled question trains you to skim its output, which is how the
+# unsettled ones get missed. Recorded here rather than in a planning file so the
+# decision arrives with the finding it answers; removing the theme from
+# UPSTREAM_TERMINAL instead would silently demote it to the weaker history check
+# and flag it again in a different shape.
+declare -A SETTLED=(
+  ["solarized-osaka"]="ours is classic Solarized (Schoonover) by choice — craftzdog's Osaka variant tweaks every ANSI slot and sets bright.black to the background, which would make bright-black text invisible"
+)
+
 colors_of() { { rg -o "#?\b[0-9a-fA-F]{6}\b" "$1" || true; } | tr -d '#' | tr 'A-F' 'a-f' | sort -u; }
 
 exact=0
 flagged=0
 skipped=0
+settled=0
 
 for id in "${themes[@]}"; do
   yml="themes/$id/theme.yml"
@@ -100,6 +111,12 @@ for id in "${themes[@]}"; do
     echo "  ?  $id — no theme.yml"
     continue
   }
+  if [[ -n "${SETTLED[$id]:-}" ]]; then
+    printf "  ==  %-22s settled: %s\n" "$id" "${SETTLED[$id]}"
+    ((++settled))
+    continue
+  fi
+
   repo=$(yq -r '.meta.plugin // ""' "$yml")
   [[ -n "$repo" && "$repo" != "null" ]] || {
     printf "  -  %-22s no upstream plugin (built-in)\n" "$id"
@@ -178,5 +195,5 @@ for id in "${themes[@]}"; do
 done
 
 echo ""
-echo "  $exact clean, $flagged to review, $skipped skipped"
+echo "  $exact clean, $flagged to review, $settled settled, $skipped skipped"
 [[ $flagged -eq 0 ]]

@@ -338,11 +338,18 @@ runtime. Worth running once or twice a year, and after adding a plugin theme.
 Two things it can find, and the second is the common one:
 
 - **Upstream changed a colour** after the transcription.
-- **The transcription was wrong from the start.** Both real findings so far were
-  this. `nightfox` had a bright-black of `#475072`, a blue-purple, where upstream
-  computes `#575860`, a grey — `Shade.new("#393b44", 0.15)`. `solarized-osaka`
-  was transcribed as *classic* Solarized rather than craftzdog's variant, which
-  tweaks every ANSI value (`#dc322f` vs `#db302d`, `#268bd2` vs `#268bd3`).
+- **The transcription was wrong from the start.** This was the one real finding:
+  `nightfox` had a bright-black of `#475072`, a blue-purple, where upstream
+  computes `#575860`, a grey — `Shade.new("#393b44", 0.15)`.
+
+A third outcome the check cannot tell from the second: **deliberate divergence.**
+`solarized-osaka` carries *classic* Solarized (Schoonover) rather than craftzdog's
+variant, which tweaks every ANSI value (`#dc322f` vs `#db302d`, `#268bd2` vs
+`#268bd3`). That is the decision, not a defect — do not "fix" it toward upstream.
+Adopting the variant verbatim also sets `bright.black` to `#001419`, the
+background, making bright-black text invisible. Decisions like this go in the
+script's `SETTLED` map with their reason, so the check reports them as settled
+and stops re-raising a question already answered.
 
 It picks its method per theme:
 
