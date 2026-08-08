@@ -28,7 +28,9 @@ _jq_normalize_history() {
       else .
       end;
     # The platform label drifted for the Arch box (arch -> archlinux). Collapse to
-    # "arch", which is what detect_platform emits going forward.
+    # "arch", which is what detect_platform emits going forward. Same mapping as
+    # _canonicalize_platform below, restated because jq cannot call into shell —
+    # change one and change the other.
     def normalize_platform:
       if . == "archlinux" then "arch" else . end;
     # Canonicalize .machine to one label per physical machine. Handles the legacy
@@ -52,25 +54,41 @@ _jq_normalize_history() {
 JQ
 }
 
-detect_platform() {
-  if [[ -n "${PLATFORM:-}" ]]; then
-    echo "$PLATFORM"
-    return
-  fi
+# The vocabulary every platform guard in lib.sh compares against. dotfiles owns
+# the other end of this contract and spells the Arch box "archlinux" — it exports
+# PLATFORM from ~/.env, which short-circuits the detection below, so that label
+# arrives here on every real Arch shell. Returning it raw made each `== "arch"`
+# guard false and `theme apply` skipped ghostty, kitty, Hyprland, Waybar and the
+# wallpaper with no error, while the unguarded apps (tmux, btop, bat) applied —
+# a half-themed machine that looks like a sync failure. Normalize at the single
+# point that produces the label rather than teaching two repos one vocabulary.
+_canonicalize_platform() {
+  case "$1" in
+    archlinux) echo "arch" ;;
+    *) echo "$1" ;;
+  esac
+}
 
-  if [[ "$OSTYPE" == "darwin"* ]]; then
-    echo "macos"
+detect_platform() {
+  local label
+
+  if [[ -n "${PLATFORM:-}" ]]; then
+    label="$PLATFORM"
+  elif [[ "$OSTYPE" == "darwin"* ]]; then
+    label="macos"
   elif [[ -f /proc/version ]] && grep -qi microsoft /proc/version; then
-    echo "wsl"
+    label="wsl"
   elif [[ -f /etc/arch-release ]]; then
-    echo "arch"
+    label="arch"
   elif [[ -f /etc/os-release ]]; then
     # A Linux system file, absent wherever this lints on macOS.
     . /etc/os-release
-    echo "${ID:-linux}"
+    label="${ID:-linux}"
   else
-    echo "unknown"
+    label="unknown"
   fi
+
+  _canonicalize_platform "$label"
 }
 
 _storage_get_machine_id() {

@@ -29,6 +29,28 @@ setup() {
   assert_output "arch"
 }
 
+@test "a drifted PLATFORM label is canonicalized before dispatch" {
+  # The other half of the same bug, and the half that survived the first fix.
+  # Agreeing on "arch" inside this repo settled nothing, because the value does
+  # not originate here: dotfiles writes `export PLATFORM=archlinux` into ~/.env
+  # from the archlinux-personal-workstation manifest, and that short-circuits
+  # detection on every real Arch shell. Passing it through raw made every
+  # `== "arch"` guard in lib.sh false while the unguarded apps kept applying, so
+  # the machine came out half-themed with an empty skipped list.
+  PLATFORM=archlinux run detect_platform
+  assert_success
+  assert_output "arch"
+}
+
+@test "an unrecognized PLATFORM label is passed through untouched" {
+  # Canonicalizing is a rename of known drift, not an allowlist. A label with no
+  # mapping has to survive so the dead-branch test above stays the thing that
+  # catches an unknown platform, rather than it being silently rewritten here.
+  PLATFORM=ubuntu run detect_platform
+  assert_success
+  assert_output "ubuntu"
+}
+
 @test "detects the host it is running on" {
   run detect_platform
   assert_success
