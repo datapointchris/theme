@@ -1,3 +1,10 @@
 .envrc
 .dev-data/
 .planning
+
+# The installer clones this repo to ~/.local/share/theme, and set_desktop_wallpaper
+# writes the hyprpaper restart fallback to ~/.local/share/theme/background.png —
+# so on Arch the live wallpaper lands inside the checkout. The path is named by
+# dotfiles' hyprpaper.conf and cannot move; ignoring it keeps `theme update` from
+# running against a dirty tree.
+background.png
