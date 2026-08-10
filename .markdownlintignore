@@ -4,14 +4,6 @@
 # one authors by hand.
 CHANGELOG.md
 
-# The only three files under analysis/ that a script writes — their table
-# separator style comes from the generator, so linting them means editing
-# output the next run overwrites. The other 26 docs there are hand-authored
-# and are linted normally.
-analysis/CANONICAL_COMPARISON_RESULTS.md
-analysis/CANONICAL_ML_EXPERIMENT.md
-analysis/NEOVIM_COMPARISON_RESULTS.md
-
 # Planning documents - ephemeral, not committed
 .planning/**
 
