@@ -194,7 +194,10 @@ Both commands come from [`bashselfupdate`](https://github.com/datapointchris/bas
 - **Windows Terminal** — terminal colors
 
 Additional generators (Alacritty, VS Code, walker, swayosd, GTK icons) live in
-`lib/generators/` and can be run directly when needed.
+`lib/generators/`. Run them through `lib/generate-all.sh`, never one at a time —
+the script owns the generator-to-filename map, and a one-off invocation leaves a
+theme with a file set no other theme has. VS Code differs only in that `theme
+apply` does not deploy its output; it is generated with everything else.
 
 ## Theme Types
 
