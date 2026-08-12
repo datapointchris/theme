@@ -327,6 +327,19 @@ theme costs 0.25s.
 - **A generator runs once per theme, so per-key `yq` calls are the cost**: reading
   one `theme.yml` was ~80 yq spawns and five seconds before `load_theme` was made
   a single pass. Add to the one yq program rather than alongside it.
+- **An apply discards stderr, so a warning needs the array and not `echo`.**
+  `apply_theme_to_apps` calls every `apply_*` as `apply_x "$theme" 2>/dev/null`,
+  which is what keeps `cp` and reload noise off the screen — and it means anything
+  written to stderr *during* an apply is thrown away. `apply_warn` appends to
+  `APPLY_WARNINGS`, which the caller prints after the per-app ticks. A warning
+  nobody can see is worse than none, because a quiet run reads as a correct one.
+- **The one failure with no output is Neovim.** A plugin theme names a colorscheme
+  this tool does not ship, so a machine that never installed it gets a terminal
+  that changes colour and an editor that does not — while every tick still says
+  the apply worked. `check_neovim_colorscheme` looks for the
+  `colors/<name>.{lua,vim}` that `:colorscheme` actually needs, deliberately not
+  asking lazy.nvim where it puts plugins, so the `vim.pack` migration cannot turn
+  the check into "always fine".
 - **Config generation is seconds; the minutes are the backgrounds.** Measured
   2026-08-11: a full `generate-all.sh` over every theme and every generator took
   7.0s wall (628% CPU under GNU parallel), and one theme takes ~1.2s. The two get
@@ -449,9 +462,13 @@ When it flags something, read the upstream palette and fix `theme.yml`, then
 forge-toolchain, which runs `tests/*.bats` flat. `tests/helpers.bash` is shared.
 
 **Every test must isolate before sourcing anything.** `isolate_theme_state`
-repoints `HOME` at the sandbox and clears `THEME_ENV` and `PLATFORM`, and it has
-to run first: both libraries read `HOME` and `THEME_ENV` at *source* time to
-decide where state lives. `THEME_ENV` is the one that bites — `.envrc` sets it to
+repoints `HOME` **and the four XDG variables** at the sandbox and clears
+`THEME_ENV` and `PLATFORM`, and it has to run first: both libraries read `HOME`
+and `THEME_ENV` at *source* time to decide where state lives. The XDG half is
+newer and was added the day it was needed — a developer's shell exports them as
+absolute paths, so overriding `HOME` alone left the Neovim colorscheme check
+reading the real `~/.local/share/nvim` and answering from whichever plugins the
+machine running the suite happened to have. `THEME_ENV` is the one that bites — `.envrc` sets it to
 `development` through direnv, so a suite inheriting a developer's shell writes its
 history into `.dev-data` and passes while editing state a later manual run reads
 back. `THEMES_DIR` is repointed separately by `use_fixture_themes_dir`, because it

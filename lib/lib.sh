@@ -275,6 +275,84 @@ install_themed_artifact() {
   ln -sfn "$named" "$dir/$pointer"
 }
 
+# Warnings raised during an apply, printed together at the end.
+#
+# Every apply_* call in apply_theme_to_apps runs with stderr redirected to
+# /dev/null, deliberately — that is what keeps cp and reload noise off the screen.
+# So anything written to stderr during an apply is discarded, and a warning nobody
+# can see is worse than no warning, because a quiet run reads as a correct one.
+# This array is the channel that survives the redirect.
+APPLY_WARNINGS=()
+
+apply_warn() {
+  APPLY_WARNINGS+=("$1")
+}
+
+# Whether Neovim could resolve this colorscheme by name.
+#
+# `:colorscheme <name>` needs a `colors/<name>.{lua,vim}` somewhere on the
+# runtimepath, so that file is what gets looked for rather than asking a particular
+# plugin manager where it keeps things — lazy.nvim installs under `nvim/lazy/`,
+# vim.pack under `nvim/site/pack/`, and a migration between them must not silently
+# turn this check into "always fine".
+neovim_colorscheme_available() {
+  local name="$1"
+  local config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
+  local data_home="${XDG_DATA_HOME:-$HOME/.local/share}"
+
+  # Tested rather than globbed: these two carry no metacharacter, so `nullglob`
+  # would not drop them when they do not exist — they would stay in the array as
+  # literal words and the check would answer "found" on every machine.
+  local candidate
+  for candidate in "$config_home/nvim/colors/$name.lua" "$config_home/nvim/colors/$name.vim"; do
+    if [[ -f "$candidate" ]]; then
+      return 0
+    fi
+  done
+
+  local restore
+  restore=$(shopt -p nullglob globstar)
+  shopt -s nullglob globstar
+  local found=("$data_home"/nvim/**/colors/"$name".lua "$data_home"/nvim/**/colors/"$name".vim)
+  eval "$restore"
+
+  [[ ${#found[@]} -gt 0 ]]
+}
+
+# Warn when Neovim cannot honour the theme being applied.
+#
+# A plugin theme names a colorscheme this tool does not ship. On a machine that
+# never installed it — no network, a locked-down box, a plugin sync that has not
+# run — the terminal changes colour and the editor does not, with nothing on screen
+# saying so. That silence is the whole reason this exists; a fallback that nobody
+# is told about is indistinguishable from the theme having applied.
+#
+# Only plugin themes are checked. A theme with no `plugin` is either generated here
+# or built into Neovim (retrobox), and neither of those can be missing.
+check_neovim_colorscheme() {
+  local theme="$1"
+  local theme_file="$THEMES_DIR/$theme/theme.yml"
+
+  [[ -f "$theme_file" ]] || return 0
+  command -v nvim &>/dev/null || return 0
+
+  local plugin
+  plugin=$(yq '.meta.plugin // ""' "$theme_file" 2>/dev/null)
+  [[ -n "$plugin" ]] || return 0
+
+  local colorscheme
+  colorscheme=$(yq '.meta.neovim_colorscheme_name // ""' "$theme_file" 2>/dev/null)
+  [[ -n "$colorscheme" ]] || return 0
+
+  neovim_colorscheme_available "$colorscheme" && return 0
+
+  if [[ -d "$THEMES_DIR/$theme/neovim" ]]; then
+    apply_warn "Neovim colorscheme '$colorscheme' is not installed ($plugin) — falling back to this theme's generated colorscheme, which is not what its author tuned."
+  else
+    apply_warn "Neovim colorscheme '$colorscheme' is not installed ($plugin) and this theme ships no generated fallback — the editor keeps its previous colours."
+  fi
+}
+
 # Apply Ghostty theme
 # Installs as themes/<id>.conf with themes/current.conf pointing at it
 apply_ghostty() {
@@ -1793,6 +1871,8 @@ apply_theme_to_apps() {
   local applied=()
   local skipped=()
 
+  APPLY_WARNINGS=()
+
   _print_app_status() {
     local app="$1"
     local success="$2"
@@ -1984,8 +2064,22 @@ apply_theme_to_apps() {
     fi
   fi
 
+  check_neovim_colorscheme "$theme"
+
   # Record current theme
   set_current_theme "$theme"
+
+  # After the per-app ticks, so the last thing on screen is the thing that needs
+  # doing rather than a wall of successes it would scroll past.
+  if [[ ${#APPLY_WARNINGS[@]} -gt 0 ]]; then
+    echo "" >&2
+    echo "  ⚠  APPLIED WITH WARNINGS" >&2
+    local warning
+    for warning in "${APPLY_WARNINGS[@]}"; do
+      echo "     $warning" >&2
+    done
+    echo "" >&2
+  fi
 
   # Return results
   echo "APPLIED:${applied[*]:-none}"

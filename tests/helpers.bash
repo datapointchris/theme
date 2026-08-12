@@ -19,6 +19,18 @@ isolate_theme_state() {
   mkdir -p "$HOME"
   unset THEME_ENV PLATFORM
 
+  # Overriding HOME does not isolate anything that reads an XDG variable, because
+  # a developer's shell exports them as absolute paths. The Neovim colorscheme
+  # check was the first library code to read one, and it answered against the real
+  # ~/.local/share/nvim — so a test asserting "this colorscheme is not installed"
+  # passed or failed on which plugins the machine running the suite happened to
+  # have. Pointed at the sandbox rather than unset, so the fallbacks are not what
+  # gets exercised.
+  export XDG_CONFIG_HOME="$HOME/.config"
+  export XDG_DATA_HOME="$HOME/.local/share"
+  export XDG_STATE_HOME="$HOME/.local/state"
+  export XDG_CACHE_HOME="$HOME/.cache"
+
   # First on PATH so stub_command can shadow anything the libraries shell out
   # to. Prepended once, here, rather than per stub, which would stack a copy of
   # PATH for every stub a test installs.
