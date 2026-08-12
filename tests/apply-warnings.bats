@@ -86,12 +86,27 @@ installed_colorscheme() {
 }
 
 @test "the warning names the fallback when the theme ships one" {
+  # The fallback is deliberately not named after the colorscheme it stands in
+  # for, so a warning that only said "falling back" would leave the reader with
+  # nothing to type.
   plugin_theme oceanic upstream/oceanic-next OceanicNext
-  mkdir -p "$THEMES_DIR/oceanic/neovim"
+  mkdir -p "$THEMES_DIR/oceanic/neovim/colors"
+  touch "$THEMES_DIR/oceanic/neovim/colors/theme-oceanic.lua"
 
   check_neovim_colorscheme oceanic
 
-  assert_regex "${APPLY_WARNINGS[0]}" "falling back"
+  assert_regex "${APPLY_WARNINGS[0]}" "theme-oceanic"
+}
+
+@test "an empty neovim directory is not mistaken for a fallback" {
+  # The directory is created by the generator before it writes anything, so the
+  # colorscheme file is what says the fallback is really there.
+  plugin_theme oceanic upstream/oceanic-next OceanicNext
+  mkdir -p "$THEMES_DIR/oceanic/neovim/colors"
+
+  check_neovim_colorscheme oceanic
+
+  assert_regex "${APPLY_WARNINGS[0]}" "no generated fallback"
 }
 
 @test "nothing is checked when there is no neovim on the machine" {

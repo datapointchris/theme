@@ -358,8 +358,15 @@ check_neovim_colorscheme() {
 
   neovim_colorscheme_available "$colorscheme" && return 0
 
-  if [[ -d "$THEMES_DIR/$theme/neovim" ]]; then
-    apply_warn "Neovim colorscheme '$colorscheme' is not installed ($plugin) — falling back to this theme's generated colorscheme, which is not what its author tuned."
+  local id
+  id=$(yq '.meta.id // ""' "$theme_file" 2>/dev/null)
+  [[ -n "$id" ]] || id="$theme"
+
+  # Named, not just announced: the fallback is only useful to someone who can
+  # type it, and it is deliberately not the name the theme advertises.
+  local fallback="theme-$id"
+  if [[ -f "$THEMES_DIR/$theme/neovim/colors/$fallback.lua" ]]; then
+    apply_warn "Neovim colorscheme '$colorscheme' is not installed ($plugin) — falling back to '$fallback', generated from this palette rather than tuned by the theme's author."
   else
     apply_warn "Neovim colorscheme '$colorscheme' is not installed ($plugin) and this theme ships no generated fallback — the editor keeps its previous colours."
   fi
