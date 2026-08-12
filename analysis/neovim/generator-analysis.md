@@ -86,7 +86,7 @@ The same principles apply here:
 
 ## Recommendation
 
-Update `neovim_generator.py` to:
+Update the Neovim generator (`lib/generators/neovim.py`) to:
 
 1. **Check for `syntax_*` fields first**:
 

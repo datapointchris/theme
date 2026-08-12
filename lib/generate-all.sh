@@ -56,6 +56,10 @@ declare -A GENERATOR_OUTPUT=(
   ["sioyek"]="sioyek.config"
   ["yazi"]="flavor.toml"
   ["aerc"]="aerc.styleset"
+  # The one generator whose output is a directory rather than a file, and the
+  # one written in Python. Both are incidental to the job runner, which only
+  # ever passes this through as the second argument.
+  ["neovim"]="neovim"
   # delta resolves its syntax theme through bat's cache, but the config fragment
   # itself is generated from theme.yml alone — no ordering constraint here.
   ["delta"]="delta.conf"
@@ -144,13 +148,19 @@ for theme in "${themes[@]}"; do
   theme_yml="$THEMES_DIR/$theme/theme.yml"
   for gen in "${generators[@]}"; do
     output_file="$THEMES_DIR/$theme/${GENERATOR_OUTPUT[$gen]}"
-    generator_script="$GENERATORS_DIR/${gen}.sh"
+    generator_script=""
+    for candidate in "$GENERATORS_DIR/${gen}.sh" "$GENERATORS_DIR/${gen}.py"; do
+      if [[ -f "$candidate" ]]; then
+        generator_script="$candidate"
+        break
+      fi
+    done
     # A mapped generator with no script is a broken map, not a job to skip.
     # Skipping is how four generators went missing for a month while every run
     # reported success: the totals above are computed from the map, so even the
     # job count looked right.
-    if [[ ! -f "$generator_script" ]]; then
-      echo "Error: generator '$gen' is in GENERATOR_OUTPUT but $generator_script does not exist" >&2
+    if [[ -z "$generator_script" ]]; then
+      echo "Error: generator '$gen' is in GENERATOR_OUTPUT but $GENERATORS_DIR/$gen.{sh,py} does not exist" >&2
       exit 1
     fi
     echo "$generator_script|$theme_yml|$output_file|$theme|$gen|$results_dir|$total_jobs"

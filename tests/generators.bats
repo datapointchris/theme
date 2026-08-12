@@ -48,13 +48,26 @@ map_keys() {
   printf '%s\n' "${!MAP_ARTIFACT[@]}"
 }
 
+# Generators are bash except neovim, which is Python because it writes a Lua tree
+# rather than a config file. Resolution order matches generate-all.sh's.
+generator_script() {
+  local name="$1" candidate
+  for candidate in "$GENERATORS_DIR/$name.sh" "$GENERATORS_DIR/$name.py"; do
+    if [[ -f "$candidate" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
 # Every distinct filename across every theme directory, and how many themes carry
 # it. Built with globs rather than `find -exec basename` — 25 themes times 24
 # artifacts is 600 process spawns, which was most of this file's runtime.
 count_theme_artifacts() {
   ARTIFACT_COUNT=()
-  # Files only. neovim/ is a directory and the one artifact themes legitimately
-  # differ on — only generated themes carry it.
+  # Files only, which leaves out neovim/ — a directory, and the one artifact
+  # whose contents are named after the theme rather than after the generator.
   local path name
   for path in "$THEME_ROOT"/themes/*/*; do
     [[ -f "$path" ]] || continue
@@ -65,19 +78,21 @@ count_theme_artifacts() {
 
 @test "no generator script is missing from the map" {
   local script name
-  for script in "$GENERATORS_DIR"/*.sh; do
-    name=$(basename "$script" .sh)
+  for script in "$GENERATORS_DIR"/*.sh "$GENERATORS_DIR"/*.py; do
+    [[ -f "$script" ]] || continue
+    name=$(basename "$script")
+    name="${name%.*}"
     [[ "$UNWIRED_GENERATORS" == *" $name "* ]] && continue
     map_keys | grep -qxF "$name" \
-      || fail "$name.sh has no GENERATOR_OUTPUT entry, so generate-all.sh never runs it"
+      || fail "$(basename "$script") has no GENERATOR_OUTPUT entry, so generate-all.sh never runs it"
   done
 }
 
 @test "no map entry is missing its generator script" {
   local name
   while read -r name; do
-    [[ -f "$GENERATORS_DIR/$name.sh" ]] \
-      || fail "GENERATOR_OUTPUT names '$name' but $GENERATORS_DIR/$name.sh does not exist"
+    generator_script "$name" >/dev/null \
+      || fail "GENERATOR_OUTPUT names '$name' but $GENERATORS_DIR/$name.{sh,py} does not exist"
   done < <(map_keys)
 }
 
@@ -161,14 +176,18 @@ count_theme_artifacts() {
   sample_theme=$(basename "$(find "$THEME_ROOT/themes" -mindepth 1 -maxdepth 1 -type d | sort | head -1)")
   local theme_yml="$THEME_ROOT/themes/$sample_theme/theme.yml"
 
-  local gen artifact
+  local gen artifact script
   for gen in "${!MAP_ARTIFACT[@]}"; do
     artifact="${MAP_ARTIFACT[$gen]}"
+    script=$(generator_script "$gen")
 
-    run "$GENERATORS_DIR/$gen.sh" "$theme_yml" "$BATS_TEST_TMPDIR/$artifact"
+    run "$script" "$theme_yml" "$BATS_TEST_TMPDIR/$artifact"
     assert_success
 
-    run diff "$THEME_ROOT/themes/$sample_theme/$artifact" "$BATS_TEST_TMPDIR/$artifact"
+    # Recursive because neovim's artifact is a directory, and excluding the one
+    # file the generator deliberately does not rewrite — overrides.lua is where a
+    # theme's hand-tuning lives, so a customized one is correct, not stale.
+    run diff -r -x overrides.lua "$THEME_ROOT/themes/$sample_theme/$artifact" "$BATS_TEST_TMPDIR/$artifact"
     assert_success
   done
 }
@@ -212,6 +231,62 @@ count_theme_artifacts() {
   assert_failure
 }
 
+@test "a plugin theme's generated colorscheme does not take the plugin's name" {
+  # The pin on the whole reason these are prefixed. A plugin theme's id is
+  # usually the plugin's own colorscheme name — kanagawa, gruvbox, nordic and
+  # nine others — so an unprefixed colors/kanagawa.lua would sit on the
+  # runtimepath beside rebelot/kanagawa.nvim's, and which one `:colorscheme`
+  # reaches is whichever the runtimepath happens to list first.
+  local theme_yml
+  theme_yml=$(make_fixture_theme kanagawa "Kanagawa" plugin)
+
+  run "$GENERATORS_DIR/neovim.py" "$theme_yml" "$BATS_TEST_TMPDIR/nvim"
+  assert_success
+
+  assert [ -f "$BATS_TEST_TMPDIR/nvim/colors/theme-kanagawa.lua" ]
+  assert [ ! -f "$BATS_TEST_TMPDIR/nvim/colors/kanagawa.lua" ]
+}
+
+@test "a theme with no plugin keeps its own name" {
+  # The other half: for these the generated colorscheme *is* the theme rather
+  # than a stand-in, nothing upstream can collide with it, and the names are
+  # already recorded in history.jsonl.
+  local theme_yml
+  theme_yml=$(make_fixture_theme smyck "Smyck" generated)
+
+  run "$GENERATORS_DIR/neovim.py" "$theme_yml" "$BATS_TEST_TMPDIR/nvim"
+  assert_success
+
+  assert [ -f "$BATS_TEST_TMPDIR/nvim/colors/smyck.lua" ]
+}
+
+@test "the generated colorscheme sets the name it is filed under" {
+  # `:colorscheme` finds the file, then the file sets vim.g.colors_name. The two
+  # disagreeing is silent — the theme loads and every consumer of colors_name
+  # reports a colorscheme that cannot be selected.
+  local theme_yml
+  theme_yml=$(make_fixture_theme kanagawa "Kanagawa" plugin)
+
+  "$GENERATORS_DIR/neovim.py" "$theme_yml" "$BATS_TEST_TMPDIR/nvim" >/dev/null
+
+  run grep -F 'vim.g.colors_name = "theme-kanagawa"' "$BATS_TEST_TMPDIR/nvim/lua/theme_kanagawa/init.lua"
+  assert_success
+}
+
+@test "hand-tuned overrides survive regeneration" {
+  # The one file the generator must not rewrite. It is where a theme's manual
+  # corrections live, and regeneration is routine.
+  local theme_yml
+  theme_yml=$(make_fixture_theme smyck "Smyck" generated)
+
+  "$GENERATORS_DIR/neovim.py" "$theme_yml" "$BATS_TEST_TMPDIR/nvim" >/dev/null
+  echo '-- hand written' >"$BATS_TEST_TMPDIR/nvim/lua/smyck/overrides.lua"
+  "$GENERATORS_DIR/neovim.py" "$theme_yml" "$BATS_TEST_TMPDIR/nvim" >/dev/null
+
+  run cat "$BATS_TEST_TMPDIR/nvim/lua/smyck/overrides.lua"
+  assert_output "-- hand written"
+}
+
 #==============================================================================
 # REPO-WIDE ARTIFACT UNIFORMITY
 #==============================================================================
@@ -219,8 +294,8 @@ count_theme_artifacts() {
 @test "every theme carries the same artifact set" {
   # The check that catches both halves of the same problem: a new theme built
   # while a generator was missing from the map, and a stale file left behind by a
-  # format migration. neovim/ is the one legitimate difference — only generated
-  # themes have it, and being a directory it is not counted here.
+  # format migration. neovim/ is a directory, so it is covered by the check below
+  # that every theme carries a fallback colorscheme rather than by this one.
   count_theme_artifacts
 
   local total="${ARTIFACT_COUNT["theme.yml"]}"
@@ -229,6 +304,22 @@ count_theme_artifacts() {
   local artifact
   for artifact in "${!ARTIFACT_COUNT[@]}"; do
     assert_equal "$artifact:${ARTIFACT_COUNT[$artifact]}" "$artifact:$total"
+  done
+}
+
+@test "every theme ships a Neovim colorscheme, under the name its source implies" {
+  # Uniformity for the one artifact the file-counting check above cannot see.
+  # A theme without this has no fallback, so on a machine whose colorscheme
+  # plugin is missing the terminal changes and the editor does not.
+  local dir id expected
+  for dir in "$THEME_ROOT"/themes/*/; do
+    id=$(basename "$dir")
+    if grep -qE '^\s*neovim_colorscheme_source:\s*"?plugin"?\s*$' "$dir/theme.yml"; then
+      expected="theme-$id"
+    else
+      expected="$id"
+    fi
+    assert [ -f "$dir/neovim/colors/$expected.lua" ]
   done
 }
 

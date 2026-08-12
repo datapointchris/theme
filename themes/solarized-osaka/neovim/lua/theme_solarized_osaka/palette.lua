@@ -1,0 +1,141 @@
+-- Auto-generated palette from theme.yml
+-- Theme: Unknown
+-- Source: Unknown
+
+local M = {}
+
+M.palette = {
+  -- Base16 palette
+  base00 = "#001419",
+  base01 = "#002b36",
+  base02 = "#073642",
+  base03 = "#586e75",
+  base04 = "#657b83",
+  base05 = "#839395",
+  base06 = "#a9b1b1",
+  base07 = "#eee8d5",
+  base08 = "#db302d",
+  base09 = "#c94c16",
+  base0A = "#b28500",
+  base0B = "#849900",
+  base0C = "#29a298",
+  base0D = "#268bd3",
+  base0E = "#d23681",
+  base0F = "#f55350",
+
+  -- Extended palette
+  diagnostic_error = "#db302d",
+  diagnostic_warning = "#b28500",
+  diagnostic_info = "#268bd3",
+  diagnostic_hint = "#29a298",
+  diagnostic_ok = "#859900",
+  syntax_comment = "#576d74",
+  syntax_string = "#29a298",
+  syntax_function = "#268bd3",
+  syntax_keyword = "#849900",
+  syntax_type = "#b28500",
+  syntax_number = "#29a298",
+  syntax_constant = "#c94c16",
+  syntax_operator = "#849900",
+  syntax_variable = "#9eabac",
+  syntax_parameter = "#c94c16",
+  syntax_preproc = "#db302d",
+  syntax_special = "#c94c16",
+  syntax_punctuation = "#849900",
+  syntax_tag = "#849900",
+  syntax_attribute = "#268bd3",
+  ui_accent = "#268bd3",
+  ui_border = "#073642",
+  ui_selection = "#073642",
+  ui_float_bg = "#002b36",
+  ui_cursor_line = "#073642",
+  git_add = "#849900",
+  git_change = "#b28500",
+  git_delete = "#db302d",
+}
+
+M.special = {
+  background = "#001419",
+  foreground = "#839395",
+  cursor = "#839395",
+  cursor_text = "#001419",
+  selection_bg = "#1a6397",
+  selection_fg = "#839395",
+  border = "#002b36",
+  panel = "#001419",
+}
+
+-- Semantic theme colors derived from palette
+M.theme = {
+  ui = {
+    bg = M.palette.base00,
+    bg_dim = M.palette.bg_dim or M.palette.base00,
+    bg_p1 = M.palette.base01,
+    bg_p2 = M.palette.base02,
+    bg_m1 = M.palette.base01,
+    bg_m3 = M.palette.base01,
+    bg_gutter = M.palette.base00,
+    bg_visual = M.palette.base02,
+    bg_search = M.palette.base0A,
+    fg = M.palette.base05,
+    fg_dim = M.palette.base04,
+    fg_reverse = M.palette.base00,
+    special = M.palette.base0C,
+    nontext = M.palette.base03,
+    whitespace = M.palette.base02,
+    float = {
+      fg = M.palette.base05,
+      bg = M.palette.base01,
+      fg_border = M.palette.base04,
+      bg_border = M.palette.base01,
+    },
+    pmenu = {
+      fg = M.palette.base05,
+      fg_sel = M.palette.base05,
+      bg = M.palette.base01,
+      bg_sel = M.palette.base02,
+      bg_sbar = M.palette.base02,
+      bg_thumb = M.palette.base03,
+    },
+  },
+  syn = {
+    comment = M.palette.syntax_comment,
+    string = M.palette.syntax_string,
+    number = M.palette.syntax_number,
+    constant = M.palette.syntax_constant,
+    identifier = M.palette.base0D,
+    parameter = M.palette.syntax_parameter,
+    fun = M.palette.syntax_function,
+    statement = M.palette.base08,
+    keyword = M.palette.syntax_keyword,
+    operator = M.palette.syntax_operator,
+    preproc = M.palette.syntax_preproc,
+    type = M.palette.syntax_type,
+    special1 = M.palette.base09,
+    special2 = M.palette.base08,
+    special3 = M.palette.base0C,
+    punct = M.palette.base09,
+    regex = M.palette.base0C,
+    deprecated = M.palette.base03,
+  },
+  diag = {
+    error = M.palette.diagnostic_error,
+    warning = M.palette.diagnostic_warning,
+    info = M.palette.diagnostic_info,
+    hint = M.palette.diagnostic_hint,
+    ok = M.palette.diagnostic_ok,
+  },
+  vcs = {
+    added = M.palette.git_add,
+    changed = M.palette.git_change,
+    removed = M.palette.git_delete,
+  },
+  diff = {
+    add = M.palette.base0B,
+    change = M.palette.base0A,
+    delete = M.palette.base08,
+    text = M.palette.base0D,
+  },
+}
+
+return M
