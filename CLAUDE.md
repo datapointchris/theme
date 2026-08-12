@@ -4,9 +4,9 @@
 
 Unified theme generation system that creates consistent color configurations
 across terminal and desktop applications from a single `theme.yml` source file.
-Supports Ghostty, Kitty, Alacritty, tmux, btop, bat, delta, yazi, sioyek, JankyBorders,
-Hyprland, Waybar, Rofi, Dunst/Mako, Firefox-based and Chromium browsers, Windows
-Terminal, and more. Each theme in `themes/` provides app configs that match a
+Supports Ghostty, Kitty, Alacritty, tmux, btop, bat, delta, yazi, sioyek, aerc,
+JankyBorders, Hyprland, Waybar, Rofi, Dunst/Mako, Firefox-based and Chromium browsers,
+Windows Terminal, and more. Each theme in `themes/` provides app configs that match a
 corresponding Neovim colorscheme.
 
 ## Directory Structure
@@ -77,6 +77,7 @@ themes/{theme-id}/
 ├── delta.conf          # delta git pager (included from gitconfig)
 ├── flavor.toml         # yazi file manager flavor
 ├── sioyek.config       # sioyek PDF viewer (managed block, spliced on apply)
+├── aerc.styleset       # aerc email client (copied to stylesets/current on apply)
 ├── userChrome.css      # Firefox-based browsers (Zen/Librewolf/Firefox/Thunderbird)
 ├── chromium.theme      # Chromium DevTools theme
 ├── icons.theme         # GTK icon theme (Arch)
@@ -478,6 +479,7 @@ is not deterministic.
 | `lib/generators/*.sh` | One per app. `ls lib/generators/` enumerates them; each takes `<theme.yml> [output]` |
 | `lib/generators/delta.sh` | Resolves through bat's theme cache — see Key Insights |
 | `lib/generators/sioyek.sh` | Emits a managed block spliced into the user's config, not a whole file |
+| `lib/generators/aerc.sh` | Foreground-only accents; aerc.conf pins `styleset-name = current`, so the applied filename is a contract |
 | `lib/generators/firefox-based.sh` | One userChrome.css covering Firefox, Zen, Librewolf and Thunderbird |
 | `lib/generators/background-*.sh` | One per background mode: `plasma` draws from the palette, `ascii`/`lowpoly`/`recolor` transform a source photo |
 | `lib/generators/vscode.sh` | Not wired into `theme apply`; run directly when needed |

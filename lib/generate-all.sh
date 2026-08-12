@@ -55,6 +55,7 @@ declare -A GENERATOR_OUTPUT=(
   ["bat"]="bat.tmTheme"
   ["sioyek"]="sioyek.config"
   ["yazi"]="flavor.toml"
+  ["aerc"]="aerc.styleset"
   # delta resolves its syntax theme through bat's cache, but the config fragment
   # itself is generated from theme.yml alone — no ordering constraint here.
   ["delta"]="delta.conf"

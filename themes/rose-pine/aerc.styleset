@@ -1,0 +1,106 @@
+# Rose Pine - aerc styleset
+# Generated from theme.yml
+# Author: Rose Pine (https://rosepinetheme.com)
+
+default.fg = #e0def4
+default.bg = #191724
+
+# Selection is a raised surface, not an inverted block: aerc's own default
+# reverses the row, which turns any saturated accent into a full-width glare
+*.selected.bg = #403d52
+*.selected.fg = #e0def4
+*.selected.bold = true
+
+border.fg = #26233a
+border.bg = #191724
+
+title.fg = #191724
+title.bg = #c4a7e7
+title.bold = true
+
+header.fg = #c4a7e7
+header.bold = true
+
+statusline_default.fg = #908caa
+statusline_default.bg = #1f1d2e
+statusline_error.fg = #eb6f92
+statusline_error.bg = #1f1d2e
+statusline_error.bold = true
+statusline_success.fg = #95b1ac
+statusline_success.bg = #1f1d2e
+
+error.fg = #eb6f92
+error.bold = true
+warning.fg = #f6c177
+success.fg = #95b1ac
+
+# Read mail recedes to the muted ink so unread carries the weight on its own
+msglist_default.fg = #e0def4
+msglist_read.fg = #908caa
+msglist_unread.fg = #e0def4
+msglist_unread.bold = true
+msglist_answered.fg = #9ccfd8
+msglist_forwarded.fg = #9ccfd8
+msglist_flagged.fg = #eb6f92
+msglist_deleted.fg = #6e6a86
+msglist_marked.fg = #f6c177
+msglist_marked.bold = true
+msglist_result.fg = #f6c177
+msglist_result.bold = true
+msglist_gutter.fg = #26233a
+msglist_pill.fg = #191724
+msglist_pill.bg = #c4a7e7
+
+# Thread prefixes are structure, not content — keep them below the subject line
+msglist_thread_context.fg = #908caa
+msglist_thread_folded.fg = #9ccfd8
+msglist_thread_orphan.fg = #6e6a86
+
+dirlist_default.fg = #908caa
+dirlist_unread.fg = #e0def4
+dirlist_unread.bold = true
+dirlist_recent.fg = #95b1ac
+
+tab.fg = #908caa
+tab.bg = #1f1d2e
+tab.selected.fg = #191724
+tab.selected.bg = #c4a7e7
+tab.selected.bold = true
+
+selector_default.fg = #e0def4
+selector_focused.fg = #191724
+selector_focused.bg = #c4a7e7
+selector_chooser.fg = #c4a7e7
+selector_chooser.bold = true
+
+completion_default.fg = #e0def4
+completion_default.bg = #1f1d2e
+completion_description.fg = #6e6a86
+completion_gutter.bg = #1f1d2e
+completion_pill.bg = #26233a
+
+part_switcher.fg = #908caa
+part_switcher.bg = #1f1d2e
+part_filename.fg = #9ccfd8
+part_mimetype.fg = #6e6a86
+
+# Underlined so a link stays identifiable where OSC 8 is stripped in transit
+url.fg = #9ccfd8
+url.underline = true
+signature.fg = #6e6a86
+spinner.fg = #c4a7e7
+stack.bg = #191724
+
+# Quote depth cycles through the palette so nested replies stay separable
+quote_1.fg = #9ccfd8
+quote_2.fg = #31748f
+quote_3.fg = #eb6f92
+quote_4.fg = #f6c177
+quote_x.fg = #6e6a86
+
+diff_meta.fg = #e0def4
+diff_meta.bold = true
+diff_chunk.fg = #9ccfd8
+diff_chunk_func.fg = #eb6f92
+diff_add.fg = #31748f
+diff_del.fg = #eb6f92
