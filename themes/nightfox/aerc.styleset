@@ -84,12 +84,17 @@ part_switcher.bg = #212e3f
 part_filename.fg = #63cdcf
 part_mimetype.fg = #738091
 
+spinner.fg = #719cd6
+
+# url, signature, quote_* and diff_* are viewer-context objects and are rejected
+# outright at the top level — aerc refuses to start on "unknown style object"
+[viewer]
 # Underlined so a link stays identifiable where OSC 8 is stripped in transit
 url.fg = #719cd6
 url.underline = true
+header.fg = #719cd6
+header.bold = true
 signature.fg = #738091
-spinner.fg = #719cd6
-stack.bg = #192330
 
 # Quote depth cycles through the palette so nested replies stay separable
 quote_1.fg = #63cdcf
