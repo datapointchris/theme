@@ -77,7 +77,7 @@ themes/{theme-id}/
 ├── delta.conf          # delta git pager (included from gitconfig)
 ├── flavor.toml         # yazi file manager flavor
 ├── sioyek.config       # sioyek PDF viewer (managed block, spliced on apply)
-├── aerc.styleset       # aerc email client (copied to stylesets/current on apply)
+├── aerc.styleset       # aerc email client (installed into stylesets/ on apply)
 ├── userChrome.css      # Firefox-based browsers (Zen/Librewolf/Firefox/Thunderbird)
 ├── chromium.theme      # Chromium DevTools theme
 ├── icons.theme         # GTK icon theme (Arch)
@@ -107,6 +107,35 @@ for f in $(fd -HI -t f . themes -x basename {} | sort -u); do
   [ "$n" -ne "$total" ] && printf "%-24s %s/%s\n" "$f" "$n" "$total"
 done
 ```
+
+### Where an applied theme lands
+
+`theme apply` installs each artifact under the **theme's own id** and points a
+stable `current` **symlink** at it — `themes/cendre-medium.conf` with
+`themes/current.conf -> cendre-medium.conf`. `install_themed_artifact` in `lib.sh`
+is the one place that happens; yazi is the single exception, because a flavor is a
+directory rather than a file.
+
+Both halves are load-bearing. The pointer keeps the name `current` because the apps
+that can only `source`/`@import`/`include` a **path** need one that does not move —
+and because the apps that resolve a theme *by name* (ghostty, btop, bat, aerc,
+rofi) read their config from a symlink into the dotfiles repo, so writing the name
+there would write through the link into that checkout. That is precisely how the
+gowall palettes dirtied dotfiles for months. The payload carries the id so a machine
+says which theme it is running, every theme applied stays installed beside the
+others, and an exported config is self-describing.
+
+Nothing is pruned, deliberately: these are also the directories a user's own themes
+live in, and an installer that deletes what it does not recognise is worse than a
+few stale kilobytes.
+
+Four apps have no pointer at all and are not part of this — dunst reads
+`dunstrc.d/` as a directory, firefox and Windows Terminal have their real file
+rewritten, and sioyek gets a managed block spliced into its own config.
+
+`tests/apply-install.bats` pins it, including the two migration cases off the
+copy-based scheme: a `current` left as a real file, and a `current.yazi` left as a
+real directory, which `ln -sfn` would otherwise link *inside*.
 
 ### theme.yml Format
 

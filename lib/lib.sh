@@ -249,8 +249,34 @@ get_library_path() {
   get_theme_path "$@"
 }
 
+# Install one artifact under the theme's own name and repoint `current` at it.
+#
+# `current` stays the name every consumer holds, for two reasons that pull the same
+# way. An app that can only `source` or `@import` a path needs one that does not
+# move. And an app that resolves a theme *by name* reads its config from a symlink
+# into the dotfiles repo, so writing the name there would write through the link
+# into the checkout — which is exactly how the gowall palettes dirtied dotfiles for
+# months. The link reconciles both: the payload carries the theme id, so a machine
+# says which theme it is running, and every theme ever applied stays beside the
+# others instead of overwriting one file forever.
+#
+# Nothing is pruned. These directories are also where a user's own themes live, and
+# an installer that deletes what it does not recognise is worse than a few stale
+# kilobytes.
+install_themed_artifact() {
+  local source="$1" dir="$2" named="$3" pointer="$4"
+
+  mkdir -p "$dir" || return 1
+  cp "$source" "$dir/$named" || return 1
+
+  # The copy-based scheme this replaces left `current` as a real file, and `ln`
+  # onto a real directory links *inside* it rather than replacing it.
+  [[ -L "$dir/$pointer" ]] || rm -rf "${dir:?}/${pointer:?}"
+  ln -sfn "$named" "$dir/$pointer"
+}
+
 # Apply Ghostty theme
-# Copies color config to themes/current.conf (imported via config-file directive)
+# Installs as themes/<id>.conf with themes/current.conf pointing at it
 apply_ghostty() {
   local theme="$1"
   local lib_path
@@ -261,15 +287,12 @@ apply_ghostty() {
   fi
 
   local ghostty_theme_dir="$HOME/.config/ghostty/themes"
-  mkdir -p "$ghostty_theme_dir"
 
-  # Copy theme colors to current.conf
-  cp "$lib_path/ghostty.conf" "$ghostty_theme_dir/current.conf"
+  install_themed_artifact "$lib_path/ghostty.conf" "$ghostty_theme_dir" "$theme.conf" "current.conf" || return 1
 
-  # Copy theme CSS to current.css if generator has run for this theme.
   # Referenced from main ghostty config via: gtk-custom-css = themes/current.css
   if [[ -f "$lib_path/ghostty.css" ]]; then
-    cp "$lib_path/ghostty.css" "$ghostty_theme_dir/current.css"
+    install_themed_artifact "$lib_path/ghostty.css" "$ghostty_theme_dir" "$theme.css" "current.css" || return 1
   fi
 
   return 0
@@ -286,10 +309,10 @@ apply_kitty() {
   fi
 
   local kitty_theme_dir="$HOME/.config/kitty/themes"
-  mkdir -p "$kitty_theme_dir"
 
-  # Copy theme to kitty themes dir
-  cp "$lib_path/kitty.conf" "$kitty_theme_dir/current-theme.conf"
+  # `current-theme.conf` is kitty's own convention — its theme kitten writes
+  # exactly that path — so the pointer keeps kitty's spelling rather than ours.
+  install_themed_artifact "$lib_path/kitty.conf" "$kitty_theme_dir" "$theme.conf" "current-theme.conf" || return 1
 
   # Kitty auto-reloads when config changes
   return 0
@@ -306,10 +329,8 @@ apply_tmux() {
   fi
 
   local tmux_theme_dir="$HOME/.config/tmux/themes"
-  mkdir -p "$tmux_theme_dir"
 
-  # Copy theme to tmux themes dir
-  cp "$lib_path/tmux.conf" "$tmux_theme_dir/current.conf"
+  install_themed_artifact "$lib_path/tmux.conf" "$tmux_theme_dir" "$theme.conf" "current.conf" || return 1
 
   return 0
 }
@@ -325,9 +346,8 @@ apply_btop() {
   fi
 
   local btop_theme_dir="$HOME/.config/btop/themes"
-  mkdir -p "$btop_theme_dir"
 
-  cp "$lib_path/btop.theme" "$btop_theme_dir/current.theme"
+  install_themed_artifact "$lib_path/btop.theme" "$btop_theme_dir" "$theme.theme" "current.theme" || return 1
 
   # Update btop config to use current theme
   local btop_config="$HOME/.config/btop/btop.conf"
@@ -351,10 +371,9 @@ apply_borders() {
   fi
 
   local borders_theme_dir="$HOME/.config/borders/themes"
-  mkdir -p "$borders_theme_dir"
 
-  cp "$lib_path/bordersrc" "$borders_theme_dir/current"
-  chmod +x "$borders_theme_dir/current"
+  install_themed_artifact "$lib_path/bordersrc" "$borders_theme_dir" "$theme" "current" || return 1
+  chmod +x "$borders_theme_dir/$theme"
 
   # Restart borders if running
   if pgrep -x "borders" &>/dev/null; then
@@ -378,10 +397,29 @@ apply_yazi() {
     return 1
   fi
 
-  local yazi_flavor_dir="$HOME/.config/yazi/flavors/current.yazi"
-  mkdir -p "$yazi_flavor_dir"
+  local yazi_dir="$HOME/.config/yazi"
+  local flavors_dir="$yazi_dir/flavors"
 
-  cp "$lib_path/flavor.toml" "$yazi_flavor_dir/flavor.toml"
+  # A flavor is a directory rather than a file, so this is the one case
+  # install_themed_artifact cannot serve.
+  mkdir -p "$flavors_dir/$theme.yazi" || return 1
+  cp "$lib_path/flavor.toml" "$flavors_dir/$theme.yazi/flavor.toml" || return 1
+
+  [[ -L "$flavors_dir/current.yazi" ]] || rm -rf "$flavors_dir/current.yazi"
+  ln -sfn "$theme.yazi" "$flavors_dir/current.yazi" || return 1
+
+  # yazi names its flavor in theme.toml and *refuses to start* when the named one
+  # is absent, so the pointer belongs to whoever knows a theme has been applied —
+  # this tool — and not to a config repo that ships it unconditionally. A machine
+  # with no theme.toml falls back to yazi's built-in theme and starts clean, which
+  # is what makes a fresh install work.
+  #
+  # Never through a symlink: that path was dotfiles-managed until dotfiles stopped
+  # shipping it, and writing through one is how the gowall palettes dirtied that
+  # repo for months. An old checkout still declaring it keeps its own file.
+  if [[ ! -L "$yazi_dir/theme.toml" ]]; then
+    printf '[flavor]\ndark = "current"\nlight = "current"\n' >"$yazi_dir/theme.toml" || return 1
+  fi
 
   return 0
 }
@@ -398,9 +436,8 @@ apply_aerc() {
   fi
 
   local aerc_styleset_dir="$HOME/.config/aerc/stylesets"
-  mkdir -p "$aerc_styleset_dir"
 
-  cp "$lib_path/aerc.styleset" "$aerc_styleset_dir/current"
+  install_themed_artifact "$lib_path/aerc.styleset" "$aerc_styleset_dir" "$theme" "current" || return 1
 
   return 0
 }
@@ -503,13 +540,12 @@ apply_bat() {
   fi
 
   local bat_themes_dir="$HOME/.config/bat/themes"
-  mkdir -p "$bat_themes_dir"
 
-  # Copy theme as "current.tmTheme" (mirrors ghostty/kitty pattern)
-  # Bat config should have: --theme=current
-  # delta reads this same cache and selects it by the filename stem, so renaming
-  # this file silently drops delta back to its bundled default theme.
-  cp "$lib_path/bat.tmTheme" "$bat_themes_dir/current.tmTheme"
+  # bat registers a theme under its filename stem, and delta selects out of the
+  # same cache by that stem — so `current.tmTheme` has to keep existing or delta
+  # silently drops to its bundled default. The link satisfies that while the named
+  # copy makes every applied theme selectable as `bat --theme=<id>`.
+  install_themed_artifact "$lib_path/bat.tmTheme" "$bat_themes_dir" "$theme.tmTheme" "current.tmTheme" || return 1
 
   # Rebuild bat cache to register the updated theme
   bat cache --build >/dev/null 2>&1 || true
@@ -536,8 +572,8 @@ apply_delta() {
   fi
 
   local delta_config_dir="$HOME/.config/delta"
-  mkdir -p "$delta_config_dir"
-  cp "$lib_path/delta.conf" "$delta_config_dir/current.gitconfig"
+
+  install_themed_artifact "$lib_path/delta.conf" "$delta_config_dir" "$theme.gitconfig" "current.gitconfig" || return 1
 
   return 0
 }
@@ -1594,9 +1630,8 @@ apply_hyprland() {
   fi
 
   local hypr_theme_dir="$HOME/.config/hypr/themes"
-  mkdir -p "$hypr_theme_dir"
 
-  cp "$lib_path/hyprland.conf" "$hypr_theme_dir/current.conf"
+  install_themed_artifact "$lib_path/hyprland.conf" "$hypr_theme_dir" "$theme.conf" "current.conf" || return 1
 
   # Reload hyprland if running
   if command -v hyprctl &>/dev/null; then
@@ -1617,9 +1652,8 @@ apply_waybar() {
   fi
 
   local waybar_theme_dir="$HOME/.config/waybar/themes"
-  mkdir -p "$waybar_theme_dir"
 
-  cp "$lib_path/waybar.css" "$waybar_theme_dir/current.css"
+  install_themed_artifact "$lib_path/waybar.css" "$waybar_theme_dir" "$theme.css" "current.css" || return 1
 
   return 0
 }
@@ -1635,9 +1669,10 @@ apply_hyprlock() {
   fi
 
   local hyprlock_theme_dir="$HOME/.config/hypr/themes"
-  mkdir -p "$hyprlock_theme_dir"
 
-  cp "$lib_path/hyprlock.conf" "$hyprlock_theme_dir/hyprlock.conf"
+  # Suffixed, because hyprland and hyprlock share one themes directory and a bare
+  # `<id>.conf` would collide with the window manager's.
+  install_themed_artifact "$lib_path/hyprlock.conf" "$hyprlock_theme_dir" "$theme-hyprlock.conf" "hyprlock.conf" || return 1
 
   return 0
 }
@@ -1672,9 +1707,8 @@ apply_rofi() {
   fi
 
   local rofi_theme_dir="$HOME/.config/rofi/themes"
-  mkdir -p "$rofi_theme_dir"
 
-  cp "$lib_path/rofi.rasi" "$rofi_theme_dir/current.rasi"
+  install_themed_artifact "$lib_path/rofi.rasi" "$rofi_theme_dir" "$theme.rasi" "current.rasi" || return 1
 
   return 0
 }
