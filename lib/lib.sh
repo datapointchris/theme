@@ -288,6 +288,18 @@ apply_warn() {
   APPLY_WARNINGS+=("$1")
 }
 
+# Whether there is a controlling terminal to write progress to.
+#
+# `[[ -w /dev/tty ]]` is the obvious test and the wrong one: it reads the device
+# node's permission bits, which are writable whether or not this process has a
+# terminal attached. So the guard passed and the very next redirect failed, and
+# `theme apply` from cron, a script or an agent session printed
+# "/dev/tty: No such device or address" and reported the background step failed.
+# Opening it is the only thing that answers the question.
+tty_writable() {
+  { : >/dev/tty; } 2>/dev/null
+}
+
 # Whether Neovim could resolve this colorscheme by name.
 #
 # `:colorscheme <name>` needs a `colors/<name>.{lua,vim}` somewhere on the
@@ -1544,13 +1556,13 @@ apply_background() {
   # A cache hit copies in ~0s; an on-the-fly render at 4K can take a while, so the
   # live style name + elapsed time make it obvious the apply is working, not hung.
   local gen_start=$SECONDS
-  if [[ -w /dev/tty ]]; then
+  if tty_writable; then
     printf '  Background: %s (%s) ... ' "$bg_value" "$bg_type" >/dev/tty
   fi
 
   render_background "$lib_path/theme.yml" "$theme" "$bg_type" "$bg_value" "$background_file" || return 1
 
-  if [[ -w /dev/tty ]]; then
+  if tty_writable; then
     printf 'done (%ds)\n' "$((SECONDS - gen_start))" >/dev/tty
   fi
 
