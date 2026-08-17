@@ -312,6 +312,22 @@ theme costs 0.25s.
   plugin + generated terminal configs
 - **neovim_colorscheme_name may differ from id**: e.g., `oceanic-next`
   directory uses `OceanicNext` colorscheme
+- **The gist holds one history file per machine, and a machine writes only its
+  own**: a union merge cannot express a deletion. Every machine may assert every
+  row, so a row removed on one machine is restored by the next machine to sync
+  from a copy that still holds it — which is how four records written by
+  `theme reject --help` survived being deleted. `_sync_merge_histories` takes
+  each other machine's file as authoritative and keeps only this machine's rows
+  from the local file, so removing a row you wrote is an ordinary edit. The
+  pre-split `history.jsonl` is deliberately never read: a machine on an older
+  release still writes the whole merged set there, and its rows arrive under the
+  new name the first time it pushes after updating. `scripts/split-gist-history.sh`
+  is the one-time split, and it seeds *every* machine's file rather than only the
+  one it runs on — an unseeded machine would vanish from the others' rankings
+  until it updated.
+- **The local `history.jsonl` is unchanged by that split**: it stays one merged
+  file holding every machine's rows, and `lib/storage.sh` never learns the gist
+  has more than one. Only `lib/sync.sh` knows.
 - **delta rides bat's theme cache**: `delta.conf` sets `syntax-theme = current`,
   which resolves through the bat cache `apply_bat` rebuilds — hence delta applies
   after bat and requires both binaries. Renaming `current.tmTheme` breaks delta

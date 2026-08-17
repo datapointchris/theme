@@ -63,44 +63,92 @@ _sync_find_gist() {
     | awk '{print $1}' || true
 }
 
-_sync_create_gist() {
-  local history_file="$THEME_HISTORY_FILE"
+# The gist holds one file per machine, and a machine writes only its own.
+#
+# A union merge cannot express a deletion: every machine may assert every row, so
+# a row removed here is put back by the next machine to sync from a copy that
+# still holds it. One writer per file makes removing a row you wrote an ordinary
+# edit, and no other machine has standing to undo it.
+_sync_history_filename() {
+  echo "history-$(_storage_get_machine_id).jsonl"
+}
 
-  if [[ ! -f "$history_file" ]] || [[ ! -s "$history_file" ]]; then
-    echo "{}" >/tmp/theme-history-init.jsonl
-    history_file="/tmp/theme-history-init.jsonl"
-  fi
+# The per-machine files, which is deliberately not the pre-split "history.jsonl".
+# A machine on an older release still writes the whole merged set to that name —
+# reading it back would restore the union this replaces.
+_sync_remote_files() {
+  local gist_id="$1"
+
+  gh gist view "$gist_id" --files 2>/dev/null | grep -E '^history-.+\.jsonl$' || true
+}
+
+_sync_fetch_file() {
+  local gist_id="$1"
+  local filename="$2"
+
+  gh gist view "$gist_id" --filename "$filename" --raw 2>/dev/null || true
+}
+
+# This machine's rows, normalized and sorted — what its file in the gist holds.
+_sync_own_records() {
+  local machine_id="$1"
+
+  [[ -f "$THEME_HISTORY_FILE" ]] || return 0
+
+  jq -s -c --arg me "$machine_id" "$(_jq_normalize_history)
+    map(normalize) | map(select(.machine == \$me)) | sort_by(.ts) | .[]
+  " "$THEME_HISTORY_FILE"
+}
+
+_sync_create_gist() {
+  local tmpdir seed
+  tmpdir=$(mktemp -d)
+  seed="$tmpdir/$(_sync_history_filename)"
+
+  _sync_own_records "$(_storage_get_machine_id)" >"$seed"
+  [[ -s "$seed" ]] || echo "{}" >"$seed"
 
   local gist_url
-  gist_url=$(gh gist create "$history_file" \
-    --desc "$THEME_GIST_DESCRIPTION" \
-    --filename "history.jsonl" 2>/dev/null)
+  gist_url=$(gh gist create "$seed" --desc "$THEME_GIST_DESCRIPTION" 2>/dev/null)
 
   echo "$gist_url" | grep -oE '[a-f0-9]{32}' | head -1
 
-  rm -f /tmp/theme-history-init.jsonl
+  rm -rf "$tmpdir"
 }
 
-_sync_fetch_gist() {
-  local gist_id="$1"
-
-  gh gist view "$gist_id" --filename "history.jsonl" --raw 2>/dev/null
-}
-
+# Every other machine's file, as it stands in the gist, plus this machine's own
+# rows from the local file.
+#
+# Taking the remote as authoritative for the others is what lets a deletion made
+# on another machine arrive here. Keeping local for this machine is what lets one
+# made here survive until the next push.
+#
+# Args: <local_file> <machine_id> [remote_content]
 _sync_merge_histories() {
   local local_file="$1"
-  local remote_content="$2"
+  local machine_id="$2"
+  local remote_content="${3:-}"
+
+  local jq_defs
+  jq_defs=$(_jq_normalize_history)
 
   {
-    [[ -f "$local_file" ]] && cat "$local_file"
-    echo "$remote_content"
-  } | jq -s "$(_jq_normalize_history)
-    flatten |
-    map(select(. != null and . != {} and type == \"object\")) |
-    map(normalize) |
-    unique_by([.ts, .machine, .theme, .action]) |
-    sort_by(.ts)
-  " | jq -c '.[]'
+    if [[ -f "$local_file" ]]; then
+      jq -s -c --arg me "$machine_id" "$jq_defs
+        map(normalize) | map(select(.machine == \$me)) | .[]
+      " "$local_file"
+    fi
+
+    if [[ -n "$remote_content" ]]; then
+      printf '%s\n' "$remote_content" | jq -s -c --arg me "$machine_id" "$jq_defs
+        flatten |
+        map(select(. != null and . != {} and type == \"object\")) |
+        map(normalize) | map(select(.machine != \$me)) | .[]
+      "
+    fi
+    # unique_by survives the split. A machine whose id drifts writes a second
+    # file, and both then carry the same rows under one normalized name.
+  } | jq -s -c 'unique_by([.ts, .machine, .theme, .action]) | sort_by(.ts) | .[]'
 }
 
 sync_init() {
@@ -157,18 +205,21 @@ sync_pull() {
     return 1
   fi
 
-  local remote_content
-  if ! remote_content=$(_sync_fetch_gist "$gist_id" 2>/dev/null); then
-    return 0
-  fi
+  local machine_id own_file
+  machine_id=$(_storage_get_machine_id)
+  own_file=$(_sync_history_filename)
 
-  if [[ -z "$remote_content" ]] || [[ "$remote_content" == "{}" ]]; then
-    return 0
-  fi
+  local remote_content="" filename
+  while IFS= read -r filename; do
+    [[ -z "$filename" || "$filename" == "$own_file" ]] && continue
+    remote_content+="$(_sync_fetch_file "$gist_id" "$filename")"$'\n'
+  done < <(_sync_remote_files "$gist_id")
 
   local merged
-  merged=$(_sync_merge_histories "$THEME_HISTORY_FILE" "$remote_content")
+  merged=$(_sync_merge_histories "$THEME_HISTORY_FILE" "$machine_id" "$remote_content")
 
+  # An empty merge means every file was unreadable, never that history is empty —
+  # writing it back would erase this machine's own rows.
   if [[ -n "$merged" ]]; then
     echo "$merged" >"$THEME_HISTORY_FILE"
   fi
@@ -202,18 +253,39 @@ sync_push() {
 
   sync_pull
 
-  if gh gist edit "$gist_id" --filename "history.jsonl" "$THEME_HISTORY_FILE" &>/dev/null; then
-    if [[ -f "$THEME_SYNC_STATE_FILE" ]]; then
-      local timestamp
-      timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-      local state
-      state=$(cat "$THEME_SYNC_STATE_FILE")
-      echo "$state" | jq --arg ts "$timestamp" '.last_sync = $ts' >"$THEME_SYNC_STATE_FILE"
-    fi
-    return 0
-  else
+  local own_file tmpdir slice
+  own_file=$(_sync_history_filename)
+  tmpdir=$(mktemp -d)
+  slice="$tmpdir/$own_file"
+  _sync_own_records "$(_storage_get_machine_id)" >"$slice"
+
+  if [[ ! -s "$slice" ]]; then
+    rm -rf "$tmpdir"
     return 0
   fi
+
+  # --filename replaces a file the gist already has; --add is the only way to
+  # create one, and it names it after the local file's basename.
+  local -a edit_args
+  if _sync_remote_files "$gist_id" | grep -qxF "$own_file"; then
+    edit_args=(--filename "$own_file" "$slice")
+  else
+    edit_args=(--add "$slice")
+  fi
+
+  local pushed=0
+  gh gist edit "$gist_id" "${edit_args[@]}" &>/dev/null && pushed=1
+  rm -rf "$tmpdir"
+
+  if [[ "$pushed" -eq 1 ]] && [[ -f "$THEME_SYNC_STATE_FILE" ]]; then
+    local timestamp
+    timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    local state
+    state=$(cat "$THEME_SYNC_STATE_FILE")
+    echo "$state" | jq --arg ts "$timestamp" '.last_sync = $ts' >"$THEME_SYNC_STATE_FILE"
+  fi
+
+  return 0
 }
 
 sync_status() {
