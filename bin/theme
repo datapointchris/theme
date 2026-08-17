@@ -75,12 +75,10 @@ count_themes() {
 # HELP
 #==============================================================================
 
-usage() {
-  if command -v print_section &>/dev/null; then
-    print_section "Theme Management" "yellow"
-
-    print_section "Commands" "blue"
-    cat <<'EOF'
+# The one place a verb's synopsis is written. verb_usage greps it, so a verb
+# added here answers --help without a second entry anywhere.
+commands_table() {
+  cat <<'EOF'
   change               Interactive theme picker with color preview
   current              Show currently active theme
   list                 List available themes
@@ -99,13 +97,25 @@ usage() {
   browsers             Show browser theme status and setup
   update               Update theme to latest release
 EOF
+}
 
-    print_section "Subcommands" "blue"
-    cat <<'EOF'
+subcommands_table() {
+  cat <<'EOF'
   background           Manage backgrounds (run for usage)
   opacity              Manage terminal opacity (run for usage)
   sync                 Manage GitHub Gist synchronization (run for usage)
 EOF
+}
+
+usage() {
+  if command -v print_section &>/dev/null; then
+    print_section "Theme Management" "yellow"
+
+    print_section "Commands" "blue"
+    commands_table
+
+    print_section "Subcommands" "blue"
+    subcommands_table
 
     print_section "Examples" "yellow"
     echo "  $(print_cyan "theme change")                       # Interactive picker with preview"
@@ -121,29 +131,15 @@ Theme Management
 
 Commands
 --------
-  change               Interactive theme picker with color preview
-  current              Show currently active theme
-  list                 List available themes
-  apply <theme>        Apply theme across all platform apps
-  random               Apply random theme
-  like [message]       Like current theme with optional reason
-  dislike [message]    Dislike current theme with optional reason
-  note <message>       Add note to current theme (message required)
-  rank                 Show themes ranked by likes/usage
-  log                  View complete history
-  info [theme]         Browse themes and view detailed history
-  reject <message>     Mark current theme as rejected (avoids rediscovery)
-  rejected             List all rejected themes
-  unreject             Restore a rejected theme (fzf picker with history)
-  verify               Check theme system is working
-  browsers             Show browser theme status and setup
-  update               Update theme to latest release
+EOF
+    commands_table
+    cat <<'EOF'
 
 Subcommands
 -----------
-  background           Manage backgrounds (run for usage)
-  opacity              Manage terminal opacity (run for usage)
-  sync                 Manage GitHub Gist synchronization (run for usage)
+EOF
+    subcommands_table
+    cat <<'EOF'
 
 Examples
 --------
@@ -154,6 +150,44 @@ Examples
   theme sync init                  # Initialize sync
 EOF
   fi
+}
+
+# Answers `theme <verb> --help`. The verbs owning a help tree of their own get
+# their full screen; everything else gets its synopsis line and a pointer.
+verb_usage() {
+  local verb="$1"
+
+  case "$verb" in
+    background) background_usage && return ;;
+    opacity) opacity_usage && return ;;
+    sync) sync_usage && return ;;
+    browsers) browsers_usage && return ;;
+    ls) verb="list" ;;
+    rand) verb="random" ;;
+    ranks | ranking) verb="rank" ;;
+    history) verb="log" ;;
+  esac
+
+  local synopsis
+  synopsis=$(commands_table | grep -E "^  ${verb}( |\$)" || true)
+
+  if [[ -z "$synopsis" ]]; then
+    usage
+    return
+  fi
+
+  # The table pads the signature out to the description with two spaces or more,
+  # and no description contains a run of two.
+  if [[ "$synopsis" =~ ^[[:space:]]+(.*[^[:space:]])[[:space:]][[:space:]]+(.*)$ ]]; then
+    echo "Usage: theme ${BASH_REMATCH[1]}"
+    echo ""
+    echo "  ${BASH_REMATCH[2]}"
+  else
+    echo "Usage: theme $verb"
+  fi
+
+  echo ""
+  echo "Every command: theme help"
 }
 
 #==============================================================================
@@ -1404,6 +1438,17 @@ main() {
     esac
   fi
 
+  # Every verb answers --help instead of taking it as its message argument.
+  # `theme reject --help` otherwise rejects the current theme with "--help" as
+  # the reason, `theme like`/`dislike`/`note` write a history record saying the
+  # same, and `theme random --help` applies a random theme.
+  case "${2:-}" in
+    --help | -h)
+      verb_usage "${1:-}"
+      exit 0
+      ;;
+  esac
+
   case "${1:-}" in
     change)
       change_theme
@@ -1451,11 +1496,7 @@ main() {
       verify_system
       ;;
     browsers)
-      if [[ "${2:-}" == "--help" ]] || [[ "${2:-}" == "-h" ]]; then
-        browsers_usage
-      else
-        show_browsers
-      fi
+      show_browsers
       ;;
     update)
       if ! declare -F bashselfupdate_update &>/dev/null; then

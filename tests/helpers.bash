@@ -31,6 +31,11 @@ isolate_theme_state() {
   export XDG_STATE_HOME="$HOME/.local/state"
   export XDG_CACHE_HOME="$HOME/.cache"
 
+  # bin/theme resolves bashselfupdate through this one, and an exported absolute
+  # path reaches the developer's real installation — which checks a remote for a
+  # release on every command a test runs.
+  export XDG_LIB_HOME="$HOME/.local/lib"
+
   # First on PATH so stub_command can shadow anything the libraries shell out
   # to. Prepended once, here, rather than per stub, which would stack a copy of
   # PATH for every stub a test installs.
