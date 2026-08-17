@@ -612,8 +612,10 @@ apply_theme() {
     echo "Error: Theme name required"
     echo "Usage: theme apply <theme-name>"
     echo ""
-    echo "Available themes:"
-    list_themes | head -10
+    echo "Available themes ($(count_themes)):"
+    list_themes
+    echo ""
+    echo "Pick one with a preview: theme change"
     exit 1
   fi
 
@@ -1240,8 +1242,10 @@ PREVIEW_EOF
   if [[ -z "$theme_data" ]] || [[ "$theme_data" == "null" ]]; then
     echo "Theme not found: $theme_input"
     echo ""
-    echo "Available themes:"
-    list_themes | head -10
+    echo "Available themes ($(count_themes)):"
+    list_themes
+    echo ""
+    echo "Pick one with a preview: theme change"
     exit 1
   fi
 
