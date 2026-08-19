@@ -386,6 +386,15 @@ theme costs 0.25s.
   fraction lands at a different perceived strength on every palette. `delta.sh`
   searches for the blend that hits a target contrast ratio against that theme's
   own background, so every theme gets an equally legible diff.
+- **`theme random` weights by recency, and every eligible theme stays
+  reachable**: `compute_theme_weights` scores each candidate from days since its
+  last apply and `weighted_random_choice` samples that distribution. Apply count
+  is the wrong axis — measured 2026-08-19, the 22 available themes spanned 4 to
+  13 applies with most of them on 8, while days since last use spanned 0 to 123.
+  Narrowing the draw to the minimum-count set makes a newly added theme the only
+  thing `random` can return until it catches the pack up, and it hands a rejected
+  theme the same privilege, since a listing off disk knows nothing about
+  rejection. `list_themes_not_rejected` is what the draw reads.
 
 ## Neovim Integration
 

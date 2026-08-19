@@ -163,6 +163,30 @@ list_themes() {
   get_theme_names
 }
 
+# The set `theme random` draws from. `theme reject` promises a theme is out of
+# rotation, and rejection lives in the history rather than on disk, so a listing
+# taken from the themes directory alone still offers every rejected theme.
+list_themes_not_rejected() {
+  local rejected
+  rejected=$(get_rejected_theme_ids)
+
+  if [[ -z "$rejected" ]]; then
+    get_theme_names
+    return
+  fi
+
+  declare -A rejected_map
+  while IFS= read -r theme; do
+    [[ -n "$theme" ]] && rejected_map["$theme"]=1
+  done <<<"$rejected"
+
+  local theme
+  while IFS= read -r theme; do
+    [[ -n "${rejected_map[$theme]:-}" ]] && continue
+    echo "$theme"
+  done < <(get_theme_names)
+}
+
 get_theme_display_info() {
   local theme="$1"
   local theme_file="$THEMES_DIR/$theme/theme.yml"
@@ -1635,7 +1659,6 @@ rotate_background() {
   fi
 
   local available=()
-  local weights=()
 
   # Add enabled generated styles (respects mode setting)
   while IFS= read -r style; do
@@ -1645,12 +1668,6 @@ rotate_background() {
     [[ "$bg_id" == "$current_background" ]] && continue
     [[ -n "${rejected_map[$bg_id]:-}" ]] && continue
     available+=("$bg_id")
-    # Get weight from JSON or default to 1
-    local weight=1
-    if [[ -n "$weights_json" ]]; then
-      weight=$(echo "$weights_json" | jq -r --arg bg "$bg_id" '.[$bg] // 1')
-    fi
-    weights+=("$weight")
   done < <(get_enabled_generated_styles)
 
   # Add source-based types if enabled and source images exist
@@ -1662,11 +1679,6 @@ rotate_background() {
         [[ "$bg_id" == "$current_background" ]] && continue
         [[ -n "${rejected_map[$bg_id]:-}" ]] && continue
         available+=("$bg_id")
-        local weight=1
-        if [[ -n "$weights_json" ]]; then
-          weight=$(echo "$weights_json" | jq -r --arg bg "$bg_id" '.[$bg] // 1')
-        fi
-        weights+=("$weight")
       done < <(get_all_background_images)
     fi
   done
@@ -1676,24 +1688,16 @@ rotate_background() {
     return 1
   fi
 
-  # Weighted random selection
-  local total_weight=0
-  for w in "${weights[@]}"; do
-    total_weight=$(awk "BEGIN {print $total_weight + $w}")
-  done
+  # One jq for the whole list. A lookup per background costs a process per
+  # image, and a configured source directory is mostly images.
+  local weights_arg="${weights_json:-}"
+  [[ -z "$weights_arg" ]] && weights_arg='{}'
 
-  local rand_val
-  rand_val=$(awk "BEGIN {srand(); print rand() * $total_weight}")
-
-  local cumulative=0
-  local selected=""
-  for i in "${!available[@]}"; do
-    cumulative=$(awk "BEGIN {print $cumulative + ${weights[$i]}}")
-    if awk "BEGIN {exit !($rand_val <= $cumulative)}"; then
-      selected="${available[$i]}"
-      break
-    fi
-  done
+  local selected
+  selected=$(printf '%s\n' "${available[@]}" \
+    | jq -R -s -r --argjson weights "$weights_arg" '
+      split("\n") | map(select(length > 0)) | .[] | "\(.)\t\($weights[.] // 1)"
+    ' | weighted_random_choice)
 
   # Fallback if something went wrong with weighting
   [[ -z "$selected" ]] && selected="${available[0]}"
@@ -2109,6 +2113,35 @@ apply_theme_to_apps() {
 #==============================================================================
 # UTILITY FUNCTIONS
 #==============================================================================
+
+# Reads "<name>\t<weight>" lines on stdin and prints one name, chosen with
+# probability proportional to its weight. Returns 1 on empty input.
+#
+# One awk over the whole list, seeded from $RANDOM. awk's bare srand() takes the
+# clock in whole seconds, so two picks inside the same second return the same
+# name — which a rotation driven by a keybinding hits routinely.
+weighted_random_choice() {
+  awk -F'\t' -v seed="${RANDOM}$$" '
+    {
+      name[NR] = $1
+      weight[NR] = $2 + 0
+      total += weight[NR]
+    }
+    END {
+      if (NR == 0 || total <= 0) exit 1
+      srand(seed)
+      target = rand() * total
+      for (i = 1; i <= NR; i++) {
+        cumulative += weight[i]
+        if (target <= cumulative) {
+          print name[i]
+          exit 0
+        }
+      }
+      print name[NR]
+    }
+  '
+}
 
 format_duration() {
   local seconds="$1"

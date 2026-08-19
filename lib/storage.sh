@@ -455,6 +455,77 @@ list_rejected_themes() {
   ' "$THEME_HISTORY_FILE"
 }
 
+# Rejected theme IDs, one per line. One jq over the whole history rather than
+# is_theme_rejected per theme, which spawns one for every theme on disk.
+#
+# Through get_history, so a rejection recorded under a legacy spelling is read
+# under the id the themes directory uses. A raw read compares "Oceanic Next"
+# against a directory named "oceanic-next" and finds no rejection at all.
+get_rejected_theme_ids() {
+  get_history | jq -r '
+    group_by(.theme) |
+    map(
+      (map(select(.action == "reject" or .action == "unreject")) | sort_by(.ts) | last | .action // "none") as $last |
+      if $last == "reject" then .[0].theme else null end
+    ) |
+    map(select(. != null)) |
+    .[]
+  '
+}
+
+# How long a theme goes unused before it weighs twice as much as one applied
+# today, and the ceiling that weight climbs to. A theme with no applies at all
+# is held at the cap rather than running away with the whole distribution.
+THEME_RECENCY_SCALE_DAYS=30
+THEME_RECENCY_CAP_DAYS=180
+
+# Selection weight per theme, read from theme names on stdin and printed as
+# "<theme>\t<weight>".
+#
+# The axis is time since last apply, not apply count. Measured 2026-08-19
+# against the real history: 22 available themes sat between 4 and 13 applies
+# with most of them on 8, while days since last use spanned 0 to 123. Apply
+# count is too flat an axis to separate anything.
+compute_theme_weights() {
+  local names_json
+  names_json=$(jq -R . | jq -s -c .)
+
+  get_history | jq -r \
+    --argjson names "$names_json" \
+    --argjson scale "$THEME_RECENCY_SCALE_DAYS" \
+    --argjson cap "$THEME_RECENCY_CAP_DAYS" '
+    def parse_ts:
+      if test("[+-][0-9]{2}:[0-9]{2}$") then
+        gsub("[+-][0-9]{2}:[0-9]{2}$"; "Z") | fromdateiso8601
+      else
+        fromdateiso8601
+      end;
+
+    (now) as $now |
+    (
+      map(select(.action == "apply")) |
+      group_by(.theme) |
+      map({key: .[0].theme, value: (max_by(.ts) | .ts)}) |
+      from_entries
+    ) as $last_applied |
+
+    # A clock-skewed record from another machine can date an apply in the
+    # future, which subtracts to a negative age and then to a weight below 1.
+    def clamp_days: if . < 0 then 0 elif . > $cap then $cap else . end;
+
+    $names[] |
+    . as $theme |
+    (
+      if $last_applied[$theme] == null then
+        $cap
+      else
+        (($now - ($last_applied[$theme] | parse_ts)) / 86400) | clamp_days
+      end
+    ) as $days |
+    "\($theme)\t\(1 + ($days / $scale))"
+  '
+}
+
 init_storage() {
   if [[ ! -d "$THEME_STATE_DIR" ]]; then
     mkdir -p "$THEME_STATE_DIR"

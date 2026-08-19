@@ -52,7 +52,7 @@ theme list                    # List all available themes
 theme change                  # Interactive picker with color preview
 theme apply <theme-id>        # Apply a specific theme
 theme current                 # Show current theme and stats
-theme random                  # Apply a random (least-used) theme
+theme random                  # Apply a random theme, weighted by time since last use
 theme info [theme]            # Browse themes and view detailed history
 theme verify                  # Check the theme system is healthy
 ```
