@@ -16,7 +16,7 @@ Dev source is `~/tools/theme`; the installed copy everything actually reads is
 
 ```text
 ~/tools/theme/
-├── bin/theme              # CLI: apply, change, like/dislike, background, sync
+├── bin/theme              # the CLI — `theme --help` for the verbs
 ├── lib/
 │   ├── theme.sh           # Loads theme.yml into the shell vars generators read
 │   ├── generate-all.sh    # Runs every generator over every theme, in parallel
@@ -280,7 +280,7 @@ the constraint to preserve:
 | `generated` | `colors/{id}.lua` | The colorscheme *is* the theme, nothing upstream can collide, and the name is already in `history.jsonl` |
 | `plugin` | `colors/theme-{id}.lua` | A fallback for a machine without the plugin, and the id is usually the plugin's own colorscheme name |
 
-Twelve of the plugin themes have an id identical to the colorscheme their plugin
+Most of the plugin themes have an id identical to the colorscheme their plugin
 provides — `kanagawa`, `gruvbox`, `nordic`, `rose-pine` among them. Emitting
 `colors/kanagawa.lua` puts a second file of that name on the runtimepath beside
 `rebelot/kanagawa.nvim`'s, and which one `:colorscheme kanagawa` resolves to is
@@ -380,8 +380,8 @@ theme costs 0.25s.
   max_by(.ts) | .ts // "never"` parses on jq 1.8 and is a *syntax error* on 1.7,
   which fails the whole program rather than that one field. The workstations run
   1.8 and the CI runner runs 1.7, so this shape passes locally and breaks in CI —
-  and broke `theme stats` on any machine still on 1.7. `jq --version` before
-  believing a jq program works.
+  and broke `get_theme_stats()` in `lib/storage.sh`, which `theme info` reaches,
+  on any machine still on 1.7. `jq --version` before believing a jq program works.
 - **Change-signal colors are solved, not blended by a fixed fraction**: a fixed
   fraction lands at a different perceived strength on every palette. `delta.sh`
   searches for the blend that hits a target contrast ratio against that theme's
@@ -546,7 +546,7 @@ is not deterministic.
 
 | File | Purpose |
 | ---- | ------- |
-| `bin/theme` | Theme CLI (apply, list, like/dislike, reject, sync) |
+| `bin/theme` | The CLI. `theme --help` lists the verbs; two partial lists in this file had already diverged from each other |
 | `lib/lib.sh` | Core functions (get_theme_display_info, apply_theme_to_apps) |
 | `lib/storage.sh` | Unified JSONL history with machine context |
 | `lib/sync.sh` | GitHub Gist synchronization |
