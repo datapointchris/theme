@@ -15,10 +15,12 @@ function M.setup(colors)
     CursorLine = { bg = theme.ui.bg_p2 },
     Directory = { fg = theme.syn.fun },
 
-    -- Diff
+    -- Diff. No foreground on any of them: a foreground here wins over
+    -- treesitter and flattens a whole hunk to one shade, which is the colour
+    -- you least want flattened.
     DiffAdd = { bg = theme.diff.add },
     DiffChange = { bg = theme.diff.change },
-    DiffDelete = { fg = theme.vcs.removed, bg = theme.diff.delete },
+    DiffDelete = { bg = theme.diff.delete },
     DiffText = { bg = theme.diff.text },
 
     EndOfBuffer = { fg = theme.ui.bg },
@@ -132,7 +134,14 @@ function M.setup(colors)
     LspSignatureActiveParameter = { fg = theme.diag.warning },
     LspCodeLens = { fg = theme.syn.comment },
 
-    -- VCS
+    -- VCS. Added/Removed/Changed are Neovim's own semantic groups, and leaving
+    -- them unset leaves Neovim's stock pastels in place — which anything reading
+    -- them for a hue then takes for this theme's answer. The diff* pairs below
+    -- are vim's syntax groups for a patch file, a different question.
+    Added = { fg = theme.vcs.added },
+    Removed = { fg = theme.vcs.removed },
+    Changed = { fg = theme.vcs.changed },
+
     diffAdded = { fg = theme.vcs.added },
     diffRemoved = { fg = theme.vcs.removed },
     diffDeleted = { fg = theme.vcs.removed },

@@ -131,10 +131,10 @@ M.theme = {
     removed = M.palette.git_delete,
   },
   diff = {
-    add = M.palette.base0B,
-    change = M.palette.base0A,
-    delete = M.palette.base08,
-    text = M.palette.base0D,
+    add = "#26350b",
+    change = "#363208",
+    delete = "#552019",
+    text = "#5b4b06",
   },
 }
 

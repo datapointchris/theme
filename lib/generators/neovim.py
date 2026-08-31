@@ -55,12 +55,77 @@ def get_color(extended: dict, extended_key: str, base16_fallback: str) -> str:
     return f"M.palette.{base16_fallback}"
 
 
+def resolve_color(base16: dict, extended: dict, extended_key: str, base16_fallback: str) -> str:
+    """Resolve a semantic colour to its hex value rather than a palette reference.
+
+    `get_color` emits `M.palette.foo` so a highlight file can stay symbolic. A
+    band has to be computed here instead, which needs the value.
+    """
+    return extended.get(extended_key) or base16.get(base16_fallback) or "#000000"
+
+
+# A diff band is solved to a contrast ratio against the theme's own background,
+# never blended by a fixed fraction — a fraction lands somewhere different on
+# every palette, from invisible to opaque. delta.sh solves the same way and to
+# these same two targets, so the git pager and the editor agree on how strong a
+# diff band is on any given theme.
+DIFF_LINE_CONTRAST = 1.45
+DIFF_EMPHASIS_CONTRAST = 2.2
+
+
+def _channels(colour: str) -> tuple[int, int, int]:
+    h = colour.lstrip("#")
+    return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+
+
+def _linear(value: float) -> float:
+    c = value / 255
+    return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+
+
+def _luminance(rgb) -> float:
+    return 0.2126 * _linear(rgb[0]) + 0.7152 * _linear(rgb[1]) + 0.0722 * _linear(rgb[2])
+
+
+def _contrast(a: float, b: float) -> float:
+    return (a + 0.05) / (b + 0.05) if a > b else (b + 0.05) / (a + 0.05)
+
+
+def band(accent: str, background: str, target: float) -> str:
+    """Blend accent toward background until the result clears `target` contrast.
+
+    Capped at 0.65 so an accent already close to the background cannot resolve to
+    an opaque slab.
+    """
+    a, b = _channels(accent), _channels(background)
+    base = _luminance(b)
+
+    def mixed(fraction: float):
+        return tuple(a[i] * fraction + b[i] * (1 - fraction) for i in range(3))
+
+    chosen = 0.65
+    fraction = 0.02
+    while fraction <= 0.65:
+        if _contrast(_luminance(mixed(fraction)), base) >= target:
+            chosen = fraction
+            break
+        fraction += 0.01
+
+    r, g, blue = mixed(chosen)
+    return f"#{int(r + 0.5):02x}{int(g + 0.5):02x}{int(blue + 0.5):02x}"
+
+
 def generate_palette_lua(theme: dict) -> str:
     """Generate palette.lua from theme.yml."""
     meta = theme.get("meta", {})
     base16 = theme.get("base16", {})
     extended = theme.get("extended", {})
     special = theme.get("special", {})
+
+    background = base16.get("base00", "#000000")
+    vcs_added = resolve_color(base16, extended, "git_add", "base0B")
+    vcs_changed = resolve_color(base16, extended, "git_change", "base0A")
+    vcs_removed = resolve_color(base16, extended, "git_delete", "base08")
 
     lines = [
         "-- Auto-generated palette from theme.yml",
@@ -165,11 +230,16 @@ def generate_palette_lua(theme: dict) -> str:
         f'    changed = {get_color(extended, "git_change", "base0A")},',
         f'    removed = {get_color(extended, "git_delete", "base08")},',
         "  },",
+        # Literals rather than palette references: a band is a solved value, not
+        # a slot. Solved against base00 because that is what Normal's background
+        # resolves to (`ui.bg`), so the ratio holds against what the diff is
+        # actually drawn on. The emphasis target goes to DiffText, which marks
+        # the characters that differ inside a line DiffChange marks whole.
         "  diff = {",
-        f'    add = M.palette.base0B,',
-        f'    change = M.palette.base0A,',
-        f'    delete = M.palette.base08,',
-        f'    text = M.palette.base0D,',
+        f'    add = "{band(vcs_added, background, DIFF_LINE_CONTRAST)}",',
+        f'    change = "{band(vcs_changed, background, DIFF_LINE_CONTRAST)}",',
+        f'    delete = "{band(vcs_removed, background, DIFF_LINE_CONTRAST)}",',
+        f'    text = "{band(vcs_changed, background, DIFF_EMPHASIS_CONTRAST)}",',
         "  },",
         "}",
         "",
@@ -198,10 +268,12 @@ function M.setup(colors)
     CursorLine = { bg = theme.ui.bg_p2 },
     Directory = { fg = theme.syn.fun },
 
-    -- Diff
+    -- Diff. No foreground on any of them: a foreground here wins over
+    -- treesitter and flattens a whole hunk to one shade, which is the colour
+    -- you least want flattened.
     DiffAdd = { bg = theme.diff.add },
     DiffChange = { bg = theme.diff.change },
-    DiffDelete = { fg = theme.vcs.removed, bg = theme.diff.delete },
+    DiffDelete = { bg = theme.diff.delete },
     DiffText = { bg = theme.diff.text },
 
     EndOfBuffer = { fg = theme.ui.bg },
@@ -315,7 +387,14 @@ function M.setup(colors)
     LspSignatureActiveParameter = { fg = theme.diag.warning },
     LspCodeLens = { fg = theme.syn.comment },
 
-    -- VCS
+    -- VCS. Added/Removed/Changed are Neovim's own semantic groups, and leaving
+    -- them unset leaves Neovim's stock pastels in place — which anything reading
+    -- them for a hue then takes for this theme's answer. The diff* pairs below
+    -- are vim's syntax groups for a patch file, a different question.
+    Added = { fg = theme.vcs.added },
+    Removed = { fg = theme.vcs.removed },
+    Changed = { fg = theme.vcs.changed },
+
     diffAdded = { fg = theme.vcs.added },
     diffRemoved = { fg = theme.vcs.removed },
     diffDeleted = { fg = theme.vcs.removed },
