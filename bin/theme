@@ -74,7 +74,7 @@ commands_table() {
   cat <<'EOF'
   change               Interactive theme picker with color preview
   current              Show currently active theme
-  list                 List available themes
+  list [--status S]    List themes; S is available, rejected or all (default available)
   apply <theme>        Apply theme across all platform apps
   random               Apply a random theme, weighted by time since last use
   like [message]       Like current theme with optional reason
@@ -84,7 +84,6 @@ commands_table() {
   log                  View complete history
   info [theme]         Browse themes and view detailed history
   reject <message>     Mark current theme as rejected (avoids rediscovery)
-  rejected             List all rejected themes
   unreject             Restore a rejected theme (fzf picker with history)
   verify               Check theme system is working
   browsers             Show browser theme status and setup
@@ -522,21 +521,139 @@ show_current() {
   display_theme_details "$current" "full"
 }
 
+_list_usage_error() {
+  echo "Error: theme list: $1" >&2
+  echo "Usage: theme list [--status available|rejected|all]" >&2
+  exit 1
+}
+
+# The one listing, narrowed by lifecycle state. Rejection is recorded in the
+# history rather than on disk, so `rejected` is read from there and `all` is the
+# union of the two: a theme can be rejected and then deleted from the themes
+# directory, and the rejection is still a row the store holds.
 show_list() {
-  local platform
-  platform=$(detect_platform)
+  local status="available" explicit=false
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --status)
+        if [[ $# -lt 2 ]]; then
+          _list_usage_error "--status needs a value"
+        fi
+        status="$2"
+        explicit=true
+        shift 2
+        ;;
+      --status=*)
+        status="${1#*=}"
+        explicit=true
+        shift
+        ;;
+      *)
+        _list_usage_error "unknown option: $1"
+        ;;
+    esac
+  done
+
+  case "$status" in
+    available | rejected | all) ;;
+    *) _list_usage_error "unknown status: $status" ;;
+  esac
+
+  # One pass over the history, keyed by theme, so the detail a rejected row
+  # carries is in hand before anything is rendered.
+  local -A reject_date=() reject_reason=()
+  local rejected_ids=()
+  local rid rdate rreason
+  while IFS=$'\t' read -r rid rdate rreason; do
+    if [[ -n "$rid" ]]; then
+      reject_date["$rid"]="$rdate"
+      reject_reason["$rid"]="$rreason"
+      rejected_ids+=("$rid")
+    fi
+  done < <(list_rejected_themes | jq -r '[.theme, .rejected_date, .reason] | @tsv')
+
+  local ids=()
+  case "$status" in
+    available)
+      mapfile -t ids < <(list_themes_not_rejected)
+      ;;
+    rejected)
+      if [[ ${#rejected_ids[@]} -gt 0 ]]; then
+        ids=("${rejected_ids[@]}")
+      fi
+      ;;
+    all)
+      mapfile -t ids < <(
+        {
+          get_theme_names
+          if [[ ${#rejected_ids[@]} -gt 0 ]]; then
+            printf '%s\n' "${rejected_ids[@]}"
+          fi
+        } | sort -u
+      )
+      ;;
+  esac
+
+  local header
+  case "$status" in
+    available) header="Themes (${#ids[@]} available)" ;;
+    rejected) header="Themes (${#ids[@]} rejected)" ;;
+    all) header="Themes (${#ids[@]} total)" ;;
+  esac
 
   if command -v print_blue &>/dev/null; then
-    print_blue "Available Themes ($(count_themes) total)"
+    print_blue "$header"
   else
-    echo "Available Themes ($(count_themes) total)"
+    echo "$header"
   fi
   echo ""
 
-  list_themes_with_status
+  if [[ ${#ids[@]} -eq 0 ]]; then
+    if [[ "$status" == "rejected" ]]; then
+      echo "When you try a theme and don't like it, mark it as rejected:"
+      echo "  theme reject \"reason\""
+    else
+      echo "No themes found."
+    fi
+    return
+  fi
+
+  local current
+  current=$(get_current_theme 2>/dev/null || echo "")
+
+  local id display marker
+  for id in "${ids[@]}"; do
+    display=$(get_theme_display_info "$id")
+    if [[ "$id" == "$current" ]]; then
+      marker="●"
+      display="$display (current)"
+    else
+      marker=" "
+    fi
+    echo "$marker $display"
+
+    # The same slice _render_theme_history takes in jq, so one record reads the
+    # same date here as under `theme info`. The first ten characters of an ISO
+    # 8601 timestamp are its date in both the Z and the offset form.
+    if [[ -n "${reject_date[$id]:-}" ]]; then
+      echo "    rejected ${reject_date[$id]:0:10}: ${reject_reason[$id]:-no reason recorded}"
+    fi
+  done
 
   echo ""
-  echo "Apply with: theme apply <name>"
+  if [[ "$status" == "rejected" ]]; then
+    echo "Restore with: theme unreject"
+  else
+    echo "Apply with: theme apply <name>"
+  fi
+
+  # On stderr, so a narrowed read is visible to a person and absent from a
+  # redirect, and only when the default actually hid something.
+  if [[ "$explicit" == false ]] && [[ ${#rejected_ids[@]} -gt 0 ]]; then
+    echo "" >&2
+    echo "Rejected themes are hidden: theme list --status all" >&2
+  fi
 }
 
 show_browsers() {
@@ -870,54 +987,6 @@ mark_rejected() {
   echo "  Reason: $reason"
   echo ""
   echo "This theme will be tracked to avoid rediscovery."
-}
-
-show_rejected() {
-  local rejected
-  rejected=$(list_rejected_themes)
-
-  if [[ -z "$rejected" ]] || [[ "$rejected" == "[]" ]]; then
-    echo "No rejected themes yet."
-    echo ""
-    echo "When you try a theme and don't like it, mark it as rejected:"
-    echo "  theme reject \"reason\""
-    return
-  fi
-
-  echo ""
-  echo "Rejected Themes"
-  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo ""
-
-  local count=0
-  while IFS= read -r line; do
-    count=$((count + 1))
-    local theme rejected_date reason platforms
-    theme=$(echo "$line" | jq -r '.theme')
-    rejected_date=$(echo "$line" | jq -r '.rejected_date')
-    reason=$(echo "$line" | jq -r '.reason')
-    platforms=$(echo "$line" | jq -r '.platforms')
-
-    local display_info
-    display_info=$(get_theme_display_info "$theme")
-
-    local date_formatted
-    if date --version &>/dev/null 2>&1; then
-      date_formatted=$(date -d "$rejected_date" +"%Y-%m-%d" 2>/dev/null || echo "$rejected_date")
-    else
-      date_formatted=$(date -j -f "%Y-%m-%dT%H:%M:%S" "${rejected_date:0:19}" +"%Y-%m-%d" 2>/dev/null || echo "$rejected_date")
-    fi
-
-    echo "$count. $display_info"
-    echo "   ID: $theme"
-    echo "   Rejected: $date_formatted"
-    echo "   Reason: $reason"
-    [[ -n "$platforms" ]] && echo "   Platforms: $platforms"
-    echo ""
-  done < <(echo "$rejected")
-
-  echo "Total rejected: $count"
-  echo ""
 }
 
 unreject_theme_interactive() {
@@ -1445,7 +1514,7 @@ main() {
       show_current
       ;;
     list | ls)
-      show_list
+      show_list "${@:2}"
       ;;
     apply)
       apply_theme "${2:-}"
@@ -1473,9 +1542,6 @@ main() {
       ;;
     reject)
       mark_rejected "${@:2}"
-      ;;
-    rejected)
-      show_rejected
       ;;
     unreject)
       unreject_theme_interactive

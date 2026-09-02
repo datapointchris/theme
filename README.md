@@ -48,7 +48,9 @@ Running `theme` with no arguments prints the full help.
 ### Basic Commands
 
 ```bash
-theme list                    # List all available themes
+theme list                    # List available themes
+theme list --status rejected  # List rejected themes, with the reason for each
+theme list --status all       # List both
 theme change                  # Interactive picker with color preview
 theme apply <theme-id>        # Apply a specific theme
 theme current                 # Show current theme and stats
@@ -72,7 +74,6 @@ theme unreject                # Restore a rejected theme (interactive picker)
 ```bash
 theme rank                    # Rankings: by likes and by hours used
 theme log                     # View complete history
-theme rejected                # List rejected themes
 ```
 
 ### Backgrounds
