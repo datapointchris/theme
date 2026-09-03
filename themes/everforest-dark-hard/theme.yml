@@ -7,6 +7,10 @@ meta:
   derived_from: neanias/everforest-nvim
   variant: dark
   author: sainnhe
+# Each comment below names the everforest slot the value was transcribed from,
+# so `grey1` and `grey2` keep everforest's spelling. Renaming them to `gray`
+# would leave the comment pointing at slots the plugin does not have, and
+# nothing would report it.
 base16:
   base00: '#1e2326'  # bg_dim - main background
   base01: '#2e383c'  # bg1 - lighter background

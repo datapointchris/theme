@@ -1,6 +1,24 @@
 [codespell]
+# The pre-commit hook passes these on the command line. Naming them here is what
+# makes a bare `codespell` at the repo root agree with what the gate enforces —
+# without it, a developer checking their own work gets a pass on the very files
+# the hook rejects.
+builtin = clear,rare,en-GB_to_en-US
+
 # noice = the folke/noice.nvim plugin (highlight-group name), not a typo
-# centre = tmux's own style value, as in `#[align=centre]`. tmux rejects
-#   `align=center` with "invalid style", the same error a bogus value gets, so
-#   the British spelling is what makes every theme's pane-border format parse.
-ignore-words-list = noice,centre
+ignore-words-list = noice
+
+# `align=centre` is tmux's spelling and the only one its style parser accepts:
+# `align=center` is refused as "invalid style", the same error a nonsense value
+# gets. Every align= site in this repo is inside a *format* rather than a style,
+# and a format validates nothing — `#[align=center]` and `#[align=bogusvalue]`
+# both set at exit 0 and simply draw left. The wrong spelling fails silently, so
+# the literal is exempted here rather than the word. The word in prose is still
+# a finding.
+#
+# The second alternation is a bash associative-array subscript. The only one
+# holding British words is `SETTLED` in scripts/check-spelling.sh, where each
+# subscript is a regex naming the spelling it settles — a citation rather than a
+# use, and unwritable any other way. Scoping to the subscript keeps that script's
+# own prose gated, which skipping the file would not.
+ignore-regex = align=centre|\["[^"]*"\]
