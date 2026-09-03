@@ -7,7 +7,7 @@
 #        scripts/check-plugin-drift.sh --since 2026-01-18   # history mode
 #
 # A plugin theme's theme.yml is a hand transcription of that plugin's palette,
-# taken once and never re-read. Two things go wrong: upstream changes a colour
+# taken once and never re-read. Two things go wrong: upstream changes a color
 # after we transcribed it, or the transcription was wrong to begin with. This
 # checks for both, and the second turns out to be the common one.
 #
@@ -75,7 +75,7 @@ declare -A UPSTREAM_TERMINAL=(
 )
 # A shipped extra can itself be stale, so prefer the freshest format a repo
 # publishes and drop any that contradicts the plugin. kanagawa is deliberately
-# absent: its extras/alacritty gives terminal black as #090618, a colour that
+# absent: its extras/alacritty gives terminal black as #090618, a color that
 # appears nowhere in its lua source, while themes.lua sets term[1] to
 # palette.sumiInk0 (#16161d) -- what we already have. That file was last touched
 # in Feb 2025. solarized-osaka is pointed at ghostty rather than alacritty for
@@ -130,14 +130,14 @@ for id in "${themes[@]}"; do
   if [[ -n "$path_tpl" ]]; then
     path="${path_tpl//\{variant\}/$variant}"
     if gh api "repos/$repo/contents/$path" --jq '.content' 2>/dev/null | base64 -d >"$tmp/up" && [[ -s "$tmp/up" ]]; then
-      # Compare colour sets, not lines: upstream ships whatever terminal format
-      # it likes, and ours is generated. A colour we lack that upstream has is
+      # Compare color sets, not lines: upstream ships whatever terminal format
+      # it likes, and ours is generated. A color we lack that upstream has is
       # usually an extended slot beyond the 16 ANSI, so report both directions.
       only_up=$(comm -23 <(colors_of "$tmp/up") <(colors_of "themes/$id/ghostty.conf") | tr '\n' ' ')
       only_ours=$(comm -13 <(colors_of "$tmp/up") <(colors_of "themes/$id/ghostty.conf") | tr '\n' ' ')
-      # Only "ours" matters. A colour upstream has and we do not is almost
+      # Only "ours" matters. A color upstream has and we do not is almost
       # always an extended slot past the 16 ANSI (nightfox ships palette 16),
-      # which we deliberately do not generate. A colour *we* have that upstream
+      # which we deliberately do not generate. A color *we* have that upstream
       # does not means the transcription invented a value.
       if [[ -z "$only_ours" ]]; then
         printf "  ok %-22s matches %s" "$id" "$path"
@@ -145,7 +145,7 @@ for id in "${themes[@]}"; do
         printf "\n"
         ((++exact))
       else
-        printf "  !! %-22s has colours upstream does not: %s\n" "$id" "$only_ours"
+        printf "  !! %-22s has colors upstream does not: %s\n" "$id" "$only_ours"
         printf "     compare against %s\n" "$path"
         ((++flagged))
       fi
@@ -154,9 +154,9 @@ for id in "${themes[@]}"; do
   fi
 
   # No shipped terminal config: fall back to asking whether upstream changed a
-  # colour since we wrote our copy. Test the patch content, not the filename --
+  # color since we wrote our copy. Test the patch content, not the filename --
   # guessing which paths hold a palette is wrong in both directions. flexoki's
-  # colors/*.lua matched a path filter while containing no colours at all (they
+  # colors/*.lua matched a path filter while containing no colors at all (they
   # are two-line loaders), and a repo can keep its palette anywhere.
   base="${since:-$(git log -1 --format=%ad --date=short -- "$yml")T00:00:00Z}"
   [[ "$base" == *T* ]] || base="${base}T00:00:00Z"
@@ -169,7 +169,7 @@ for id in "${themes[@]}"; do
 
   # jq uses Oniguruma, where ^ anchors to the start of the *string* and the "m"
   # flag means "dot matches newline" rather than enabling line anchors. Hence the
-  # explicit (^|\n). Colours appear as #rrggbb and as 0xrrggbb (alacritty), and
+  # explicit (^|\n). Colors appear as #rrggbb and as 0xrrggbb (alacritty), and
   # [^+\-\n] keeps the +++/--- file headers out.
   out=$(gh api "repos/$repo/compare/${sha}...HEAD" \
     --jq '"\(.ahead_by)\n" + ([.files[] | select((.patch // "") | test("(^|\n)[+-][^+\\-\n]*(#|0x)[0-9a-fA-F]{6}")) | .filename] | join("\n"))' \
@@ -182,13 +182,13 @@ for id in "${themes[@]}"; do
   mine=$(printf '%s' "$changed" | { rg -F "$variant" || true; })
 
   if [[ -z "$changed" ]]; then
-    printf "  ok %-22s %s commits upstream since %s, no colour changed\n" "$id" "$ahead" "${base%%T*}"
+    printf "  ok %-22s %s commits upstream since %s, no color changed\n" "$id" "$ahead" "${base%%T*}"
     ((++exact))
   elif [[ -z "$mine" ]]; then
-    printf "  ok %-22s upstream changed colours only in other variants\n" "$id"
+    printf "  ok %-22s upstream changed colors only in other variants\n" "$id"
     ((++exact))
   else
-    printf "  !! %-22s colours changed upstream since %s\n" "$id" "${base%%T*}"
+    printf "  !! %-22s colors changed upstream since %s\n" "$id" "${base%%T*}"
     printf "     %s\n" "$(printf '%s' "$mine" | head -4 | tr '\n' ' ')"
     ((++flagged))
   fi

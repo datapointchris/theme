@@ -77,7 +77,7 @@ installed_colorscheme() {
   assert [ "${#APPLY_WARNINGS[@]}" -eq 0 ]
 }
 
-@test "the warning says the editor keeps its old colours when there is no fallback" {
+@test "the warning says the editor keeps its old colors when there is no fallback" {
   plugin_theme oceanic upstream/oceanic-next OceanicNext
 
   check_neovim_colorscheme oceanic

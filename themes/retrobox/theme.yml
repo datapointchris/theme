@@ -17,7 +17,7 @@ base16:
   base00: "#1c1c1c"  # Background (bg0)
   base01: "#3c3836"  # Lighter background (bg1)
   base02: "#504945"  # Selection background (bg2)
-  base03: "#928374"  # Comments (grey)
+  base03: "#928374"  # Comments (gray)
   base04: "#a89984"  # Dark foreground (fg4)
   base05: "#ebdbb2"  # Default foreground (fg1)
   base06: "#d5c4a1"  # Light foreground (fg2)
@@ -41,7 +41,7 @@ ansi:
   magenta: "#b16286"      # ANSI 5 - neutralpurple
   cyan: "#689d6a"         # ANSI 6 - neutralaqua
   white: "#a89984"        # ANSI 7 - fg4
-  bright_black: "#928374" # ANSI 8 - grey
+  bright_black: "#928374" # ANSI 8 - gray
   bright_red: "#fb4934"   # ANSI 9 - red
   bright_green: "#b8bb26" # ANSI 10 - green
   bright_yellow: "#fabd2f" # ANSI 11 - yellow
@@ -77,7 +77,7 @@ extended:
   fg2: "#d5c4a1"
   fg3: "#bdae93"
   fg4: "#a89984"
-  grey: "#928374"
+  gray: "#928374"
 
   # Neutral colors (darker)
   neutral_red: "#cc241d"

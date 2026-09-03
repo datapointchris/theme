@@ -46,7 +46,7 @@ SESSION_GAP="  "
 # Conditionals wrap whole #[...] blocks rather than sitting inside one (no
 # "fg=#{?...}") — tmux resolves a style at draw time and does not expand formats
 # within it. Same idiom as pane-border-style below. Alert mirrors the window
-# bell style: inverted rather than merely recoloured.
+# bell style: inverted rather than merely recolored.
 SESSION_ENTRY="#[range=session|#{session_id}]#{?session_alert,#[fg=${BASE00}]#[bg=${DIAG_ERROR}]#[bold],#[fg=${BASE04}]#[bg=${BASE00}]} #{session_name} #[nobold]#[norange]#[default]${SESSION_GAP}"
 SESSION_ENTRY_CURRENT="#[range=session|#{session_id} list=focus]#[fg=${GIT_ADD}]#[bg=${BASE00}]#[bold] #{session_name} #[nobold]#[norange]#[list=on]#[default]${SESSION_GAP}"
 
@@ -160,7 +160,7 @@ set-option -g status-left ""
 
 # Window status: the same shape as the session list above, so the two lines read
 # as one bar. Separation is whitespace only; the current window is told apart by
-# colour and weight, which is preattentive and needs no reading.
+# color and weight, which is preattentive and needs no reading.
 set-window-option -g window-status-separator "${SESSION_GAP}"
 set-window-option -g window-status-format " #W "
 set-window-option -g window-status-current-format " #W "

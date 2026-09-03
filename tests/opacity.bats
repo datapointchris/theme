@@ -139,7 +139,7 @@ setup() {
 
 @test "tmux gets a transparent override below full opacity and none at full" {
   # tmux cannot be translucent itself; it has to stop painting its own background
-  # so the terminal's shows through. At full opacity the theme owns the colour
+  # so the terminal's shows through. At full opacity the theme owns the color
   # again, so the override has to come back out.
   set_tmux_opacity 0.85
   run cat "$TMUX_OPACITY_FILE"

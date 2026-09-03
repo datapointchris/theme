@@ -168,7 +168,7 @@ setup() {
   assert_output "bg:one	2"
 }
 
-@test "get_recent_backgrounds returns applies newest first, honouring the limit" {
+@test "get_recent_backgrounds returns applies newest first, honoring the limit" {
   add_background_record "2025-01-01T00:00:00Z" "bg:one" gruvbox apply
   add_background_record "2025-01-02T00:00:00Z" "bg:two" gruvbox apply
   add_background_record "2025-01-03T00:00:00Z" "bg:three" gruvbox apply
@@ -194,7 +194,7 @@ setup() {
 
 @test "compute_background_weights ranks liked above neutral above disliked" {
   # The rotation is weighted, not filtered: a disliked background keeps a small
-  # chance rather than disappearing, so a snap judgement is recoverable.
+  # chance rather than disappearing, so a snap judgment is recoverable.
   add_background_record "2025-01-01T00:00:00Z" "bg:liked" gruvbox like
   add_background_record "2025-01-02T00:00:00Z" "bg:neutral" gruvbox note "seen it"
   add_background_record "2025-01-03T00:00:00Z" "bg:disliked" gruvbox dislike

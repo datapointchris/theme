@@ -1,3 +1,6 @@
 [codespell]
 # noice = the folke/noice.nvim plugin (highlight-group name), not a typo
-ignore-words-list = noice
+# centre = tmux's own style value, as in `#[align=centre]`. tmux rejects
+#   `align=center` with "invalid style", the same error a bogus value gets, so
+#   the British spelling is what makes every theme's pane-border format parse.
+ignore-words-list = noice,centre

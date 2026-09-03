@@ -4,7 +4,7 @@
 # lib/theme.sh is the only thing that reads theme.yml, and every generator
 # consumes what it emits via `eval "$(load_colors ...)"`. So this file asserts on
 # the variables after the eval, not on the text of the assignments: the fallbacks
-# are written as literal "$BASE08" strings that only become colours when the eval
+# are written as literal "$BASE08" strings that only become colors when the eval
 # runs, and a generator sees the resolved value.
 
 load "$HOME/.local/lib/bats-support/load.bash"
@@ -97,7 +97,7 @@ YAML
   eval "$(load_theme "$FIXTURE")"
   assert_equal "$ANSI_RED" "#ff0000"
   assert_equal "$ANSI_BRIGHT_BLACK" "#444444"
-  # An ansi block that names only some colours still falls back for the rest.
+  # An ansi block that names only some colors still falls back for the rest.
   assert_equal "$ANSI_GREEN" "#0b0b0b"
 }
 
@@ -159,7 +159,7 @@ YAML
   assert_equal "$via_alias" "$via_direct"
 }
 
-@test "to_upper uppercases a hex colour for btop" {
+@test "to_upper uppercases a hex color for btop" {
   run to_upper "#a3be8c"
   assert_success
   assert_output "#A3BE8C"

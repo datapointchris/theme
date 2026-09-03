@@ -61,7 +61,7 @@ use_fixture_themes_dir() {
 
 # Writes a theme.yml carrying meta and base16 only, so the ANSI and special
 # fallbacks in load_theme are what gets exercised. Each base16 slot holds the
-# colour that names its own index — base0D is #0d0d0d — which is what lets a
+# color that names its own index — base0D is #0d0d0d — which is what lets a
 # fallback assertion read as the slot it fell back to.
 #
 # Usage: make_fixture_theme <id> [display_name] [colorscheme_source]

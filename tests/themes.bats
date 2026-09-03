@@ -156,7 +156,7 @@ setup() {
 }
 
 @test "get_theme_display_info adds no label for an unrecognized source" {
-  # Only "generated" and "plugin" are labelled. A typo in the field is therefore
+  # Only "generated" and "plugin" are labeled. A typo in the field is therefore
   # invisible here, and equally invisible to Neovim's picker, which reads the
   # same field.
   yq -i '.meta.neovim_colorscheme_source = "typo"' "$THEMES_DIR/alpha-dark/theme.yml"

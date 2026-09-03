@@ -49,8 +49,8 @@ bg_rgb=$(hex_to_rgb "$BASE00")
 
 # -C colors each glyph from the source pixel underneath it, which also makes
 # --font-color a no-op — passing both produced byte-identical output. Keep the
-# per-glyph colour, since recoloring below maps it into the palette and a single
-# flat font colour would throw the image away entirely.
+# per-glyph color, since recoloring below maps it into the palette and a single
+# flat font color would throw the image away entirely.
 # -s takes a directory; the filename is auto-generated as <basename>-ascii-art.png
 temp_dir="/tmp/ascii_$$"
 mkdir -p "$temp_dir"
@@ -72,7 +72,7 @@ if [[ ! -f "$generated_file" ]]; then
   exit 1
 fi
 
-# --save-bg themes the ground but the glyphs keep the photo's colours, so the
+# --save-bg themes the ground but the glyphs keep the photo's colors, so the
 # result only half-matched the theme. Hand it to the recolor generator, but not
 # on the settings lowpoly and recolor use: ASCII output is mostly ground, so it
 # arrives dark already (mean ~20 of 100) and the darkening pass crushes it to

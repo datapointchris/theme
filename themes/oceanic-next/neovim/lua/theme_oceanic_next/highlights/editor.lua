@@ -16,7 +16,7 @@ function M.setup(colors)
     Directory = { fg = theme.syn.fun },
 
     -- Diff. No foreground on any of them: a foreground here wins over
-    -- treesitter and flattens a whole hunk to one shade, which is the colour
+    -- treesitter and flattens a whole hunk to one shade, which is the color
     -- you least want flattened.
     DiffAdd = { bg = theme.diff.add },
     DiffChange = { bg = theme.diff.change },

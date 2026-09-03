@@ -123,7 +123,7 @@ at_days_offset() {
   assert_equal "$drawn" 3
 }
 
-@test "weighted_random_choice favours the heavier candidate" {
+@test "weighted_random_choice favors the heavier candidate" {
   local heavy=0
   for _ in $(seq 40); do
     [[ "$(printf 'heavy\t9\nlight\t1\n' | weighted_random_choice)" == "heavy" ]] && heavy=$((heavy + 1))

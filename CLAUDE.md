@@ -126,7 +126,7 @@ says which theme it is running, every theme applied stays installed beside the
 others, and an exported config is self-describing.
 
 Nothing is pruned, deliberately: these are also the directories a user's own themes
-live in, and an installer that deletes what it does not recognise is worse than a
+live in, and an installer that deletes what it does not recognize is worse than a
 few stale kilobytes.
 
 Four apps have no pointer at all and are not part of this — dunst reads
@@ -209,7 +209,7 @@ Run from the repo root (`~/tools/theme`). Writing `theme.yml` is the whole job;
 every app config is derived from it.
 
 1. **Write `themes/{id}/theme.yml`** — meta, base16, ansi, special, extended.
-   Mapping a palette into those slots is the only part that takes judgement:
+   Mapping a palette into those slots is the only part that takes judgment:
    see "Mapping a Palette into theme.yml" below.
 
 2. **Generate every app config in one call.** Never invoke generators one by one
@@ -228,7 +228,7 @@ every app config is derived from it.
 
 3. **Verify against the source, not by eye.** When a theme comes from a plugin
    that ships its own terminal configs, diff the generated file against theirs —
-   an exact match on every colour is the proof the transcription is right:
+   an exact match on every color is the proof the transcription is right:
 
    ```bash
    diff <(rg -N "^(background|foreground|cursor|selection|palette)" themes/{id}/ghostty.conf) \
@@ -244,14 +244,14 @@ every app config is derived from it.
 
 ### Mapping a Palette into theme.yml
 
-Upstream palettes are organised by *role* ("keywords", "types"); base16 slots are
-organised by *hue*. When they conflict, **follow hue** — every theme here does,
+Upstream palettes are organized by *role* ("keywords", "types"); base16 slots are
+organized by *hue*. When they conflict, **follow hue** — every theme here does,
 and the generators mix `base16` and `ansi` values in the same output file, so a
 role-based mapping puts a green in the slot a generator draws its red from.
 
 - `base0D` is the single most-used slot (`rg -c BASE0D lib/generators/*.sh`), and
   generators treat it as the primary UI accent, not as "the blue". If a theme's
-  true blue is a loud diagnostic colour, set `base0D` to the restrained blue and
+  true blue is a loud diagnostic color, set `base0D` to the restrained blue and
   put the intended accent in `extended.ui_accent`, which overrides `BASE0D` in
   every generator that draws UI chrome.
 - `base06`/`base07` are "lighter/lightest foreground". Duplicating `base05` when
@@ -272,7 +272,7 @@ directory, neither of which the job runner cares about: it passes the mapped
 value through as `$2` and nothing else reads it. The PEP 723 header is what makes
 it directly executable, so it needs no `uv run` wrapper at the call site.
 
-**The name it emits depends on where the theme's colours come from**, and this is
+**The name it emits depends on where the theme's colors come from**, and this is
 the constraint to preserve:
 
 | `neovim_colorscheme_source` | Emits | Why |
@@ -339,7 +339,7 @@ theme costs 0.25s.
   moved on, not as noise.
 - **A generated colorscheme is a fallback, not a substitute**: it is derived from
   the palette, where the plugin was tuned by hand against real buffers. It exists
-  so a machine without the plugin still changes colour, and `theme apply` says so
+  so a machine without the plugin still changes color, and `theme apply` says so
   by name when it is what Neovim will land on.
 - **Generate only through `generate-all.sh`**: a one-off generator invocation is
   how `mako.ini` came back a week after the migration that deleted it — eight
@@ -362,7 +362,7 @@ theme costs 0.25s.
   nobody can see is worse than none, because a quiet run reads as a correct one.
 - **The one failure with no output is Neovim.** A plugin theme names a colorscheme
   this tool does not ship, so a machine that never installed it gets a terminal
-  that changes colour and an editor that does not — while every tick still says
+  that changes color and an editor that does not — while every tick still says
   the apply worked. `check_neovim_colorscheme` looks for the
   `colors/<name>.{lua,vim}` that `:colorscheme` actually needs, deliberately not
   asking lazy.nvim where it puts plugins, so the `vim.pack` migration cannot turn
@@ -447,10 +447,10 @@ runtime. Worth running once or twice a year, and after adding a plugin theme.
 
 Two things it can find, and the second is the common one:
 
-- **Upstream changed a colour** after the transcription.
+- **Upstream changed a color** after the transcription.
 - **The transcription was wrong from the start.** This was the one real finding:
   `nightfox` had a bright-black of `#475072`, a blue-purple, where upstream
-  computes `#575860`, a grey — `Shade.new("#393b44", 0.15)`.
+  computes `#575860`, a gray — `Shade.new("#393b44", 0.15)`.
 
 A third outcome the check cannot tell from the second: **deliberate divergence.**
 `solarized-osaka` carries *classic* Solarized (Schoonover) rather than craftzdog's
@@ -465,11 +465,11 @@ It picks its method per theme:
 
 - Repos shipping a terminal config (`extras/ghostty`, `extra/<v>/<v>.ghostty`,
   `extras/alacritty/…`) get an **exact** check — that file is generated from the
-  same palette the colorscheme uses, so comparing colour sets settles it without
-  parsing Lua. Only colours *we* have and upstream lacks are errors; the reverse
+  same palette the colorscheme uses, so comparing color sets settles it without
+  parsing Lua. Only colors *we* have and upstream lacks are errors; the reverse
   is normally an extended slot past the 16 ANSI that we do not generate.
 - Everything else gets a **history** check: did any added or removed line in
-  upstream carry a colour since `theme.yml` was last written? That only says
+  upstream carry a color since `theme.yml` was last written? That only says
   "look at this", never "this is wrong".
 
 Two traps it exists to encode:
@@ -480,11 +480,11 @@ Two traps it exists to encode:
 - **A repo can host several colorschemes.** flexoki ships one file per variant,
   so a change to one would otherwise flag all four. The check keeps only changed
   files naming this theme's variant.
-- **Judge by colours changed, never by filename.** flexoki's `colors/*.lua` are
-  two-line loaders holding no colours, and a repo may keep its palette anywhere.
+- **Judge by colors changed, never by filename.** flexoki's `colors/*.lua` are
+  two-line loaders holding no colors, and a repo may keep its palette anywhere.
   Filtering on paths produced three false positives out of five on the first run.
 - **A shipped extra can be as stale as our own copy.** kanagawa's
-  `extras/alacritty` calls terminal black `#090618`, a colour in none of its Lua
+  `extras/alacritty` calls terminal black `#090618`, a color in none of its Lua
   source, while `themes.lua` sets `term[1]` to `sumiInk0` (`#16161d`) — ours was
   right. It is out of the exact-check map for that reason. Where a repo ships
   several formats that disagree, prefer the freshest and check it against the

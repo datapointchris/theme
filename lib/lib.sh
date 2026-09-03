@@ -285,7 +285,7 @@ get_library_path() {
 # others instead of overwriting one file forever.
 #
 # Nothing is pruned. These directories are also where a user's own themes live, and
-# an installer that deletes what it does not recognise is worse than a few stale
+# an installer that deletes what it does not recognize is worse than a few stale
 # kilobytes.
 install_themed_artifact() {
   local source="$1" dir="$2" named="$3" pointer="$4"
@@ -355,11 +355,11 @@ neovim_colorscheme_available() {
   [[ ${#found[@]} -gt 0 ]]
 }
 
-# Warn when Neovim cannot honour the theme being applied.
+# Warn when Neovim cannot honor the theme being applied.
 #
 # A plugin theme names a colorscheme this tool does not ship. On a machine that
 # never installed it — no network, a locked-down box, a plugin sync that has not
-# run — the terminal changes colour and the editor does not, with nothing on screen
+# run — the terminal changes color and the editor does not, with nothing on screen
 # saying so. That silence is the whole reason this exists; a fallback that nobody
 # is told about is indistinguishable from the theme having applied.
 #
@@ -392,7 +392,7 @@ check_neovim_colorscheme() {
   if [[ -f "$THEMES_DIR/$theme/neovim/colors/$fallback.lua" ]]; then
     apply_warn "Neovim colorscheme '$colorscheme' is not installed ($plugin) — falling back to '$fallback', generated from this palette rather than tuned by the theme's author."
   else
-    apply_warn "Neovim colorscheme '$colorscheme' is not installed ($plugin) and this theme ships no generated fallback — the editor keeps its previous colours."
+    apply_warn "Neovim colorscheme '$colorscheme' is not installed ($plugin) and this theme ships no generated fallback — the editor keeps its previous colors."
   fi
 }
 

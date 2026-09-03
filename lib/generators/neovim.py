@@ -32,7 +32,7 @@ def slug_to_module(slug: str) -> str:
 def colorscheme_name_for(meta: dict, slug: str) -> str:
     """Name the colorscheme this theme's generated plugin provides.
 
-    A theme whose colours come from a plugin gets a `theme-` prefix, because its
+    A theme whose colors come from a plugin gets a `theme-` prefix, because its
     id is usually the plugin's own colorscheme name — `kanagawa`, `gruvbox` and
     ten others — and two `colors/kanagawa.lua` on the runtimepath is a coin toss
     over which one `:colorscheme` finds. The prefixed copy is the fallback for a
@@ -56,7 +56,7 @@ def get_color(extended: dict, extended_key: str, base16_fallback: str) -> str:
 
 
 def resolve_color(base16: dict, extended: dict, extended_key: str, base16_fallback: str) -> str:
-    """Resolve a semantic colour to its hex value rather than a palette reference.
+    """Resolve a semantic color to its hex value rather than a palette reference.
 
     `get_color` emits `M.palette.foo` so a highlight file can stay symbolic. A
     band has to be computed here instead, which needs the value.
@@ -73,8 +73,8 @@ DIFF_LINE_CONTRAST = 1.45
 DIFF_EMPHASIS_CONTRAST = 2.2
 
 
-def _channels(colour: str) -> tuple[int, int, int]:
-    h = colour.lstrip("#")
+def _channels(color: str) -> tuple[int, int, int]:
+    h = color.lstrip("#")
     return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
 
 
@@ -269,7 +269,7 @@ function M.setup(colors)
     Directory = { fg = theme.syn.fun },
 
     -- Diff. No foreground on any of them: a foreground here wins over
-    -- treesitter and flattens a whole hunk to one shade, which is the colour
+    -- treesitter and flattens a whole hunk to one shade, which is the color
     -- you least want flattened.
     DiffAdd = { bg = theme.diff.add },
     DiffChange = { bg = theme.diff.change },

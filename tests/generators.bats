@@ -117,7 +117,7 @@ count_theme_artifacts() {
 
 @test "a mapped generator with no script is a hard error, not a skipped job" {
   # What should have happened when the subscripts were mangled. Asserted through
-  # the script rather than by reading it, since the guard is the behaviour.
+  # the script rather than by reading it, since the guard is the behavior.
   local sandbox="$BATS_TEST_TMPDIR/repo"
   mkdir -p "$sandbox/lib/generators" "$sandbox/themes/only"
   cp "$GENERATE_ALL" "$sandbox/lib/generate-all.sh"
@@ -211,7 +211,7 @@ count_theme_artifacts() {
   assert_regex "$uuid_one" '<string>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}</string>'
 }
 
-@test "a generator carries the theme's own colours into its output" {
+@test "a generator carries the theme's own colors into its output" {
   # The fixture's base00 is #000000 and its foreground falls back to base05,
   # #050505 — values no real theme has, so finding them proves the output came
   # from this theme.yml rather than from a default baked into the generator.

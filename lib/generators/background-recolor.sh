@@ -8,7 +8,7 @@
 #
 # The defaults are what recolor and lowpoly both want: the full palette, then a
 # darkening pass. A photo's brightness survives recoloring — gowall maps each
-# pixel to the nearest palette colour, so a bright sky lands on the theme's
+# pixel to the nearest palette color, so a bright sky lands on the theme's
 # foreground and stays a pale expanse. Backgrounds are seen through terminal
 # transparency, where that washes out.
 #
@@ -106,7 +106,7 @@ palette_name="theme-$theme_id-dark"
 # The full palette adds the foreground tier and the lightest accent back. Those
 # four are exactly what a bright region maps onto, so the dark variant is this
 # same palette with its top end removed rather than a different set of hues.
-# Removing more than this pushes bright areas onto a coloured accent and tints
+# Removing more than this pushes bright areas onto a colored accent and tints
 # the sky - salmon on a warm theme, lavender on a cool one.
 if [[ "$palette_variant" == "full" ]]; then
   colors+=("$BASE05" "$BASE06" "$BASE07" "$BASE0A")
@@ -114,7 +114,7 @@ if [[ "$palette_variant" == "full" ]]; then
 fi
 
 # Rewritten on every run rather than reused when present. The old config-append
-# skipped regeneration once a name existed, so editing a colour in theme.yml
+# skipped regeneration once a name existed, so editing a color in theme.yml
 # never reached gowall and the wallpaper kept the palette from first use.
 palette_file="$palette_dir/${palette_name}.json"
 {
