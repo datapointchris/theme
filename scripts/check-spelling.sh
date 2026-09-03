@@ -33,8 +33,8 @@ done
 # line rather than the word, because the same word is correct in one place and
 # wrong three lines later.
 declare -A SETTLED=(
-  ["display-panes-colour|display-panes-active-colour|clock-mode-colour"]="tmux's own option names; it stores the -color alias back under -colour"
-  ["align=centre"]="tmux's style parser accepts no other spelling (0 here: .codespellrc's ignore-regex filters it first)"
+  ["display-panes-colour|display-panes-active-colour|clock-mode-colour|(^|[^a-zA-Z])-colour([^a-zA-Z]|$)"]="tmux's own option names, and the -colour suffix where the comments name it"
+  ["align=centre"]="tmux's style parser accepts no other spelling; the generated sites are filtered earlier by .codespellrc's ignore-regex, so these are the prose ones"
   ["grey[0-9]"]="everforest's own palette slot names, quoted where a value was transcribed"
   ["(^|[^A-Za-z])(EDE|CAF|DAA|caf)([^A-Za-z]|$)"]="hex fragments, read as words once the token regex splits on digits"
   ["theme_get's"]="a possessive of the function name, split at the underscore"
@@ -43,6 +43,11 @@ declare -A SETTLED=(
 
 list_settled=0
 [[ ${1:-} == "--list-settled" ]] && list_settled=1
+
+# A finding is attributed to the first pattern that matches it, and bash gives no
+# order to an associative array's keys. Sorting makes the per-pattern counts the
+# same on every run, so a change in them means the tree changed.
+mapfile -t SETTLED_ORDER < <(printf '%s\n' "${!SETTLED[@]}" | sort)
 
 echo "Scanning $(git ls-files | wc -l) tracked files"
 echo ""
@@ -63,7 +68,7 @@ while IFS= read -r finding; do
   src=$(sed -n "${lineno}p" "$file")
 
   matched=""
-  for pattern in "${!SETTLED[@]}"; do
+  for pattern in "${SETTLED_ORDER[@]}"; do
     if printf '%s' "$src" | rg -q "$pattern"; then
       matched="$pattern"
       break
@@ -85,7 +90,7 @@ if [[ $list_settled -eq 1 || $review -gt 0 ]]; then
   echo ""
 fi
 echo "  Settled:"
-for pattern in "${!SETTLED[@]}"; do
+for pattern in "${SETTLED_ORDER[@]}"; do
   printf "    %3d  %s\n" "${settled_by["$pattern"]:-0}" "${SETTLED[$pattern]}"
 done
 

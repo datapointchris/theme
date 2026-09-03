@@ -40,7 +40,7 @@ GIT_ADD="${EXTENDED_GIT_ADD:-$BASE0B}"
 # doing one job, which flattens the spacing so proximity carries no information
 # and the line only looks busier. Gestalt proximity groups on relative distance,
 # so the gap between entries being wider than the gap inside a name is the whole
-# mechanism — see docs/architecture/tmux-sessions.md in dotfiles.
+# mechanism.
 SESSION_GAP="  "
 
 # Conditionals wrap whole #[...] blocks rather than sitting inside one (no
@@ -105,6 +105,14 @@ set-option -g pane-border-style "#{?#{==:#{pane_current_command},ssh},fg=${DIAG_
 set-option -g pane-active-border-style "#{?#{==:#{pane_current_command},ssh},fg=${DIAG_ERROR} bold,fg=${BASE0A}}"
 
 # Pane number display (prefix + q)
+#
+# The -colour ending here, and on clock-mode below, is tmux's own spelling
+# rather than a British one that escaped the spell gate. tmux does accept
+# display-panes-color and stores it back under -colour, which is what
+# show-options prints and what its manpage documents, so a rename reads as
+# working while this file stops matching what tmux reports. Nothing catches
+# that: codespell keeps a hyphenated token whole, so a file holding
+# display-panes-colour exits 0 either way.
 set-option -g display-panes-active-colour "${DIAG_WARNING}"
 set-option -g display-panes-colour "${BASE03}"
 
@@ -172,16 +180,17 @@ set-option -g status-right "#[fg=${BASE04}]%I:%M%p  %m.%d.%Y "
 # Session list, drawn on the first status line above the window row. list=focus
 # on the current session keeps it scrolled into view once the list outgrows the
 # terminal, with < > markers on the ends.
-# tmux's stock window row is relocated to the second line by \`tmux-sessions
-# install-status\`, which dotfiles runs before sourcing this file.
+# tmux draws its stock window row on the first status line, where this session
+# list needs the room. Relocating that row to the second line is a status
+# installer's job rather than a theme's, so this file assumes it has happened.
 set-option -g "status-format[0]" "#[align=left]#[list=on]#[list=left-marker]<#[list=right-marker]>#[list=on]#{S:${SESSION_ENTRY},${SESSION_ENTRY_CURRENT}}"
 
 # Pane border format: index, command, path (normal) — or a red host badge when
 # the pane is running ssh. Host-side remote indicator: the local tmux detects the
 # ssh process via pane_current_command, so any SSH target lights up red (theme's
 # diagnostic_error) with zero setup on the remote — bare servers work. The badge
-# shows pane_title, which a dotfiles remote sets to "host:cwd" via an OSC 2 prompt
-# hook (falling back to the local "ssh: <target>" label, or plain SSH). Style
+# shows pane_title, which a remote shell can set to "host:cwd" with an OSC 2
+# prompt hook (falling back to the local "ssh: <target>" label, or plain SSH). Style
 # attributes are space-separated (not comma) so they don't collide with the
 # #{?...} branch separator; the nested #{?#{pane_title}...} is brace-scoped so its
 # commas are fine.
