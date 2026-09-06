@@ -104,6 +104,13 @@ set-window-option -g window-status-bell-style "fg=${BASE00},bg=${DIAG_ERROR},bol
 set-option -g pane-border-style "#{?#{==:#{pane_current_command},ssh},fg=${DIAG_ERROR},fg=${UI_BORDER}}"
 set-option -g pane-active-border-style "#{?#{==:#{pane_current_command},ssh},fg=${DIAG_ERROR} bold,fg=${BASE0A}}"
 
+# With pane-border-status on top, a status line is the header of the pane BELOW
+# it, so the line under the active pane belongs to that pane and is drawn in the
+# inactive style — the active pane's floor never takes the active color. Arrows
+# mark the edge instead: the borders adjacent to the active pane get a glyph
+# pointing at it, independent of color.
+set-option -g pane-border-indicators both
+
 # Pane number display (prefix + q)
 set-option -g display-panes-active-colour "${DIAG_WARNING}"
 set-option -g display-panes-colour "${BASE03}"
@@ -185,7 +192,12 @@ set-option -g "status-format[0]" "#[align=left]#[list=on]#[list=left-marker]<#[l
 # attributes are space-separated (not comma) so they don't collide with the
 # #{?...} branch separator; the nested #{?#{pane_title}...} is brace-scoped so its
 # commas are fine.
-set-option -g pane-border-format "#{?#{==:#{pane_current_command},ssh},  #[align=left fg=${DIAG_ERROR} bold](#{pane_index})  #[align=centre fg=${DIAG_ERROR} bold] 󰢹 #{?#{pane_title},#{pane_title},SSH}  ,  #[align=left fg=${BASE03}](#{pane_index})  #[align=centre fg=${UI_ACCENT}]  #{pane_current_command}  #[align=right fg=${BASE0A}]  #{pane_current_path}  }"
+#
+# An inactive pane's command and path drop to the border color so the whole
+# header recedes into the line it sits on, leaving the active pane's header the
+# only lit one. The ssh branch keeps its red on every pane: it is an alarm, and
+# an alarm that dims on the panes you are not looking at is no alarm.
+set-option -g pane-border-format "#{?#{==:#{pane_current_command},ssh},  #[align=left fg=${DIAG_ERROR} bold](#{pane_index})  #[align=centre fg=${DIAG_ERROR} bold] 󰢹 #{?#{pane_title},#{pane_title},SSH}  ,  #[align=left fg=${BASE03}](#{pane_index})  #[align=centre fg=#{?pane_active,${UI_ACCENT},${UI_BORDER}}]  #{pane_current_command}  #[align=right fg=#{?pane_active,${BASE0A},${UI_BORDER}}]  #{pane_current_path}  }"
 
 # vim: set ft=tmux tw=0:
 EOF
