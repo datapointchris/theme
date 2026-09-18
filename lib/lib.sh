@@ -1527,7 +1527,7 @@ render_background() {
       echo "Error: no generator for style: $bg_value" >&2
       return 1
     }
-    bash "$generator" "$theme_yml" "$output_file" "$BACKGROUND_WIDTH" "$BACKGROUND_HEIGHT" >/dev/null 2>&1
+    _run_background_generator "$generator" "$theme_yml" "$output_file" "$BACKGROUND_WIDTH" "$BACKGROUND_HEIGHT"
     return $?
   fi
 
@@ -1536,7 +1536,17 @@ render_background() {
     echo "Error: unknown background type: $bg_type" >&2
     return 1
   }
-  bash "$generator" "$theme_yml" "$bg_value" "$output_file" >/dev/null 2>&1
+  _run_background_generator "$generator" "$theme_yml" "$bg_value" "$output_file"
+}
+
+# Runs a background generator silently unless it fails. A generator's last
+# lines on stderr are the ones naming what went wrong (a missing binary, a
+# rejected image), so those reach stderr on failure and nothing else does.
+_run_background_generator() {
+  local err
+  err=$(bash "$@" 2>&1 >/dev/null) && return 0
+  printf '%s\n' "$err" | tail -n 2 >&2
+  return 1
 }
 
 apply_background() {
@@ -1954,15 +1964,21 @@ apply_theme_to_apps() {
   # Background (macOS, Arch, WSL)
   local background_id=""
   if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]] || [[ "$platform" == "wsl" ]]; then
-    local background_style
-    if background_style=$(apply_background "$theme" 2>/dev/null); then
+    # stderr goes to a file rather than /dev/null so a failure can say why. The
+    # style name is this call's stdout, so the reason cannot share it.
+    local background_style background_error reason
+    background_error=$(mktemp)
+    if background_style=$(apply_background "$theme" 2>"$background_error"); then
       applied+=("background")
       _print_app_status "background ($background_style)" "true"
       background_id=$(get_current_background)
     else
       skipped+=("background")
       _print_app_status "background" "false"
+      reason=$(paste -sd ' ' "$background_error")
+      apply_warn "Background not changed: ${reason:-no reason given}"
     fi
+    rm -f "$background_error"
   fi
 
   # Tmux (all platforms)
