@@ -80,8 +80,12 @@ set-option -g status-style "fg=${BASE04},bg=${BASE00}"
 set-window-option -g window-status-style "fg=${BASE04},bg=${BASE00}"
 
 # Current/active window - use warning color for high visibility
-# ANSI black for deeper contrast on current window
-set-window-option -g window-status-current-style "fg=${DIAG_WARNING},bg=${ANSI_BLACK},bold"
+# base00 = main background, the same as the current session in the list above:
+# the current entry is told apart by color and weight, never by a box. ANSI
+# black cannot supply one consistently. Palettes place it anywhere from darker
+# than base00, which reads as a hole in the bar, to a mid gray, and many make it
+# identical to base00.
+set-window-option -g window-status-current-style "fg=${DIAG_WARNING},bg=${BASE00},bold"
 
 # Last visited window - same as inactive (no special highlight)
 set-window-option -g window-status-last-style "fg=${BASE04},bg=${BASE00}"
