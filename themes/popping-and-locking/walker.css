@@ -5,7 +5,7 @@
 /* Base16 palette */
 @define-color base00 #181921;
 @define-color base01 #252631;
-@define-color base02 #ebdbb2;
+@define-color base02 #383637;
 @define-color base03 #928374;
 @define-color base04 #a89984;
 @define-color base05 #ebdbb2;
@@ -29,7 +29,7 @@
 @define-color border #928374;
 
 /* Selection and highlight */
-@define-color selected-bg #ebdbb2;
+@define-color selected-bg #383637;
 @define-color selected-text #458588;
 @define-color match #f42c3e;
 @define-color accent #458588;

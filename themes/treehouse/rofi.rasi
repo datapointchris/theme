@@ -6,7 +6,7 @@
     /* Base16 palette */
     base00: #191919;  /* Main background */
     base01: #252220;  /* Lighter background */
-    base02: #786b53;  /* Selection background */
+    base02: #3a362d;  /* Selection background */
     base03: #504332;  /* Comments, muted */
     base04: #786b53;  /* Dark foreground */
     base05: #786b53;  /* Default foreground */

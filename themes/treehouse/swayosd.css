@@ -5,7 +5,7 @@
 /* Base16 palette */
 @define-color base00 #191919;
 @define-color base01 #252220;
-@define-color base02 #786b53;
+@define-color base02 #3a362d;
 @define-color base03 #504332;
 @define-color base04 #786b53;
 @define-color base05 #786b53;
@@ -22,7 +22,7 @@
 
 /* OSD element colors */
 @define-color background-color #191919;
-@define-color border-color #786b53;
+@define-color border-color #3a362d;
 @define-color label #786b53;
 @define-color image #58859a;
 @define-color progress #58859a;

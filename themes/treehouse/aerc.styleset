@@ -7,7 +7,7 @@ default.bg = #191919
 
 # Selection is a raised surface, not an inverted block: aerc's own default
 # reverses the row, which turns any saturated accent into a full-width glare
-*.selected.bg = #786b53
+*.selected.bg = #3a362d
 *.selected.fg = #ffc800
 *.selected.bold = true
 

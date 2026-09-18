@@ -32,8 +32,8 @@
   /* URL bar */
   --urlbar-box-bgcolor: #252631 !important;
   --urlbar-box-text-color: #ebdbb2 !important;
-  --urlbar-box-hover-bgcolor: #ebdbb2 !important;
-  --urlbar-box-active-bgcolor: #ebdbb2 !important;
+  --urlbar-box-hover-bgcolor: #383637 !important;
+  --urlbar-box-active-bgcolor: #383637 !important;
   --urlbar-box-focus-bgcolor: #252631 !important;
   --autocomplete-popup-background: #252631 !important;
   --autocomplete-popup-color: #ebdbb2 !important;
@@ -49,7 +49,7 @@
   --arrowpanel-background: #252631 !important;
   --arrowpanel-color: #ebdbb2 !important;
   --arrowpanel-border-color: #928374 !important;
-  --panel-separator-color: #ebdbb2 !important;
+  --panel-separator-color: #383637 !important;
 
   /* Focus and selection */
   --focus-outline-color: #458588 !important;
@@ -60,7 +60,7 @@
   /* Buttons */
   --button-bgcolor: #252631 !important;
   --button-color: #ebdbb2 !important;
-  --button-hover-bgcolor: #ebdbb2 !important;
+  --button-hover-bgcolor: #383637 !important;
   --button-active-bgcolor: #928374 !important;
   --button-primary-bgcolor: #458588 !important;
   --button-primary-color: #181921 !important;
@@ -77,7 +77,7 @@
   --lwt-toolbar-field-background-color: #252631 !important;
   --lwt-toolbar-field-color: #ebdbb2 !important;
   --lwt-toolbar-field-border-color: #928374 !important;
-  --lwt-toolbar-field-focus: #ebdbb2 !important;
+  --lwt-toolbar-field-focus: #383637 !important;
   --lwt-toolbar-field-highlight: #ebdbb2 !important;
   --lwt-toolbar-field-highlight-text: #ebdbb2 !important;
 
@@ -228,7 +228,7 @@ menu:hover {
 }
 
 menuseparator {
-  border-color: #ebdbb2 !important;
+  border-color: #383637 !important;
 }
 
 /* Sidebar */

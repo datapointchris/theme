@@ -22,26 +22,26 @@ preview = { underline = true }
 
 [tabs]
 active = { fg = "#191919", bg = "#786b53", bold = true }
-inactive = { fg = "#786b53", bg = "#786b53" }
+inactive = { fg = "#786b53", bg = "#3a362d" }
 sep_inner = { open = "", close = "" }
 sep_outer = { open = "", close = "" }
 
 [mode]
 normal_main = { fg = "#191919", bg = "#786b53", bold = true }
-normal_alt = { fg = "#786b53", bg = "#786b53" }
+normal_alt = { fg = "#786b53", bg = "#3a362d" }
 select_main = { fg = "#191919", bg = "#ed5d20", bold = true }
-select_alt = { fg = "#ed5d20", bg = "#786b53" }
+select_alt = { fg = "#ed5d20", bg = "#3a362d" }
 unset_main = { fg = "#191919", bg = "#44a900", bold = true }
-unset_alt = { fg = "#44a900", bg = "#786b53" }
+unset_alt = { fg = "#44a900", bg = "#3a362d" }
 
 [status]
 sep_left = { open = "", close = "" }
 sep_right = { open = "", close = "" }
 overall = { fg = "#786b53", bg = "#252220" }
 progress_label = { fg = "#58859a", bold = true }
-progress_normal = { fg = "#786b53", bg = "#191919" }
-progress_error = { fg = "#786b53", bg = "#191919" }
-perm_type = { fg = "#786b53" }
+progress_normal = { fg = "#3a362d", bg = "#191919" }
+progress_error = { fg = "#3a362d", bg = "#191919" }
+perm_type = { fg = "#3a362d" }
 perm_read = { fg = "#55f238" }
 perm_write = { fg = "#b2270e" }
 perm_exec = { fg = "#55f238" }
@@ -75,7 +75,7 @@ separator_style = { fg = "#504332" }
 mask = { bg = "#252220" }
 rest = { fg = "#504332" }
 cand = { fg = "#58859a" }
-desc = { fg = "#786b53" }
+desc = { fg = "#3a362d" }
 
 [help]
 on = { fg = "#f07d14" }
@@ -98,7 +98,7 @@ btn_yes = { reversed = true, fg = "#786b53" }
 btn_no = {}
 
 [spot]
-border = { fg = "#786b53" }
+border = { fg = "#3a362d" }
 title = { fg = "#504332", bold = true }
 tbl_col = { fg = "#786b53" }
 tbl_cell = { bg = "#252220" }

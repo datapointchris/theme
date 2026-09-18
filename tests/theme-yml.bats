@@ -176,3 +176,23 @@ YAML
     assert_output --regexp '^#[0-9a-fA-F]{6}$'
   done
 }
+
+@test "every real theme's selection background sits nearer the page than the text" {
+  # base02 is the cursor line and the menu selection as well as the selection,
+  # and every generator drawing on it leaves the text in its own colors. An
+  # upstream palette may invert its selection instead, making the background
+  # the text color, and copying that here hides the text in all three places.
+  # A background divides the text's contrast by its own, so this asks that the
+  # selection take less than half of it: the text keeps more contrast on the
+  # selection than the selection has against the page. That is what makes it a
+  # background, whatever the theme's own text contrast is.
+  local failures
+  failures=$(yq -r '[filename, .base16.base00, .base16.base05, .base16.base02, (.extended.ui_selection // .base16.base02)] | @tsv' \
+    "$THEME_ROOT"/themes/*/theme.yml | awk -F'\t' '
+      function chan(h, i) { return strtonum("0x" substr(h, i + 1, 2)) }
+      function lin(v,  c) { c = v / 255; return (c <= 0.03928) ? c / 12.92 : ((c + 0.055) / 1.055) ^ 2.4 }
+      function lum(h) { return 0.2126 * lin(chan(h, 1)) + 0.7152 * lin(chan(h, 3)) + 0.0722 * lin(chan(h, 5)) }
+      function ratio(a, b,  x, y) { x = lum(a); y = lum(b); return (x > y) ? (x + 0.05) / (y + 0.05) : (y + 0.05) / (x + 0.05) }
+      ratio($3, $4) <= ratio($4, $2) || ratio($3, $5) <= ratio($5, $2) { print $1 }')
+  assert_equal "$failures" ""
+}

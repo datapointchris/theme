@@ -8,7 +8,7 @@ M.palette = {
   -- Base16 palette
   base00 = "#191919",
   base01 = "#252220",
-  base02 = "#786b53",
+  base02 = "#3a362d",
   base03 = "#504332",
   base04 = "#786b53",
   base05 = "#786b53",
@@ -46,7 +46,7 @@ M.palette = {
   syntax_attribute = "#aa820c",
   ui_accent = "#58859a",
   ui_border = "#786b53",
-  ui_selection = "#786b53",
+  ui_selection = "#3a362d",
   ui_float_bg = "#252220",
   ui_cursor_line = "#252220",
   git_add = "#44a900",
@@ -75,6 +75,8 @@ M.theme = {
     bg_gutter = M.palette.base00,
     bg_visual = M.palette.base02,
     bg_search = M.palette.base0A,
+    fg_search = "#191919",
+    fg_substitute = "#d9d6cf",
     fg = M.palette.base05,
     fg_dim = M.palette.base04,
     fg_reverse = M.palette.base00,
@@ -133,6 +135,7 @@ M.theme = {
     change = "#403515",
     delete = "#622014",
     text = "#634f12",
+    text_fg = "#c9c4ba",
   },
 }
 

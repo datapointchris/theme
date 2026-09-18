@@ -115,6 +115,49 @@ def band(accent: str, background: str, target: float) -> str:
     return f"#{int(r + 0.5):02x}{int(g + 0.5):02x}{int(blue + 0.5):02x}"
 
 
+# A background divides the contrast of every foreground drawn on it by its own
+# contrast with the page. A comment at 2:1 on the page reads at 1:1 on a 2.2:1
+# band, and the page's text on a bright search fill is lighter than the fill.
+# So a group whose background is a solved band or a bright accent carries a
+# solved foreground of its own, at the contrast body text needs.
+TEXT_CONTRAST = 4.5
+
+
+def _extreme(surface_luminance: float) -> int:
+    """White or black, whichever contrasts more with a surface of this luminance.
+
+    The two contrasts multiply to 21, so the larger is never below 4.58:1 and
+    pushing toward it can always reach TEXT_CONTRAST. The extreme on the text's
+    own side of a mid-luminance surface can top out below it.
+    """
+    return 255 if _contrast(1.0, surface_luminance) >= _contrast(0.0, surface_luminance) else 0
+
+
+def legible(text: str, surface: str, target: float) -> str:
+    """Push `text` toward the surface's stronger extreme until it clears `target`.
+
+    Each candidate is rounded before it is measured, so the check is on the
+    color emitted.
+    """
+    t = _channels(text)
+    base = _luminance(_channels(surface))
+    toward = _extreme(base)
+    fraction = 0.0
+    while fraction < 1:
+        c = tuple(int(toward * fraction + t[i] * (1 - fraction) + 0.5) for i in range(3))
+        if _contrast(_luminance(c), base) >= target:
+            return f"#{c[0]:02x}{c[1]:02x}{c[2]:02x}"
+        fraction += 0.02
+    return f"#{toward:02x}{toward:02x}{toward:02x}"
+
+
+def text_on(surface: str, text: str, background: str) -> str:
+    """The theme's text or background color, whichever lies toward the surface's stronger extreme, solved."""
+    lighter, darker = sorted((text, background), key=lambda c: _luminance(_channels(c)), reverse=True)
+    start = lighter if _extreme(_luminance(_channels(surface))) == 255 else darker
+    return legible(start, surface, TEXT_CONTRAST)
+
+
 def generate_palette_lua(theme: dict) -> str:
     """Generate palette.lua from theme.yml."""
     meta = theme.get("meta", {})
@@ -126,6 +169,9 @@ def generate_palette_lua(theme: dict) -> str:
     vcs_added = resolve_color(base16, extended, "git_add", "base0B")
     vcs_changed = resolve_color(base16, extended, "git_change", "base0A")
     vcs_removed = resolve_color(base16, extended, "git_delete", "base08")
+    text = base16.get("base05", "#ffffff")
+    search = base16.get("base0A", "#000000")
+    diff_text = band(vcs_changed, background, DIFF_EMPHASIS_CONTRAST)
 
     lines = [
         "-- Auto-generated palette from theme.yml",
@@ -177,6 +223,8 @@ def generate_palette_lua(theme: dict) -> str:
         f'    bg_gutter = M.palette.base00,',
         f'    bg_visual = M.palette.base02,',
         f'    bg_search = M.palette.base0A,',
+        f'    fg_search = "{text_on(search, text, background)}",',
+        f'    fg_substitute = "{text_on(vcs_removed, text, background)}",',
         f'    fg = M.palette.base05,',
         f'    fg_dim = M.palette.base04,',
         f'    fg_reverse = M.palette.base00,',
@@ -234,12 +282,15 @@ def generate_palette_lua(theme: dict) -> str:
         # a slot. Solved against base00 because that is what Normal's background
         # resolves to (`ui.bg`), so the ratio holds against what the diff is
         # actually drawn on. The emphasis target goes to DiffText, which marks
-        # the characters that differ inside a line DiffChange marks whole.
+        # the characters that differ inside a line DiffChange marks whole, and
+        # only DiffText carries a foreground: the line bands leave syntax colors
+        # readable, the emphasis band does not.
         "  diff = {",
         f'    add = "{band(vcs_added, background, DIFF_LINE_CONTRAST)}",',
         f'    change = "{band(vcs_changed, background, DIFF_LINE_CONTRAST)}",',
         f'    delete = "{band(vcs_removed, background, DIFF_LINE_CONTRAST)}",',
-        f'    text = "{band(vcs_changed, background, DIFF_EMPHASIS_CONTRAST)}",',
+        f'    text = "{diff_text}",',
+        f'    text_fg = "{legible(text, diff_text, TEXT_CONTRAST)}",',
         "  },",
         "}",
         "",
@@ -260,7 +311,7 @@ function M.setup(colors)
     -- Basic UI
     ColorColumn = { bg = theme.ui.bg_p1 },
     Conceal = { fg = theme.ui.special, bold = true },
-    CurSearch = { fg = theme.ui.fg, bg = theme.ui.bg_search, bold = true },
+    CurSearch = { fg = theme.ui.fg_search, bg = theme.ui.bg_search, bold = true },
     Cursor = { fg = theme.ui.bg, bg = theme.ui.fg },
     lCursor = { link = "Cursor" },
     CursorIM = { link = "Cursor" },
@@ -274,7 +325,7 @@ function M.setup(colors)
     DiffAdd = { bg = theme.diff.add },
     DiffChange = { bg = theme.diff.change },
     DiffDelete = { bg = theme.diff.delete },
-    DiffText = { bg = theme.diff.text },
+    DiffText = { fg = theme.diff.text_fg, bg = theme.diff.text },
 
     EndOfBuffer = { fg = theme.ui.bg },
     ErrorMsg = { fg = theme.diag.error },
@@ -286,7 +337,7 @@ function M.setup(colors)
 
     -- Search
     IncSearch = { fg = theme.ui.fg_reverse, bg = theme.diag.warning },
-    Substitute = { fg = theme.ui.fg, bg = theme.vcs.removed },
+    Substitute = { fg = theme.ui.fg_substitute, bg = theme.vcs.removed },
 
     -- Line numbers
     LineNr = { fg = theme.ui.nontext, bg = theme.ui.bg_gutter },
@@ -320,7 +371,7 @@ function M.setup(colors)
 
     Question = { link = "MoreMsg" },
     QuickFixLine = { bg = theme.ui.bg_p1 },
-    Search = { fg = theme.ui.fg, bg = theme.ui.bg_search },
+    Search = { fg = theme.ui.fg_search, bg = theme.ui.bg_search },
     SpecialKey = { fg = theme.ui.special },
 
     -- Spell
@@ -1197,10 +1248,10 @@ function M.highlights(colors, highlights)
   -- highlights.VisualNOS = {{ bg = ui.bg_visual }}
 
   -- Search
-  -- highlights.Search = {{ fg = ui.fg, bg = ui.bg_search }}
+  -- highlights.Search = {{ fg = ui.fg_search, bg = ui.bg_search }}
   -- highlights.IncSearch = {{ fg = ui.fg_reverse, bg = diag.warning }}
-  -- highlights.CurSearch = {{ fg = ui.fg, bg = ui.bg_search, bold = true }}
-  -- highlights.Substitute = {{ fg = ui.fg, bg = colors.theme.vcs.removed }}
+  -- highlights.CurSearch = {{ fg = ui.fg_search, bg = ui.bg_search, bold = true }}
+  -- highlights.Substitute = {{ fg = ui.fg_substitute, bg = colors.theme.vcs.removed }}
 
   -- Matching
   -- highlights.MatchParen = {{ fg = diag.warning, bold = true }}
@@ -1244,7 +1295,7 @@ function M.highlights(colors, highlights)
   -- highlights.DiffAdd = {{ bg = colors.theme.diff.add }}
   -- highlights.DiffChange = {{ bg = colors.theme.diff.change }}
   -- highlights.DiffDelete = {{ fg = colors.theme.vcs.removed, bg = colors.theme.diff.delete }}
-  -- highlights.DiffText = {{ bg = colors.theme.diff.text }}
+  -- highlights.DiffText = {{ fg = colors.theme.diff.text_fg, bg = colors.theme.diff.text }}
   -- highlights.diffAdded = {{ fg = colors.theme.vcs.added }}
   -- highlights.diffRemoved = {{ fg = colors.theme.vcs.removed }}
   -- highlights.diffChanged = {{ fg = colors.theme.vcs.changed }}

@@ -7,7 +7,7 @@ function M.setup(colors)
     -- Basic UI
     ColorColumn = { bg = theme.ui.bg_p1 },
     Conceal = { fg = theme.ui.special, bold = true },
-    CurSearch = { fg = theme.ui.fg, bg = theme.ui.bg_search, bold = true },
+    CurSearch = { fg = theme.ui.fg_search, bg = theme.ui.bg_search, bold = true },
     Cursor = { fg = theme.ui.bg, bg = theme.ui.fg },
     lCursor = { link = "Cursor" },
     CursorIM = { link = "Cursor" },
@@ -21,7 +21,7 @@ function M.setup(colors)
     DiffAdd = { bg = theme.diff.add },
     DiffChange = { bg = theme.diff.change },
     DiffDelete = { bg = theme.diff.delete },
-    DiffText = { bg = theme.diff.text },
+    DiffText = { fg = theme.diff.text_fg, bg = theme.diff.text },
 
     EndOfBuffer = { fg = theme.ui.bg },
     ErrorMsg = { fg = theme.diag.error },
@@ -33,7 +33,7 @@ function M.setup(colors)
 
     -- Search
     IncSearch = { fg = theme.ui.fg_reverse, bg = theme.diag.warning },
-    Substitute = { fg = theme.ui.fg, bg = theme.vcs.removed },
+    Substitute = { fg = theme.ui.fg_substitute, bg = theme.vcs.removed },
 
     -- Line numbers
     LineNr = { fg = theme.ui.nontext, bg = theme.ui.bg_gutter },
@@ -67,7 +67,7 @@ function M.setup(colors)
 
     Question = { link = "MoreMsg" },
     QuickFixLine = { bg = theme.ui.bg_p1 },
-    Search = { fg = theme.ui.fg, bg = theme.ui.bg_search },
+    Search = { fg = theme.ui.fg_search, bg = theme.ui.bg_search },
     SpecialKey = { fg = theme.ui.special },
 
     -- Spell

@@ -10,7 +10,7 @@ meta:
 base16:
   base00: '#191919'
   base01: '#252220'  # Computed: slightly lighter with warm tone (was #504332 - wrong, too bright for UI bg)
-  base02: '#786b53'
+  base02: '#3a362d'  # Computed: base00 lifted toward base05 to 1.45:1. Upstream's selection is inverted (selection_bg is the text color) and only reads with selection_fg drawn over it; base02 is also the cursor line and menu selection, which draw text in its own colors
   base03: '#504332'
   base04: '#786b53'
   base05: '#786b53'
@@ -72,7 +72,7 @@ extended:
   syntax_attribute: '#aa820c'    # yellow/gold
   ui_accent: '#58859a'
   ui_border: '#786b53'
-  ui_selection: '#786b53'
+  ui_selection: '#3a362d'  # base02, for the reason given there
   ui_float_bg: '#252220'  # Matches base01
   ui_cursor_line: '#252220'  # Matches base01
   git_add: '#44a900'

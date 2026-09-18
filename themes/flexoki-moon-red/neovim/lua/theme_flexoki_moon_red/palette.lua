@@ -77,6 +77,8 @@ M.theme = {
     bg_gutter = M.palette.base00,
     bg_visual = M.palette.base02,
     bg_search = M.palette.base0A,
+    fg_search = "#18090b",
+    fg_substitute = "#f0e8dd",
     fg = M.palette.base05,
     fg_dim = M.palette.base04,
     fg_reverse = M.palette.base00,
@@ -135,6 +137,7 @@ M.theme = {
     change = "#422b08",
     delete = "#591a18",
     text = "#634606",
+    text_fg = "#f0e8dd",
   },
 }
 
