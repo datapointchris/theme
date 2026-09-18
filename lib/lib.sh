@@ -668,8 +668,12 @@ apply_bat() {
   # copy makes every applied theme selectable as `bat --theme=<id>`.
   install_themed_artifact "$lib_path/bat.tmTheme" "$bat_themes_dir" "$theme.tmTheme" "current.tmTheme" || return 1
 
-  # Rebuild bat cache to register the updated theme
-  bat cache --build >/dev/null 2>&1 || true
+  # Rebuild bat cache to register the updated theme. The link above is already
+  # moved, so a failed build leaves bat and delta on the previous theme while
+  # the tick below says bat applied — nothing else would show it.
+  if ! bat cache --build >/dev/null 2>&1; then
+    apply_warn "bat cache --build failed — bat and delta keep the previous theme until it succeeds. Run it by hand to see why."
+  fi
 
   return 0
 }
