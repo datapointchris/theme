@@ -2,220 +2,81 @@
 
 ## Overview
 
-Unified theme generation system that creates consistent color configurations
-across terminal and desktop applications from a single `theme.yml` source file.
-Supports Ghostty, Kitty, Alacritty, tmux, btop, bat, delta, yazi, sioyek, aerc,
-JankyBorders, Hyprland, Waybar, Rofi, Dunst/Mako, Firefox-based and Chromium browsers,
-Windows Terminal, and more. Each theme in `themes/` provides app configs that match a
-corresponding Neovim colorscheme.
+Unified theme generation that creates consistent color configurations across terminal and
+desktop applications from a single `theme.yml` per theme. Each theme in `themes/` provides app
+configs that match a corresponding Neovim colorscheme.
 
-## Directory Structure
-
-Dev source is `~/tools/theme`; the installed copy everything actually reads is
-`~/.local/share/theme` (see Neovim Integration for why that distinction bites).
+Dev source is `~/tools/theme`. The installed copy everything actually reads is
+`~/.local/share/theme` (see Neovim Integration for why that distinction bites). State and
+generated data live at:
 
 ```text
-~/tools/theme/
-├── bin/theme              # the CLI — `theme --help` for the verbs
-├── lib/
-│   ├── theme.sh           # Loads theme.yml into the shell vars generators read
-│   ├── generate-all.sh    # Runs every generator over every theme, in parallel
-│   ├── generators/        # One script per app: <theme.yml> [output] -> config
-│   ├── lib.sh, storage.sh, sync.sh  # Apply logic, JSONL history, Gist sync
-│   └── browser-profiles.sh, theme-preview.sh
-├── themes/{id}/           # theme.yml source + every generated app config
-│   └── neovim/            # Colorscheme plugin; every theme has one
-├── tests/                 # bats suite; see Tests below
-├── scripts/               # Migration and live-machine apply checks
-├── analysis/              # Why the rules are what they are; see analysis/README.md
-└── install.sh
-
-# Data locations (XDG-compliant):
-# ~/.local/state/theme/history.jsonl   - Unified history (synced via gist)
-# ~/.local/state/theme/current         - Current theme ID
-# ~/.local/state/theme/sync-state.json - Sync configuration
-# ~/.cache/theme/backgrounds/          - Pre-rendered backgrounds per theme
-# ~/.cache/theme/gowall/               - Per-theme gowall palettes, as JSON
+~/.local/state/theme/history.jsonl   - Unified history (synced via gist)
+~/.local/state/theme/current         - Current theme ID
+~/.local/state/theme/sync-state.json - Sync configuration
+~/.cache/theme/backgrounds/          - Pre-rendered backgrounds per theme
+~/.cache/theme/gowall/               - Per-theme gowall palettes, as JSON
 ```
 
-Generated state belongs in those two cache directories and nowhere else. The
-gowall palettes were previously appended to `~/.config/gowall/config.yml`, which
-is a symlink into the dotfiles repo — so every theme apply dirtied dotfiles, and
-entries for deleted themes accumulated for months.
+Generated state belongs in those two cache directories and nowhere else. An app config here is
+often a symlink into another repo, so writing generated state into it dirties that repo on every
+apply.
 
 ## Theme Categories
 
-Every theme is either **generated** (its Neovim colorscheme is built from
-`theme.yml` into `themes/{id}/neovim/`) or **plugin** (it supplies app configs
-that match a Neovim colorscheme someone else maintains). `theme.yml` is the only
-place that fact is recorded, so read it from there rather than from a list here:
+Every theme is either **generated** (its Neovim colorscheme is built from `theme.yml` into
+`themes/{id}/neovim/`) or **plugin** (it supplies app configs that match a Neovim colorscheme
+someone else maintains). `theme.yml` is the only place that fact is recorded, so read it there:
 
 ```bash
 yq -r '[.meta.id, .meta.neovim_colorscheme_source, (.meta.plugin // "-"), .meta.derived_from] | @tsv' \
   themes/*/theme.yml | column -t -s$'\t'
 ```
 
-Generated themes are the exception, not the rule — see Key Insights below for
-why most themes are better off pairing a hand-tuned plugin with generated app
-configs.
+Generated themes are the exception. A hand-tuned plugin usually looks better than a colorscheme
+derived from the same palette, so most themes pair the original Neovim plugin with generated app
+configs. `neovim_colorscheme_name` may differ from the id (`oceanic-next` uses `OceanicNext`).
 
-## Theme Files
-
-Each theme directory contains app-specific configs generated from `theme.yml`:
-
-```text
-themes/{theme-id}/
-├── theme.yml           # Source palette (required)
-├── ghostty.conf        # Ghostty terminal colors
-├── ghostty.css         # Ghostty tab custom CSS
-├── kitty.conf          # Kitty terminal
-├── alacritty.toml      # Alacritty terminal
-├── tmux.conf           # tmux status bar
-├── btop.theme          # btop system monitor
-├── bat.tmTheme         # bat pager syntax theme
-├── delta.conf          # delta git pager (included from gitconfig)
-├── flavor.toml         # yazi file manager flavor
-├── sioyek.config       # sioyek PDF viewer (managed block, spliced on apply)
-├── aerc.styleset       # aerc email client (installed into stylesets/ on apply)
-├── userChrome.css      # Firefox-based browsers (Zen/Librewolf/Firefox/Thunderbird)
-├── chromium.theme      # Chromium DevTools theme
-├── icons.theme         # GTK icon theme (Arch)
-├── bordersrc           # JankyBorders (macOS)
-├── hyprland.conf       # Hyprland WM (Arch)
-├── hyprland-picker.css # Hyprland color picker (Arch)
-├── hyprlock.conf       # Hyprlock lock screen (Arch)
-├── waybar.css          # Waybar status bar (Arch)
-├── walker.css          # Walker launcher (Arch)
-├── swayosd.css         # SwayOSD on-screen display (Arch)
-├── rofi.rasi           # Rofi launcher (Arch)
-├── dunst.conf          # Dunst notifications (Arch)
-├── mako.conf           # Mako notifications (Arch)
-├── windows-terminal.json  # Windows Terminal (WSL)
-└── neovim/             # Colorscheme plugin (a directory, not a file)
-```
-
-**Every theme has the identical file set** — that uniformity is the check that
-catches both a new theme built with a generator missing from `generate-all.sh`
-and a stale artifact left behind by a format migration. Anything below the theme
-count is a defect (`neovim/` is a directory, so the file sweep below skips it —
-`tests/generators.bats` covers it separately):
-
-```bash
-total=$(fd -HI '^theme.yml$' themes | wc -l)
-for f in $(fd -HI -t f . themes -x basename {} | sort -u); do
-  n=$(fd -HI "^${f}$" themes | wc -l)
-  [ "$n" -ne "$total" ] && printf "%-24s %s/%s\n" "$f" "$n" "$total"
-done
-```
+**Every theme has the identical artifact set.** That uniformity catches both a generator missing
+from `generate-all.sh` and a stale artifact left behind by a format migration.
+`tests/generators.bats` asserts it.
 
 ### Where an applied theme lands
 
-`theme apply` installs each artifact under the **theme's own id** and points a
-stable `current` **symlink** at it — `themes/cendre-medium.conf` with
-`themes/current.conf -> cendre-medium.conf`. `install_themed_artifact` in `lib.sh`
-is the one place that happens; yazi is the single exception, because a flavor is a
-directory rather than a file.
+`theme apply` installs each artifact under the **theme's own id** and points a stable `current`
+**symlink** at it: `themes/cendre-medium.conf` with `themes/current.conf -> cendre-medium.conf`.
+`install_themed_artifact` in `lib.sh` is the one place that happens. yazi is the single
+exception, because a flavor is a directory rather than a file.
 
-Both halves are load-bearing. The pointer keeps the name `current` because the apps
-that can only `source`/`@import`/`include` a **path** need one that does not move —
-and because the apps that resolve a theme *by name* (ghostty, btop, bat, aerc,
-rofi) read their config from a symlink into the dotfiles repo, so writing the name
-there would write through the link into that checkout. That is precisely how the
-gowall palettes dirtied dotfiles for months. The payload carries the id so a machine
-says which theme it is running, every theme applied stays installed beside the
-others, and an exported config is self-describing.
+Both halves are load-bearing. The pointer keeps the name `current` because the apps that can only
+`source`/`@import`/`include` a **path** need one that does not move. The apps that resolve a theme
+*by name* (ghostty, btop, bat, aerc, rofi) read their config from a symlink into the dotfiles
+repo, so writing the name there would write through the link into that checkout. The payload
+carries the id so a machine says which theme it is running, every applied theme stays installed
+beside the others, and an exported config is self-describing.
 
-Nothing is pruned, deliberately: these are also the directories a user's own themes
-live in, and an installer that deletes what it does not recognise is worse than a
-few stale kilobytes.
+Nothing is pruned, deliberately. These are also the directories a user's own themes live in, and
+an installer that deletes what it does not recognize is worse than a few stale kilobytes.
 
-Four apps have no pointer at all and are not part of this — dunst reads
-`dunstrc.d/` as a directory, firefox and Windows Terminal have their real file
-rewritten, and sioyek gets a managed block spliced into its own config.
+Four apps have no pointer at all. dunst reads `dunstrc.d/` as a directory, firefox and Windows
+Terminal have their real file rewritten, and sioyek gets a managed block spliced into its own
+config.
 
-`tests/apply-install.bats` pins it, including the two migration cases off the
-copy-based scheme: a `current` left as a real file, and a `current.yazi` left as a
-real directory, which `ln -sfn` would otherwise link *inside*.
+`tests/apply-install.bats` pins it, including the two migration cases off the copy-based scheme:
+a `current` left as a real file, and a `current.yazi` left as a real directory, which `ln -sfn`
+would otherwise link *inside*.
 
-### theme.yml Format
+## Creating a New Theme
 
-```yaml
-meta:
-  id: "gruvbox-dark-hard"              # Directory name, lowercase-hyphen
-  display_name: "Gruvbox Dark Hard"    # Pretty name for UI
-  neovim_colorscheme_name: "gruvbox-dark-hard"  # What :colorscheme uses
-  neovim_colorscheme_source: "generated"  # "generated" or "plugin"
-  plugin: null                         # "author/repo" or null
-  neovim_plugin_background: null       # Optional. Plugin variant that has no
-                                       # colorscheme name of its own — passed to
-                                       # require(<colorscheme>).setup{background=}
-                                       # before applying (cendre's three depths)
-  derived_from: "ghostty-builtin"      # Where colors came from
-  variant: "dark"
-  author: "morhetz"
+Run from the repo root (`~/tools/theme`). Writing `theme.yml` is the whole job; every app config
+is derived from it. `themes/*/theme.yml` shows the format.
 
-base16:
-  base00: "#1d2021"  # Background through base0F
-  # ...
+1. **Write `themes/{id}/theme.yml`** — meta, base16, ansi, special, extended. Mapping a palette
+   into those slots is the only part that takes judgment: see "Mapping a Palette into theme.yml" below.
 
-ansi:
-  black: "#..."      # 16 ANSI terminal colors
-  # ...
-
-special:
-  background: "#..."
-  foreground: "#..."
-  cursor: "#..."
-  # ...
-
-extended:
-  # Theme-specific extra colors (optional)
-```
-
-## Theme Workflow
-
-### Using Existing Themes
-
-```bash
-theme list                       # List with display names
-theme change                     # Interactive picker
-theme apply gruvbox-dark-hard    # Apply by id
-theme current                    # Show current theme
-theme like "great contrast"      # Rate current theme
-theme reject "too bright"        # Remove from rotation
-theme update                     # Update to latest version
-
-# Background management
-theme background                 # Show background usage
-theme background current         # Show current background
-theme background rotate          # Rotate to new background
-theme background mode set recolor generated:plasma  # Set modes
-theme background source add ~/Pictures/wallpapers   # Add source
-
-# Opacity
-theme opacity                    # Show opacity usage
-theme opacity current            # Show current opacity
-theme opacity set 90             # Set opacity to 90%
-
-# Sync
-theme sync                       # Show sync usage
-theme sync init                  # Initialize GitHub Gist sync
-theme sync status                # Show sync status
-```
-
-### Creating a New Theme
-
-Run from the repo root (`~/tools/theme`). Writing `theme.yml` is the whole job;
-every app config is derived from it.
-
-1. **Write `themes/{id}/theme.yml`** — meta, base16, ansi, special, extended.
-   Mapping a palette into those slots is the only part that takes judgement:
-   see "Mapping a Palette into theme.yml" below.
-
-2. **Generate every app config in one call.** Never invoke generators one by one
-   — `generate-all.sh` owns the generator-to-filename mapping, runs them in
-   parallel, and is the only thing guaranteed to leave a new theme with the same
-   file set as every existing one:
+2. **Generate every app config in one call.** Never invoke generators one by one.
+   `generate-all.sh` owns the generator-to-filename mapping, runs them in parallel, and is the
+   only thing guaranteed to leave a new theme with the same file set as every existing one:
 
    ```bash
    lib/generate-all.sh --themes {id}      # one theme, every generator
@@ -223,41 +84,39 @@ every app config is derived from it.
    lib/generate-all.sh --help             # lists the generators it knows about
    ```
 
-   A generator that is not in that script's `GENERATOR_OUTPUT` map is invisible
-   to it, so adding a generator means adding its map entry in the same commit.
+   A generator that is not in that script's `GENERATOR_OUTPUT` map is invisible to it, so adding
+   a generator means adding its map entry in the same commit.
 
-3. **Verify against the source, not by eye.** When a theme comes from a plugin
-   that ships its own terminal configs, diff the generated file against theirs —
-   an exact match on every colour is the proof the transcription is right:
+3. **Verify against the source, not by eye.** When a theme comes from a plugin that ships its own
+   terminal configs, diff the generated file against theirs. An exact match on every color is the
+   proof the transcription is right:
 
    ```bash
    diff <(rg -N "^(background|foreground|cursor|selection|palette)" themes/{id}/ghostty.conf) \
         <(rg -N "^(background|foreground|cursor|selection|palette)" /path/to/upstream/extras/ghostty/{name})
    ```
 
-4. **Plugin themes need a Neovim entry too** — see "Neovim Integration" below.
-   Terminal configs alone leave the editor on the previous colorscheme.
+4. **Plugin themes need a Neovim entry too** — see "Neovim Integration" below. Terminal configs
+   alone leave the editor on the previous colorscheme.
 
-5. **Deploy.** The installed tool reads `~/.local/share/theme`, not this repo, so
-   nothing takes effect until a release ships: commit, push (the Release workflow
-   tags it), then `theme update`, then `theme apply {id}`.
+5. **Deploy.** The installed tool reads `~/.local/share/theme`, not this repo, so nothing takes
+   effect until a release ships: commit, push (the Release workflow tags it), then `theme update`,
+   then `theme apply {id}`.
 
 ### Mapping a Palette into theme.yml
 
-Upstream palettes are organised by *role* ("keywords", "types"); base16 slots are
-organised by *hue*. When they conflict, **follow hue** — every theme here does,
-and the generators mix `base16` and `ansi` values in the same output file, so a
-role-based mapping puts a green in the slot a generator draws its red from.
+Upstream palettes are organized by *role* ("keywords", "types"); base16 slots are organized by
+*hue*. When they conflict, **follow hue**. The generators mix `base16` and `ansi` values in the
+same output file, so a role-based mapping puts a green in the slot a generator draws its red from.
 
-- `base0D` is the single most-used slot (`rg -c BASE0D lib/generators/*.sh`), and
-  generators treat it as the primary UI accent, not as "the blue". If a theme's
-  true blue is a loud diagnostic colour, set `base0D` to the restrained blue and
-  put the intended accent in `extended.ui_accent`, which overrides `BASE0D` in
-  every generator that draws UI chrome.
-- `base06`/`base07` are "lighter/lightest foreground". Duplicating `base05` when
-  a palette has no lighter ink is normal — several themes do it.
-- The `extended` block is optional, but generators read a fixed set of keys from
-  it and silently fall back when one is absent. List what is actually consumed:
+- `base0D` is the single most-used slot (`rg -c BASE0D lib/generators/*.sh`), and generators
+  treat it as the primary UI accent, not as "the blue". If a theme's true blue is a loud
+  diagnostic color, set `base0D` to the restrained blue and put the intended accent in
+  `extended.ui_accent`, which overrides `BASE0D` in every generator that draws UI chrome.
+- `base06`/`base07` are "lighter/lightest foreground". Duplicating `base05` when a palette has no
+  lighter ink is normal.
+- The `extended` block is optional, but generators read a fixed set of keys from it and silently
+  fall back when one is absent. List what is actually consumed:
 
   ```bash
   rg -o --no-filename "EXTENDED_[A-Z0-9_]+" lib/ | sort -u
@@ -265,136 +124,94 @@ role-based mapping puts a green in the slot a generator draws its red from.
 
 ### The Generated Neovim Colorscheme
 
-Every theme has one, and `generate-all.sh` produces it like any other artifact —
-`lib/generators/neovim.py`, wired into the map under `["neovim"]="neovim"`. It is
-the only generator written in Python and the only one whose second argument is a
-directory, neither of which the job runner cares about: it passes the mapped
-value through as `$2` and nothing else reads it. The PEP 723 header is what makes
-it directly executable, so it needs no `uv run` wrapper at the call site.
+Every theme has one, and `generate-all.sh` produces it like any other artifact:
+`lib/generators/neovim.py`, mapped under `["neovim"]="neovim"`. It is the only generator written
+in Python and the only one whose second argument is a directory. The job runner cares about
+neither: it passes the mapped value through as `$2`. The PEP 723 header makes it directly
+executable, so it needs no `uv run` wrapper at the call site.
 
-**The name it emits depends on where the theme's colours come from**, and this is
-the constraint to preserve:
+**The name it emits depends on where the theme's colors come from**, and this is the constraint
+to preserve:
 
 | `neovim_colorscheme_source` | Emits | Why |
 | --- | --- | --- |
 | `generated` | `colors/{id}.lua` | The colorscheme *is* the theme, nothing upstream can collide, and the name is already in `history.jsonl` |
 | `plugin` | `colors/theme-{id}.lua` | A fallback for a machine without the plugin, and the id is usually the plugin's own colorscheme name |
 
-Most of the plugin themes have an id identical to the colorscheme their plugin
-provides — `kanagawa`, `gruvbox`, `nordic`, `rose-pine` among them. Emitting
-`colors/kanagawa.lua` puts a second file of that name on the runtimepath beside
-`rebelot/kanagawa.nvim`'s, and which one `:colorscheme kanagawa` resolves to is
-whichever the runtimepath lists first. The prefix is what lets the fallback be
-addressable without displacing the real thing. This is pinned by
-`tests/generators.bats`.
+Most plugin themes have an id identical to the colorscheme their plugin provides (`kanagawa`,
+`gruvbox`, `nordic`, `rose-pine`). Emitting `colors/kanagawa.lua` would put a second file of that
+name on the runtimepath beside `rebelot/kanagawa.nvim`'s, and `:colorscheme kanagawa` would
+resolve to whichever the runtimepath lists first. The prefix makes the fallback addressable
+without displacing the real thing. `tests/generators.bats` pins this.
 
-The generator used to refuse a plugin theme outright for that reason. Prefixing
-removes the collision, so the refusal and its `--force` escape hatch are gone.
+**`overrides.lua` is written only when absent, and preserved otherwise.** It is hand-edited, and
+it lives inside the generated tree with nothing marking it. Any reimplementation that writes the
+whole file map destroys every theme's customizations with no error. `write_file` rstrips and
+re-adds one trailing newline so the templates agree with `end-of-file-fixer`; matching that
+byte-for-byte is what keeps a regeneration diff empty.
 
-**`overrides.lua` is written only when absent, and preserved otherwise** — it is
-hand-edited, and it lives inside the generated tree with nothing marking it. Any
-reimplementation that writes the whole file map destroys every theme's
-customizations with no error. The same care applies to `write_file`, which
-rstrips and re-adds one trailing newline so the templates agree with
-`end-of-file-fixer`; matching that byte-for-byte is what keeps a regeneration
-diff empty.
-
-**Only `palette.lua` is derived from `theme.yml`.** Every highlight file
-references `M.palette.*` symbolically and is identical across themes but for the
-module name, which is `id` with hyphens replaced by underscores. Measured: one
-theme costs 0.25s.
+**Only `palette.lua` is derived from `theme.yml`.** Every highlight file references
+`M.palette.*` symbolically and is identical across themes but for the module name, which is the
+id with hyphens replaced by underscores.
 
 ## Key Insights
 
-- **Same palette ≠ same result**: Hand-crafted Neovim plugins often look
-  better than generated colorschemes
-- **Generated themes are rare**: Most themes work best with original Neovim
-  plugin + generated terminal configs
-- **neovim_colorscheme_name may differ from id**: e.g., `oceanic-next`
-  directory uses `OceanicNext` colorscheme
-- **The gist holds one history file per machine, and a machine writes only its
-  own**: a union merge cannot express a deletion. Every machine may assert every
-  row, so a row removed on one machine is restored by the next machine to sync
-  from a copy that still holds it — which is how four records written by
-  `theme reject --help` survived being deleted. `_sync_merge_histories` takes
-  each other machine's file as authoritative and keeps only this machine's rows
-  from the local file, so removing a row you wrote is an ordinary edit. The
-  pre-split `history.jsonl` is deliberately never read: a machine on an older
-  release still writes the whole merged set there, and its rows arrive under the
-  new name the first time it pushes after updating. `scripts/split-gist-history.sh`
-  is the one-time split, and it seeds *every* machine's file rather than only the
-  one it runs on — an unseeded machine would vanish from the others' rankings
-  until it updated.
-- **The local `history.jsonl` is unchanged by that split**: it stays one merged
-  file holding every machine's rows, and `lib/storage.sh` never learns the gist
-  has more than one. Only `lib/sync.sh` knows.
-- **delta rides bat's theme cache**: `delta.conf` sets `syntax-theme = current`,
-  which resolves through the bat cache `apply_bat` rebuilds — hence delta applies
-  after bat and requires both binaries. Renaming `current.tmTheme` breaks delta
-  silently, with no error and a stock Monokai fallback.
-- **Generated output goes stale silently**: `themes/*/neovim/` and the app
-  configs are committed artifacts, so a generator improvement does not reach a
-  theme until that theme is regenerated. Regenerate broadly rather than only the
-  theme being worked on, and treat an unexpected diff as the generator having
-  moved on, not as noise.
-- **A generated colorscheme is a fallback, not a substitute**: it is derived from
-  the palette, where the plugin was tuned by hand against real buffers. It exists
-  so a machine without the plugin still changes colour, and `theme apply` says so
-  by name when it is what Neovim will land on.
-- **Generate only through `generate-all.sh`**: a one-off generator invocation is
-  how `mako.ini` came back a week after the migration that deleted it — eight
-  themes carried a dead legacy file for months because the regeneration ran
-  outside the script that owns the filename map.
-- **Keep `GENERATOR_OUTPUT`'s subscripts quoted**: unquoted, shfmt reads a
-  subscript as arithmetic and rewrites `[ghostty-css]` as `[ghostty - css]`. Bash
-  accepts the key, so the only symptom is a generator path that does not exist —
-  which is why four generators stopped running for a month while every run
-  reported all its jobs successful. `tests/generators.bats` pins this; the totals
-  the script prints cannot, because they come from the map rather than the jobs.
-- **A generator runs once per theme, so per-key `yq` calls are the cost**: reading
-  one `theme.yml` was ~80 yq spawns and five seconds before `load_theme` was made
-  a single pass. Add to the one yq program rather than alongside it.
+- **The gist holds one history file per machine, and a machine writes only its own.** A union
+  merge cannot express a deletion: a row removed on one machine is restored by the next machine
+  to sync from a copy that still holds it. `_sync_merge_histories` takes each other machine's
+  file as authoritative and keeps only this machine's rows from the local file, so removing a row
+  you wrote is an ordinary edit. The pre-split gist `history.jsonl` is deliberately never read,
+  because a machine on an older release still writes the whole merged set there.
+  `scripts/split-gist-history.sh` is the one-time split, and it seeds *every* machine's file; an
+  unseeded machine would vanish from the others' rankings until it updated.
+- **The local `history.jsonl` is one merged file** holding every machine's rows. `lib/storage.sh`
+  never learns the gist has more than one; only `lib/sync.sh` knows.
+- **delta rides bat's theme cache.** `delta.conf` sets `syntax-theme = current`, which resolves
+  through the bat cache `apply_bat` rebuilds. So delta applies after bat and requires both
+  binaries. Renaming `current.tmTheme` breaks delta silently, with a stock Monokai fallback.
+- **Generated output goes stale silently.** `themes/*/neovim/` and the app configs are committed
+  artifacts, so a generator improvement does not reach a theme until that theme is regenerated.
+  Regenerate broadly, and treat an unexpected diff as the generator having moved on, not as noise.
+- **A generated colorscheme is a fallback, not a substitute.** It is derived from the palette,
+  where the plugin was tuned by hand against real buffers. It exists so a machine without the
+  plugin still changes color, and `theme apply` says so by name when Neovim will land on it.
+- **Generate only through `generate-all.sh`.** A one-off generator invocation is how a deleted
+  legacy artifact (`mako.ini`) came back into eight themes: the regeneration ran outside the
+  script that owns the filename map.
+- **Keep `GENERATOR_OUTPUT`'s subscripts quoted.** Unquoted, shfmt reads a subscript as
+  arithmetic and rewrites `[ghostty-css]` as `[ghostty - css]`. Bash accepts the key, so the only
+  symptom is a generator path that does not exist while every run reports all its jobs
+  successful. `tests/generators.bats` pins this. The totals the script prints cannot, because
+  they come from the map rather than the jobs.
+- **A generator runs once per theme, so per-key `yq` calls are the cost.** `load_theme` reads
+  `theme.yml` in a single yq pass. Add to that one program rather than alongside it.
 - **An apply discards stderr, so a warning needs the array and not `echo`.**
-  `apply_theme_to_apps` calls every `apply_*` as `apply_x "$theme" 2>/dev/null`,
-  which is what keeps `cp` and reload noise off the screen — and it means anything
-  written to stderr *during* an apply is thrown away. `apply_warn` appends to
-  `APPLY_WARNINGS`, which the caller prints after the per-app ticks. A warning
-  nobody can see is worse than none, because a quiet run reads as a correct one.
-- **The one failure with no output is Neovim.** A plugin theme names a colorscheme
-  this tool does not ship, so a machine that never installed it gets a terminal
-  that changes colour and an editor that does not — while every tick still says
-  the apply worked. `check_neovim_colorscheme` looks for the
-  `colors/<name>.{lua,vim}` that `:colorscheme` actually needs, deliberately not
-  asking lazy.nvim where it puts plugins, so the `vim.pack` migration cannot turn
-  the check into "always fine".
-- **Config generation is seconds; the minutes are the backgrounds.** Measured
-  2026-08-11: a full `generate-all.sh` over every theme and every generator took
-  7.0s wall (628% CPU under GNU parallel), and one theme takes ~1.2s. The two get
-  remembered as one cost because both are "generating a theme", and the belief
-  that regeneration is expensive is what argues against ever moving these
-  artifacts out of the repo. Re-measure with `time bash lib/generate-all.sh`
-  before accepting that argument. `background-recolor.sh` shells out to gowall and
-  `background-lowpoly.sh` to ImageMagick at 3840x2160 — those are the minutes, and
-  they are not in `generate-all.sh`.
+  `apply_theme_to_apps` calls every `apply_*` as `apply_x "$theme" 2>/dev/null`, which keeps `cp`
+  and reload noise off the screen and throws away anything written to stderr during an apply.
+  `apply_warn` appends to `APPLY_WARNINGS`, which the caller prints after the per-app ticks.
+- **The one failure with no output is Neovim.** A plugin theme names a colorscheme this tool does
+  not ship, so a machine without the plugin gets a terminal that changes color and an editor that
+  does not, while every tick says the apply worked. `check_neovim_colorscheme` looks for the
+  `colors/<name>.{lua,vim}` that `:colorscheme` actually needs. It deliberately does not ask
+  lazy.nvim where it puts plugins, so a plugin-manager migration cannot turn it into "always fine".
+- **Config generation is seconds; the minutes are the backgrounds.** A full `generate-all.sh`
+  takes seconds (`time bash lib/generate-all.sh` to re-measure). `background-recolor.sh` (gowall)
+  and `background-lowpoly.sh` (ImageMagick at 3840x2160) are the slow part, and they are not in
+  `generate-all.sh`.
 - **Parenthesize a jq object value that pipes into `//`**: `last_used: map(…) |
   max_by(.ts) | .ts // "never"` parses on jq 1.8 and is a *syntax error* on 1.7,
   which fails the whole program rather than that one field. The workstations run
   1.8 and the CI runner runs 1.7, so this shape passes locally and breaks in CI —
   and broke `get_theme_stats()` in `lib/storage.sh`, which `theme info` reaches,
   on any machine still on 1.7. `jq --version` before believing a jq program works.
-- **Change-signal colors are solved, not blended by a fixed fraction**: a fixed
-  fraction lands at a different perceived strength on every palette. `delta.sh`
-  searches for the blend that hits a target contrast ratio against that theme's
-  own background, so every theme gets an equally legible diff.
-- **`theme random` weights by recency, and every eligible theme stays
-  reachable**: `compute_theme_weights` scores each candidate from days since its
-  last apply and `weighted_random_choice` samples that distribution. Apply count
-  is the wrong axis — measured 2026-08-19, the 22 available themes spanned 4 to
-  13 applies with most of them on 8, while days since last use spanned 0 to 123.
-  Narrowing the draw to the minimum-count set makes a newly added theme the only
-  thing `random` can return until it catches the pack up, and it hands a rejected
-  theme the same privilege, since a listing off disk knows nothing about
-  rejection. `list_themes_not_rejected` is what the draw reads.
+- **Change-signal colors are solved, not blended by a fixed fraction.** A fixed fraction lands at
+  a different perceived strength on every palette. `delta.sh` searches for the blend that hits a
+  target contrast ratio against that theme's own background.
+- **`theme random` weights by recency, and every eligible theme stays reachable.**
+  `compute_theme_weights` scores each candidate from days since its last apply, and
+  `weighted_random_choice` samples that distribution. Apply count is the wrong axis: narrowing the
+  draw to the least-applied set makes a newly added theme the only thing `random` can return
+  until it catches up. `list_themes_not_rejected` is what the draw reads.
 
 ## Neovim Integration
 
@@ -429,9 +246,7 @@ silently rather than loudly:
 
 **Adding a theme needs no Neovim-side edit.** `colorscheme-manager.lua` scans
 `themes/*/neovim/` for the generated colorschemes and reads each `theme.yml`'s
-`meta.plugin` for the lazy.nvim specs, so both halves come from this repo. The
-list of plugin specs used to be hand-maintained there, and forgetting one was
-silent: `:colorscheme` found nothing and the apply left the old theme up.
+`meta.plugin` for the lazy.nvim specs, so both halves come from this repo.
 
 **Plugin palettes are a snapshot, and the seam is silent.** `theme.yml` is a
 one-time transcription of the plugin's palette; nothing re-reads the plugin, so
@@ -440,72 +255,45 @@ Neovim follows upstream while every other app keeps whatever was transcribed.
 
 ## Checking Plugin Themes Against Upstream
 
-`scripts/check-plugin-drift.sh [theme-id ...]` compares every plugin theme with
-the colorscheme it claims to mirror. Development tooling, deliberately not a
-`theme` subcommand: it is a maintenance question, not something the CLI needs at
-runtime. Worth running once or twice a year, and after adding a plugin theme.
+`scripts/check-plugin-drift.sh [theme-id ...]` compares every plugin theme with the colorscheme it
+claims to mirror. It is development tooling and deliberately not a `theme` subcommand. Run it after
+adding a plugin theme and occasionally otherwise. It finds upstream changing a color after the
+transcription, and a transcription that was wrong from the start.
 
-Two things it can find, and the second is the common one:
+It cannot tell a wrong transcription from **deliberate divergence**. `solarized-osaka` carries
+*classic* Solarized rather than craftzdog's variant, whose `bright.black` is the background and
+makes bright-black text invisible. Do not "fix" it toward upstream. Decisions like this go in the
+script's `SETTLED` map with their reason, so the check stops re-raising them.
 
-- **Upstream changed a colour** after the transcription.
-- **The transcription was wrong from the start.** This was the one real finding:
-  `nightfox` had a bright-black of `#475072`, a blue-purple, where upstream
-  computes `#575860`, a grey — `Shade.new("#393b44", 0.15)`.
+Repos shipping a terminal config get an **exact** color-set check; only colors we have and upstream
+lacks are errors. Everything else gets a **history** check, which only ever says "look at this".
+The traps it encodes:
 
-A third outcome the check cannot tell from the second: **deliberate divergence.**
-`solarized-osaka` carries *classic* Solarized (Schoonover) rather than craftzdog's
-variant, which tweaks every ANSI value (`#dc322f` vs `#db302d`, `#268bd2` vs
-`#268bd3`). That is the decision, not a defect — do not "fix" it toward upstream.
-Adopting the variant verbatim also sets `bright.black` to `#001419`, the
-background, making bright-black text invisible. Decisions like this go in the
-script's `SETTLED` map with their reason, so the check reports them as settled
-and stops re-raising a question already answered.
+- **Do not baseline against `lazy-lock.json`.** The pin moves on every `:Lazy update`, so
+  comparing against it reports nothing. The baseline is the date `theme.yml` was last committed.
+- **A repo can host several colorschemes**, so the check keeps only changed files naming this
+  theme's variant.
+- **Judge by colors changed, never by filename.** A repo may keep its palette anywhere, and its
+  `colors/*.lua` may be loaders holding no colors.
+- **A shipped extra can be as stale as our own copy.** kanagawa's `extras/alacritty` disagrees
+  with its own Lua source, so it is out of the exact-check map. Where formats disagree, check the
+  freshest against the plugin's source before believing it.
 
-It picks its method per theme:
-
-- Repos shipping a terminal config (`extras/ghostty`, `extra/<v>/<v>.ghostty`,
-  `extras/alacritty/…`) get an **exact** check — that file is generated from the
-  same palette the colorscheme uses, so comparing colour sets settles it without
-  parsing Lua. Only colours *we* have and upstream lacks are errors; the reverse
-  is normally an extended slot past the 16 ANSI that we do not generate.
-- Everything else gets a **history** check: did any added or removed line in
-  upstream carry a colour since `theme.yml` was last written? That only says
-  "look at this", never "this is wrong".
-
-Two traps it exists to encode:
-
-- **Do not baseline against `lazy-lock.json`.** It pins the plugin, but the pin
-  moves on every `:Lazy update` — weekly here — so comparing against it reports
-  nothing. The baseline is the date `theme.yml` was last committed.
-- **A repo can host several colorschemes.** flexoki ships one file per variant,
-  so a change to one would otherwise flag all four. The check keeps only changed
-  files naming this theme's variant.
-- **Judge by colours changed, never by filename.** flexoki's `colors/*.lua` are
-  two-line loaders holding no colours, and a repo may keep its palette anywhere.
-  Filtering on paths produced three false positives out of five on the first run.
-- **A shipped extra can be as stale as our own copy.** kanagawa's
-  `extras/alacritty` calls terminal black `#090618`, a colour in none of its Lua
-  source, while `themes.lua` sets `term[1]` to `sumiInk0` (`#16161d`) — ours was
-  right. It is out of the exact-check map for that reason. Where a repo ships
-  several formats that disagree, prefer the freshest and check it against the
-  plugin's source before believing it.
-
-When it flags something, read the upstream palette and fix `theme.yml`, then
+When it flags something, read the upstream palette, fix `theme.yml`, then run
 `lib/generate-all.sh --themes <id>`.
 
 ## Tests
 
-`bats tests/` — also run by the pre-commit hook and in CI, both generated by
-forge-toolchain, which runs `tests/*.bats` flat. `tests/helpers.bash` is shared.
+`bats tests/` runs the suite; the pre-commit hook and CI run `tests/*.bats` flat.
+`tests/helpers.bash` is shared.
 
 **Every test must isolate before sourcing anything.** `isolate_theme_state`
 repoints `HOME` **and the four XDG variables** at the sandbox and clears
 `THEME_ENV` and `PLATFORM`, and it has to run first: both libraries read `HOME`
-and `THEME_ENV` at *source* time to decide where state lives. The XDG half is
-newer and was added the day it was needed — a developer's shell exports them as
-absolute paths, so overriding `HOME` alone left the Neovim colorscheme check
-reading the real `~/.local/share/nvim` and answering from whichever plugins the
-machine running the suite happened to have. `THEME_ENV` is the one that bites — `.envrc` sets it to
+and `THEME_ENV` at *source* time to decide where state lives. A developer's shell
+exports the XDG variables as absolute paths, so overriding `HOME` alone left the
+Neovim colorscheme check reading the real `~/.local/share/nvim` and answering from
+whichever plugins the machine running the suite happened to have. `THEME_ENV` is the one that bites — `.envrc` sets it to
 `development` through direnv, so a suite inheriting a developer's shell writes its
 history into `.dev-data` and passes while editing state a later manual run reads
 back. `THEMES_DIR` is repointed separately by `use_fixture_themes_dir`, because it
@@ -515,56 +303,27 @@ is derived from `lib.sh`'s own location.
 opacity and reload paths shell out to: an unstubbed `tmux source-file` reaches the
 developer's live tmux server and restyles their panes from the sandbox file.
 
-**Speed is a design constraint, not an afterthought** — the hook runs this on
-every commit. Two patterns matter. Fixture records use `printf`, not `jq`: the
-values are literals a test chose, and one process per record was a large fraction
-of the runtime. Assertions on a pipeline use `run pipeline "foo | jq ..."` rather
-than `run bash -c "source ../lib/lib.sh; foo | jq ..."` — the latter respawns a
-shell and re-sources the libraries for every assertion. About two thirds of what
-remains is bats' own per-test cost (~0.06s of framework plus ~0.08s to `load`
-bats-assert), which is the floor short of `bats --jobs`, and the invocation is
-toolchain-generated.
+**Speed is a design constraint**, because the hook runs this on every commit. Fixture records use
+`printf`, not `jq`, since one process per record was a large fraction of the runtime. Assertions
+on a pipeline use `run pipeline "foo | jq ..."`, never `run bash -c "source ../lib/lib.sh; ..."`,
+which respawns a shell and re-sources the libraries for every assertion.
 
-Coverage is the pure library functions, per file: `theme-yml` (the theme.yml →
-shell variable contract), `themes` (discovery, name resolution, current-theme
-state), `history` and `backgrounds` (both JSONL logs and the read-time
-normalizer), `background-modes` (rotation modes and source paths), `opacity`,
-`format`, `platform` (detection and the label contract), `generators` (the
-registry invariants). The apply path itself is not covered — it mutates the live
-machine, which is what `scripts/test-all-themes.sh` and
+Coverage is the pure library functions, one file per concern. The apply path itself is not
+covered: it mutates the live machine, which is what `scripts/test-all-themes.sh` and
 `scripts/test-theme-apps.sh` are for, and why neither can run in CI.
 
-`tests/generators.bats` carries the repo-wide invariants that used to live in
-this file as shell one-liners to run by hand: every generator is in
-`generate-all.sh`'s map and vice versa, no map subscript contains a space, every
-theme carries the identical artifact set, and every artifact is one some generator
-produces. Its strongest check regenerates one theme and diffs the result against
-what is committed — a mismatch means either the artifacts are stale or a generator
-is not deterministic.
+`tests/generators.bats` carries the repo-wide invariants: every generator is in `generate-all.sh`'s
+map and vice versa, no map subscript contains a space, every theme carries the identical artifact
+set, and every artifact is one some generator produces. Its strongest check regenerates one theme
+and diffs the result against what is committed. A mismatch means either the artifacts are stale
+or a generator is not deterministic.
 
-## Files Reference
+## Generators worth knowing
 
-| File | Purpose |
-| ---- | ------- |
-| `bin/theme` | The CLI. `theme --help` lists the verbs; two partial lists in this file had already diverged from each other |
-| `lib/lib.sh` | Core functions (get_theme_display_info, apply_theme_to_apps) |
-| `lib/storage.sh` | Unified JSONL history with machine context |
-| `lib/sync.sh` | GitHub Gist synchronization |
-| `lib/theme.sh` | Loads theme.yml into shell variables for generators |
-| `lib/generators/neovim.py` | Generates the Neovim colorscheme; see The Generated Neovim Colorscheme |
-| `install.sh` | Installation script for fresh installs |
-| `scripts/check-plugin-drift.sh` | Compares plugin themes against upstream; see Checking Plugin Themes Against Upstream |
-| `scripts/test-all-themes.sh` | Generates and validates every theme |
-| `scripts/test-theme-apps.sh` | Checks each app's generated output |
-| `tests/helpers.bash` | Suite isolation, fixture builders, command stubs — see Tests |
-| `tests/*.bats` | One file per concern; `bats tests/` runs them all |
-| `lib/generate-all.sh` | Runs every generator over every theme in parallel; owns the generator-to-filename map |
-| `lib/generators/*.sh` | One per app. `ls lib/generators/` enumerates them; each takes `<theme.yml> [output]` |
-| `lib/generators/delta.sh` | Resolves through bat's theme cache — see Key Insights |
-| `lib/generators/sioyek.sh` | Emits a managed block spliced into the user's config, not a whole file |
-| `lib/generators/aerc.sh` | Foreground-only accents; aerc.conf pins `styleset-name = current`, so the applied filename is a contract |
-| `lib/generators/firefox-based.sh` | One userChrome.css covering Firefox, Zen, Librewolf and Thunderbird |
-| `lib/generators/background-*.sh` | One per background mode: `plasma` draws from the palette, `ascii`/`lowpoly`/`recolor` transform a source photo |
-| `lib/generators/vscode.sh` | Not wired into `theme apply`; run directly when needed |
-| `lib/browser-profiles.sh` | Firefox-based browser profile discovery |
-| `lib/theme-preview.sh` | ANSI color-swatch preview for the `theme change` fzf picker |
+`ls lib/generators/` is the list, and each takes `<theme.yml> [output]`. `theme --help` lists the
+CLI verbs. Four generators behave unlike the rest:
+
+- `sioyek.sh` emits a managed block spliced into the user's config, not a whole file.
+- `aerc.sh` relies on aerc.conf pinning `styleset-name = current`, so the applied filename is a contract.
+- `firefox-based.sh` writes one userChrome.css covering Firefox, Zen, Librewolf and Thunderbird.
+- `vscode.sh` is not wired into `theme apply`; run it directly when needed.
