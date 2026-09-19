@@ -137,6 +137,63 @@ give_artifact() {
   assert_output "owned elsewhere"
 }
 
+@test "glow's style installs under the theme id, and glow.yml names current by absolute path" {
+  # glow exits 1 on a style path it cannot open, and glamour expands neither ~
+  # nor $HOME, so only an absolute path works.
+  stub_command glow
+  give_artifact alpha-dark glow.json
+
+  run apply_glow alpha-dark
+  assert_success
+  assert [ -f "$HOME/.config/glow/themes/alpha-dark.json" ]
+  run readlink "$HOME/.config/glow/themes/current.json"
+  assert_output "alpha-dark.json"
+  run yq '.style' "$HOME/.config/glow/glow.yml"
+  assert_output "$HOME/.config/glow/themes/current.json"
+}
+
+@test "an existing glow.yml keeps its other settings and comments" {
+  stub_command glow
+  give_artifact alpha-dark glow.json
+  mkdir -p "$HOME/.config/glow"
+  printf '# style name or JSON path (default "auto")\nstyle: "auto"\nwidth: 80\n' >"$HOME/.config/glow/glow.yml"
+
+  apply_glow alpha-dark
+
+  run cat "$HOME/.config/glow/glow.yml"
+  assert_output --partial "width: 80"
+  assert_output --partial "# style name or JSON path"
+  run yq '.style' "$HOME/.config/glow/glow.yml"
+  assert_output "$HOME/.config/glow/themes/current.json"
+}
+
+@test "a symlinked glow.yml is never written through, and the apply says so" {
+  stub_command glow
+  give_artifact alpha-dark glow.json
+  mkdir -p "$HOME/.config/glow"
+  printf 'style: "auto"\n' >"$BATS_TEST_TMPDIR/managed.yml"
+  ln -s "$BATS_TEST_TMPDIR/managed.yml" "$HOME/.config/glow/glow.yml"
+
+  apply_glow alpha-dark
+
+  run cat "$BATS_TEST_TMPDIR/managed.yml"
+  assert_output 'style: "auto"'
+  assert [ "${#APPLY_WARNINGS[@]}" -eq 1 ]
+  assert_regex "${APPLY_WARNINGS[0]}" "glow.yml"
+}
+
+@test "a symlinked glow.yml already naming current raises nothing" {
+  stub_command glow
+  give_artifact alpha-dark glow.json
+  mkdir -p "$HOME/.config/glow"
+  printf 'style: "%s"\n' "$HOME/.config/glow/themes/current.json" >"$BATS_TEST_TMPDIR/managed.yml"
+  ln -s "$BATS_TEST_TMPDIR/managed.yml" "$HOME/.config/glow/glow.yml"
+
+  apply_glow alpha-dark
+
+  assert [ "${#APPLY_WARNINGS[@]}" -eq 0 ]
+}
+
 @test "hyprland and hyprlock share a themes directory without colliding" {
   stub_command hyprctl
   give_artifact alpha-dark hyprland.conf

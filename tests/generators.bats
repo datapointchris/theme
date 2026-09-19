@@ -353,3 +353,36 @@ count_theme_artifacts() {
       || fail "THEME_APP_ARTIFACTS lists '$artifact', which no generator produces"
   done
 }
+
+@test "every artifact a generator produces is one the CLI reports on" {
+  # The other direction. Without it an app can be deployed on every apply and
+  # still be missing from `theme current`.
+  source "$THEME_ROOT/lib/lib.sh"
+
+  local reported=" "
+  local row
+  for row in "${THEME_APP_ARTIFACTS[@]}"; do
+    reported+="${row%%:*} "
+  done
+
+  # Ghostty's tab CSS is the second half of one app, reported under ghostty.conf.
+  local companions=" ghostty.css "
+
+  local artifact
+  for artifact in "${MAP_ARTIFACT[@]}"; do
+    [[ "$companions" == *" $artifact "* ]] && continue
+    [[ "$reported" == *" $artifact "* ]] \
+      || fail "generate-all.sh produces '$artifact', which THEME_APP_ARTIFACTS does not list"
+  done
+}
+
+@test "every glow color is a theme hex, never an xterm-256 index" {
+  # glamour's built-in styles use indices 16-255, which no terminal palette
+  # reaches, so glow looked the same under every theme. An empty value is the
+  # other failure: glamour reads it as "no color" and falls back without a word.
+  run jq -r '.. | objects | (.color?, .background_color?) | select(. != null)
+             | select(test("^#[0-9a-fA-F]{6}$") | not) | "\(input_filename): \(.)"' \
+    "$THEME_ROOT"/themes/*/glow.json
+  assert_success
+  assert_output ""
+}

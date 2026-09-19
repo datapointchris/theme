@@ -321,9 +321,13 @@ or a generator is not deterministic.
 ## Generators worth knowing
 
 `ls lib/generators/` is the list, and each takes `<theme.yml> [output]`. `theme --help` lists the
-CLI verbs. Four generators behave unlike the rest:
+CLI verbs. These generators behave unlike the rest:
 
 - `sioyek.sh` emits a managed block spliced into the user's config, not a whole file.
 - `aerc.sh` relies on aerc.conf pinning `styleset-name = current`, so the applied filename is a contract.
 - `firefox-based.sh` writes one userChrome.css covering Firefox, Zen, Librewolf and Thunderbird.
 - `vscode.sh` is not wired into `theme apply`; run it directly when needed.
+- `glow.sh` emits a glamour style whose code blocks reach the screen quantized to xterm-256.
+  glow never sets glamour's chroma formatter, so only prose keeps true color. `apply_glow` writes
+  `glow.yml`'s `style` as an absolute path, because glamour expands neither `~` nor `$HOME` and
+  glow exits 1 when the file is missing.

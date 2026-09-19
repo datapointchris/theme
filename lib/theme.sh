@@ -35,6 +35,19 @@ export \
   SPECIAL_PANEL \
   SPECIAL_SELECTION_BG \
   SPECIAL_SELECTION_FG \
+  SYNTAX_ATTRIBUTE \
+  SYNTAX_COMMENT \
+  SYNTAX_CONSTANT \
+  SYNTAX_FUNCTION \
+  SYNTAX_KEYWORD \
+  SYNTAX_NUMBER \
+  SYNTAX_OPERATOR \
+  SYNTAX_PARAMETER \
+  SYNTAX_PUNCTUATION \
+  SYNTAX_STRING \
+  SYNTAX_TAG \
+  SYNTAX_TYPE \
+  SYNTAX_VARIABLE \
   THEME_AUTHOR \
   THEME_NAME \
   THEME_SLUG \
@@ -218,6 +231,32 @@ load_theme() {
 # Load colors from theme.yml (alias for load_theme)
 load_colors() {
   load_theme "$1"
+}
+
+# The syntax roles every terminal code renderer draws with.
+#
+# bat and glow both highlight code, and the same snippet has to read the same in
+# either, so the fallbacks live here once rather than in each generator. They
+# prefer extended.syntax_* from theme.yml, which carries the Neovim colors.
+# Call after `eval "$(load_colors ...)"`, whose names the fallbacks read.
+resolve_syntax_colors() {
+  SYNTAX_COMMENT="${EXTENDED_SYNTAX_COMMENT:-$BASE03}"
+  SYNTAX_STRING="${EXTENDED_SYNTAX_STRING:-$BASE0B}"
+  SYNTAX_NUMBER="${EXTENDED_SYNTAX_NUMBER:-$BASE09}"
+  SYNTAX_CONSTANT="${EXTENDED_SYNTAX_CONSTANT:-$BASE09}"
+  SYNTAX_PARAMETER="${EXTENDED_SYNTAX_PARAMETER:-$SPECIAL_FG}"
+  SYNTAX_FUNCTION="${EXTENDED_SYNTAX_FUNCTION:-$BASE0D}"
+  SYNTAX_KEYWORD="${EXTENDED_SYNTAX_KEYWORD:-$BASE0E}"
+  SYNTAX_TYPE="${EXTENDED_SYNTAX_TYPE:-$BASE0A}"
+  SYNTAX_OPERATOR="${EXTENDED_SYNTAX_OPERATOR:-$SPECIAL_FG}"
+  SYNTAX_PUNCTUATION="${EXTENDED_SYNTAX_PUNCTUATION:-$BASE04}"
+  SYNTAX_ATTRIBUTE="${EXTENDED_SYNTAX_ATTRIBUTE:-$BASE0A}"
+
+  # Neovim's @variable is the plain foreground, so a variable is not colored.
+  SYNTAX_VARIABLE="${SPECIAL_FG}"
+
+  # Neovim's Tag group draws from syntax_special3, with base0C behind it.
+  SYNTAX_TAG="${EXTENDED_SYNTAX_SPECIAL3:-$BASE0C}"
 }
 
 # Convert color to uppercase (for btop)

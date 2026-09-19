@@ -38,13 +38,16 @@ THEME_APP_ARTIFACTS=(
   "btop.theme:btop"
   "bat.tmTheme:bat"
   "delta.conf:delta"
+  "glow.json:glow"
   "flavor.toml:yazi"
+  "aerc.styleset:aerc"
   "sioyek.config:sioyek"
   "userChrome.css:Firefox-based"
   "chromium.theme:Chromium"
   "bordersrc:JankyBorders"
   "hyprland.conf:Hyprland"
   "hyprlock.conf:Hyprlock"
+  "hyprland-picker.css:HyprlandPicker"
   "waybar.css:Waybar"
   "walker.css:Walker"
   "swayosd.css:SwayOSD"
@@ -699,6 +702,53 @@ apply_delta() {
   local delta_config_dir="$HOME/.config/delta"
 
   install_themed_artifact "$lib_path/delta.conf" "$delta_config_dir" "$theme.gitconfig" "current.gitconfig" || return 1
+
+  return 0
+}
+
+# Apply glow markdown renderer theme (all platforms)
+# Installs a glamour style as themes/<id>.json and points glow.yml at current.json
+apply_glow() {
+  local theme="$1"
+  local lib_path
+  lib_path=$(get_library_path "$theme")
+
+  if [[ -z "$lib_path" ]] || [[ ! -f "$lib_path/glow.json" ]]; then
+    return 1
+  fi
+
+  if ! command -v glow &>/dev/null; then
+    return 1
+  fi
+
+  # glow searches $XDG_CONFIG_HOME/glow ahead of its platform default, which on
+  # macOS is ~/Library/Preferences rather than ~/.config.
+  local glow_dir="${XDG_CONFIG_HOME:-$HOME/.config}/glow"
+  local style="$glow_dir/themes/current.json"
+
+  install_themed_artifact "$lib_path/glow.json" "$glow_dir/themes" "$theme.json" "current.json" || return 1
+
+  # The pointer is written here rather than shipped by a config repo, for the
+  # reason yazi's theme.toml is. glow exits 1 when its style file is missing, so
+  # a machine that never applied a theme would lose glow entirely. And neither
+  # glow nor glamour expands ~ or $HOME in a style path, so the value is an
+  # absolute path only this machine knows.
+  local config="$glow_dir/glow.yml"
+  if [[ "$(yq '.style // ""' "$config" 2>/dev/null)" == "$style" ]]; then
+    return 0
+  fi
+
+  # Never through a symlink, which would edit whichever repo owns the file.
+  if [[ -L "$config" ]]; then
+    apply_warn "glow.yml is a symlink, so it was left alone — glow keeps its built-in style until its style is set to $style."
+    return 0
+  fi
+
+  if [[ -f "$config" ]]; then
+    STYLE="$style" yq -i '.style = strenv(STYLE)' "$config" || return 1
+  else
+    printf 'style: "%s"\n' "$style" >"$config" || return 1
+  fi
 
   return 0
 }
@@ -2042,6 +2092,15 @@ apply_theme_to_apps() {
   else
     skipped+=("delta")
     _print_app_status "delta" "false"
+  fi
+
+  # glow markdown renderer (all platforms)
+  if apply_glow "$theme" 2>/dev/null; then
+    applied+=("glow")
+    _print_app_status "glow" "true"
+  else
+    skipped+=("glow")
+    _print_app_status "glow" "false"
   fi
 
   # sioyek PDF viewer (all platforms)

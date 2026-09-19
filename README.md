@@ -171,6 +171,7 @@ Both commands come from [`bashselfupdate`](https://github.com/datapointchris/bas
 - **bat** — syntax highlighter / pager
 - **delta** — git diff pager (requires bat; include
   `~/.config/delta/current.gitconfig` from your gitconfig)
+- **glow** — markdown renderer (sets `style` in `glow.yml`)
 - **yazi** — file manager
 - **sioyek** — PDF viewer (custom color mode)
 - **Neovim** — text editor (via colorscheme plugins or generated)

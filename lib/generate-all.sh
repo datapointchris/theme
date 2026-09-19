@@ -63,6 +63,7 @@ declare -A GENERATOR_OUTPUT=(
   # delta resolves its syntax theme through bat's cache, but the config fragment
   # itself is generated from theme.yml alone — no ordering constraint here.
   ["delta"]="delta.conf"
+  ["glow"]="glow.json"
 )
 
 # Parse arguments

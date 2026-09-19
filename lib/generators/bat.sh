@@ -23,28 +23,7 @@ output_file="${2:-}"
 
 # Load colors
 eval "$(load_colors "$input_file")"
-
-# Define syntax colors with fallbacks to base16
-# These prefer extended.syntax_* values from theme.yml which match Neovim colors
-SYNTAX_COMMENT="${EXTENDED_SYNTAX_COMMENT:-$BASE03}"
-SYNTAX_STRING="${EXTENDED_SYNTAX_STRING:-$BASE0B}"
-SYNTAX_NUMBER="${EXTENDED_SYNTAX_NUMBER:-$BASE09}"
-SYNTAX_CONSTANT="${EXTENDED_SYNTAX_CONSTANT:-$BASE09}"
-SYNTAX_PARAMETER="${EXTENDED_SYNTAX_PARAMETER:-$SPECIAL_FG}"
-SYNTAX_FUNCTION="${EXTENDED_SYNTAX_FUNCTION:-$BASE0D}"
-SYNTAX_KEYWORD="${EXTENDED_SYNTAX_KEYWORD:-$BASE0E}"
-SYNTAX_TYPE="${EXTENDED_SYNTAX_TYPE:-$BASE0A}"
-SYNTAX_OPERATOR="${EXTENDED_SYNTAX_OPERATOR:-$SPECIAL_FG}"
-SYNTAX_PUNCTUATION="${EXTENDED_SYNTAX_PUNCTUATION:-$BASE04}"
-SYNTAX_ATTRIBUTE="${EXTENDED_SYNTAX_ATTRIBUTE:-$BASE0A}"
-
-# Variables: Use foreground color to match Neovim's @variable (theme.ui.fg)
-# Neovim doesn't distinctly color generic variables - they use foreground
-SYNTAX_VARIABLE="${SPECIAL_FG}"
-
-# Tags: Use special3 to match Neovim's Tag highlight group (theme.syn.special3)
-# Neovim uses syntax_special3 with fallback to base0C for tags
-SYNTAX_TAG="${EXTENDED_SYNTAX_SPECIAL3:-$BASE0C}"
+resolve_syntax_colors
 
 # Git/diff colors with fallbacks
 GIT_ADD="${EXTENDED_GIT_ADD:-$BASE0B}"
