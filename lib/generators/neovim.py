@@ -262,7 +262,7 @@ def generate_palette_lua(theme: dict) -> str:
         f'    special1 = {get_color(extended, "syntax_special1", "base09")},',
         f'    special2 = {get_color(extended, "syntax_special2", "base08")},',
         f'    special3 = {get_color(extended, "syntax_special3", "base0C")},',
-        f'    punct = {get_color(extended, "syntax_punct", "base09")},',
+        f'    punct = {get_color(extended, "syntax_punctuation", "base04")},',
         f'    regex = {get_color(extended, "syntax_regex", "base0C")},',
         f'    deprecated = M.palette.base03,',
         "  },",

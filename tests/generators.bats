@@ -260,6 +260,28 @@ count_theme_artifacts() {
   assert [ -f "$BATS_TEST_TMPDIR/nvim/colors/smyck.lua" ]
 }
 
+@test "the editor and the pager draw punctuation from the same key" {
+  # resolve_syntax_colors in lib/theme.sh exists so a snippet reads the same in
+  # bat as in Neovim, and punctuation is the role where a divergence costs most:
+  # brackets, commas and colons outnumber every other token in a source file.
+  # Both sides have to name extended.syntax_punctuation. A name only one side
+  # knows falls back in silence, and base09 is an orange in most themes.
+  local theme_yml
+  theme_yml=$(make_fixture_theme fixture-punct "Fixture Punct" generated)
+  printf 'extended:\n  syntax_punctuation: "#abcdef"\n' >>"$theme_yml"
+
+  run "$GENERATORS_DIR/neovim.py" "$theme_yml" "$BATS_TEST_TMPDIR/nvim"
+  assert_success
+  run cat "$BATS_TEST_TMPDIR/nvim/lua/fixture_punct/palette.lua"
+  assert_output --partial 'syntax_punctuation = "#abcdef"'
+  assert_output --partial 'punct = M.palette.syntax_punctuation'
+
+  run "$GENERATORS_DIR/bat.sh" "$theme_yml" "$BATS_TEST_TMPDIR/bat.tmTheme"
+  assert_success
+  run cat "$BATS_TEST_TMPDIR/bat.tmTheme"
+  assert_output --partial "#abcdef"
+}
+
 @test "the generated colorscheme sets the name it is filed under" {
   # `:colorscheme` finds the file, then the file sets vim.g.colors_name. The two
   # disagreeing is silent — the theme loads and every consumer of colors_name

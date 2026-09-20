@@ -133,7 +133,7 @@ M.theme = {
     special1 = M.palette.base09,
     special2 = M.palette.base08,
     special3 = M.palette.base0C,
-    punct = M.palette.base09,
+    punct = M.palette.syntax_punctuation,
     regex = M.palette.syntax_regex,
     deprecated = M.palette.base03,
   },
