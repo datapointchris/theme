@@ -11,8 +11,8 @@
 @define-color base05 #ebdbb2;
 @define-color base06 #ebdbb2;
 @define-color base07 #ebdbb2;
-@define-color base08 #cc241d;
-@define-color base09 #f42c3e;
+@define-color base08 #cc5351;
+@define-color base09 #e1656a;
 @define-color base0A #d79921;
 @define-color base0B #98971a;
 @define-color base0C #689d6a;
@@ -29,7 +29,7 @@
 @define-color progress-bg #252631;
 
 /* Status colors for volume/brightness */
-@define-color muted #cc241d;
+@define-color muted #cc5351;
 @define-color low #689d6a;
 @define-color normal #458588;
-@define-color high #f42c3e;
+@define-color high #e1656a;

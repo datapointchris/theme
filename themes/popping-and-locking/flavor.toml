@@ -4,7 +4,7 @@
 
 [mgr]
 cwd = { fg = "#458588" }
-find_keyword = { fg = "#f42c3e", bg = "#181921" }
+find_keyword = { fg = "#e1656a", bg = "#181921" }
 find_position = {}
 marker_copied = { fg = "#689d6a", bg = "#689d6a" }
 marker_cut = { fg = "#b16286", bg = "#b16286" }
@@ -43,7 +43,7 @@ progress_normal = { fg = "#383637", bg = "#181921" }
 progress_error = { fg = "#383637", bg = "#181921" }
 perm_type = { fg = "#383637" }
 perm_read = { fg = "#b8bb26" }
-perm_write = { fg = "#cc241d" }
+perm_write = { fg = "#cc5351" }
 perm_exec = { fg = "#b8bb26" }
 perm_sep = { fg = "#b16286" }
 
@@ -112,13 +112,13 @@ rules = [
   { mime = "{audio,video}/*", fg = "#fabd2f" },
 
   # Archives
-  { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "#cc241d" },
+  { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "#cc5351" },
 
   # Documents
   { mime = "application/{pdf,doc,rtf,vnd.*}", fg = "#689d6a" },
 
   # Broken symlinks
-  { url = "*", is = "orphan", fg = "#cc241d" },
+  { url = "*", is = "orphan", fg = "#cc5351" },
 
   # Executables
   { url = "*", is = "exec", fg = "#98971a" },

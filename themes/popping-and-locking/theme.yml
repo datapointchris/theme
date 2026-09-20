@@ -9,24 +9,24 @@ meta:
   author: Hedinn Eiriksson
 base16:
   base00: '#181921'
-  base01: '#252631'  # Computed: slightly lighter than base00 (was #928374 - wrong, that's comments)
+  base01: '#252631'  # Computed: slightly lighter than base00
   base02: '#383637'  # Computed: base00 lifted toward base05 to 1.45:1. Upstream's selection is inverted (selection_bg is the text color) and only reads with selection_fg drawn over it; base02 is also the cursor line and menu selection, which draw text in its own colors
   base03: '#928374'
   base04: '#a89984'
   base05: '#ebdbb2'
   base06: '#ebdbb2'
   base07: '#ebdbb2'
-  base08: '#cc241d'
-  base09: '#f42c3e'
+  base08: '#cc5351'
+  base09: '#e1656a'
   base0A: '#d79921'
-  base0B: '#98971a'
+  base0B: '#98971a'  # Stays olive at hue 109. base0C is #689d6a, a green at hue 145, so this palette has no cyan — green and cyan are told apart by 36 degrees of hue and 0.011 of lightness. Moving this into the theme's own green family closes that to 2.8 degrees and the terminal loses the pair
   base0C: '#689d6a'
   base0D: '#458588'
   base0E: '#b16286'
   base0F: '#b16286'
 ansi:
   black: '#1d2021'
-  red: '#cc241d'
+  red: '#cc5351'
   green: '#98971a'
   yellow: '#d79921'
   blue: '#458588'
@@ -34,7 +34,7 @@ ansi:
   cyan: '#689d6a'
   white: '#a89984'
   bright_black: '#928374'
-  bright_red: '#f42c3e'
+  bright_red: '#e1656a'
   bright_green: '#b8bb26'
   bright_yellow: '#fabd2f'
   bright_blue: '#99c6ca'
@@ -49,32 +49,43 @@ special:
   selection_bg: '#ebdbb2'
   selection_fg: '#928374'
 extended_source: hedinne/popping-and-locking-vscode
+# The syntax palette is solved against this theme's own background rather than
+# transcribed. Each slot below names its OKLCH lightness, chroma and hue, because
+# the separations between them are what the choices are made on: two roles that
+# sit next to each other in a buffer need a gap on at least one of the three.
+#
+# The reds are the exception that shaped the rest. #f42c3e carried chroma 0.231
+# where every other color here sits at 0.16 or below, and six roles resolved to
+# it or to #cc241d, punctuation among them. Keywords are blue now and the reds
+# are down to 0.155, which is the palette's own ceiling.
 extended:
-  diagnostic_error: '#cc241d'
-  diagnostic_ok: '#b8bb26'
-  diagnostic_warning: '#f42c3e'
+  diagnostic_error: '#cc5351'
+  diagnostic_ok: '#7fc678'
+  diagnostic_warning: '#e1656a'
   diagnostic_info: '#689d6a'
   diagnostic_hint: '#689d6a'
-  syntax_comment: '#506899'      # was #928374 - blue-gray, not brown
-  syntax_string: '#b8bb26'       # was #98971a - brighter green
-  syntax_function: '#7ec16e'     # was #458588 - bright green, not blue!
-  syntax_keyword: '#f42c3e'      # was #b16286 - red, not magenta
-  syntax_type: '#fabd2f'         # was #d79921 - brighter yellow
-  syntax_number: '#d3869b'       # was #b16286 - pink (matches constant)
-  syntax_constant: '#d3869b'     # was #d79921 - pink
-  syntax_operator: '#7ec16e'     # was #a89984 - keyword operators are green
-  syntax_variable: '#99c6ca'     # was #ebdbb2 - cyan, not cream
-  syntax_parameter: '#99c6ca'    # matches variable
-  syntax_preproc: '#f42c3e'      # storage/types use red in VS Code theme
+  syntax_comment: '#7a7064'      # L .551 C .022 H 72. Warm, so it carries no hue in common with the keyword blue
+  syntax_string: '#92d3a3'       # L .810 C .095 H 152. In the theme's own green family, where #b8bb26 sat 40 degrees away at hue 111
+  syntax_function: '#7ec16e'     # L .746 C .133 H 140
+  syntax_keyword: '#7398dc'      # L .680 C .109 H 262. Also statement and preproc, so def, class, import, if and for agree
+  syntax_statement: '#7398dc'    # if, for, while, else
+  syntax_type: '#fabd2f'
+  syntax_number: '#d3869b'
+  syntax_constant: '#d3869b'
+  syntax_operator: '#a89984'     # base04. Operators are structure, like punctuation, rather than meaning
+  syntax_identifier: '#4fa1a5'   # L .659 C .080 H 200, 5.81:1. self.accents and every @variable.member, which base0D drew at 4.14:1
+  syntax_variable: '#99c6ca'
+  syntax_parameter: '#99c6ca'
+  syntax_preproc: '#7398dc'
   syntax_special: '#689d6a'
-  syntax_punctuation: '#506899'  # blue-gray, matches comment
-  syntax_tag: '#f42c3e'          # red, matches keyword
-  syntax_attribute: '#99c6ca'    # cyan, matches variable
+  syntax_punctuation: '#c59d5d'  # L .719 C .095 H 78. Chroma held to the string's, because punctuation is the densest token class in a file
+  syntax_tag: '#7398dc'
+  syntax_attribute: '#99c6ca'
   ui_accent: '#458588'
   ui_border: '#ebdbb2'
   ui_selection: '#383637'  # base02, for the reason given there
   ui_float_bg: '#252631'  # Matches base01
   ui_cursor_line: '#252631'  # Matches base01
-  git_add: '#98971a'
+  git_add: '#63ac6f'
   git_change: '#d79921'
-  git_delete: '#cc241d'
+  git_delete: '#cc5351'

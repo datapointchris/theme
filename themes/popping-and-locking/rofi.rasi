@@ -12,8 +12,8 @@
     base05: #ebdbb2;  /* Default foreground */
     base06: #ebdbb2;  /* Light foreground */
     base07: #ebdbb2;  /* Brightest foreground */
-    base08: #cc241d;  /* Red */
-    base09: #f42c3e;  /* Orange */
+    base08: #cc5351;  /* Red */
+    base09: #e1656a;  /* Orange */
     base0A: #d79921;  /* Yellow */
     base0B: #98971a;  /* Green */
     base0C: #689d6a;  /* Cyan */
@@ -32,21 +32,21 @@
     border: #ebdbb2;
 
     /* Status colors - use extended diagnostic colors when available */
-    urgent: #cc241d;
-    active: #b8bb26;
+    urgent: #cc5351;
+    active: #7fc678;
     selected: #458588;
 
     /* Named accent colors */
-    red: #cc241d;
+    red: #cc5351;
     green: #98971a;
     yellow: #d79921;
     blue: #458588;
     magenta: #b16286;
     cyan: #689d6a;
-    orange: #f42c3e;
+    orange: #e1656a;
 
     /* Bright variants */
-    bright-red: #f42c3e;
+    bright-red: #e1656a;
     bright-green: #b8bb26;
     bright-yellow: #fabd2f;
     bright-blue: #99c6ca;

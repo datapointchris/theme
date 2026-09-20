@@ -11,8 +11,8 @@
 @define-color base05 #ebdbb2;
 @define-color base06 #ebdbb2;
 @define-color base07 #ebdbb2;
-@define-color base08 #cc241d;
-@define-color base09 #f42c3e;
+@define-color base08 #cc5351;
+@define-color base09 #e1656a;
 @define-color base0A #d79921;
 @define-color base0B #98971a;
 @define-color base0C #689d6a;
@@ -31,5 +31,5 @@
 /* Selection and highlight */
 @define-color selected-bg #383637;
 @define-color selected-text #458588;
-@define-color match #f42c3e;
+@define-color match #e1656a;
 @define-color accent #458588;
