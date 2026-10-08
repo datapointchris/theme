@@ -196,13 +196,15 @@ give_artifact() {
 
 @test "hyprland and hyprlock share a themes directory without colliding" {
   stub_command hyprctl
-  give_artifact alpha-dark hyprland.conf
+  give_artifact alpha-dark hyprland.lua
   give_artifact alpha-dark hyprlock.conf
 
   apply_hyprland alpha-dark
   apply_hyprlock alpha-dark
 
-  assert [ -f "$HOME/.config/hypr/themes/alpha-dark.conf" ]
+  assert [ -f "$HOME/.config/hypr/themes/alpha-dark.lua" ]
+  run readlink "$HOME/.config/hypr/themes/current.lua"
+  assert_output "alpha-dark.lua"
   assert [ -f "$HOME/.config/hypr/themes/alpha-dark-hyprlock.conf" ]
   run readlink "$HOME/.config/hypr/themes/hyprlock.conf"
   assert_output "alpha-dark-hyprlock.conf"

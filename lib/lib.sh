@@ -45,7 +45,7 @@ THEME_APP_ARTIFACTS=(
   "userChrome.css:Firefox-based"
   "chromium.theme:Chromium"
   "bordersrc:JankyBorders"
-  "hyprland.conf:Hyprland"
+  "hyprland.lua:Hyprland"
   "hyprlock.conf:Hyprlock"
   "hyprland-picker.css:HyprlandPicker"
   "waybar.css:Waybar"
@@ -1790,13 +1790,13 @@ apply_hyprland() {
   local lib_path
   lib_path=$(get_library_path "$theme")
 
-  if [[ -z "$lib_path" ]] || [[ ! -f "$lib_path/hyprland.conf" ]]; then
+  if [[ -z "$lib_path" ]] || [[ ! -f "$lib_path/hyprland.lua" ]]; then
     return 1
   fi
 
   local hypr_theme_dir="$HOME/.config/hypr/themes"
 
-  install_themed_artifact "$lib_path/hyprland.conf" "$hypr_theme_dir" "$theme.conf" "current.conf" || return 1
+  install_themed_artifact "$lib_path/hyprland.lua" "$hypr_theme_dir" "$theme.lua" "current.lua" || return 1
 
   # Reload hyprland if running
   if command -v hyprctl &>/dev/null; then

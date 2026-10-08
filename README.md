@@ -185,7 +185,8 @@ Both commands come from [`bashselfupdate`](https://github.com/datapointchris/bas
 
 ### Arch Linux / Hyprland
 
-- **Hyprland** — window manager colors
+- **Hyprland** — window manager colors (needs the Lua config of Hyprland 0.56 or
+  later; add `pcall(require, 'themes.current')` to `hyprland.lua` after your own colors)
 - **Hyprlock** — lock screen
 - **Waybar** — status bar
 - **Rofi** — application launcher

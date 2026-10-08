@@ -656,12 +656,12 @@ def extract_alacritty_colors(filepath: Path) -> dict[str, str]:
 
 
 def extract_hyprland_colors(filepath: Path) -> dict[str, str]:
-    """Extract colors from hyprland.conf (rgb format)."""
+    """Extract colors from hyprland.lua (rgb format)."""
     colors = {}
     content = filepath.read_text()
 
-    # Match patterns like: $activeBorderColor = rgb(D8DEE9)
-    for match in re.finditer(r'\$(\w+)\s*=\s*rgb\(([0-9a-fA-F]{6})\)', content):
+    # Match palette entries like: uiAccent = 'rgb(D8DEE9)',
+    for match in re.finditer(r"(\w+)\s*=\s*'rgb\(([0-9a-fA-F]{6})\)'", content):
         name = match.group(1)
         hex_val = match.group(2)
         colors[name] = f"#{hex_val}"
@@ -861,7 +861,7 @@ def extract_all_training_data():
             ("hyprlock", "hyprlock.conf", extract_hyprlock_colors),
             ("kitty", "kitty.conf", extract_kitty_colors),
             ("alacritty", "alacritty.toml", extract_alacritty_colors),
-            ("hyprland", "hyprland.conf", extract_hyprland_colors),
+            ("hyprland", "hyprland.lua", extract_hyprland_colors),
             ("waybar", "waybar.css", extract_waybar_colors),
         ]
 

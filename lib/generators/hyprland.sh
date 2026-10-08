@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Generate hyprland config from theme.yml
+# Generate a Hyprland Lua theme module from theme.yml
 # Usage: hyprland.sh <theme.yml> [output-file]
 #
 # Enhanced generator using FULL color palette:
 # - Active borders use accent color (base0D blue)
 # - Inactive borders use subtle color (base02)
 # - Group colors use distinct accents
-# - All base16 colors available as variables
+# - The module returns the whole palette, so a config can reuse any color
 
 set -euo pipefail
 
@@ -35,68 +35,58 @@ strip_hash() {
 
 generate() {
   cat <<EOF
-# ${THEME_NAME} - hyprland theme
-# Generated from theme.yml
-# Author: ${THEME_AUTHOR}
+-- ${THEME_NAME} - hyprland theme
+-- Generated from theme.yml
+-- Author: ${THEME_AUTHOR}
+--
+-- Applied as ~/.config/hypr/themes/current.lua, which a Hyprland config loads
+-- with require('themes.current') after its own colors so these win.
 
-# =============================================================================
-# COLOR VARIABLES (Base16)
-# =============================================================================
+local palette = {
+  -- Base16
+  base00 = 'rgb($(strip_hash "$BASE00"))', -- Main background
+  base01 = 'rgb($(strip_hash "$BASE01"))', -- Lighter background
+  base02 = 'rgb($(strip_hash "$BASE02"))', -- Selection
+  base03 = 'rgb($(strip_hash "$BASE03"))', -- Comments
+  base04 = 'rgb($(strip_hash "$BASE04"))', -- Dark foreground
+  base05 = 'rgb($(strip_hash "$BASE05"))', -- Foreground
+  base06 = 'rgb($(strip_hash "$BASE06"))', -- Light foreground
+  base07 = 'rgb($(strip_hash "$BASE07"))', -- Brightest
+  base08 = 'rgb($(strip_hash "$BASE08"))', -- Red
+  base09 = 'rgb($(strip_hash "$BASE09"))', -- Orange
+  base0A = 'rgb($(strip_hash "$BASE0A"))', -- Yellow
+  base0B = 'rgb($(strip_hash "$BASE0B"))', -- Green
+  base0C = 'rgb($(strip_hash "$BASE0C"))', -- Cyan
+  base0D = 'rgb($(strip_hash "$BASE0D"))', -- Blue
+  base0E = 'rgb($(strip_hash "$BASE0E"))', -- Magenta
+  base0F = 'rgb($(strip_hash "$BASE0F"))', -- Brown
 
-\$base00 = rgb($(strip_hash "$BASE00"))  # Main background
-\$base01 = rgb($(strip_hash "$BASE01"))  # Lighter background
-\$base02 = rgb($(strip_hash "$BASE02"))  # Selection
-\$base03 = rgb($(strip_hash "$BASE03"))  # Comments
-\$base04 = rgb($(strip_hash "$BASE04"))  # Dark foreground
-\$base05 = rgb($(strip_hash "$BASE05"))  # Foreground
-\$base06 = rgb($(strip_hash "$BASE06"))  # Light foreground
-\$base07 = rgb($(strip_hash "$BASE07"))  # Brightest
-\$base08 = rgb($(strip_hash "$BASE08"))  # Red
-\$base09 = rgb($(strip_hash "$BASE09"))  # Orange
-\$base0A = rgb($(strip_hash "$BASE0A"))  # Yellow
-\$base0B = rgb($(strip_hash "$BASE0B"))  # Green
-\$base0C = rgb($(strip_hash "$BASE0C"))  # Cyan
-\$base0D = rgb($(strip_hash "$BASE0D"))  # Blue
-\$base0E = rgb($(strip_hash "$BASE0E"))  # Magenta
-\$base0F = rgb($(strip_hash "$BASE0F"))  # Brown
-
-# =============================================================================
-# EXTENDED PALETTE (when available)
-# =============================================================================
-
-\$uiAccent = rgb($(strip_hash "$UI_ACCENT"))
-\$uiBorder = rgb($(strip_hash "$UI_BORDER"))
-
-# =============================================================================
-# SEMANTIC COLORS
-# =============================================================================
-
-\$activeBorderColor = \$uiAccent
-\$inactiveBorderColor = \$uiBorder
-\$groupActiveBorderColor = \$base0E
-\$groupInactiveBorderColor = \$base03
-\$groupLockedActiveBorderColor = \$base09
-\$groupLockedInactiveBorderColor = \$base01
-
-# =============================================================================
-# WINDOW BORDERS
-# =============================================================================
-
-general {
-    col.active_border = \$activeBorderColor
-    col.inactive_border = \$inactiveBorderColor
+  -- Extended palette (when available)
+  uiAccent = 'rgb($(strip_hash "$UI_ACCENT"))',
+  uiBorder = 'rgb($(strip_hash "$UI_BORDER"))',
 }
 
-# =============================================================================
-# GROUP BORDERS
-# =============================================================================
+hl.config({
+  -- Window borders
+  general = {
+    col = {
+      active_border = palette.uiAccent,
+      inactive_border = palette.uiBorder,
+    },
+  },
 
-group {
-    col.border_active = \$groupActiveBorderColor
-    col.border_inactive = \$groupInactiveBorderColor
-    col.border_locked_active = \$groupLockedActiveBorderColor
-    col.border_locked_inactive = \$groupLockedInactiveBorderColor
-}
+  -- Group borders
+  group = {
+    col = {
+      border_active = palette.base0E,
+      border_inactive = palette.base03,
+      border_locked_active = palette.base09,
+      border_locked_inactive = palette.base01,
+    },
+  },
+})
+
+return palette
 EOF
 }
 
