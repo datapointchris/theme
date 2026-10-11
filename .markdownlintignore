@@ -3,9 +3,6 @@
 # is undone on the next release and returns as a conflict.
 CHANGELOG.md
 
-# Planning documents - ephemeral, not committed
-.planning/**
-
 # Auto-generated noise directories (gitignored)
 debug/**
 file-history/**
