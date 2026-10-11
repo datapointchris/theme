@@ -1397,7 +1397,7 @@ verify_system() {
   if [[ $errors -eq 0 ]]; then
     echo "System ready!"
   else
-    echo "Found $errors error(s). Run: task symlinks:link"
+    echo "Found $errors error(s) above."
   fi
 }
 
