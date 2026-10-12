@@ -36,6 +36,7 @@ THEME_APP_ARTIFACTS=(
   "alacritty.toml:Alacritty"
   "tmux.conf:tmux"
   "btop.theme:btop"
+  "abtop.theme:abtop"
   "bat.tmTheme:bat"
   "delta.conf:delta"
   "glow.json:glow"
@@ -482,6 +483,21 @@ apply_btop() {
   fi
 
   return 0
+}
+
+# abtop's config.toml is expected to set theme = "current" already. It is often
+# a symlink into a config repo, which a write here would dirty.
+apply_abtop() {
+  local theme="$1"
+  local lib_path
+  lib_path=$(get_library_path "$theme")
+
+  if [[ -z "$lib_path" ]] || [[ ! -f "$lib_path/abtop.theme" ]]; then
+    return 1
+  fi
+
+  local abtop_theme_dir="${XDG_CONFIG_HOME:-$HOME/.config}/abtop/themes"
+  install_themed_artifact "$lib_path/abtop.theme" "$abtop_theme_dir" "$theme.theme" "current.theme"
 }
 
 # Apply JankyBorders theme (macOS)
@@ -2047,6 +2063,15 @@ apply_theme_to_apps() {
   else
     skipped+=("btop")
     _print_app_status "btop" "false"
+  fi
+
+  # abtop (all platforms)
+  if apply_abtop "$theme" 2>/dev/null; then
+    applied+=("abtop")
+    _print_app_status "abtop" "true"
+  else
+    skipped+=("abtop")
+    _print_app_status "abtop" "false"
   fi
 
   # Yazi (all platforms)

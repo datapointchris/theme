@@ -1,0 +1,68 @@
+# GitHub Dark Dimmed - abtop theme
+# Generated from theme.yml
+# Author: Projekt0n
+
+theme[main_bg]="#22272E"
+theme[main_fg]="#ADBAC7"
+
+# Panel titles
+theme[title]="#96D0FF"
+
+# Key hints, executing sessions, Bash calls
+theme[hi_fg]="#539BF5"
+
+theme[selected_bg]="#373E47"
+theme[selected_fg]="#CDD9E5"
+theme[inactive_fg]="#768390"
+
+# Labels and secondary text throughout
+theme[graph_text]="#636E7B"
+
+# Unfilled meter cells
+theme[meter_bg]="#768390"
+
+# Thinking sessions, Edit calls, open ports
+theme[proc_misc]="#46954A"
+
+# Session ids, Read calls, MCP profiles
+theme[session_id]="#C69026"
+
+# Rate-limited sessions and status messages
+theme[status_fg]="#E5534B"
+theme[warning_fg]="#C69026"
+
+theme[cpu_box]="#444C56"
+theme[mem_box]="#444C56"
+theme[net_box]="#444C56"
+theme[proc_box]="#444C56"
+theme[div_line]="#444C56"
+
+# Session badge per agent CLI
+theme[agent_claude]="#E0823D"
+theme[agent_codex]="#6CB6FF"
+theme[agent_opencode]="#57AB5A"
+
+# Context, quota and token-rate meters, by severity
+theme[cpu_start]="#46954A"
+theme[cpu_mid]="#C69026"
+theme[cpu_end]="#E5534B"
+
+# Each session's context use, waiting sessions, port conflicts
+theme[process_start]="#46954A"
+theme[process_mid]="#C69026"
+theme[process_end]="#E5534B"
+
+# Input tokens
+theme[free_start]="#46954A"
+theme[free_mid]="#96D0FF"
+theme[free_end]="#CDD9E5"
+
+# Output tokens and per-project fill
+theme[used_start]="#C69026"
+theme[used_mid]="#E5534B"
+theme[used_end]="#C69026"
+
+# Cache reads and writes
+theme[cached_start]="#C69026"
+theme[cached_mid]="#C69026"
+theme[cached_end]="#CDD9E5"

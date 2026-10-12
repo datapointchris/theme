@@ -1,0 +1,68 @@
+# Solarized Osaka - abtop theme
+# Generated from theme.yml
+# Author: Takuya Matsuyama (craftzdog)
+
+theme[main_bg]="#001419"
+theme[main_fg]="#839395"
+
+# Panel titles
+theme[title]="#29A298"
+
+# Key hints, executing sessions, Bash calls
+theme[hi_fg]="#268BD3"
+
+theme[selected_bg]="#073642"
+theme[selected_fg]="#A9B1B1"
+theme[inactive_fg]="#586E75"
+
+# Labels and secondary text throughout
+theme[graph_text]="#657B83"
+
+# Unfilled meter cells
+theme[meter_bg]="#586E75"
+
+# Thinking sessions, Edit calls, open ports
+theme[proc_misc]="#859900"
+
+# Session ids, Read calls, MCP profiles
+theme[session_id]="#B28500"
+
+# Rate-limited sessions and status messages
+theme[status_fg]="#DB302D"
+theme[warning_fg]="#B28500"
+
+theme[cpu_box]="#073642"
+theme[mem_box]="#073642"
+theme[net_box]="#073642"
+theme[proc_box]="#073642"
+theme[div_line]="#073642"
+
+# Session badge per agent CLI
+theme[agent_claude]="#C94C16"
+theme[agent_codex]="#268BD3"
+theme[agent_opencode]="#849900"
+
+# Context, quota and token-rate meters, by severity
+theme[cpu_start]="#859900"
+theme[cpu_mid]="#B28500"
+theme[cpu_end]="#DB302D"
+
+# Each session's context use, waiting sessions, port conflicts
+theme[process_start]="#859900"
+theme[process_mid]="#B28500"
+theme[process_end]="#DB302D"
+
+# Input tokens
+theme[free_start]="#859900"
+theme[free_mid]="#29A298"
+theme[free_end]="#A9B1B1"
+
+# Output tokens and per-project fill
+theme[used_start]="#B28500"
+theme[used_mid]="#DB302D"
+theme[used_end]="#B28500"
+
+# Cache reads and writes
+theme[cached_start]="#B28500"
+theme[cached_mid]="#B28500"
+theme[cached_end]="#A9B1B1"

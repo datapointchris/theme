@@ -1,0 +1,68 @@
+# Sora - abtop theme
+# Generated from theme.yml
+# Author: Aejkatappaja
+
+theme[main_bg]="#0E1018"
+theme[main_fg]="#C8D0E0"
+
+# Panel titles
+theme[title]="#78B8B0"
+
+# Key hints, executing sessions, Bash calls
+theme[hi_fg]="#80C8E0"
+
+theme[selected_bg]="#1E2430"
+theme[selected_fg]="#DCE4F0"
+theme[inactive_fg]="#586478"
+
+# Labels and secondary text throughout
+theme[graph_text]="#9AA4B8"
+
+# Unfilled meter cells
+theme[meter_bg]="#586478"
+
+# Thinking sessions, Edit calls, open ports
+theme[proc_misc]="#68A888"
+
+# Session ids, Read calls, MCP profiles
+theme[session_id]="#D4B878"
+
+# Rate-limited sessions and status messages
+theme[status_fg]="#C46C78"
+theme[warning_fg]="#C8A860"
+
+theme[cpu_box]="#222838"
+theme[mem_box]="#222838"
+theme[net_box]="#222838"
+theme[proc_box]="#222838"
+theme[div_line]="#222838"
+
+# Session badge per agent CLI
+theme[agent_claude]="#D0A888"
+theme[agent_codex]="#80C8E0"
+theme[agent_opencode]="#90C8A0"
+
+# Context, quota and token-rate meters, by severity
+theme[cpu_start]="#68A888"
+theme[cpu_mid]="#C8A860"
+theme[cpu_end]="#C46C78"
+
+# Each session's context use, waiting sessions, port conflicts
+theme[process_start]="#68A888"
+theme[process_mid]="#C8A860"
+theme[process_end]="#C46C78"
+
+# Input tokens
+theme[free_start]="#68A888"
+theme[free_mid]="#78B8B0"
+theme[free_end]="#DCE4F0"
+
+# Output tokens and per-project fill
+theme[used_start]="#C8A860"
+theme[used_mid]="#C46C78"
+theme[used_end]="#D4B878"
+
+# Cache reads and writes
+theme[cached_start]="#D4B878"
+theme[cached_mid]="#C8A860"
+theme[cached_end]="#DCE4F0"

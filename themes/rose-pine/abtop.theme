@@ -1,0 +1,68 @@
+# Rose Pine - abtop theme
+# Generated from theme.yml
+# Author: Rose Pine (https://rosepinetheme.com)
+
+theme[main_bg]="#191724"
+theme[main_fg]="#E0DEF4"
+
+# Panel titles
+theme[title]="#9CCFD8"
+
+# Key hints, executing sessions, Bash calls
+theme[hi_fg]="#C4A7E7"
+
+theme[selected_bg]="#403D52"
+theme[selected_fg]="#E0DEF4"
+theme[inactive_fg]="#6E6A86"
+
+# Labels and secondary text throughout
+theme[graph_text]="#908CAA"
+
+# Unfilled meter cells
+theme[meter_bg]="#6E6A86"
+
+# Thinking sessions, Edit calls, open ports
+theme[proc_misc]="#95B1AC"
+
+# Session ids, Read calls, MCP profiles
+theme[session_id]="#EBBCBA"
+
+# Rate-limited sessions and status messages
+theme[status_fg]="#EB6F92"
+theme[warning_fg]="#F6C177"
+
+theme[cpu_box]="#26233A"
+theme[mem_box]="#26233A"
+theme[net_box]="#26233A"
+theme[proc_box]="#26233A"
+theme[div_line]="#26233A"
+
+# Session badge per agent CLI
+theme[agent_claude]="#F6C177"
+theme[agent_codex]="#C4A7E7"
+theme[agent_opencode]="#31748F"
+
+# Context, quota and token-rate meters, by severity
+theme[cpu_start]="#95B1AC"
+theme[cpu_mid]="#F6C177"
+theme[cpu_end]="#EB6F92"
+
+# Each session's context use, waiting sessions, port conflicts
+theme[process_start]="#95B1AC"
+theme[process_mid]="#F6C177"
+theme[process_end]="#EB6F92"
+
+# Input tokens
+theme[free_start]="#95B1AC"
+theme[free_mid]="#9CCFD8"
+theme[free_end]="#E0DEF4"
+
+# Output tokens and per-project fill
+theme[used_start]="#F6C177"
+theme[used_mid]="#EB6F92"
+theme[used_end]="#EBBCBA"
+
+# Cache reads and writes
+theme[cached_start]="#EBBCBA"
+theme[cached_mid]="#F6C177"
+theme[cached_end]="#E0DEF4"

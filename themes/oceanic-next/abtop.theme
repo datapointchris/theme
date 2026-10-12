@@ -1,0 +1,68 @@
+# Oceanic Next - abtop theme
+# Generated from theme.yml
+# Author: Ghostty
+
+theme[main_bg]="#162C35"
+theme[main_fg]="#C0C5CE"
+
+# Panel titles
+theme[title]="#5FB3B3"
+
+# Key hints, executing sessions, Bash calls
+theme[hi_fg]="#6699CC"
+
+theme[selected_bg]="#4F5B66"
+theme[selected_fg]="#FFFFFF"
+theme[inactive_fg]="#65737E"
+
+# Labels and secondary text throughout
+theme[graph_text]="#FFFFFF"
+
+# Unfilled meter cells
+theme[meter_bg]="#65737E"
+
+# Thinking sessions, Edit calls, open ports
+theme[proc_misc]="#99C794"
+
+# Session ids, Read calls, MCP profiles
+theme[session_id]="#FAC863"
+
+# Rate-limited sessions and status messages
+theme[status_fg]="#EC5F67"
+theme[warning_fg]="#FCE094"
+
+theme[cpu_box]="#343D46"
+theme[mem_box]="#343D46"
+theme[net_box]="#343D46"
+theme[proc_box]="#343D46"
+theme[div_line]="#343D46"
+
+# Session badge per agent CLI
+theme[agent_claude]="#EC5F67"
+theme[agent_codex]="#6699CC"
+theme[agent_opencode]="#99C794"
+
+# Context, quota and token-rate meters, by severity
+theme[cpu_start]="#99C794"
+theme[cpu_mid]="#FCE094"
+theme[cpu_end]="#EC5F67"
+
+# Each session's context use, waiting sessions, port conflicts
+theme[process_start]="#99C794"
+theme[process_mid]="#FCE094"
+theme[process_end]="#EC5F67"
+
+# Input tokens
+theme[free_start]="#99C794"
+theme[free_mid]="#5FB3B3"
+theme[free_end]="#FFFFFF"
+
+# Output tokens and per-project fill
+theme[used_start]="#FCE094"
+theme[used_mid]="#EC5F67"
+theme[used_end]="#FAC863"
+
+# Cache reads and writes
+theme[cached_start]="#FAC863"
+theme[cached_mid]="#FCE094"
+theme[cached_end]="#FFFFFF"

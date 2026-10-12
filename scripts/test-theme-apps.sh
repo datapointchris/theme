@@ -25,7 +25,7 @@ echo "========================================"
 echo ""
 
 # Apps to test (macOS)
-APPS=(ghostty kitty borders wallpaper tmux btop)
+APPS=(ghostty kitty borders wallpaper tmux btop abtop)
 
 for app in "${APPS[@]}"; do
   printf "  %-12s " "$app"

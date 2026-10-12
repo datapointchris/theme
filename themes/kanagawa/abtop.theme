@@ -1,0 +1,68 @@
+# Kanagawa - abtop theme
+# Generated from theme.yml
+# Author: Tommaso Laurenzi (rebelot)
+
+theme[main_bg]="#1F1F28"
+theme[main_fg]="#DCD7BA"
+
+# Panel titles
+theme[title]="#6A9589"
+
+# Key hints, executing sessions, Bash calls
+theme[hi_fg]="#7E9CD8"
+
+theme[selected_bg]="#2D4F67"
+theme[selected_fg]="#C8C093"
+theme[inactive_fg]="#727169"
+
+# Labels and secondary text throughout
+theme[graph_text]="#C8C093"
+
+# Unfilled meter cells
+theme[meter_bg]="#727169"
+
+# Thinking sessions, Edit calls, open ports
+theme[proc_misc]="#98BB6C"
+
+# Session ids, Read calls, MCP profiles
+theme[session_id]="#C0A36E"
+
+# Rate-limited sessions and status messages
+theme[status_fg]="#E82424"
+theme[warning_fg]="#FF9E3B"
+
+theme[cpu_box]="#54546D"
+theme[mem_box]="#54546D"
+theme[net_box]="#54546D"
+theme[proc_box]="#54546D"
+theme[div_line]="#54546D"
+
+# Session badge per agent CLI
+theme[agent_claude]="#FFA066"
+theme[agent_codex]="#7E9CD8"
+theme[agent_opencode]="#76946A"
+
+# Context, quota and token-rate meters, by severity
+theme[cpu_start]="#98BB6C"
+theme[cpu_mid]="#FF9E3B"
+theme[cpu_end]="#E82424"
+
+# Each session's context use, waiting sessions, port conflicts
+theme[process_start]="#98BB6C"
+theme[process_mid]="#FF9E3B"
+theme[process_end]="#E82424"
+
+# Input tokens
+theme[free_start]="#98BB6C"
+theme[free_mid]="#6A9589"
+theme[free_end]="#C8C093"
+
+# Output tokens and per-project fill
+theme[used_start]="#FF9E3B"
+theme[used_mid]="#E82424"
+theme[used_end]="#C0A36E"
+
+# Cache reads and writes
+theme[cached_start]="#C0A36E"
+theme[cached_mid]="#FF9E3B"
+theme[cached_end]="#C8C093"

@@ -1,0 +1,68 @@
+# Gruvbox Dark Hard - abtop theme
+# Generated from theme.yml
+# Author: morhetz (https://github.com/morhetz/gruvbox)
+
+theme[main_bg]="#1D2021"
+theme[main_fg]="#EBDBB2"
+
+# Panel titles
+theme[title]="#8EC07C"
+
+# Key hints, executing sessions, Bash calls
+theme[hi_fg]="#83A598"
+
+theme[selected_bg]="#665C54"
+theme[selected_fg]="#D5C4A1"
+theme[inactive_fg]="#665C54"
+
+# Labels and secondary text throughout
+theme[graph_text]="#928374"
+
+# Unfilled meter cells
+theme[meter_bg]="#665C54"
+
+# Thinking sessions, Edit calls, open ports
+theme[proc_misc]="#B8BB26"
+
+# Session ids, Read calls, MCP profiles
+theme[session_id]="#FABD2F"
+
+# Rate-limited sessions and status messages
+theme[status_fg]="#FB4934"
+theme[warning_fg]="#FE8019"
+
+theme[cpu_box]="#504945"
+theme[mem_box]="#504945"
+theme[net_box]="#504945"
+theme[proc_box]="#504945"
+theme[div_line]="#504945"
+
+# Session badge per agent CLI
+theme[agent_claude]="#FE8019"
+theme[agent_codex]="#83A598"
+theme[agent_opencode]="#B8BB26"
+
+# Context, quota and token-rate meters, by severity
+theme[cpu_start]="#B8BB26"
+theme[cpu_mid]="#FE8019"
+theme[cpu_end]="#FB4934"
+
+# Each session's context use, waiting sessions, port conflicts
+theme[process_start]="#B8BB26"
+theme[process_mid]="#FE8019"
+theme[process_end]="#FB4934"
+
+# Input tokens
+theme[free_start]="#B8BB26"
+theme[free_mid]="#8EC07C"
+theme[free_end]="#D5C4A1"
+
+# Output tokens and per-project fill
+theme[used_start]="#FE8019"
+theme[used_mid]="#FB4934"
+theme[used_end]="#FABD2F"
+
+# Cache reads and writes
+theme[cached_start]="#FABD2F"
+theme[cached_mid]="#FE8019"
+theme[cached_end]="#D5C4A1"

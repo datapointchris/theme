@@ -50,7 +50,7 @@ exception, because a flavor is a directory rather than a file.
 
 Both halves are load-bearing. The pointer keeps the name `current` because the apps that can only
 `source`/`@import`/`include` a **path** need one that does not move. The apps that resolve a theme
-*by name* (ghostty, btop, bat, aerc, rofi) read their config from a symlink into the dotfiles
+*by name* (ghostty, btop, abtop, bat, aerc, rofi) read their config from a symlink into the dotfiles
 repo, so writing the name there would write through the link into that checkout. The payload
 carries the id so a machine says which theme it is running, every applied theme stays installed
 beside the others, and an exported config is self-describing.

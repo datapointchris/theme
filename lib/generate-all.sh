@@ -38,6 +38,7 @@ declare -A GENERATOR_OUTPUT=(
   ["alacritty"]="alacritty.toml"
   ["tmux"]="tmux.conf"
   ["btop"]="btop.theme"
+  ["abtop"]="abtop.theme"
   ["borders"]="bordersrc"
   ["hyprland"]="hyprland.lua"
   ["hyprlock"]="hyprlock.conf"

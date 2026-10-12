@@ -1,0 +1,68 @@
+# Everforest Dark Hard - abtop theme
+# Generated from theme.yml
+# Author: sainnhe
+
+theme[main_bg]="#1E2326"
+theme[main_fg]="#D3C6AA"
+
+# Panel titles
+theme[title]="#83C092"
+
+# Key hints, executing sessions, Bash calls
+theme[hi_fg]="#A7C080"
+
+theme[selected_bg]="#4C3743"
+theme[selected_fg]="#D3C6AA"
+theme[inactive_fg]="#859289"
+
+# Labels and secondary text throughout
+theme[graph_text]="#9DA9A0"
+
+# Unfilled meter cells
+theme[meter_bg]="#859289"
+
+# Thinking sessions, Edit calls, open ports
+theme[proc_misc]="#A7C080"
+
+# Session ids, Read calls, MCP profiles
+theme[session_id]="#DBBC7F"
+
+# Rate-limited sessions and status messages
+theme[status_fg]="#E67E80"
+theme[warning_fg]="#DBBC7F"
+
+theme[cpu_box]="#414B50"
+theme[mem_box]="#414B50"
+theme[net_box]="#414B50"
+theme[proc_box]="#414B50"
+theme[div_line]="#414B50"
+
+# Session badge per agent CLI
+theme[agent_claude]="#E69875"
+theme[agent_codex]="#7FBBB3"
+theme[agent_opencode]="#A7C080"
+
+# Context, quota and token-rate meters, by severity
+theme[cpu_start]="#A7C080"
+theme[cpu_mid]="#DBBC7F"
+theme[cpu_end]="#E67E80"
+
+# Each session's context use, waiting sessions, port conflicts
+theme[process_start]="#A7C080"
+theme[process_mid]="#DBBC7F"
+theme[process_end]="#E67E80"
+
+# Input tokens
+theme[free_start]="#A7C080"
+theme[free_mid]="#83C092"
+theme[free_end]="#D3C6AA"
+
+# Output tokens and per-project fill
+theme[used_start]="#DBBC7F"
+theme[used_mid]="#E67E80"
+theme[used_end]="#DBBC7F"
+
+# Cache reads and writes
+theme[cached_start]="#DBBC7F"
+theme[cached_mid]="#DBBC7F"
+theme[cached_end]="#D3C6AA"

@@ -1,0 +1,68 @@
+# Treehouse - abtop theme
+# Generated from theme.yml
+# Author: Ghostty
+
+theme[main_bg]="#191919"
+theme[main_fg]="#786B53"
+
+# Panel titles
+theme[title]="#B25A1E"
+
+# Key hints, executing sessions, Bash calls
+theme[hi_fg]="#58859A"
+
+theme[selected_bg]="#3A362D"
+theme[selected_fg]="#FFC800"
+theme[inactive_fg]="#504332"
+
+# Labels and secondary text throughout
+theme[graph_text]="#786B53"
+
+# Unfilled meter cells
+theme[meter_bg]="#504332"
+
+# Thinking sessions, Edit calls, open ports
+theme[proc_misc]="#44A900"
+
+# Session ids, Read calls, MCP profiles
+theme[session_id]="#AA820C"
+
+# Rate-limited sessions and status messages
+theme[status_fg]="#B2270E"
+theme[warning_fg]="#ED5D20"
+
+theme[cpu_box]="#786B53"
+theme[mem_box]="#786B53"
+theme[net_box]="#786B53"
+theme[proc_box]="#786B53"
+theme[div_line]="#786B53"
+
+# Session badge per agent CLI
+theme[agent_claude]="#ED5D20"
+theme[agent_codex]="#58859A"
+theme[agent_opencode]="#44A900"
+
+# Context, quota and token-rate meters, by severity
+theme[cpu_start]="#44A900"
+theme[cpu_mid]="#ED5D20"
+theme[cpu_end]="#B2270E"
+
+# Each session's context use, waiting sessions, port conflicts
+theme[process_start]="#44A900"
+theme[process_mid]="#ED5D20"
+theme[process_end]="#B2270E"
+
+# Input tokens
+theme[free_start]="#44A900"
+theme[free_mid]="#B25A1E"
+theme[free_end]="#FFC800"
+
+# Output tokens and per-project fill
+theme[used_start]="#ED5D20"
+theme[used_mid]="#B2270E"
+theme[used_end]="#AA820C"
+
+# Cache reads and writes
+theme[cached_start]="#AA820C"
+theme[cached_mid]="#ED5D20"
+theme[cached_end]="#FFC800"

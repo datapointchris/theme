@@ -1,0 +1,68 @@
+# Terafox - abtop theme
+# Generated from theme.yml
+# Author: EdenEast
+
+theme[main_bg]="#152528"
+theme[main_fg]="#E6EAEA"
+
+# Panel titles
+theme[title]="#A1CDD8"
+
+# Key hints, executing sessions, Bash calls
+theme[hi_fg]="#5A93AA"
+
+theme[selected_bg]="#293E40"
+theme[selected_fg]="#EAEEEE"
+theme[inactive_fg]="#6D7F8B"
+
+# Labels and secondary text throughout
+theme[graph_text]="#587B7B"
+
+# Unfilled meter cells
+theme[meter_bg]="#6D7F8B"
+
+# Thinking sessions, Edit calls, open ports
+theme[proc_misc]="#7AA4A1"
+
+# Session ids, Read calls, MCP profiles
+theme[session_id]="#FDA47F"
+
+# Rate-limited sessions and status messages
+theme[status_fg]="#E85C51"
+theme[warning_fg]="#FDA47F"
+
+theme[cpu_box]="#2D4F56"
+theme[mem_box]="#2D4F56"
+theme[net_box]="#2D4F56"
+theme[proc_box]="#2D4F56"
+theme[div_line]="#2D4F56"
+
+# Session badge per agent CLI
+theme[agent_claude]="#FF8349"
+theme[agent_codex]="#5A93AA"
+theme[agent_opencode]="#7AA4A1"
+
+# Context, quota and token-rate meters, by severity
+theme[cpu_start]="#7AA4A1"
+theme[cpu_mid]="#FDA47F"
+theme[cpu_end]="#E85C51"
+
+# Each session's context use, waiting sessions, port conflicts
+theme[process_start]="#7AA4A1"
+theme[process_mid]="#FDA47F"
+theme[process_end]="#E85C51"
+
+# Input tokens
+theme[free_start]="#7AA4A1"
+theme[free_mid]="#A1CDD8"
+theme[free_end]="#EAEEEE"
+
+# Output tokens and per-project fill
+theme[used_start]="#FDA47F"
+theme[used_mid]="#E85C51"
+theme[used_end]="#FDA47F"
+
+# Cache reads and writes
+theme[cached_start]="#FDA47F"
+theme[cached_mid]="#FDA47F"
+theme[cached_end]="#EAEEEE"

@@ -1,0 +1,68 @@
+# Nightfox - abtop theme
+# Generated from theme.yml
+# Author: EdenEast
+
+theme[main_bg]="#192330"
+theme[main_fg]="#CDCECF"
+
+# Panel titles
+theme[title]="#63CDCF"
+
+# Key hints, executing sessions, Bash calls
+theme[hi_fg]="#719CD6"
+
+theme[selected_bg]="#2B3B51"
+theme[selected_fg]="#D6D6D7"
+theme[inactive_fg]="#738091"
+
+# Labels and secondary text throughout
+theme[graph_text]="#71839B"
+
+# Unfilled meter cells
+theme[meter_bg]="#738091"
+
+# Thinking sessions, Edit calls, open ports
+theme[proc_misc]="#81B29A"
+
+# Session ids, Read calls, MCP profiles
+theme[session_id]="#DBC074"
+
+# Rate-limited sessions and status messages
+theme[status_fg]="#C94F6D"
+theme[warning_fg]="#DBC074"
+
+theme[cpu_box]="#39506D"
+theme[mem_box]="#39506D"
+theme[net_box]="#39506D"
+theme[proc_box]="#39506D"
+theme[div_line]="#39506D"
+
+# Session badge per agent CLI
+theme[agent_claude]="#F4A261"
+theme[agent_codex]="#719CD6"
+theme[agent_opencode]="#81B29A"
+
+# Context, quota and token-rate meters, by severity
+theme[cpu_start]="#81B29A"
+theme[cpu_mid]="#DBC074"
+theme[cpu_end]="#C94F6D"
+
+# Each session's context use, waiting sessions, port conflicts
+theme[process_start]="#81B29A"
+theme[process_mid]="#DBC074"
+theme[process_end]="#C94F6D"
+
+# Input tokens
+theme[free_start]="#81B29A"
+theme[free_mid]="#63CDCF"
+theme[free_end]="#D6D6D7"
+
+# Output tokens and per-project fill
+theme[used_start]="#DBC074"
+theme[used_mid]="#C94F6D"
+theme[used_end]="#DBC074"
+
+# Cache reads and writes
+theme[cached_start]="#DBC074"
+theme[cached_mid]="#DBC074"
+theme[cached_end]="#D6D6D7"

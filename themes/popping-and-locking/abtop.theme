@@ -1,0 +1,68 @@
+# Popping and Locking - abtop theme
+# Generated from theme.yml
+# Author: Hedinn Eiriksson
+
+theme[main_bg]="#181921"
+theme[main_fg]="#EBDBB2"
+
+# Panel titles
+theme[title]="#689D6A"
+
+# Key hints, executing sessions, Bash calls
+theme[hi_fg]="#458588"
+
+theme[selected_bg]="#383637"
+theme[selected_fg]="#EBDBB2"
+theme[inactive_fg]="#928374"
+
+# Labels and secondary text throughout
+theme[graph_text]="#A89984"
+
+# Unfilled meter cells
+theme[meter_bg]="#928374"
+
+# Thinking sessions, Edit calls, open ports
+theme[proc_misc]="#7FC678"
+
+# Session ids, Read calls, MCP profiles
+theme[session_id]="#D79921"
+
+# Rate-limited sessions and status messages
+theme[status_fg]="#CC5351"
+theme[warning_fg]="#E1656A"
+
+theme[cpu_box]="#EBDBB2"
+theme[mem_box]="#EBDBB2"
+theme[net_box]="#EBDBB2"
+theme[proc_box]="#EBDBB2"
+theme[div_line]="#EBDBB2"
+
+# Session badge per agent CLI
+theme[agent_claude]="#E1656A"
+theme[agent_codex]="#458588"
+theme[agent_opencode]="#98971A"
+
+# Context, quota and token-rate meters, by severity
+theme[cpu_start]="#7FC678"
+theme[cpu_mid]="#E1656A"
+theme[cpu_end]="#CC5351"
+
+# Each session's context use, waiting sessions, port conflicts
+theme[process_start]="#7FC678"
+theme[process_mid]="#E1656A"
+theme[process_end]="#CC5351"
+
+# Input tokens
+theme[free_start]="#7FC678"
+theme[free_mid]="#689D6A"
+theme[free_end]="#EBDBB2"
+
+# Output tokens and per-project fill
+theme[used_start]="#E1656A"
+theme[used_mid]="#CC5351"
+theme[used_end]="#D79921"
+
+# Cache reads and writes
+theme[cached_start]="#D79921"
+theme[cached_mid]="#E1656A"
+theme[cached_end]="#EBDBB2"

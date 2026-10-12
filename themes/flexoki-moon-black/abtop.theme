@@ -1,0 +1,68 @@
+# Flexoki Moon Black - abtop theme
+# Generated from theme.yml
+# Author: datapointchris
+
+theme[main_bg]="#100F0F"
+theme[main_fg]="#CECDC3"
+
+# Panel titles
+theme[title]="#3AA99F"
+
+# Key hints, executing sessions, Bash calls
+theme[hi_fg]="#3AA99F"
+
+theme[selected_bg]="#343331"
+theme[selected_fg]="#EDEECF"
+theme[inactive_fg]="#575653"
+
+# Labels and secondary text throughout
+theme[graph_text]="#878580"
+
+# Unfilled meter cells
+theme[meter_bg]="#575653"
+
+# Thinking sessions, Edit calls, open ports
+theme[proc_misc]="#879A39"
+
+# Session ids, Read calls, MCP profiles
+theme[session_id]="#D0A215"
+
+# Rate-limited sessions and status messages
+theme[status_fg]="#D14D41"
+theme[warning_fg]="#DA702C"
+
+theme[cpu_box]="#575653"
+theme[mem_box]="#575653"
+theme[net_box]="#575653"
+theme[proc_box]="#575653"
+theme[div_line]="#575653"
+
+# Session badge per agent CLI
+theme[agent_claude]="#DA702C"
+theme[agent_codex]="#4385BE"
+theme[agent_opencode]="#879A39"
+
+# Context, quota and token-rate meters, by severity
+theme[cpu_start]="#879A39"
+theme[cpu_mid]="#DA702C"
+theme[cpu_end]="#D14D41"
+
+# Each session's context use, waiting sessions, port conflicts
+theme[process_start]="#879A39"
+theme[process_mid]="#DA702C"
+theme[process_end]="#D14D41"
+
+# Input tokens
+theme[free_start]="#879A39"
+theme[free_mid]="#3AA99F"
+theme[free_end]="#EDEECF"
+
+# Output tokens and per-project fill
+theme[used_start]="#DA702C"
+theme[used_mid]="#D14D41"
+theme[used_end]="#D0A215"
+
+# Cache reads and writes
+theme[cached_start]="#D0A215"
+theme[cached_mid]="#DA702C"
+theme[cached_end]="#EDEECF"
