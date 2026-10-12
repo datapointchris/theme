@@ -2287,9 +2287,10 @@ reload_hyprland() {
 }
 
 # Restart waybar instead of SIGUSR2 reload.
-# Why: Waybar's in-process reload races with MPRIS/playerctl D-Bus signal
-# callbacks, occasionally segfaulting in libplayerctl during teardown.
-# A clean process restart sidesteps the race entirely.
+# Why: when playerctld starts after waybar 0.15.0, its mpris module leaks a
+# player whose handlers outlive the module a reload destroys. The next player
+# event then calls into freed memory and segfaults waybar. A process started
+# while playerctld runs holds no leaked player.
 reload_waybar() {
   if pgrep -x waybar &>/dev/null; then
     pkill -x waybar 2>/dev/null || true
