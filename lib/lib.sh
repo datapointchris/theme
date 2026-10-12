@@ -2295,6 +2295,43 @@ reload_tmux() {
   return 1
 }
 
+# SIGUSR2 terminates a process with no handler for it. On Linux each process's
+# caught-signal mask (bit 11 is SIGUSR2) says whether it has one. Elsewhere the
+# binary on PATH is asked instead, through the check named by $2.
+_signal_reload() {
+  local name="$1" binary_handles_usr2="$2"
+  local pids pid mask
+  pids=$(pgrep -x "$name") || return 1
+
+  if [[ ! -d /proc/self ]]; then
+    "$binary_handles_usr2" || return 1
+    pkill -USR2 -x "$name" 2>/dev/null || true
+    return 0
+  fi
+
+  for pid in $pids; do
+    mask=$(awk '/^SigCgt:/ { print $2 }' "/proc/$pid/status" 2>/dev/null) || continue
+    if [[ -n "$mask" ]] && (((16#$mask >> 11) & 1)); then
+      kill -USR2 "$pid" 2>/dev/null || true
+    fi
+  done
+}
+
+# btop reloads its config and theme on SIGUSR2 from 1.3.1.
+_btop_handles_usr2() {
+  local version
+  version=$(btop --version 2>/dev/null | grep -m1 -oE '[0-9]+\.[0-9]+\.[0-9]+') || return 1
+  printf '%s\n' 1.3.1 "$version" | sort -V -C
+}
+
+# Only abtop's -fork builds reload their theme on SIGUSR2.
+_abtop_handles_usr2() {
+  [[ "$(abtop --version 2>/dev/null)" == *-fork.* ]]
+}
+
+reload_btop() { _signal_reload btop _btop_handles_usr2; }
+reload_abtop() { _signal_reload abtop _abtop_handles_usr2; }
+
 reload_kitty() {
   if command -v pkill &>/dev/null; then
     pkill -USR1 kitty 2>/dev/null || true
@@ -2343,21 +2380,23 @@ reload_dunst() {
 reload_apps() {
   local platform
   platform=$(detect_platform)
-  local applied_apps="${1:-}"
+  # Padded so a name matches whole: "btop" must not match "abtop".
+  local applied_apps=" ${1:-} "
 
-  # tmux (all platforms)
-  [[ "$applied_apps" == *"tmux"* ]] && reload_tmux
-
-  # Platform-specific reloads
+  # rofi loads its theme on next launch, hyprlock on next lock.
+  local reloadable=(tmux btop abtop)
   if [[ "$platform" == "arch" ]]; then
-    [[ "$applied_apps" == *"kitty"* ]] && reload_kitty
-    [[ "$applied_apps" == *"hyprland"* ]] && reload_hyprland
-    [[ "$applied_apps" == *"waybar"* ]] && reload_waybar
-    [[ "$applied_apps" == *"dunst"* ]] && reload_dunst
-    # btop requires manual restart
-    # rofi loads theme on next launch
-    # hyprlock loads theme on next lock
+    reloadable+=(kitty hyprland waybar dunst)
   fi
+
+  # A reload returns 1 when its app is not running, which errexit would turn
+  # into an aborted apply.
+  local app
+  for app in "${reloadable[@]}"; do
+    if [[ "$applied_apps" == *" $app "* ]]; then
+      "reload_$app" || true
+    fi
+  done
 }
 
 # Render the "About" block (theme.yml metadata) — the theme's identity. Shown

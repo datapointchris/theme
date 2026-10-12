@@ -167,7 +167,10 @@ Both commands come from [`bashselfupdate`](https://github.com/datapointchris/bas
 - **Ghostty** — terminal emulator (colors + tab CSS)
 - **Kitty** — terminal emulator
 - **tmux** — terminal multiplexer
-- **btop** — system monitor
+- **btop** — system monitor (reloads in place from btop 1.3.1)
+- **abtop** — AI agent monitor. Needs [the fork](https://github.com/datapointchris/abtop)
+  that reads theme files and reloads in place, with `theme = "current"` in
+  `~/.config/abtop/config.toml`
 - **bat** — syntax highlighter / pager
 - **delta** — git diff pager (requires bat; include
   `~/.config/delta/current.gitconfig` from your gitconfig)
