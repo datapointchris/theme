@@ -2317,16 +2317,18 @@ _signal_reload() {
   done
 }
 
-# btop reloads its config and theme on SIGUSR2 from 1.3.1.
+# btop reloads its config and theme on SIGUSR2 from 1.3.1. Compared by hand
+# because BSD sort, the one this fallback runs against, has no -V.
 _btop_handles_usr2() {
-  local version
+  local version major minor patch
   version=$(btop --version 2>/dev/null | grep -m1 -oE '[0-9]+\.[0-9]+\.[0-9]+') || return 1
-  printf '%s\n' 1.3.1 "$version" | sort -V -C
+  IFS=. read -r major minor patch <<<"$version"
+  ((major > 1 || (major == 1 && (minor > 3 || (minor == 3 && patch >= 1)))))
 }
 
 # Only abtop's -fork builds reload their theme on SIGUSR2.
 _abtop_handles_usr2() {
-  [[ "$(abtop --version 2>/dev/null)" == *-fork.* ]]
+  [[ "$(abtop --version 2>/dev/null)" == *-fork* ]]
 }
 
 reload_btop() { _signal_reload btop _btop_handles_usr2; }
