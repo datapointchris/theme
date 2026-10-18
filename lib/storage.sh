@@ -103,10 +103,13 @@ _storage_get_machine_id() {
   echo "$host"
 }
 
+# Usage: log_action <action> [theme] [message] [trigger]
+# trigger says who applied a theme: "schedule" or "manual". Absent keys are omitted, never blank.
 log_action() {
   local action="$1"
   local theme="${2:-}"
   local message="${3:-}"
+  local trigger="${4:-}"
 
   if [[ -z "$action" ]]; then
     echo "Error: action required" >&2
@@ -115,34 +118,17 @@ log_action() {
 
   mkdir -p "$THEME_STATE_DIR"
 
-  local timestamp
-  timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-  local platform
-  platform=$(detect_platform)
-  local machine
-  machine=$(_storage_get_machine_id)
-
-  local record
-  if [[ -n "$message" ]]; then
-    record=$(jq -nc \
-      --arg ts "$timestamp" \
-      --arg platform "$platform" \
-      --arg machine "$machine" \
-      --arg theme "$theme" \
-      --arg act "$action" \
-      --arg msg "$message" \
-      '{ts: $ts, platform: $platform, machine: $machine, theme: $theme, action: $act, message: $msg}')
-  else
-    record=$(jq -nc \
-      --arg ts "$timestamp" \
-      --arg platform "$platform" \
-      --arg machine "$machine" \
-      --arg theme "$theme" \
-      --arg act "$action" \
-      '{ts: $ts, platform: $platform, machine: $machine, theme: $theme, action: $act}')
-  fi
-
-  echo "$record" >>"$THEME_HISTORY_FILE"
+  jq -nc \
+    --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    --arg platform "$(detect_platform)" \
+    --arg machine "$(_storage_get_machine_id)" \
+    --arg theme "$theme" \
+    --arg act "$action" \
+    --arg msg "$message" \
+    --arg trigger "$trigger" \
+    '{ts: $ts, platform: $platform, machine: $machine, theme: $theme, action: $act}
+      + (if $msg == "" then {} else {message: $msg} end)
+      + (if $trigger == "" then {} else {trigger: $trigger} end)' >>"$THEME_HISTORY_FILE"
 }
 
 get_history() {
@@ -218,6 +204,41 @@ calculate_usage_time() {
     | group_by(.theme)
     | map({key: .[0].theme, value: (map(.duration) | add // 0)})
     | from_entries
+  '
+}
+
+# Each theme's finished scheduled turns: kept until the next scheduled change, or switched
+# away from by hand, with the median seconds before the switch.
+get_schedule_turns() {
+  get_history | jq -c '
+    def parse_ts: sub("[+-][0-9]{2}:[0-9]{2}$"; "Z") | fromdateiso8601;
+    def median:
+      sort
+      | if length == 0 then null
+        elif length % 2 == 1 then .[length / 2 | floor]
+        else (.[length / 2 - 1] + .[length / 2]) / 2
+        end;
+
+    [
+      map(select(.action == "apply")) | group_by(.machine)[] | sort_by(.ts)
+      | . as $applies
+      | range(0; ($applies | length) - 1) as $i
+      | select($applies[$i].trigger == "schedule")
+      | {
+          theme: $applies[$i].theme,
+          kept: ($applies[$i + 1].trigger == "schedule"),
+          seconds: (($applies[$i + 1].ts | parse_ts) - ($applies[$i].ts | parse_ts))
+        }
+    ]
+    | group_by(.theme)
+    | map({
+        theme: .[0].theme,
+        turns: length,
+        kept: (map(select(.kept)) | length),
+        switched: (map(select(.kept | not)) | length),
+        median_switch_seconds: (map(select(.kept | not) | .seconds) | median)
+      })
+    | .[]
   '
 }
 

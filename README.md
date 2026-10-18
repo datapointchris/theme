@@ -72,9 +72,26 @@ theme unreject                # Restore a rejected theme (interactive picker)
 ### Rankings and History
 
 ```bash
-theme rank                    # Rankings: by likes and by hours used
+theme rank                    # Rankings: by likes, by hours used, and by scheduled turns kept
 theme log                     # View complete history
 ```
+
+### Schedule
+
+Changes the theme on a timer, so the history shows which themes you switch away
+from and which you leave on:
+
+```bash
+theme schedule on             # Install the timer: systemd on Linux, launchd on macOS
+theme schedule status         # Whether it is on, and when the next change is due
+theme schedule off            # Remove the timer
+```
+
+A theme the schedule applied keeps the screen for 6 hours, and one you applied by
+hand for 12. A due change waits until you are at the machine, so it lands while
+you use it. `theme rank` counts each theme's scheduled turns as kept or switched
+away from. On Hyprland, telling idle from active needs a hypridle listener, which
+`theme schedule --help` shows. WSL is not supported.
 
 ### Backgrounds
 
@@ -236,6 +253,7 @@ Data and configuration live in XDG-compliant locations:
 ~/.local/state/theme/
 ├── history.jsonl      # Usage/rating history (synced)
 ├── current            # Current theme ID
+├── schedule.json      # Outcome of the last scheduled check
 └── sync-state.json    # Sync configuration
 
 ~/.config/theme/

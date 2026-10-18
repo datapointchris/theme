@@ -14,6 +14,7 @@ generated data live at:
 ~/.local/state/theme/history.jsonl   - Unified history (synced via gist)
 ~/.local/state/theme/current         - Current theme ID
 ~/.local/state/theme/sync-state.json - Sync configuration
+~/.local/state/theme/schedule.json   - Outcome of the last scheduled check
 ~/.cache/theme/backgrounds/          - Pre-rendered backgrounds per theme
 ~/.cache/theme/gowall/               - Per-theme gowall palettes, as JSON
 ```
@@ -207,6 +208,18 @@ id with hyphens replaced by underscores.
 - **Change-signal colors are solved, not blended by a fixed fraction.** A fixed fraction lands at
   a different perceived strength on every palette. `delta.sh` searches for the blend that hits a
   target contrast ratio against that theme's own background.
+- **`theme schedule` reads only this machine's apply rows.** Each apply row carries a
+  `trigger`, `schedule` or `manual`, and a row without one predates the schedule and was
+  applied by hand. A scheduled apply is due again after 6 hours and a hand apply after 12.
+  A due change waits until logind (or macOS input idleness) says the user is present.
+  `theme rank`'s SCHEDULED TURNS reads the same field: a scheduled turn is kept when the
+  machine's next apply was also scheduled, and switched away from otherwise.
+- **A desktop daemon the apply restarts goes through Hyprland's exec dispatcher.** A
+  process started by the apply stays in the apply's cgroup even after `setsid`, and
+  systemd kills that cgroup when the scheduled oneshot exits. So `start_session_daemon`
+  hands waybar and dunst to Hyprland, where login started them. On launchd the same kill
+  hits the job's process group, which the agent's `AbandonProcessGroup` turns off. For
+  the same reason a scheduled apply pushes to the gist in the foreground.
 - **`theme random` weights by recency, and every eligible theme stays reachable.**
   `compute_theme_weights` scores each candidate from days since its last apply, and
   `weighted_random_choice` samples that distribution. Apply count is the wrong axis: narrowing the
