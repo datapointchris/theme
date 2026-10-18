@@ -17,8 +17,7 @@ setup() {
   source_theme_libs
 
   stub_command tmux 1    # "no server running", so nothing is sourced into one
-  stub_command pgrep 1   # waybar not running
-  stub_command killall 0 # never reached while pgrep says no
+  stub_command pgrep 1   # waybar not running, so it is never restarted
   stub_command cmd.exe 1 # not WSL, so the Windows Terminal write is skipped
 }
 

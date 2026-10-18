@@ -911,10 +911,8 @@ set_waybar_opacity() {
 @define-color waybar-bg alpha(@bg, $opacity);
 EOF
 
-  # Reload waybar if running
-  if pgrep -x waybar &>/dev/null; then
-    killall -SIGUSR2 waybar 2>/dev/null || true
-  fi
+  # Restarted rather than sent SIGUSR2, for the reason reload_waybar gives.
+  reload_waybar || true
 }
 
 # Get current opacity (from first available terminal)
@@ -1814,11 +1812,6 @@ apply_hyprland() {
 
   install_themed_artifact "$lib_path/hyprland.lua" "$hypr_theme_dir" "$theme.lua" "current.lua" || return 1
 
-  # Reload hyprland if running
-  if command -v hyprctl &>/dev/null; then
-    hyprctl reload 2>/dev/null || true
-  fi
-
   return 0
 }
 
@@ -2344,7 +2337,7 @@ reload_kitty() {
 
 reload_hyprland() {
   if command -v hyprctl &>/dev/null; then
-    hyprctl reload 2>/dev/null || true
+    hyprctl reload >/dev/null 2>&1 || true
     return 0
   fi
   return 1
@@ -2358,8 +2351,7 @@ reload_hyprland() {
 reload_waybar() {
   if pgrep -x waybar &>/dev/null; then
     pkill -x waybar 2>/dev/null || true
-    setsid waybar >/dev/null 2>&1 </dev/null &
-    disown
+    start_session_daemon waybar
     return 0
   fi
   return 1
@@ -2370,12 +2362,27 @@ reload_dunst() {
     killall dunst 2>/dev/null || true
     # Dunst auto-restarts on next notification, or start it explicitly
     if command -v dunst &>/dev/null; then
-      dunst &>/dev/null &
-      disown
+      start_session_daemon dunst
     fi
     return 0
   fi
   return 1
+}
+
+# Starts a desktop daemon outside the apply's cgroup, which systemd kills when an apply run as a
+# service ends. Hyprland's child sits where login started it. A transient scope is the fallback.
+start_session_daemon() {
+  local program="$1"
+  if command -v hyprctl &>/dev/null \
+    && [[ "$(hyprctl dispatch "hl.dsp.exec_cmd('$program')" 2>/dev/null)" == "ok" ]]; then
+    return 0
+  fi
+  if systemctl --user show-environment &>/dev/null; then
+    systemd-run --user --scope --collect --quiet "$program" >/dev/null 2>&1 </dev/null &
+  else
+    setsid "$program" >/dev/null 2>&1 </dev/null &
+  fi
+  disown
 }
 
 # Reload all applicable apps after theme apply

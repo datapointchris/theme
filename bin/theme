@@ -23,6 +23,7 @@ fi
 source "$THEME_APP_DIR/lib/lib.sh"
 source "$THEME_APP_DIR/lib/storage.sh"
 source "$THEME_APP_DIR/lib/sync.sh"
+source "$THEME_APP_DIR/lib/schedule.sh"
 
 # Sourced if present rather than required, so an installation predating this
 # dependency still runs every command it ran before. `theme update` says how to
@@ -95,6 +96,7 @@ subcommands_table() {
   cat <<'EOF'
   background           Manage backgrounds (run for usage)
   opacity              Manage terminal opacity (run for usage)
+  schedule             Change the theme on a timer while you are active (run for usage)
   sync                 Manage GitHub Gist synchronization (run for usage)
 EOF
 }
@@ -152,6 +154,7 @@ verb_usage() {
   case "$verb" in
     background) background_usage && return ;;
     opacity) opacity_usage && return ;;
+    schedule) schedule_usage && return ;;
     sync) sync_usage && return ;;
     browsers) browsers_usage && return ;;
     ls) verb="list" ;;
@@ -457,6 +460,86 @@ EOF
   fi
 }
 
+schedule_usage_commands() {
+  cat <<'EOF'
+  status               Show whether the schedule is on and when the next change is due
+  on                   Install the timer: systemd on Linux, launchd on macOS
+  off                  Remove the timer
+  run                  Check once, and change the theme if its turn is due (the timer runs this)
+EOF
+}
+
+schedule_usage_rules() {
+  local idle_minutes=$((THEME_SCHEDULE_IDLE_SECONDS / 60))
+  local login1="busctl call org.freedesktop.login1 /org/freedesktop/login1/session/auto org.freedesktop.login1.Session SetIdleHint"
+  cat <<EOF
+  A theme the schedule applied keeps the screen for $THEME_SCHEDULE_TURN_HOURS hours. One you applied
+  by hand keeps it for $THEME_SCHEDULE_HOLD_HOURS. A due change waits until you are at the machine,
+  so it lands while you use it. The timer checks every $THEME_SCHEDULE_CHECK_MINUTES minutes.
+
+  theme rank counts each theme's scheduled turns: kept until the next scheduled
+  change, or switched away from by hand.
+
+  Away on macOS means no input for $idle_minutes minutes. On Linux it means logind's
+  IdleHint or LockedHint is set for your display session. hypridle does not set
+  IdleHint by itself; this listener in hypridle.conf does:
+
+    listener {
+        timeout = $THEME_SCHEDULE_IDLE_SECONDS
+        on-timeout = $login1 b true
+        on-resume = $login1 b false
+    }
+
+  On Linux the timer runs in the systemd user manager. It needs the desktop's
+  WAYLAND_DISPLAY or DISPLAY, and under Hyprland its HYPRLAND_INSTANCE_SIGNATURE.
+  systemctl --user show-environment lists what the manager has. If your session
+  does not export them to it, run this at login:
+
+    systemctl --user import-environment WAYLAND_DISPLAY DISPLAY HYPRLAND_INSTANCE_SIGNATURE
+
+  theme schedule status reports a check blocked without them.
+EOF
+}
+
+schedule_usage() {
+  if command -v print_section &>/dev/null; then
+    print_section "Theme Schedule" "yellow"
+
+    print_section "Commands" "blue"
+    schedule_usage_commands
+
+    print_section "How it decides" "blue"
+    schedule_usage_rules
+
+    print_section "Examples" "yellow"
+    echo "  $(print_cyan "theme schedule on")       # Start changing themes on the timer"
+    echo "  $(print_cyan "theme schedule status")   # When the next change is due"
+
+  else
+    cat <<'EOF'
+Theme Schedule
+==============
+
+Commands
+--------
+EOF
+    schedule_usage_commands
+    cat <<'EOF'
+
+How it decides
+--------------
+EOF
+    schedule_usage_rules
+    cat <<'EOF'
+
+Examples
+--------
+  theme schedule on       # Start changing themes on the timer
+  theme schedule status   # When the next change is due
+EOF
+  fi
+}
+
 browsers_usage() {
   if command -v print_section &>/dev/null; then
     print_section "Browser Theme Diagnostics" "yellow"
@@ -749,8 +832,11 @@ show_browsers() {
   fi
 }
 
+# Usage: apply_theme <theme> [trigger]
+# trigger is "manual" unless the schedule is applying, which sets "schedule".
 apply_theme() {
   local theme_input="$1"
+  local trigger="${2:-manual}"
 
   if [[ -z "$theme_input" ]]; then
     echo "Error: Theme name required"
@@ -797,20 +883,26 @@ apply_theme() {
   reload_apps "$applied"
 
   # Log the theme action
-  log_action "apply" "$canonical"
+  log_action "apply" "$canonical" "" "$trigger"
 
   # Log the background action if one was applied
   if [[ -n "$background_id" ]] && [[ "$background_id" != "none" ]]; then
     log_background_action "apply" "$background_id" "$canonical"
   fi
 
-  sync_after_action
+  # A scheduled run pushes in the foreground itself, because its unit ends a backgrounded push.
+  [[ "$trigger" == "schedule" ]] || sync_after_action
 
   echo ""
   echo "Theme applied."
+  if schedule_is_on; then
+    schedule_next_change_line
+  fi
 }
 
+# Usage: apply_random [trigger]
 apply_random() {
+  local trigger="${1:-manual}"
   local candidates
   mapfile -t candidates < <(list_themes_not_rejected)
 
@@ -846,7 +938,7 @@ apply_random() {
   echo "🎲 Randomly selected: $display_info"
   echo "   (${#candidates[@]} themes, weighted toward the least recently used)"
   echo ""
-  apply_theme "$random_theme"
+  apply_theme "$random_theme" "$trigger"
 }
 
 change_theme() {
@@ -1190,6 +1282,38 @@ _render_rank_section() {
   done <<<"$sorted"
 }
 
+# Finished scheduled turns per available theme, most often kept first.
+# Args: $1 rankings JSON array carrying .display, $2 name width.
+_render_turns_section() {
+  local rankings="$1" name_width="$2"
+  local rows
+  rows=$(get_schedule_turns | jq -s -r --argjson r "$rankings" '
+    ($r | map({key: .theme, value: .display}) | from_entries) as $display
+    | map(select($display[.theme] != null) | .display = $display[.theme])
+    | sort_by(-(.kept / .turns), -.turns, .display)
+    | .[]
+    | [.display, .kept, .turns, .switched, (.median_switch_seconds | if . == null then "" else floor end)]
+    | @tsv')
+  [[ -z "$rows" ]] && return 0
+
+  local c_reset='\033[0m'
+  local c_blue='\033[0;34m'
+  echo ""
+  echo -e "${c_blue}SCHEDULED TURNS${c_reset}"
+
+  local rank=0 display kept turns switched median
+  while IFS=$'\t' read -r display kept turns switched median; do
+    rank=$((rank + 1))
+    if [[ ${#display} -gt $name_width ]]; then
+      display="${display:0:$((name_width - 3))}..."
+    fi
+    local after=""
+    [[ -n "$median" ]] && after=" after $(format_duration "$median")"
+    printf "%2d. %-${name_width}s  %7s kept  %2d switched%s\n" \
+      "$rank" "$display" "$kept/$turns" "$switched" "$after"
+  done <<<"$rows"
+}
+
 show_rankings() {
   sync_before_read
 
@@ -1231,6 +1355,7 @@ show_rankings() {
 
   _render_rank_section "BY LIKES" "$rankings" likes "$name_width"
   _render_rank_section "BY HOURS USED" "$rankings" hours "$name_width"
+  _render_turns_section "$rankings" "$name_width"
   echo ""
 }
 
@@ -1489,8 +1614,8 @@ main() {
   # identically. Never fails and never prints an error; `theme update` is where
   # update failures surface.
   if declare -F bashselfupdate_notify &>/dev/null; then
-    case "${1:-}" in
-      update | --version | -v) ;;
+    case "${1:-} ${2:-}" in
+      "update "* | "--version "* | "-v "* | "schedule run") ;;
       *) bashselfupdate_notify theme "$THEME_APP_DIR" ;;
     esac
   fi
@@ -2106,6 +2231,29 @@ main() {
           ;;
         *)
           echo "Usage: theme sync <init|status|push|pull|on|off>"
+          exit 1
+          ;;
+      esac
+      ;;
+    schedule)
+      case "${2:-}" in
+        "" | --help | -h)
+          schedule_usage
+          ;;
+        status)
+          schedule_status
+          ;;
+        on)
+          schedule_on
+          ;;
+        off)
+          schedule_off
+          ;;
+        run)
+          schedule_run
+          ;;
+        *)
+          echo "Usage: theme schedule <status|on|off|run>" >&2
           exit 1
           ;;
       esac

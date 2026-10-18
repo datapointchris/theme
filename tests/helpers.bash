@@ -112,6 +112,16 @@ add_history_record() {
   fi
 }
 
+# An apply carrying the trigger the schedule reads: "schedule" or "manual".
+#
+# Usage: add_apply_record <ts> <theme> <trigger> [machine]
+add_apply_record() {
+  local ts="$1" theme="$2" trigger="$3" machine="${4:-testbox}"
+  mkdir -p "$(dirname "$THEME_HISTORY_FILE")"
+  printf '{"ts":"%s","platform":"arch","machine":"%s","theme":"%s","action":"apply","trigger":"%s"}\n' \
+    "$ts" "$machine" "$theme" "$trigger" >>"$THEME_HISTORY_FILE"
+}
+
 # Usage: add_background_record <ts> <background> <theme> <action> [message]
 add_background_record() {
   local ts="$1" background="$2" theme="$3" action="$4" message="${5:-}"

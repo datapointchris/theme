@@ -96,17 +96,22 @@ _storage_get_machine_id() {
   # field, so prefixing it (the old "platform-host" format) both duplicated the
   # platform and split one machine across records when the platform label drifted
   # (arch -> archlinux) or the hostname case changed (Macmini vs macmini). The
-  # read-time normalize_machine shim canonicalizes existing platform-host history.
+  # read-time normalize_machine shim canonicalizes existing platform-host history,
+  # and the id goes through the same shim. A hostname shaped like a legacy label
+  # (linux-box) reads back as "box", so a raw id would match none of its own rows.
   local host
   host=$(uname -n 2>/dev/null | cut -d. -f1 | tr '[:upper:]' '[:lower:]')
   [[ -z "$host" ]] && host="unknown"
-  echo "$host"
+  jq -rn --arg host "$host" "$(_jq_normalize_history) \$host | normalize_machine"
 }
 
+# Usage: log_action <action> [theme] [message] [trigger]
+# trigger says who applied a theme: "schedule" or "manual". Absent keys are omitted, never blank.
 log_action() {
   local action="$1"
   local theme="${2:-}"
   local message="${3:-}"
+  local trigger="${4:-}"
 
   if [[ -z "$action" ]]; then
     echo "Error: action required" >&2
@@ -115,34 +120,17 @@ log_action() {
 
   mkdir -p "$THEME_STATE_DIR"
 
-  local timestamp
-  timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-  local platform
-  platform=$(detect_platform)
-  local machine
-  machine=$(_storage_get_machine_id)
-
-  local record
-  if [[ -n "$message" ]]; then
-    record=$(jq -nc \
-      --arg ts "$timestamp" \
-      --arg platform "$platform" \
-      --arg machine "$machine" \
-      --arg theme "$theme" \
-      --arg act "$action" \
-      --arg msg "$message" \
-      '{ts: $ts, platform: $platform, machine: $machine, theme: $theme, action: $act, message: $msg}')
-  else
-    record=$(jq -nc \
-      --arg ts "$timestamp" \
-      --arg platform "$platform" \
-      --arg machine "$machine" \
-      --arg theme "$theme" \
-      --arg act "$action" \
-      '{ts: $ts, platform: $platform, machine: $machine, theme: $theme, action: $act}')
-  fi
-
-  echo "$record" >>"$THEME_HISTORY_FILE"
+  jq -nc \
+    --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    --arg platform "$(detect_platform)" \
+    --arg machine "$(_storage_get_machine_id)" \
+    --arg theme "$theme" \
+    --arg act "$action" \
+    --arg msg "$message" \
+    --arg trigger "$trigger" \
+    '{ts: $ts, platform: $platform, machine: $machine, theme: $theme, action: $act}
+      + (if $msg == "" then {} else {message: $msg} end)
+      + (if $trigger == "" then {} else {trigger: $trigger} end)' >>"$THEME_HISTORY_FILE"
 }
 
 get_history() {
@@ -189,10 +177,12 @@ get_theme_stats() {
   '
 }
 
+# Seconds each theme was on screen. An apply ends at the next apply on the same machine.
+# Another machine's latest apply is left out, since nothing here knows when it ended.
 calculate_usage_time() {
   local current_theme="$1"
 
-  get_history | jq -r --arg current "$current_theme" '
+  get_history | jq -r --arg current "$current_theme" --arg machine "$(_storage_get_machine_id)" '
     def parse_ts:
       if test("[+-][0-9]{2}:[0-9]{2}$") then
         gsub("[+-][0-9]{2}:[0-9]{2}$"; "Z") | fromdateiso8601
@@ -200,32 +190,57 @@ calculate_usage_time() {
         fromdateiso8601
       end;
 
-    [map(select(.action == "apply")) | sort_by(.ts) | to_entries[]] as $applies |
+    [
+      map(select(.action == "apply")) | group_by(.machine)[] | sort_by(.ts)
+      | . as $applies
+      | range(0; $applies | length) as $i
+      | $applies[$i] as $apply
+      | if $i < (($applies | length) - 1) then
+          {theme: $apply.theme, duration: (($applies[$i + 1].ts | parse_ts) - ($apply.ts | parse_ts))}
+        elif $apply.machine == $machine and $apply.theme == $current then
+          {theme: $apply.theme, duration: ((now | floor) - ($apply.ts | parse_ts))}
+        else
+          empty
+        end
+    ]
+    | group_by(.theme)
+    | map({key: .[0].theme, value: (map(.duration) | add // 0)})
+    | from_entries
+  '
+}
 
-    ($applies | map(
-      . as $entry |
-      $entry.key as $idx |
-      $entry.value as $apply |
+# Each theme's finished scheduled turns: kept until the next scheduled change, or switched
+# away from by hand, with the median seconds before the switch.
+get_schedule_turns() {
+  get_history | jq -c '
+    def parse_ts: sub("[+-][0-9]{2}:[0-9]{2}$"; "Z") | fromdateiso8601;
+    def median:
+      sort
+      | if length == 0 then null
+        elif length % 2 == 1 then .[length / 2 | floor]
+        else (.[length / 2 - 1] + .[length / 2]) / 2
+        end;
 
-      if ($idx < (($applies | length) - 1)) then
-        {
-          theme: $apply.theme,
-          duration: (($applies[$idx + 1].value.ts | parse_ts) - ($apply.ts | parse_ts))
+    [
+      map(select(.action == "apply")) | group_by(.machine)[] | sort_by(.ts)
+      | . as $applies
+      | range(0; ($applies | length) - 1) as $i
+      | select($applies[$i].trigger == "schedule")
+      | {
+          theme: $applies[$i].theme,
+          kept: ($applies[$i + 1].trigger == "schedule"),
+          seconds: (($applies[$i + 1].ts | parse_ts) - ($applies[$i].ts | parse_ts))
         }
-      elif $apply.theme == $current then
-        {
-          theme: $apply.theme,
-          duration: ((now | floor) - ($apply.ts | parse_ts))
-        }
-      else
-        null
-      end
-    ) | map(select(. != null))) as $durations |
-
-    ($durations | group_by(.theme) | map({
-      key: .[0].theme,
-      value: (map(.duration) | add // 0)
-    }) | from_entries)
+    ]
+    | group_by(.theme)
+    | map({
+        theme: .[0].theme,
+        turns: length,
+        kept: (map(select(.kept)) | length),
+        switched: (map(select(.kept | not)) | length),
+        median_switch_seconds: (map(select(.kept | not) | .seconds) | median)
+      })
+    | .[]
   '
 }
 

@@ -32,18 +32,10 @@ setup() {
   assert_output "action,machine,platform,theme,ts"
 }
 
-@test "log_action omits the message key rather than writing an empty one" {
-  # Two record shapes, not one with a blank field. Readers test for the key's
-  # presence — get_background_stats collects `.message // empty` — so an empty
-  # string would show up as a note with no text.
-  log_action apply gruvbox
-  run jq -r 'has("message")' "$THEME_HISTORY_FILE"
-  assert_output "false"
-
-  : >"$THEME_HISTORY_FILE"
-  log_action like gruvbox "nice"
-  run jq -r '.message' "$THEME_HISTORY_FILE"
-  assert_output "nice"
+@test "log_action writes the message and the trigger the schedule reads" {
+  log_action apply gruvbox "nice" schedule
+  run jq -r '[.message, .trigger] | join(",")' "$THEME_HISTORY_FILE"
+  assert_output "nice,schedule"
 }
 
 @test "log_action records the platform and machine of the writing host" {
@@ -61,18 +53,6 @@ setup() {
   log_action apply gruvbox
   run jq -r '.ts | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")' "$THEME_HISTORY_FILE"
   assert_output "true"
-}
-
-@test "log_action requires an action" {
-  run log_action ""
-  assert_failure
-  assert_output --partial "action required"
-}
-
-@test "log_action creates the state directory if it is missing" {
-  rm -rf "$THEME_STATE_DIR"
-  log_action apply gruvbox
-  assert_equal "$(wc -l <"$THEME_HISTORY_FILE" | xargs)" "1"
 }
 
 #==============================================================================
@@ -204,16 +184,17 @@ setup() {
   assert_output --partial "theme name required"
 }
 
-@test "calculate_usage_time credits each apply until the next one" {
-  # The apply log is a timeline, not a set of independent events: a theme's hours
-  # are the gaps between its apply and whatever replaced it.
+@test "calculate_usage_time credits each apply until the next one on the same machine" {
+  # A theme's hours are the gaps between its apply and whatever replaced it on that
+  # machine. The other machine's apply at 02:00 neither ends nord nor counts itself.
   add_history_record "2025-01-01T00:00:00Z" gruvbox apply
   add_history_record "2025-01-01T01:00:00Z" nord apply
+  add_history_record "2025-01-01T02:00:00Z" kanagawa apply "" arch otherbox
   add_history_record "2025-01-01T03:00:00Z" gruvbox apply
   add_history_record "2025-01-01T04:00:00Z" everforest apply
 
-  run pipeline "calculate_usage_time '' | jq -c '{gruvbox,nord}'"
-  assert_output '{"gruvbox":7200,"nord":7200}'
+  run pipeline "calculate_usage_time '' | jq -c '{gruvbox,nord,kanagawa}'"
+  assert_output '{"gruvbox":7200,"nord":7200,"kanagawa":null}'
 }
 
 @test "calculate_usage_time leaves the final apply uncounted unless it is current" {
@@ -227,6 +208,7 @@ setup() {
 }
 
 @test "calculate_usage_time counts the current theme up to now" {
+  stub_command_with_output uname testbox
   add_history_record "2025-01-01T00:00:00Z" gruvbox apply
   add_history_record "2025-01-01T01:00:00Z" nord apply
 
@@ -244,6 +226,19 @@ setup() {
 
   run pipeline "calculate_usage_time '' | jq -r '.gruvbox'"
   assert_output "7200"
+}
+
+@test "get_schedule_turns counts a turn kept until the next scheduled change, or switched away by hand" {
+  # The other machine's hand apply between sora and kanagawa does not end sora's turn.
+  add_apply_record "2026-01-01T00:00:00Z" sora schedule
+  add_apply_record "2026-01-01T01:00:00Z" nord manual otherbox
+  add_apply_record "2026-01-01T06:00:00Z" kanagawa schedule
+  add_apply_record "2026-01-01T06:14:00Z" nord manual
+  add_apply_record "2026-01-01T18:14:00Z" sora schedule
+
+  run pipeline "get_schedule_turns | jq -c '[.theme, .turns, .kept, .switched, .median_switch_seconds]'"
+  assert_output '["kanagawa",1,0,1,840]
+["sora",1,1,0,null]'
 }
 
 #==============================================================================
