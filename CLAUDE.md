@@ -215,6 +215,9 @@ id with hyphens replaced by underscores.
   A due change waits until logind (or macOS input idleness) says the user is present.
   `theme rank`'s SCHEDULED TURNS reads the same field: a scheduled turn is kept when the
   machine's next apply was also scheduled, and switched away from otherwise.
+  A timer turned on in dev mode is its own unit, `theme-schedule-dev`, so it never replaces or
+  removes the installed copy's. It carries `THEME_ENV=development`, so it reads and writes
+  `.dev-data`, and like any dev-mode apply it still writes the real app configs.
 - **A desktop daemon the apply restarts goes through Hyprland's exec dispatcher.** A
   process started by the apply stays in the apply's cgroup even after `setsid`, and
   systemd kills that cgroup when the scheduled oneshot exits. So `start_session_daemon`

@@ -12,8 +12,15 @@ THEME_SCHEDULE_CHECK_MINUTES=5
 # macOS reads input idleness itself. The hypridle listener in the help uses the same figure.
 THEME_SCHEDULE_IDLE_SECONDS=600
 
-THEME_SCHEDULE_UNIT="theme-schedule"
-THEME_SCHEDULE_LABEL="com.datapointchris.theme-schedule"
+# A development checkout gets a timer of its own beside the installed copy's,
+# so turning either one on or off never replaces or removes the other.
+if [[ "${THEME_ENV:-}" == "development" ]]; then
+  THEME_SCHEDULE_UNIT="theme-schedule-dev"
+  THEME_SCHEDULE_LABEL="com.datapointchris.theme-schedule-dev"
+else
+  THEME_SCHEDULE_UNIT="theme-schedule"
+  THEME_SCHEDULE_LABEL="com.datapointchris.theme-schedule"
+fi
 THEME_SCHEDULE_STATE_FILE="$THEME_STATE_DIR/schedule.json"
 
 # The service manager that runs the timer, or nothing. WSL has no display session to read.
@@ -57,6 +64,11 @@ _schedule_clock() {
     if ($t - now) > -518400 and ($t - now) < 518400 then $t | strflocaltime("%a %H:%M")
     else $t | strflocaltime("%Y-%m-%d %H:%M")
     end'
+}
+
+# GNU stat first, then BSD's, since macOS may carry either on PATH.
+_schedule_mtime() {
+  stat -c %Y "$1" 2>/dev/null || stat -f %m "$1"
 }
 
 # This machine's latest apply as {theme, trigger, at, due}. A row with no trigger was applied by hand.
@@ -225,14 +237,21 @@ _schedule_write_systemd() {
   dir=$(_schedule_systemd_dir)
   mkdir -p "$dir"
 
-  # The enabling shell's PATH, since the user manager's lacks where jq, yq and gh usually live.
+  # The enabling shell's PATH, since the user manager's lacks where jq, yq and gh
+  # usually live. THEME_ENV carries dev mode, so a timer turned on from a
+  # development checkout reads and writes .dev-data like every other command.
+  local environment="Environment=\"PATH=$PATH\""
+  if [[ "${THEME_ENV:-}" == "development" ]]; then
+    environment+=$'\nEnvironment="THEME_ENV=development"'
+  fi
+
   cat >"$dir/$THEME_SCHEDULE_UNIT.service" <<EOF
 [Unit]
 Description=Change the theme when its scheduled turn is due
 
 [Service]
 Type=oneshot
-Environment="PATH=$PATH"
+$environment
 ExecStart="$THEME_APP_DIR/bin/theme" schedule run
 EOF
 
@@ -253,6 +272,14 @@ _schedule_write_launchd() {
   plist=$(_schedule_plist)
   mkdir -p "$(dirname "$plist")"
 
+  local environment="    <key>PATH</key>
+    <string>$PATH</string>"
+  if [[ "${THEME_ENV:-}" == "development" ]]; then
+    environment+="
+    <key>THEME_ENV</key>
+    <string>development</string>"
+  fi
+
   # AbandonProcessGroup stops launchd killing what the apply restarted when the job exits.
   cat >"$plist" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -269,8 +296,7 @@ _schedule_write_launchd() {
   </array>
   <key>EnvironmentVariables</key>
   <dict>
-    <key>PATH</key>
-    <string>$PATH</string>
+$environment
   </dict>
   <key>StartInterval</key>
   <integer>$((THEME_SCHEDULE_CHECK_MINUTES * 60))</integer>
@@ -367,6 +393,41 @@ _schedule_timer_state() {
   esac
 }
 
+# No recorded check has two causes: a timer that stopped firing, and runs that
+# die before they record, such as a unit whose program was deleted. schedule.json
+# cannot tell them apart, so the supervisor's record of the runs decides.
+# Args: $1 seconds since the last check, $2 epoch seconds a recent run would follow.
+_schedule_explain_quiet() {
+  local quiet="$1" since="$2"
+  local failing=""
+
+  case "$(schedule_supervisor)" in
+    systemd)
+      local fired
+      fired=$(systemctl --user show "$THEME_SCHEDULE_UNIT.timer" -p LastTriggerUSec --value 2>/dev/null || true)
+      if [[ -n "$fired" && "$fired" != "n/a" ]] \
+        && [[ "$(date -d "$fired" +%s 2>/dev/null || echo 0)" -ge "$since" ]]; then
+        failing="journalctl --user -u $THEME_SCHEDULE_UNIT.service"
+      fi
+      ;;
+    launchd)
+      local code
+      code=$(launchctl print "gui/$(id -u)/$THEME_SCHEDULE_LABEL" 2>/dev/null \
+        | awk -F' = ' '/last exit code/ { print $2; exit }' || true)
+      if [[ "$code" =~ ^[0-9]+$ && "$code" != "0" ]]; then
+        failing="$THEME_STATE_DIR/schedule.log"
+      fi
+      ;;
+  esac
+
+  if [[ -n "$failing" ]]; then
+    echo "  ! No check recorded for $(format_duration "$quiet"), though the timer runs: each run fails first."
+    echo "    Its errors are in: $failing"
+  else
+    echo "  ! No check for $(format_duration "$quiet"), so the timer is not running."
+  fi
+}
+
 schedule_status() {
   echo ""
   echo "Theme Schedule"
@@ -426,12 +487,12 @@ schedule_status() {
 
   # A check from before the timer was installed says nothing about whether it runs.
   if [[ "$on" == true ]]; then
-    local installed quiet
-    installed=$(date -r "$(_schedule_definition_file)" +%s)
+    local installed quiet window=$((THEME_SCHEDULE_CHECK_MINUTES * 60 * 3))
+    installed=$(_schedule_mtime "$(_schedule_definition_file)")
     [[ "$installed" -gt "$last_seen" ]] && last_seen=$installed
     quiet=$((now - last_seen))
-    if [[ "$quiet" -gt $((THEME_SCHEDULE_CHECK_MINUTES * 60 * 3)) ]]; then
-      echo "  ! No check for $(format_duration "$quiet"), so the timer is not running."
+    if [[ "$quiet" -gt "$window" ]]; then
+      _schedule_explain_quiet "$quiet" "$((now - window))"
     fi
   fi
 
