@@ -1812,11 +1812,6 @@ apply_hyprland() {
 
   install_themed_artifact "$lib_path/hyprland.lua" "$hypr_theme_dir" "$theme.lua" "current.lua" || return 1
 
-  # Reload hyprland if running
-  if command -v hyprctl &>/dev/null; then
-    hyprctl reload 2>/dev/null || true
-  fi
-
   return 0
 }
 
@@ -2342,7 +2337,7 @@ reload_kitty() {
 
 reload_hyprland() {
   if command -v hyprctl &>/dev/null; then
-    hyprctl reload 2>/dev/null || true
+    hyprctl reload >/dev/null 2>&1 || true
     return 0
   fi
   return 1
