@@ -62,6 +62,7 @@ Reports and data files the scripts write are not committed — the markdown here
 is the distilled version. Re-run a script to regenerate its report.
 
 Two caveats before trusting a re-run: the corpus has changed since these were
-written (19 themes were removed in `8c7ce14`), and the extractors read from
+written (`git log --diff-filter=D --stat -- 'themes/*/theme.yml'` lists the
+removals), and the extractors read from
 installed Neovim plugins, which move with `:Lazy update`. Numbers will not
 reproduce exactly.

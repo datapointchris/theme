@@ -21,7 +21,7 @@ setup() {
   # A verb that acts needs something to act on, or it exits early on "no theme
   # applied" and the test passes without exercising the guard.
   mkdir -p "$THEME_LIVE_DIR"
-  echo "gruvbox-dark-hard" >"$CURRENT_THEME_FILE"
+  echo "gruvbox" >"$CURRENT_THEME_FILE"
 }
 
 # Commands and Subcommands both sit between those two headers on the plain
