@@ -391,10 +391,12 @@ schedule_status() {
     due=$(jq -r '.due' <<<"$last")
     [[ "$(jq -r '.trigger' <<<"$last")" == "schedule" ]] && how="by the schedule"
     echo "Current: $(get_theme_display_info "$theme"), applied $how $(_schedule_clock "$at")"
-    if [[ "$now" -lt "$due" ]]; then
-      echo "Next change: after $(_schedule_clock "$due"), once you are active"
-    else
-      echo "Next change: due since $(_schedule_clock "$due"), at the first check while you are active"
+    if [[ "$on" == true ]]; then
+      if [[ "$now" -lt "$due" ]]; then
+        echo "Next change: after $(_schedule_clock "$due"), once you are active"
+      else
+        echo "Next change: due since $(_schedule_clock "$due"), at the first check while you are active"
+      fi
     fi
   fi
 
