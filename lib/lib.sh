@@ -2369,15 +2369,19 @@ reload_dunst() {
   return 1
 }
 
-# Starts a desktop daemon as Hyprland's child, where login started it. A child of the
-# apply stays in the apply's cgroup, which systemd kills when an apply run as a service ends.
+# Starts a desktop daemon outside the apply's cgroup, which systemd kills when an apply run as a
+# service ends. Hyprland's child sits where login started it. A transient scope is the fallback.
 start_session_daemon() {
   local program="$1"
   if command -v hyprctl &>/dev/null \
     && [[ "$(hyprctl dispatch "hl.dsp.exec_cmd('$program')" 2>/dev/null)" == "ok" ]]; then
     return 0
   fi
-  setsid "$program" >/dev/null 2>&1 </dev/null &
+  if systemctl --user show-environment &>/dev/null; then
+    systemd-run --user --scope --collect --quiet "$program" >/dev/null 2>&1 </dev/null &
+  else
+    setsid "$program" >/dev/null 2>&1 </dev/null &
+  fi
   disown
 }
 

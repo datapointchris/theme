@@ -217,7 +217,8 @@ id with hyphens replaced by underscores.
 - **A desktop daemon the apply restarts goes through Hyprland's exec dispatcher.** A
   process started by the apply stays in the apply's cgroup even after `setsid`, and
   systemd kills that cgroup when the scheduled oneshot exits. So `start_session_daemon`
-  hands waybar and dunst to Hyprland, where login started them. On launchd the same kill
+  hands waybar and dunst to Hyprland, where login started them, and elsewhere starts them
+  in a transient `systemd-run --user --scope`. On launchd the same kill
   hits the job's process group, which the agent's `AbandonProcessGroup` turns off. For
   the same reason a scheduled apply pushes to the gist in the foreground.
 - **`theme random` weights by recency, and every eligible theme stays reachable.**
