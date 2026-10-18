@@ -92,6 +92,21 @@ commands_table() {
 EOF
 }
 
+root_guide() {
+  cat <<'EOF'
+  Pick a theme with theme change, or let theme random hand you one. With
+  theme schedule on, the random draw happens on a timer while you are here.
+  Then judge what is on screen. like, dislike, note and reject act on the
+  current theme, so each takes a message and never a theme name.
+
+  dislike keeps a theme in the draw and lowers it in theme rank. reject takes
+  it out of list, random and the picker until theme unreject. When only the
+  wallpaper is wrong, theme background rotate keeps the theme.
+
+  Every command answers --help.
+EOF
+}
+
 subcommands_table() {
   cat <<'EOF'
   background           Manage backgrounds (run for usage)
@@ -104,6 +119,7 @@ EOF
 usage() {
   if command -v print_section &>/dev/null; then
     print_section "Theme Management" "yellow"
+    root_guide
 
     print_section "Commands" "blue"
     commands_table
@@ -112,16 +128,21 @@ usage() {
     subcommands_table
 
     print_section "Examples" "yellow"
-    echo "  $(print_cyan "theme change")                       # Interactive picker with preview"
-    echo "  $(print_cyan "theme apply \"Rose Pine\"")            # Apply a theme"
-    echo "  $(print_cyan "theme background rotate")            # New background, same theme"
-    echo "  $(print_cyan "theme opacity set 90")               # Set opacity to 90%"
-    echo "  $(print_cyan "theme sync init")                    # Initialize sync"
+    echo "  $(print_cyan "theme change")                         # Pick a theme with a preview"
+    echo "  $(print_cyan "theme like \"great in the terminal\"")   # Record why the current theme works"
+    echo "  $(print_cyan "theme reject \"comments unreadable\"")   # Take the current theme out of rotation"
+    echo "  $(print_cyan "theme apply \"Rose Pine\"")              # Apply one theme by name"
+    echo "  $(print_cyan "theme background rotate")              # New background, same theme"
+    echo "  $(print_cyan "theme opacity set 90")                 # Set terminal opacity to 90%"
 
   else
     cat <<'EOF'
 Theme Management
 ================
+
+EOF
+    root_guide
+    cat <<'EOF'
 
 Commands
 --------
@@ -137,11 +158,12 @@ EOF
 
 Examples
 --------
-  theme change                     # Interactive picker with preview
-  theme apply "Rose Pine"          # Apply a theme
-  theme background rotate          # New background, same theme
-  theme opacity set 90             # Set opacity to 90%
-  theme sync init                  # Initialize sync
+  theme change                         # Pick a theme with a preview
+  theme like "great in the terminal"   # Record why the current theme works
+  theme reject "comments unreadable"   # Take the current theme out of rotation
+  theme apply "Rose Pine"              # Apply one theme by name
+  theme background rotate              # New background, same theme
+  theme opacity set 90                 # Set terminal opacity to 90%
 EOF
   fi
 }
