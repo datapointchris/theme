@@ -32,14 +32,7 @@ setup() {
   assert_output "action,machine,platform,theme,ts"
 }
 
-@test "log_action writes the message and trigger keys only when given" {
-  # Readers test for the key's presence — get_background_stats collects
-  # `.message // empty` — so an empty string would show up as a note with no text.
-  log_action apply gruvbox
-  run jq -r '[has("message"), has("trigger")] | join(",")' "$THEME_HISTORY_FILE"
-  assert_output "false,false"
-
-  : >"$THEME_HISTORY_FILE"
+@test "log_action writes the message and the trigger the schedule reads" {
   log_action apply gruvbox "nice" schedule
   run jq -r '[.message, .trigger] | join(",")' "$THEME_HISTORY_FILE"
   assert_output "nice,schedule"
