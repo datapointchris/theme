@@ -289,6 +289,7 @@ The traps it encodes:
 
 - **Do not baseline against `lazy-lock.json`.** The pin moves on every `:Lazy update`, so
   comparing against it reports nothing. The baseline is the date `theme.yml` was last committed.
+  `--since` overrides it with a span back from now (`26w`), a day, or an RFC 3339 instant.
 - **A repo can host several colorschemes**, so the check keeps only changed files naming this
   theme's variant.
 - **Judge by colors changed, never by filename.** A repo may keep its palette anywhere, and its
