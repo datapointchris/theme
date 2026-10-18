@@ -2362,6 +2362,15 @@ reload_kitty() {
   return 1
 }
 
+# Ghostty's GTK app reloads its config through an action on the session bus.
+# Calling the bus name while no Ghostty runs would start one.
+reload_ghostty() {
+  pgrep -x ghostty &>/dev/null || return 1
+  command -v gdbus &>/dev/null || return 1
+  gdbus call --session --dest com.mitchellh.ghostty --object-path /com/mitchellh/ghostty \
+    --method org.gtk.Actions.Activate reload-config '[]' '{}' >/dev/null 2>&1 || true
+}
+
 reload_hyprland() {
   if command -v hyprctl &>/dev/null; then
     hyprctl reload >/dev/null 2>&1 || true
@@ -2422,7 +2431,7 @@ reload_apps() {
   # rofi loads its theme on next launch, hyprlock on next lock.
   local reloadable=(tmux btop abtop)
   if [[ "$platform" == "arch" ]]; then
-    reloadable+=(kitty hyprland waybar dunst)
+    reloadable+=(kitty ghostty hyprland waybar dunst)
   fi
 
   # A reload returns 1 when its app is not running, which errexit would turn
