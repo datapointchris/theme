@@ -189,10 +189,12 @@ get_theme_stats() {
   '
 }
 
+# Seconds each theme was on screen. An apply ends at the next apply on the same machine.
+# Another machine's latest apply is left out, since nothing here knows when it ended.
 calculate_usage_time() {
   local current_theme="$1"
 
-  get_history | jq -r --arg current "$current_theme" '
+  get_history | jq -r --arg current "$current_theme" --arg machine "$(_storage_get_machine_id)" '
     def parse_ts:
       if test("[+-][0-9]{2}:[0-9]{2}$") then
         gsub("[+-][0-9]{2}:[0-9]{2}$"; "Z") | fromdateiso8601
@@ -200,32 +202,22 @@ calculate_usage_time() {
         fromdateiso8601
       end;
 
-    [map(select(.action == "apply")) | sort_by(.ts) | to_entries[]] as $applies |
-
-    ($applies | map(
-      . as $entry |
-      $entry.key as $idx |
-      $entry.value as $apply |
-
-      if ($idx < (($applies | length) - 1)) then
-        {
-          theme: $apply.theme,
-          duration: (($applies[$idx + 1].value.ts | parse_ts) - ($apply.ts | parse_ts))
-        }
-      elif $apply.theme == $current then
-        {
-          theme: $apply.theme,
-          duration: ((now | floor) - ($apply.ts | parse_ts))
-        }
-      else
-        null
-      end
-    ) | map(select(. != null))) as $durations |
-
-    ($durations | group_by(.theme) | map({
-      key: .[0].theme,
-      value: (map(.duration) | add // 0)
-    }) | from_entries)
+    [
+      map(select(.action == "apply")) | group_by(.machine)[] | sort_by(.ts)
+      | . as $applies
+      | range(0; $applies | length) as $i
+      | $applies[$i] as $apply
+      | if $i < (($applies | length) - 1) then
+          {theme: $apply.theme, duration: (($applies[$i + 1].ts | parse_ts) - ($apply.ts | parse_ts))}
+        elif $apply.machine == $machine and $apply.theme == $current then
+          {theme: $apply.theme, duration: ((now | floor) - ($apply.ts | parse_ts))}
+        else
+          empty
+        end
+    ]
+    | group_by(.theme)
+    | map({key: .[0].theme, value: (map(.duration) | add // 0)})
+    | from_entries
   '
 }
 

@@ -204,16 +204,17 @@ setup() {
   assert_output --partial "theme name required"
 }
 
-@test "calculate_usage_time credits each apply until the next one" {
-  # The apply log is a timeline, not a set of independent events: a theme's hours
-  # are the gaps between its apply and whatever replaced it.
+@test "calculate_usage_time credits each apply until the next one on the same machine" {
+  # A theme's hours are the gaps between its apply and whatever replaced it on that
+  # machine. The other machine's apply at 02:00 neither ends nord nor counts itself.
   add_history_record "2025-01-01T00:00:00Z" gruvbox apply
   add_history_record "2025-01-01T01:00:00Z" nord apply
+  add_history_record "2025-01-01T02:00:00Z" kanagawa apply "" arch otherbox
   add_history_record "2025-01-01T03:00:00Z" gruvbox apply
   add_history_record "2025-01-01T04:00:00Z" everforest apply
 
-  run pipeline "calculate_usage_time '' | jq -c '{gruvbox,nord}'"
-  assert_output '{"gruvbox":7200,"nord":7200}'
+  run pipeline "calculate_usage_time '' | jq -c '{gruvbox,nord,kanagawa}'"
+  assert_output '{"gruvbox":7200,"nord":7200,"kanagawa":null}'
 }
 
 @test "calculate_usage_time leaves the final apply uncounted unless it is current" {
@@ -227,6 +228,7 @@ setup() {
 }
 
 @test "calculate_usage_time counts the current theme up to now" {
+  stub_command_with_output uname testbox
   add_history_record "2025-01-01T00:00:00Z" gruvbox apply
   add_history_record "2025-01-01T01:00:00Z" nord apply
 
