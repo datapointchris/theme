@@ -23,7 +23,7 @@
   --lwt-text-color: #839395 !important;
 
   /* Tab colors */
-  --tab-selected-bgcolor: #1a6397 !important;
+  --tab-selected-bgcolor: #073642 !important;
   --tab-selected-textcolor: #839395 !important;
   --tab-line-color: #268bd3 !important;
   --tabs-border-color: #002b36 !important;
@@ -37,7 +37,7 @@
   --urlbar-box-focus-bgcolor: #002b36 !important;
   --autocomplete-popup-background: #002b36 !important;
   --autocomplete-popup-color: #839395 !important;
-  --autocomplete-popup-highlight-background: #1a6397 !important;
+  --autocomplete-popup-highlight-background: #073642 !important;
   --autocomplete-popup-highlight-color: #839395 !important;
 
   /* Sidebar */
@@ -84,7 +84,7 @@
   /* Context menu */
   --menu-background-color: #002b36 !important;
   --menu-color: #839395 !important;
-  --menuitem-hover-background-color: #1a6397 !important;
+  --menuitem-hover-background-color: #073642 !important;
 
   /* Findbar */
   --toolbar-field-focus-background-color: #002b36 !important;
@@ -160,7 +160,7 @@
 
 /* Active/selected tab */
 .tabbrowser-tab[selected="true"] {
-  background-color: #1a6397 !important;
+  background-color: #073642 !important;
   color: #839395 !important;
 }
 
@@ -196,7 +196,7 @@
 }
 
 .urlbarView-row[selected] {
-  background-color: #1a6397 !important;
+  background-color: #073642 !important;
 }
 
 /* Navigation buttons */
@@ -224,7 +224,7 @@ menuitem {
 
 menuitem:hover,
 menu:hover {
-  background-color: #1a6397 !important;
+  background-color: #073642 !important;
 }
 
 menuseparator {

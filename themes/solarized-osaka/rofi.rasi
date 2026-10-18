@@ -24,7 +24,7 @@
     /* Semantic colors */
     bg: #001419;
     bg-alt: #002b36;
-    bg-selected: #1a6397;
+    bg-selected: #073642;
     fg: #839395;
     fg-alt: #657b83;
     fg-muted: #586e75;

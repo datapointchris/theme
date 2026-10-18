@@ -29,6 +29,9 @@ DIAG_ERROR="${EXTENDED_DIAGNOSTIC_ERROR:-$BASE08}"
 DIAG_OK="${EXTENDED_DIAGNOSTIC_OK:-$BASE0B}"
 UI_ACCENT="${EXTENDED_UI_ACCENT:-$BASE0D}"
 UI_BORDER="${EXTENDED_UI_BORDER:-$SPECIAL_BORDER}"
+# The selected element draws its text in fg, so it takes the UI selection rather
+# than selection_bg, which a theme with an inverted selection sets to its text color.
+UI_SELECTION="${EXTENDED_UI_SELECTION:-$BASE02}"
 
 generate() {
   cat <<EOF
@@ -58,7 +61,7 @@ generate() {
     /* Semantic colors */
     bg: ${SPECIAL_BG};
     bg-alt: ${BASE01};
-    bg-selected: ${SPECIAL_SELECTION_BG};
+    bg-selected: ${UI_SELECTION};
     fg: ${SPECIAL_FG};
     fg-alt: ${BASE04};
     fg-muted: ${BASE03};

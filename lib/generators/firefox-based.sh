@@ -25,6 +25,11 @@ output_file="${2:-}"
 # Load colors
 eval "$(load_colors "$input_file")"
 
+# A selected tab, row or menu item draws its text in fg, so it takes the UI
+# selection. selection_bg pairs with selection_fg and is kept for selected text,
+# because a theme with an inverted selection sets it to its own text color.
+UI_SELECTION="${EXTENDED_UI_SELECTION:-$BASE02}"
+
 generate() {
   cat <<EOF
 /* Theme: ${THEME_NAME} */
@@ -52,7 +57,7 @@ generate() {
   --lwt-text-color: ${SPECIAL_FG} !important;
 
   /* Tab colors */
-  --tab-selected-bgcolor: ${SPECIAL_SELECTION_BG} !important;
+  --tab-selected-bgcolor: ${UI_SELECTION} !important;
   --tab-selected-textcolor: ${SPECIAL_FG} !important;
   --tab-line-color: ${BASE0D} !important;
   --tabs-border-color: ${SPECIAL_BORDER} !important;
@@ -66,7 +71,7 @@ generate() {
   --urlbar-box-focus-bgcolor: ${BASE01} !important;
   --autocomplete-popup-background: ${BASE01} !important;
   --autocomplete-popup-color: ${SPECIAL_FG} !important;
-  --autocomplete-popup-highlight-background: ${SPECIAL_SELECTION_BG} !important;
+  --autocomplete-popup-highlight-background: ${UI_SELECTION} !important;
   --autocomplete-popup-highlight-color: ${SPECIAL_FG} !important;
 
   /* Sidebar */
@@ -108,12 +113,12 @@ generate() {
   --lwt-toolbar-field-border-color: ${SPECIAL_BORDER} !important;
   --lwt-toolbar-field-focus: ${BASE02} !important;
   --lwt-toolbar-field-highlight: ${SPECIAL_SELECTION_BG} !important;
-  --lwt-toolbar-field-highlight-text: ${SPECIAL_FG} !important;
+  --lwt-toolbar-field-highlight-text: ${SPECIAL_SELECTION_FG} !important;
 
   /* Context menu */
   --menu-background-color: ${BASE01} !important;
   --menu-color: ${SPECIAL_FG} !important;
-  --menuitem-hover-background-color: ${SPECIAL_SELECTION_BG} !important;
+  --menuitem-hover-background-color: ${UI_SELECTION} !important;
 
   /* Findbar */
   --toolbar-field-focus-background-color: ${BASE01} !important;
@@ -189,7 +194,7 @@ generate() {
 
 /* Active/selected tab */
 .tabbrowser-tab[selected="true"] {
-  background-color: ${SPECIAL_SELECTION_BG} !important;
+  background-color: ${UI_SELECTION} !important;
   color: ${SPECIAL_FG} !important;
 }
 
@@ -225,7 +230,7 @@ generate() {
 }
 
 .urlbarView-row[selected] {
-  background-color: ${SPECIAL_SELECTION_BG} !important;
+  background-color: ${UI_SELECTION} !important;
 }
 
 /* Navigation buttons */
@@ -253,7 +258,7 @@ menuitem {
 
 menuitem:hover,
 menu:hover {
-  background-color: ${SPECIAL_SELECTION_BG} !important;
+  background-color: ${UI_SELECTION} !important;
 }
 
 menuseparator {

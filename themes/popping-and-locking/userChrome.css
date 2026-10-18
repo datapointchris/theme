@@ -23,7 +23,7 @@
   --lwt-text-color: #ebdbb2 !important;
 
   /* Tab colors */
-  --tab-selected-bgcolor: #ebdbb2 !important;
+  --tab-selected-bgcolor: #383637 !important;
   --tab-selected-textcolor: #ebdbb2 !important;
   --tab-line-color: #458588 !important;
   --tabs-border-color: #928374 !important;
@@ -37,7 +37,7 @@
   --urlbar-box-focus-bgcolor: #252631 !important;
   --autocomplete-popup-background: #252631 !important;
   --autocomplete-popup-color: #ebdbb2 !important;
-  --autocomplete-popup-highlight-background: #ebdbb2 !important;
+  --autocomplete-popup-highlight-background: #383637 !important;
   --autocomplete-popup-highlight-color: #ebdbb2 !important;
 
   /* Sidebar */
@@ -79,12 +79,12 @@
   --lwt-toolbar-field-border-color: #928374 !important;
   --lwt-toolbar-field-focus: #383637 !important;
   --lwt-toolbar-field-highlight: #ebdbb2 !important;
-  --lwt-toolbar-field-highlight-text: #ebdbb2 !important;
+  --lwt-toolbar-field-highlight-text: #928374 !important;
 
   /* Context menu */
   --menu-background-color: #252631 !important;
   --menu-color: #ebdbb2 !important;
-  --menuitem-hover-background-color: #ebdbb2 !important;
+  --menuitem-hover-background-color: #383637 !important;
 
   /* Findbar */
   --toolbar-field-focus-background-color: #252631 !important;
@@ -160,7 +160,7 @@
 
 /* Active/selected tab */
 .tabbrowser-tab[selected="true"] {
-  background-color: #ebdbb2 !important;
+  background-color: #383637 !important;
   color: #ebdbb2 !important;
 }
 
@@ -196,7 +196,7 @@
 }
 
 .urlbarView-row[selected] {
-  background-color: #ebdbb2 !important;
+  background-color: #383637 !important;
 }
 
 /* Navigation buttons */
@@ -224,7 +224,7 @@ menuitem {
 
 menuitem:hover,
 menu:hover {
-  background-color: #ebdbb2 !important;
+  background-color: #383637 !important;
 }
 
 menuseparator {
