@@ -37,13 +37,18 @@ _schedule_plist() {
   echo "$HOME/Library/LaunchAgents/$THEME_SCHEDULE_LABEL.plist"
 }
 
-# On means the timer's definition is installed.
-schedule_is_on() {
+_schedule_definition_file() {
   case "$(schedule_supervisor)" in
-    systemd) [[ -f "$(_schedule_systemd_dir)/$THEME_SCHEDULE_UNIT.timer" ]] ;;
-    launchd) [[ -f "$(_schedule_plist)" ]] ;;
+    systemd) echo "$(_schedule_systemd_dir)/$THEME_SCHEDULE_UNIT.timer" ;;
+    launchd) _schedule_plist ;;
     *) return 1 ;;
   esac
+}
+
+# On means the timer's definition is installed.
+schedule_is_on() {
+  local definition
+  definition=$(_schedule_definition_file) && [[ -f "$definition" ]]
 }
 
 # A weekday alone is ambiguous more than six days away, so those get the date.
@@ -408,18 +413,26 @@ schedule_status() {
   fi
   _schedule_warn_idle_hint
 
+  local last_seen=0
   if [[ -f "$THEME_SCHEDULE_STATE_FILE" ]]; then
-    local checked outcome detail age
-    checked=$(jq -r '.ts | fromdateiso8601' "$THEME_SCHEDULE_STATE_FILE")
+    local outcome detail
+    last_seen=$(jq -r '.ts | fromdateiso8601' "$THEME_SCHEDULE_STATE_FILE")
     outcome=$(jq -r '.outcome' "$THEME_SCHEDULE_STATE_FILE")
     detail=$(jq -r '.detail' "$THEME_SCHEDULE_STATE_FILE")
-    echo "Last check: $(_schedule_clock "$checked"), $outcome: $detail"
-    age=$((now - checked))
-    if [[ "$on" == true ]] && [[ "$age" -gt $((THEME_SCHEDULE_CHECK_MINUTES * 60 * 3)) ]]; then
-      echo "  ! No check for $(format_duration "$age"), so the timer is not running."
-    fi
+    echo "Last check: $(_schedule_clock "$last_seen"), $outcome: $detail"
   elif [[ "$on" == true ]]; then
     echo "Last check: none yet"
+  fi
+
+  # A check from before the timer was installed says nothing about whether it runs.
+  if [[ "$on" == true ]]; then
+    local installed quiet
+    installed=$(date -r "$(_schedule_definition_file)" +%s)
+    [[ "$installed" -gt "$last_seen" ]] && last_seen=$installed
+    quiet=$((now - last_seen))
+    if [[ "$quiet" -gt $((THEME_SCHEDULE_CHECK_MINUTES * 60 * 3)) ]]; then
+      echo "  ! No check for $(format_duration "$quiet"), so the timer is not running."
+    fi
   fi
 
   if [[ "$on" == false ]]; then
