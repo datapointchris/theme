@@ -105,19 +105,19 @@
         "italic": true
       },
       "comment_preproc": {
-        "color": "#7398dc"
+        "color": "#e1656a"
       },
       "keyword": {
-        "color": "#7398dc"
+        "color": "#e1656a"
       },
       "keyword_reserved": {
-        "color": "#7398dc"
+        "color": "#e1656a"
       },
       "keyword_namespace": {
-        "color": "#7398dc"
+        "color": "#e1656a"
       },
       "keyword_type": {
-        "color": "#fabd2f"
+        "color": "#f2883f"
       },
       "operator": {
         "color": "#a89984"
@@ -129,16 +129,16 @@
         "color": "#ebdbb2"
       },
       "name_builtin": {
-        "color": "#7ec16e"
+        "color": "#fabd2f"
       },
       "name_tag": {
-        "color": "#689d6a"
+        "color": "#e1656a"
       },
       "name_attribute": {
         "color": "#99c6ca"
       },
       "name_class": {
-        "color": "#fabd2f"
+        "color": "#f2883f"
       },
       "name_constant": {
         "color": "#d3869b"
@@ -147,10 +147,10 @@
         "color": "#b16286"
       },
       "name_exception": {
-        "color": "#fabd2f"
+        "color": "#f2883f"
       },
       "name_function": {
-        "color": "#7ec16e"
+        "color": "#fabd2f"
       },
       "literal_number": {
         "color": "#d3869b"

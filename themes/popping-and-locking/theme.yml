@@ -54,32 +54,37 @@ extended_source: hedinne/popping-and-locking-vscode
 # the separations between them are what the choices are made on: two roles that
 # sit next to each other in a buffer need a gap on at least one of the three.
 #
-# The reds are the exception that shaped the rest. #f42c3e carried chroma 0.231
-# where every other color here sits at 0.16 or below, and six roles resolved to
-# it or to #cc241d, punctuation among them. Keywords are blue now and the reds
-# are down to 0.155, which is the palette's own ceiling.
+# The roles follow upstream's VS Code map: keywords red, function names gold,
+# self pink. Upstream's red #f42c3e carries chroma 0.231 and its orange #fe8019
+# 0.182, where the rest of the palette sits at 0.16 or below. Both are solved
+# down to 0.155 at their own hues. Red is kept to the keyword family, so
+# punctuation and operators never share it.
 extended:
   diagnostic_error: '#cc5351'
   diagnostic_ok: '#7fc678'
   diagnostic_warning: '#e1656a'
   diagnostic_info: '#689d6a'
   diagnostic_hint: '#689d6a'
-  syntax_comment: '#7a7064'      # L .551 C .022 H 72. Warm, so it carries no hue in common with the keyword blue
-  syntax_string: '#92d3a3'       # L .810 C .095 H 152. In the theme's own green family, where #b8bb26 sat 40 degrees away at hue 111
-  syntax_function: '#7ec16e'     # L .746 C .133 H 140
-  syntax_keyword: '#7398dc'      # L .680 C .109 H 262. Also statement and preproc, so def, class, import, if and for agree
-  syntax_statement: '#7398dc'    # if, for, while, else
-  syntax_type: '#fabd2f'
+  syntax_comment: '#7a7064'      # L .551 C .022 H 72. Near-gray, so no role's hue reads as a comment
+  syntax_string: '#92d3a3'       # L .810 C .095 H 152. In the theme's own green family, 69 degrees from the gold functions; upstream's #b8bb26 sits 28 from them
+  syntax_function: '#fabd2f'     # L .832 C .159 H 83. Upstream's function and class gold
+  syntax_keyword: '#e1656a'      # L .660 C .155 H 20, 5.23:1. Upstream's keyword red at the ceiling. Also statement, preproc and special3, so def, import, if, for, return and raise agree
+  syntax_statement: '#e1656a'    # if, for, while, else
+  syntax_type: '#f2883f'         # L .730 C .155 H 52. Upstream's orange at the ceiling, between the red keywords and the gold functions, so an annotation beside a call reads apart from both
   syntax_number: '#d3869b'
   syntax_constant: '#d3869b'
   syntax_operator: '#a89984'     # base04. Operators are structure, like punctuation, rather than meaning
   syntax_identifier: '#4fa1a5'   # L .659 C .080 H 200, 5.81:1. self.accents and every @variable.member, which base0D drew at 4.14:1
   syntax_variable: '#99c6ca'
   syntax_parameter: '#99c6ca'
-  syntax_preproc: '#7398dc'
+  syntax_preproc: '#e1656a'      # import
   syntax_special: '#689d6a'
-  syntax_punctuation: '#c59d5d'  # L .719 C .095 H 78. Chroma held to the string's, because punctuation is the densest token class in a file
-  syntax_tag: '#7398dc'
+  syntax_special1: '#f2883f'     # constructors, builtin modules, f-string braces and links, drawn as types
+  syntax_special2: '#d3869b'     # self and the other builtin variables, italic. Upstream's variable.language pink
+  syntax_special3: '#e1656a'     # return, raise and tags, as keywords
+  syntax_regex: '#f2883f'        # regex and escapes, in upstream's orange
+  syntax_punctuation: '#c59d5d'  # L .719 C .095 H 78. Chroma held to the string's, because punctuation is the densest token class in a file. 0.113 darker than the gold functions, 5 degrees of hue away
+  syntax_tag: '#fabd2f'
   syntax_attribute: '#99c6ca'
   ui_accent: '#458588'
   ui_border: '#ebdbb2'
