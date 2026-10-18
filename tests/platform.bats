@@ -122,6 +122,14 @@ setup() {
   assert_output "macmini"
 }
 
+@test "a host named like a platform-host label (linux-box) finds its own history rows" {
+  # The schedule, the usage timeline and sync each select this machine's rows by id.
+  stub_command_with_output uname "linux-box"
+  log_action apply gruvbox
+  run pipeline "get_history | jq --arg me \"\$(_storage_get_machine_id)\" 'map(select(.machine == \$me)) | length'"
+  assert_output "1"
+}
+
 @test "the machine id falls back to unknown when the hostname is empty" {
   # Not hypothetical: the Arch box recorded an empty hostname for a while, which
   # is why the history normalizer has an "unknown" branch to merge back.

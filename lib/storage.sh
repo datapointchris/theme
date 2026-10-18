@@ -96,11 +96,13 @@ _storage_get_machine_id() {
   # field, so prefixing it (the old "platform-host" format) both duplicated the
   # platform and split one machine across records when the platform label drifted
   # (arch -> archlinux) or the hostname case changed (Macmini vs macmini). The
-  # read-time normalize_machine shim canonicalizes existing platform-host history.
+  # read-time normalize_machine shim canonicalizes existing platform-host history,
+  # and the id goes through the same shim. A hostname shaped like a legacy label
+  # (linux-box) reads back as "box", so a raw id would match none of its own rows.
   local host
   host=$(uname -n 2>/dev/null | cut -d. -f1 | tr '[:upper:]' '[:lower:]')
   [[ -z "$host" ]] && host="unknown"
-  echo "$host"
+  jq -rn --arg host "$host" "$(_jq_normalize_history) \$host | normalize_machine"
 }
 
 # Usage: log_action <action> [theme] [message] [trigger]
