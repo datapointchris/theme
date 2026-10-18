@@ -210,7 +210,8 @@ id with hyphens replaced by underscores.
   target contrast ratio against that theme's own background.
 - **`theme schedule` reads only this machine's apply rows.** Each apply row carries a
   `trigger`, `schedule` or `manual`, and a row without one predates the schedule and was
-  applied by hand. A scheduled apply is due again after 6 hours and a hand apply after 12.
+  applied by hand. A scheduled apply is due again after `THEME_SCHEDULE_TURN_HOURS` and a
+  hand apply after the longer `THEME_SCHEDULE_HOLD_HOURS`, both in `lib/schedule.sh`.
   A due change waits until logind (or macOS input idleness) says the user is present.
   `theme rank`'s SCHEDULED TURNS reads the same field: a scheduled turn is kept when the
   machine's next apply was also scheduled, and switched away from otherwise.
