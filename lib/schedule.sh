@@ -137,6 +137,18 @@ _schedule_record() {
   mv "$partial" "$THEME_SCHEDULE_STATE_FILE"
 }
 
+# The user manager carries only what the session imported. Without these, the restarted bar exits.
+_schedule_missing_desktop_env() {
+  [[ "$(detect_platform)" == "macos" ]] && return 0
+  local missing=()
+  [[ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]] || missing+=(WAYLAND_DISPLAY DISPLAY)
+  if command -v hyprctl &>/dev/null && pgrep -u "$(id -u)" -x Hyprland &>/dev/null \
+    && ! hyprctl version &>/dev/null; then
+    missing+=(HYPRLAND_INSTANCE_SIGNATURE)
+  fi
+  echo "${missing[*]}"
+}
+
 # One check, which is what the timer runs.
 schedule_run() {
   local verdict due reason
@@ -155,9 +167,11 @@ schedule_run() {
       ;;
   esac
 
-  # Without the compositor's environment, the bar the apply restarts cannot connect and exits.
-  if [[ "$(detect_platform)" != "macos" ]] && [[ -z "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]]; then
-    local blocked="no WAYLAND_DISPLAY or DISPLAY, so a change could not reach the desktop"
+  local missing
+  missing=$(_schedule_missing_desktop_env)
+  if [[ -n "$missing" ]]; then
+    local blocked="no usable $missing, so a change could not reach the desktop."
+    blocked+=" From a terminal on the desktop, run: systemctl --user import-environment $missing"
     _schedule_record blocked "$blocked"
     echo "blocked: $blocked" >&2
     return 1

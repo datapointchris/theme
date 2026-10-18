@@ -490,9 +490,14 @@ schedule_usage_rules() {
         on-resume = $login1 b false
     }
 
-  On Linux the timer runs in the systemd user manager, which needs the desktop's
-  WAYLAND_DISPLAY or DISPLAY. theme schedule status reports a check blocked
-  without it.
+  On Linux the timer runs in the systemd user manager. It needs the desktop's
+  WAYLAND_DISPLAY or DISPLAY, and under Hyprland its HYPRLAND_INSTANCE_SIGNATURE.
+  systemctl --user show-environment lists what the manager has. If your session
+  does not export them to it, run this at login:
+
+    systemctl --user import-environment WAYLAND_DISPLAY DISPLAY HYPRLAND_INSTANCE_SIGNATURE
+
+  theme schedule status reports a check blocked without them.
 EOF
 }
 
