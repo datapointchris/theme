@@ -1008,7 +1008,8 @@ BACKGROUND_SOURCES_FILE="${BACKGROUND_SOURCES_FILE:-$HOME/.config/theme/backgrou
 # Current background tracking - always in production so background actually changes
 BACKGROUND_CURRENT_FILE="$THEME_LIVE_DIR/background-current"
 
-# Mode setting (which background types to include in rotation)
+# Which background types rotate, one per line. "all" enables every type and
+# "none" turns backgrounds off, so an apply leaves the desktop picture alone.
 BACKGROUND_MODE_FILE="${BACKGROUND_MODE_FILE:-$HOME/.config/theme/background-mode}"
 
 # Default background resolution
@@ -1054,14 +1055,18 @@ get_background_mode() {
   echo "$content"
 }
 
+background_is_off() {
+  [[ "$(get_background_mode)" == "none" ]]
+}
+
 # Set background mode to specific types
 # Args: type1 [type2 ...]
-# Special values: "all" enables everything
+# Special values: "all" enables everything, "none" turns backgrounds off
 set_background_mode() {
   mkdir -p "$(dirname "$BACKGROUND_MODE_FILE")"
 
-  if [[ "$1" == "all" ]]; then
-    echo "all" >"$BACKGROUND_MODE_FILE"
+  if [[ "$1" == "all" || "$1" == "none" ]]; then
+    echo "$1" >"$BACKGROUND_MODE_FILE"
     return
   fi
 
@@ -1079,6 +1084,12 @@ add_background_mode() {
 
   if [[ "$current" == "all" ]]; then
     echo "Already set to 'all' - all modes enabled"
+    return
+  fi
+
+  if [[ "$current" == "none" ]]; then
+    echo "$mode" >"$BACKGROUND_MODE_FILE"
+    echo "Added: $mode (backgrounds were off)"
     return
   fi
 
@@ -1108,6 +1119,11 @@ remove_background_mode() {
     return
   fi
 
+  if [[ "$current" == "none" ]]; then
+    echo "Backgrounds are already off"
+    return
+  fi
+
   if ! echo "$current" | grep -qxF "$mode"; then
     echo "Mode not enabled: $mode"
     return
@@ -1115,6 +1131,13 @@ remove_background_mode() {
 
   { grep -vxF "$mode" "$BACKGROUND_MODE_FILE" || true; } >"${BACKGROUND_MODE_FILE}.tmp"
   mv "${BACKGROUND_MODE_FILE}.tmp" "$BACKGROUND_MODE_FILE"
+
+  # An empty file reads as "all", so the last mode out would turn every type on.
+  if ! grep -q '[^[:space:]]' "$BACKGROUND_MODE_FILE"; then
+    echo "none" >"$BACKGROUND_MODE_FILE"
+    echo "Removed: $mode (no modes left, so backgrounds are off)"
+    return
+  fi
   echo "Removed: $mode"
 }
 
@@ -2023,21 +2046,25 @@ apply_theme_to_apps() {
   # Background (macOS, Arch, WSL)
   local background_id=""
   if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]] || [[ "$platform" == "wsl" ]]; then
-    # stderr goes to a file rather than /dev/null so a failure can say why. The
-    # style name is this call's stdout, so the reason cannot share it.
-    local background_style background_error reason
-    background_error=$(mktemp)
-    if background_style=$(apply_background "$theme" 2>"$background_error"); then
-      applied+=("background")
-      _print_app_status "background ($background_style)" "true"
-      background_id=$(get_current_background)
+    if background_is_off; then
+      echo "  - background (skipped: background mode is none)" >&2
     else
-      skipped+=("background")
-      _print_app_status "background" "false"
-      reason=$(paste -sd ' ' "$background_error")
-      apply_warn "Background not changed: ${reason:-no reason given}"
+      # stderr goes to a file rather than /dev/null so a failure can say why. The
+      # style name is this call's stdout, so the reason cannot share it.
+      local background_style background_error reason
+      background_error=$(mktemp)
+      if background_style=$(apply_background "$theme" 2>"$background_error"); then
+        applied+=("background")
+        _print_app_status "background ($background_style)" "true"
+        background_id=$(get_current_background)
+      else
+        skipped+=("background")
+        _print_app_status "background" "false"
+        reason=$(paste -sd ' ' "$background_error")
+        apply_warn "Background not changed: ${reason:-no reason given}"
+      fi
+      rm -f "$background_error"
     fi
-    rm -f "$background_error"
   fi
 
   # Tmux (all platforms)

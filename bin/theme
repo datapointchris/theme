@@ -209,7 +209,7 @@ EOF
 
     print_section "Subcommands" "blue"
     cat <<'EOF'
-  mode                 Manage background mode settings (run for usage)
+  mode                 Choose which backgrounds rotate, or turn them off (run for usage)
   source               Manage source images (run for usage)
 EOF
 
@@ -239,7 +239,7 @@ Commands
 
 Subcommands
 -----------
-  mode                 Manage background mode settings (run for usage)
+  mode                 Choose which backgrounds rotate, or turn them off (run for usage)
   source               Manage source images (run for usage)
 
 Examples
@@ -264,6 +264,7 @@ background_mode_usage() {
   add <mode>           Add mode to current set
   remove <mode>        Remove mode from current set
   all                  Enable all modes (default)
+  none                 Turn backgrounds off; theme apply leaves the desktop alone
 EOF
 
     print_section "Available Modes" "blue"
@@ -281,6 +282,7 @@ EOF
     echo "Shortcuts:"
     echo "  generated      - All generated styles"
     echo "  all            - Everything (default)"
+    echo "  none           - No background, where setting one fails (WSL) or you set your own"
 
     print_section "Examples" "yellow"
     echo "  $(print_cyan "theme background mode current")"
@@ -288,6 +290,7 @@ EOF
     echo "  $(print_cyan "theme background mode add ascii")"
     echo "  $(print_cyan "theme background mode remove lowpoly")"
     echo "  $(print_cyan "theme background mode all")"
+    echo "  $(print_cyan "theme background mode none")"
 
   else
     cat <<'EOF'
@@ -302,6 +305,7 @@ Commands
   add <mode>           Add mode to current set
   remove <mode>        Remove mode from current set
   all                  Enable all modes (default)
+  none                 Turn backgrounds off; theme apply leaves the desktop alone
 
 Examples
 --------
@@ -310,6 +314,7 @@ Examples
   theme background mode add ascii
   theme background mode remove lowpoly
   theme background mode all
+  theme background mode none
 EOF
   fi
 }
@@ -1795,6 +1800,11 @@ main() {
           fi
           ;;
         rotate)
+          if background_is_off; then
+            echo "Backgrounds are off: the background mode is none." >&2
+            echo "Turn them back on with: theme background mode all" >&2
+            exit 1
+          fi
           echo "Rotating background..."
 
           # Get current theme for filtering
@@ -1912,6 +1922,7 @@ main() {
               echo "Shortcuts:"
               echo "  generated      - All generated styles"
               echo "  all            - Everything (default)"
+              echo "  none           - No background"
               ;;
             current)
               echo ""
@@ -1922,6 +1933,8 @@ main() {
               current_mode=$(get_background_mode)
               if [[ "$current_mode" == "all" ]]; then
                 echo "Mode: all (everything enabled)"
+              elif [[ "$current_mode" == "none" ]]; then
+                echo "Mode: none (backgrounds off; theme apply leaves the desktop alone)"
               else
                 echo "Enabled modes:"
                 echo "$current_mode" | while IFS= read -r mode; do
@@ -1932,6 +1945,10 @@ main() {
             all)
               set_background_mode "all"
               echo "Set mode: all (everything enabled)"
+              ;;
+            none)
+              set_background_mode "none"
+              echo "Set mode: none (backgrounds off; theme apply leaves the desktop alone)"
               ;;
             add)
               if [[ -z "${4:-}" ]]; then
@@ -1963,7 +1980,7 @@ main() {
               ;;
             *)
               echo "Unknown mode command: ${3:-}" >&2
-              echo "Usage: theme background mode [current|list|set|add|remove|all]" >&2
+              echo "Usage: theme background mode [current|list|set|add|remove|all|none]" >&2
               exit 1
               ;;
           esac

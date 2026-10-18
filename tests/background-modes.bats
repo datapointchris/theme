@@ -105,14 +105,17 @@ setup() {
   assert_output "recolor"
 }
 
-@test "remove_background_mode can empty the list, which reads back as all" {
-  # Worth knowing rather than guessing at: removing the last mode does not
-  # disable backgrounds, it re-enables everything, because an empty file is
-  # indistinguishable from an unconfigured one.
+@test "removing the last mode turns backgrounds off, and adding one turns them on" {
+  # An empty file reads as all, so the last removal has to write "none" instead.
   set_background_mode recolor
-  remove_background_mode recolor
+  run remove_background_mode recolor
+  assert_output --partial "backgrounds are off"
+  run background_is_off
+  assert_success
+
+  add_background_mode ascii
   run get_background_mode
-  assert_output "all"
+  assert_output "ascii"
 }
 
 @test "is_background_type_enabled accepts everything under all" {
