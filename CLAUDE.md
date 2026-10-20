@@ -210,9 +210,13 @@ id with hyphens replaced by underscores.
   target contrast ratio against that theme's own background.
 - **`theme schedule` reads only this machine's apply rows.** Each apply row carries a
   `trigger`, `schedule` or `manual`, and a row without one predates the schedule and was
-  applied by hand. A scheduled apply is due again after `THEME_SCHEDULE_TURN_HOURS` and a
-  hand apply after the longer `THEME_SCHEDULE_HOLD_HOURS`, both in `lib/schedule.sh`.
-  A due change waits until logind (or macOS input idleness) says the user is present.
+  applied by hand. Turns start at fixed local hours, `THEME_SCHEDULE_FIRST_TURN_HOUR` and
+  every `THEME_SCHEDULE_TURN_HOURS` after, all in `lib/schedule.sh`. A scheduled apply leads
+  to the next turn, and a hand apply to the first after `THEME_SCHEDULE_HOLD_HOURS`. A turn
+  is taken at the first check within `THEME_SCHEDULE_WINDOW_MINUTES` where logind (or macOS
+  input idleness) says the user is present, and skipped otherwise. Fixed hours are what let
+  a second timer on the desktop keep its changes between these. A turn timed from the last
+  apply and caught up on return landed every overdue change at the same moment.
   `theme rank`'s SCHEDULED TURNS reads the same field: a scheduled turn is kept when the
   machine's next apply was also scheduled, and switched away from otherwise.
   A timer turned on in dev mode is its own unit, `theme-schedule-dev`, so it never replaces or

@@ -500,9 +500,11 @@ schedule_usage_rules() {
   local idle_minutes=$((THEME_SCHEDULE_IDLE_SECONDS / 60))
   local login1="busctl call org.freedesktop.login1 /org/freedesktop/login1/session/auto org.freedesktop.login1.Session SetIdleHint"
   cat <<EOF
-  A theme the schedule applied keeps the screen for $THEME_SCHEDULE_TURN_HOURS hours. One you applied
-  by hand keeps it for $THEME_SCHEDULE_HOLD_HOURS. A due change waits until you are at the machine,
-  so it lands while you use it. The timer checks every $THEME_SCHEDULE_CHECK_MINUTES minutes.
+  The theme changes at $(_schedule_turn_times), local time.
+  Each change lands at the first check within $THEME_SCHEDULE_WINDOW_MINUTES minutes of its turn that
+  finds you at the machine. A turn you are away for is skipped, so changes missed
+  overnight never all land on your return. One you applied by hand holds for
+  $THEME_SCHEDULE_HOLD_HOURS hours. The timer checks every $THEME_SCHEDULE_CHECK_MINUTES minutes.
 
   theme rank counts each theme's scheduled turns: kept until the next scheduled
   change, or switched away from by hand.

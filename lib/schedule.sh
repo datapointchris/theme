@@ -6,7 +6,12 @@ set -euo pipefail
 [[ -n "${_THEME_SCHEDULE_SOURCED:-}" ]] && return 0
 _THEME_SCHEDULE_SOURCED=1
 
-THEME_SCHEDULE_TURN_HOURS=6
+# Turns start at fixed local hours rather than a span after the last apply, so another
+# timer on the desktop can keep its changes between them.
+THEME_SCHEDULE_TURN_HOURS=4
+THEME_SCHEDULE_FIRST_TURN_HOUR=2
+# A turn caught up later would land at the user's return, beside every change that waited too.
+THEME_SCHEDULE_WINDOW_MINUTES=60
 THEME_SCHEDULE_HOLD_HOURS=12
 THEME_SCHEDULE_CHECK_MINUTES=5
 # macOS reads input idleness itself. The hypridle listener in the help uses the same figure.
@@ -71,21 +76,44 @@ _schedule_mtime() {
   stat -c %Y "$1" 2>/dev/null || stat -f %m "$1"
 }
 
-# This machine's latest apply as {theme, trigger, at, due}. A row with no trigger was applied by hand.
+# The local times turns start, as "02:00, 06:00 and 10:00".
+_schedule_turn_times() {
+  local hour list=""
+  for ((hour = THEME_SCHEDULE_FIRST_TURN_HOUR % THEME_SCHEDULE_TURN_HOURS; hour < 24; hour += THEME_SCHEDULE_TURN_HOURS)); do
+    if [[ -n "$list" ]]; then
+      if ((hour + THEME_SCHEDULE_TURN_HOURS >= 24)); then list+=" and "; else list+=", "; fi
+    fi
+    list+=$(printf '%02d:00' "$hour")
+  done
+  echo "$list"
+}
+
+# This machine's latest apply as {theme, trigger, at}. A row with no trigger was applied by hand.
 schedule_last_apply() {
-  get_history | jq -c \
-    --arg machine "$(_storage_get_machine_id)" \
-    --argjson turn "$((THEME_SCHEDULE_TURN_HOURS * 3600))" \
-    --argjson hold "$((THEME_SCHEDULE_HOLD_HOURS * 3600))" '
+  get_history | jq -c --arg machine "$(_storage_get_machine_id)" '
     map(select(.action == "apply" and .machine == $machine)) | last // empty
-    | (.trigger // "manual") as $trigger
-    | (.ts | sub("[+-][0-9]{2}:[0-9]{2}$"; "Z") | fromdateiso8601) as $at
     | {
         theme,
-        trigger: $trigger,
-        at: $at,
-        due: ($at + (if $trigger == "schedule" then $turn else $hold end))
+        trigger: (.trigger // "manual"),
+        at: (.ts | sub("[+-][0-9]{2}:[0-9]{2}$"; "Z") | fromdateiso8601)
       }'
+}
+
+# The start of the next turn at epoch $1: the first after the last apply, or its hold, still open.
+schedule_next_turn() {
+  local now="$1" last
+  last=$(schedule_last_apply)
+  jq -nr --argjson now "$now" --argjson last "${last:-null}" \
+    --argjson turn "$((THEME_SCHEDULE_TURN_HOURS * 3600))" \
+    --argjson first "$((THEME_SCHEDULE_FIRST_TURN_HOUR * 3600))" \
+    --argjson window "$((THEME_SCHEDULE_WINDOW_MINUTES * 60))" \
+    --argjson hold "$((THEME_SCHEDULE_HOLD_HOURS * 3600))" '
+    (if $last == null then null
+     elif $last.trigger == "schedule" then $last.at + 1
+     else $last.at + $hold end) as $earliest
+    | ([$earliest, $now - $window + 1] | max) as $from
+    | (($from | localtime | mktime) - $from) as $offset
+    | (($from + $offset - $first) / $turn | ceil) * $turn + $first - $offset'
 }
 
 # Prints why the user counts as away and succeeds, or prints "active" and fails.
@@ -124,8 +152,7 @@ schedule_away_reason() {
 schedule_decide() {
   local now="$1"
   local due
-  due=$(schedule_last_apply | jq -r '.due')
-  due="${due:-$now}"
+  due=$(schedule_next_turn "$now")
 
   if [[ "$now" -lt "$due" ]]; then
     printf 'waiting\t%s\t\n' "$due"
@@ -222,14 +249,13 @@ schedule_run() {
 
 # The line `theme apply` prints while the schedule is on.
 schedule_next_change_line() {
-  local last
-  last=$(schedule_last_apply)
-  [[ -z "$last" ]] && return 0
+  local due
+  due=$(schedule_next_turn "$(date +%s)")
+  echo "Schedule: next turn $(_schedule_clock "$due"), taken if you are active $(_schedule_window_close "$due")"
+}
 
-  local due hours=$THEME_SCHEDULE_HOLD_HOURS
-  due=$(jq -r '.due' <<<"$last")
-  [[ "$(jq -r '.trigger' <<<"$last")" == "schedule" ]] && hours=$THEME_SCHEDULE_TURN_HOURS
-  echo "Schedule: next change after $(_schedule_clock "$due") (${hours} h, once you are active)"
+_schedule_window_close() {
+  jq -nr --argjson t "$(($1 + THEME_SCHEDULE_WINDOW_MINUTES * 60))" '$t | strflocaltime("before %H:%M")'
 }
 
 _schedule_write_systemd() {
@@ -337,8 +363,8 @@ schedule_on() {
   esac
 
   echo "✓ Schedule on, checking every $THEME_SCHEDULE_CHECK_MINUTES minutes"
-  echo "  A scheduled theme gets $THEME_SCHEDULE_TURN_HOURS h and one applied by hand $THEME_SCHEDULE_HOLD_HOURS h."
-  echo "  A due change waits until you are active."
+  echo "  The theme changes at $(_schedule_turn_times), at the first check"
+  echo "  within $THEME_SCHEDULE_WINDOW_MINUTES minutes that finds you active. One applied by hand holds $THEME_SCHEDULE_HOLD_HOURS h."
   _schedule_warn_idle_hint
 }
 
@@ -451,19 +477,21 @@ schedule_status() {
   last=$(schedule_last_apply)
   now=$(date +%s)
   if [[ -n "$last" ]]; then
-    local theme at due how="by hand"
+    local theme at how="by hand"
     theme=$(jq -r '.theme' <<<"$last")
     at=$(jq -r '.at' <<<"$last")
-    due=$(jq -r '.due' <<<"$last")
     [[ "$(jq -r '.trigger' <<<"$last")" == "schedule" ]] && how="by the schedule"
     echo "Current: $(get_theme_display_info "$theme"), applied $how $(_schedule_clock "$at")"
-    if [[ "$on" == true ]]; then
-      if [[ "$now" -lt "$due" ]]; then
-        echo "Next change: after $(_schedule_clock "$due"), once you are active"
-      else
-        echo "Next change: due since $(_schedule_clock "$due"), at the first check while you are active"
-      fi
+  fi
+  if [[ "$on" == true ]]; then
+    local due
+    due=$(schedule_next_turn "$now")
+    if [[ "$now" -lt "$due" ]]; then
+      echo "Next change: $(_schedule_clock "$due"), if you are active $(_schedule_window_close "$due")"
+    else
+      echo "Next change: due since $(_schedule_clock "$due"), at the first check $(_schedule_window_close "$due") while you are active"
     fi
+    echo "Turns: $(_schedule_turn_times)"
   fi
 
   local reason

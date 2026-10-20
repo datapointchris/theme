@@ -1,5 +1,5 @@
 #!/usr/bin/env bats
-# When the schedule changes the theme: the hold each kind of apply earns, and the presence check.
+# When the schedule changes the theme: the turn each kind of apply leads to, and the presence check.
 
 load "$HOME/.local/lib/bats-support/load.bash"
 load "$HOME/.local/lib/bats-assert/load.bash"
@@ -10,6 +10,13 @@ setup() {
   source_theme_libs
   source "$THEME_ROOT/lib/schedule.sh"
   stub_command_with_output uname testbox
+  # Turns are local hours. A POSIX zone needs no tzdata: 02:00 local is 07:00Z.
+  export TZ=EST5
+}
+
+# Epoch seconds at an hour of 2026-01-01 UTC, past 24 into the next day.
+utc_hour() {
+  echo $((1767225600 + $1 * 3600))
 }
 
 # A logind whose display session is 2 and carries the given hints.
@@ -24,22 +31,29 @@ EOF
   chmod +x "$BATS_TEST_TMPDIR/stubs/loginctl"
 }
 
-@test "a hand apply holds the next change 12 hours, a scheduled one 6, and only this machine's count" {
+@test "the next turn follows a scheduled apply, waits out a hand apply's hold, and skips a missed window" {
   # No trigger is how every apply before the schedule reads, and it was applied by hand.
   add_history_record "2026-01-01T00:00:00Z" sora apply
-  add_apply_record "2026-01-01T01:00:00Z" nord schedule otherbox
-  run pipeline "schedule_last_apply | jq -r '.due'"
-  assert_output "$((1767225600 + 12 * 3600))"
+  # Counted, another machine's apply at 02:30 local would lead to the 06:00 turn.
+  add_apply_record "2026-01-01T07:30:00Z" nord schedule otherbox
+  # 19:00 local plus the 12-hour hold is 07:00, so the 10:00 turn.
+  run schedule_next_turn "$(utc_hour 0)"
+  assert_output "$(utc_hour 15)"
 
-  add_apply_record "2026-01-01T02:00:00Z" kanagawa schedule
-  run pipeline "schedule_last_apply | jq -r '.due'"
-  assert_output "$((1767232800 + 6 * 3600))"
+  add_apply_record "2026-01-01T15:10:00Z" kanagawa schedule
+  run schedule_next_turn "$(utc_hour 15)"
+  assert_output "$(utc_hour 19)"
+
+  # Away until 15:30 local, past the 14:00 turn's hour, so the 18:00 turn.
+  run schedule_next_turn "$(($(utc_hour 20) + 1800))"
+  assert_output "$(utc_hour 23)"
 }
 
 @test "a due change waits while the session is idle or locked, and goes ahead while it is active" {
   export PLATFORM=arch
-  add_apply_record "2026-01-01T00:00:00Z" sora schedule
-  local due=$((1767225600 + 6 * 3600))
+  add_apply_record "2026-01-01T15:10:00Z" sora schedule
+  local due
+  due=$(utc_hour 19)
 
   run pipeline "schedule_decide $((due - 60)) | cut -f1"
   assert_output "waiting"

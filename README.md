@@ -87,10 +87,11 @@ theme schedule status         # Whether it is on, and when the next change is du
 theme schedule off            # Remove the timer
 ```
 
-A theme you applied by hand keeps the screen longer than one the schedule applied.
-`theme schedule --help` gives both durations. A due change waits until you are at
-the machine, so it lands while
-you use it. `theme rank` counts each theme's scheduled turns as kept or switched
+The theme changes at fixed local hours, at the first check in the hour after each
+that finds you at the machine. A turn you are away for is skipped, so changes missed
+overnight never all land on your return. A theme you applied by hand holds through
+the turns for longer. `theme schedule --help` gives the hours and the hold.
+`theme rank` counts each theme's scheduled turns as kept or switched
 away from. On Hyprland, telling idle from active needs a hypridle listener, which
 `theme schedule --help` shows. WSL is not supported.
 
