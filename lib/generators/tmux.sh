@@ -24,6 +24,12 @@ output_file="${2:-}"
 # Load colors (auto-detects format)
 eval "$(load_colors "$input_file")"
 
+# Lowercase, because tmux format-expands several of these values and an
+# uppercase #D or #F is the pane_id or window_flags alias, not a hex digit.
+for color_var in ${!BASE@} ${!EXTENDED_@}; do
+  printf -v "$color_var" '%s' "${!color_var,,}"
+done
+
 # Use extended palette colors when available, fall back to base16
 # This ensures author-intended colors are used (e.g., brighter reds for errors in kanagawa)
 DIAG_ERROR="${EXTENDED_DIAGNOSTIC_ERROR:-$BASE08}"
@@ -34,6 +40,29 @@ UI_ACCENT="${EXTENDED_UI_ACCENT:-$BASE0D}"
 UI_SELECTION="${EXTENDED_UI_SELECTION:-$BASE02}"
 UI_BORDER="${EXTENDED_UI_BORDER:-$BASE01}"
 GIT_ADD="${EXTENDED_GIT_ADD:-$BASE0B}"
+
+# tmux 3.8 draws popups, menus, copy-mode matches and scrollbars from ten named
+# colors (themedarkgrey and siblings) that default to fixed xterm grays. Both
+# the dark and light sets get the palette, so the client's reported background
+# cannot pick the wrong one. -q keeps an older tmux, which lacks them, quiet.
+TMUX_THEME_COLORS=(
+  black "$BASE00"
+  dark-grey "$BASE01"
+  light-grey "$BASE03"
+  white "$BASE05"
+  red "$BASE08"
+  yellow "$BASE0A"
+  green "$BASE0B"
+  cyan "$BASE0C"
+  blue "$BASE0D"
+  magenta "$BASE0E"
+)
+TMUX_THEME_COLOR_OPTIONS=""
+for set_name in dark light; do
+  for ((i = 0; i < ${#TMUX_THEME_COLORS[@]}; i += 2)); do
+    TMUX_THEME_COLOR_OPTIONS+="set-option -gq ${set_name}-theme-${TMUX_THEME_COLORS[i]} \"${TMUX_THEME_COLORS[i + 1]}\""$'\n'
+  done
+done
 
 # Session list (status line 1). Entries are separated by whitespace and nothing
 # else. Dividers were tried and dropped: padding and a bar are two separators
@@ -156,6 +185,16 @@ set-window-option -g clock-mode-colour "${DIAG_INFO}"
 # Using base00 for consistency with terminal background
 set-window-option -g window-style "bg=${BASE00}"
 set-window-option -g window-active-style "bg=${BASE00}"
+
+# ==============================================================================
+# POPUPS AND TMUX THEME COLORS
+# ==============================================================================
+
+${TMUX_THEME_COLOR_OPTIONS}
+# Popups take the terminal's own background, which is what window-style
+# resolves to under any opacity, so a popup matches the panes it covers.
+set-option -g popup-style "bg=default,fg=default"
+set-option -g popup-border-style "bg=default,fg=${BASE03}"
 
 # ==============================================================================
 # STATUS BAR LAYOUT
