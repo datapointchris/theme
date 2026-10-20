@@ -55,20 +55,22 @@ bg_rgb=$(hex_to_rgb "$BASE00")
 temp_dir="/tmp/ascii_$$"
 mkdir -p "$temp_dir"
 
-ascii-image-converter "$source_image" \
+# -C reads color support from the terminal's environment even when only saving, so a run
+# with no terminal, such as a timer's, fails unless told. It exits 0 when it does.
+converter_error=$(COLORTERM=truecolor ascii-image-converter "$source_image" \
   -C \
   -s "$temp_dir" \
   --save-bg "${bg_rgb},100" \
   --width 200 \
   --only-save \
-  2>/dev/null
+  2>&1 >/dev/null) || true
 
 source_basename=$(basename "$source_image" | sed 's/\.[^.]*$//')
 generated_file="$temp_dir/${source_basename}-ascii-art.png"
 
 if [[ ! -f "$generated_file" ]]; then
   rm -rf "$temp_dir"
-  echo "Error: ascii-image-converter failed to create output" >&2
+  echo "Error: ascii-image-converter failed to create output${converter_error:+: $converter_error}" >&2
   exit 1
 fi
 
