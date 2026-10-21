@@ -140,8 +140,8 @@ Restart the terminal to see opacity changes.
 theme browsers                # Show detected browsers and theme status
 ```
 
-Firefox-based browsers (Zen, Librewolf, Firefox, Thunderbird) and Vivaldi are
-themed automatically on `theme apply`. Firefox-based browsers require
+Firefox-based browsers and Vivaldi are themed automatically on `theme apply`.
+Firefox-based browsers require
 `toolkit.legacyUserProfileCustomizations.stylesheets = true` in `about:config`,
 then a restart, for `userChrome.css` to take effect.
 

@@ -638,12 +638,14 @@ apply_vivaldi() {
   [[ -f "$dir/Local State" ]] || return 1
 
   if vivaldi_running_pid "$dir" >/dev/null; then
-    vivaldi_waiter_running || vivaldi_start_waiter "$dir" || return 1
+    vivaldi_stage_theme "$lib_path/vivaldi.json" || return 1
+    vivaldi_waiter_running || start_detached "$THEME_LIB_DIR/vivaldi-install-after-exit.sh" "$dir"
     echo "at next launch"
     return 0
   fi
 
-  vivaldi_install_theme "$dir" "$lib_path/vivaldi.json"
+  vivaldi_install_theme "$dir" "$lib_path/vivaldi.json" || return 1
+  rm -f "$VIVALDI_PENDING_THEME"
 }
 
 # Apply sioyek PDF viewer theme (all platforms)
@@ -2149,6 +2151,10 @@ apply_theme_to_apps() {
 
   # Vivaldi (macOS and Arch)
   if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]]; then
+    local vivaldi_stranded
+    if vivaldi_stranded=$(vivaldi_stranded_theme); then
+      apply_warn "Vivaldi never got $vivaldi_stranded: it was still open when its waiter stopped. This apply replaces it."
+    fi
     local vivaldi_status
     if vivaldi_status=$(apply_vivaldi "$theme" 2>/dev/null); then
       applied+=("vivaldi")
@@ -2443,18 +2449,28 @@ reload_dunst() {
   return 1
 }
 
-# Starts a desktop daemon outside the apply's cgroup, which systemd kills when an apply run as a
-# service ends. Hyprland's child sits where login started it. A transient scope is the fallback.
+# Starts a desktop daemon outside the apply's cgroup. Hyprland's child sits where login started
+# it, so the daemon lives as if login had started it. start_detached is the fallback.
 start_session_daemon() {
   local program="$1"
   if command -v hyprctl &>/dev/null \
     && [[ "$(hyprctl dispatch "hl.dsp.exec_cmd('$program')" 2>/dev/null)" == "ok" ]]; then
     return 0
   fi
+  start_detached "$program"
+}
+
+# Starts a command that must outlive the apply. systemd kills a scheduled apply's cgroup when the
+# oneshot exits, so where a systemd user manager runs, the command gets its own transient scope.
+# Elsewhere it gets its own session. On macOS the launchd agent sets AbandonProcessGroup
+# (lib/schedule.sh), which spares it.
+start_detached() {
   if systemctl --user show-environment &>/dev/null; then
-    systemd-run --user --scope --collect --quiet "$program" >/dev/null 2>&1 </dev/null &
+    systemd-run --user --scope --collect --quiet -- "$@" >/dev/null 2>&1 </dev/null &
+  elif command -v setsid &>/dev/null; then
+    setsid "$@" >/dev/null 2>&1 </dev/null &
   else
-    setsid "$program" >/dev/null 2>&1 </dev/null &
+    nohup "$@" >/dev/null 2>&1 </dev/null &
   fi
   disown
 }

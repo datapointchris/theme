@@ -576,7 +576,6 @@ browsers_usage() {
     print_section "Description" "blue"
     cat <<'EOF'
   Show detected browsers and their theme configuration status.
-  Supports Firefox-based browsers (Zen, Librewolf, Firefox, Thunderbird) and Vivaldi.
 EOF
 
     print_section "Setup Required" "blue"
@@ -600,7 +599,6 @@ Browser Theme Diagnostics
 Description
 -----------
   Show detected browsers and their theme configuration status.
-  Supports Firefox-based browsers (Zen, Librewolf, Firefox, Thunderbird) and Vivaldi.
 
 Setup Required
 --------------
@@ -845,11 +843,12 @@ show_browsers() {
   if [[ -f "$vivaldi_dir/Local State" ]]; then
     echo ""
     echo "Vivaldi:"
-    local vivaldi_theme
-    vivaldi_theme=$(jq -r '.vivaldi.themes.current // "none"' "$vivaldi_dir/Default/Preferences" 2>/dev/null || echo "unknown")
-    echo "  Theme: $vivaldi_theme"
-    if vivaldi_waiter_running; then
-      echo "  Pending: the current theme installs when Vivaldi exits"
+    vivaldi_selected_themes "$vivaldi_dir" | sed 's/^/  /'
+    local vivaldi_stranded
+    if vivaldi_stranded=$(vivaldi_stranded_theme); then
+      echo "  Pending: $vivaldi_stranded, never installed. The next theme apply replaces it."
+    elif [[ -f "$VIVALDI_PENDING_THEME" ]]; then
+      echo "  Pending: $(jq -r '.name // .id' "$VIVALDI_PENDING_THEME"), installed when Vivaldi exits"
     fi
   fi
 

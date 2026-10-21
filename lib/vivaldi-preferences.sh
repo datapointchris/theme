@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
-# Installs a generated Vivaldi theme into Vivaldi's own profile.
+# Reads and writes Vivaldi's own profile.
 #
 # Vivaldi keeps its themes in each profile's Preferences and holds that file in
 # memory while it runs, writing all of it back on exit. A write made while it is
-# open is therefore overwritten, so a theme is installed only while Vivaldi is
-# closed. An apply that finds it open leaves a waiter behind, which installs
-# whatever theme is current once that Vivaldi exits.
+# open is overwritten, so a theme is installed only while Vivaldi is closed. An
+# apply that finds it open stages the theme as pending and leaves a waiter,
+# which installs the pending theme once that Vivaldi exits.
+#
+# The waiter sources only this file, so nothing here reads lib.sh.
 
-VIVALDI_WAITER_PID_FILE="$HOME/.cache/theme/vivaldi-waiter.pid"
+VIVALDI_STATE_DIR="$HOME/.cache/theme/vivaldi"
+VIVALDI_PENDING_THEME="$VIVALDI_STATE_DIR/pending-theme.json"
+VIVALDI_WAITER_PID_FILE="$VIVALDI_STATE_DIR/waiter.pid"
 
 vivaldi_user_data_dir() {
   case "$(uname -s)" in
@@ -16,26 +20,41 @@ vivaldi_user_data_dir() {
   esac
 }
 
-# The pid of the Vivaldi holding this user-data dir, read from Chromium's own
-# SingletonLock symlink, whose target is `<host>-<pid>`. A crash leaves the link
-# naming a dead pid, which counts as not running.
-vivaldi_running_pid() {
-  local dir="$1"
-  local target
-  target=$(readlink "$dir/SingletonLock" 2>/dev/null) || return 1
-
-  local host="${target%-*}" pid="${target##*-}"
-  [[ "$host" == "$(uname -n)" ]] || return 1
+# A lock or pid file outlives the process that wrote it, and kill -0 answers for
+# whatever process holds the number now, so a pid is trusted only while it still
+# runs the expected program.
+vivaldi_pid_is_vivaldi() {
+  local pid="$1" comm
   [[ "$pid" =~ ^[0-9]+$ ]] || return 1
-  kill -0 "$pid" 2>/dev/null || return 1
+  comm=$(ps -p "$pid" -o comm= 2>/dev/null) || return 1
+  comm="${comm##*/}"
+  [[ "$comm" == vivaldi-bin || "$comm" == Vivaldi ]]
+}
+
+# The pid of the Vivaldi holding this user-data dir, read from Chromium's own
+# SingletonLock symlink, whose target is `<host>-<pid>`. The host is not
+# compared, because macOS renames the host with the network while the lock
+# keeps the name from launch.
+vivaldi_running_pid() {
+  local target pid
+  target=$(readlink "$1/SingletonLock" 2>/dev/null) || return 1
+  pid="${target##*-}"
+  vivaldi_pid_is_vivaldi "$pid" || return 1
   echo "$pid"
+}
+
+# Each profile directory with its display name, tab-separated, from Local
+# State, which is Vivaldi's own record of its profiles.
+vivaldi_profiles() {
+  jq -r '.profile.info_cache // {} | to_entries[] | [.key, (.value.name // .key)] | @tsv' "$1/Local State"
 }
 
 # Upsert one theme object into every profile's Preferences and select it.
 #
 # Both OS-schedule slots are pointed at it as well as `current`, because
 # Vivaldi's default schedule follows the OS light/dark setting and reads those
-# slots instead of `current`. Every other user theme stays installed.
+# slots instead of `current`. Every other user theme stays installed. A profile
+# that fails leaves the rest to be installed, and the call returns 1.
 vivaldi_install_theme() {
   local dir="$1"
   local theme_json="$2"
@@ -43,66 +62,99 @@ vivaldi_install_theme() {
   [[ -f "$dir/Local State" && -f "$theme_json" ]] || return 1
 
   local profiles
-  profiles=$(jq -r '.profile.info_cache // {} | keys[]' "$dir/Local State") || return 1
+  profiles=$(vivaldi_profiles "$dir") || return 1
 
-  local profile prefs staged
-  while IFS= read -r profile; do
+  local profile name prefs staged failed=0
+  while IFS=$'\t' read -r profile name; do
     [[ -n "$profile" ]] || continue
     prefs="$dir/$profile/Preferences"
     [[ -f "$prefs" ]] || continue
 
     # Staged beside the file so the mv is a rename; mktemp's 0600 matches
     # Chromium's own mode for it.
-    staged=$(mktemp "$prefs.theme.XXXXXX") || return 1
-    if ! jq -c --slurpfile theme "$theme_json" '
+    if ! staged=$(mktemp "$prefs.theme.XXXXXX"); then
+      failed=1
+      continue
+    fi
+    if jq -c --slurpfile theme "$theme_json" '
       $theme[0] as $t
       | .vivaldi.themes.user = ([(.vivaldi.themes.user // [])[] | select(.id != $t.id)] + [$t])
       | .vivaldi.themes.current = $t.id
       | .vivaldi.theme.schedule.o_s = ((.vivaldi.theme.schedule.o_s // {}) + {light: $t.id, dark: $t.id})
-    ' "$prefs" >"$staged"; then
-      rm -f "$staged"
-      return 1
+    ' "$prefs" >"$staged" && mv "$staged" "$prefs"; then
+      continue
     fi
-    mv "$staged" "$prefs" || return 1
+    rm -f "$staged"
+    failed=1
   done <<<"$profiles"
+
+  return "$failed"
 }
 
-# Whether an earlier apply already left a waiter, which will install whatever
-# theme is current when it fires, so one is enough.
+# What each profile shows, one `<profile name>: <theme>` line apiece. The
+# schedule decides which pref that is: `off` reads `current`, the default
+# `system` reads the OS light and dark slots, and `timeline` reads a list of
+# times this tool never writes. Absent prefs take Vivaldi's own defaults.
+vivaldi_selected_themes() {
+  local dir="$1" profile name
+  while IFS=$'\t' read -r profile name; do
+    [[ -n "$profile" ]] || continue
+    jq -r --arg profile "$name" '
+      ((.vivaldi.themes.user // []) | map({key: .id, value: .name}) | from_entries) as $names
+      | (.vivaldi.theme.schedule // {}) as $s
+      | ($s.o_s // {}) as $o
+      | ($o.light // "Vivaldi1") as $light
+      | ($o.dark // "Vivaldi2") as $dark
+      | ($s.enabled // "system") as $mode
+      | if $mode == "off" or $mode == 0 then ($names[.vivaldi.themes.current // "Vivaldi1"] // (.vivaldi.themes.current // "Vivaldi1"))
+        elif $mode == "timeline" or $mode == 2 then "a timeline schedule"
+        elif $light == $dark then ($names[$light] // $light)
+        else "\($names[$light] // $light) when light, \($names[$dark] // $dark) when dark"
+        end
+      | "\($profile): \(.)"
+    ' "$dir/$profile/Preferences" 2>/dev/null || echo "$name: unreadable"
+  done < <(vivaldi_profiles "$dir")
+}
+
+# The waiter is trusted only while its pid still runs the waiter.
 vivaldi_waiter_running() {
-  local pid
+  local pid args
   pid=$(cat "$VIVALDI_WAITER_PID_FILE" 2>/dev/null) || return 1
-  [[ "$pid" =~ ^[0-9]+$ ]] && kill -0 "$pid" 2>/dev/null
+  [[ "$pid" =~ ^[0-9]+$ ]] || return 1
+  args=$(ps -p "$pid" -o args= 2>/dev/null) || return 1
+  [[ "$args" == *vivaldi-install-after-exit* ]]
 }
 
-# Detach a waiter from this apply. A scheduled apply runs as a oneshot whose
-# cgroup systemd kills on exit, so on Linux the waiter is its own transient
-# service. On macOS the launchd agent sets AbandonProcessGroup, so nohup is
-# enough there.
-vivaldi_start_waiter() {
-  local dir="$1"
-  local waiter="$THEME_LIB_DIR/vivaldi-install-after-exit.sh"
+# Stage a theme for the waiter. A later apply overwrites it, so the theme that
+# lands is the last one applied while Vivaldi was open.
+vivaldi_stage_theme() {
+  mkdir -p "$VIVALDI_STATE_DIR" || return 1
+  cp "$1" "$VIVALDI_PENDING_THEME.tmp" && mv "$VIVALDI_PENDING_THEME.tmp" "$VIVALDI_PENDING_THEME"
+}
 
-  if [[ "$(uname -s)" != "Darwin" ]] && systemctl --user show-environment &>/dev/null; then
-    systemd-run --user --collect --quiet -E HOME -E PATH -- "$waiter" "$dir" >/dev/null 2>&1 </dev/null
-  else
-    nohup "$waiter" "$dir" >/dev/null 2>&1 </dev/null &
-    disown
-  fi
+# The name of a staged theme no waiter will install. That is what a waiter
+# leaves when its install failed, or when Vivaldi outlasted it at logout.
+vivaldi_stranded_theme() {
+  [[ -f "$VIVALDI_PENDING_THEME" ]] || return 1
+  vivaldi_waiter_running && return 1
+  jq -r '.name // .id' "$VIVALDI_PENDING_THEME" 2>/dev/null || echo "a theme"
 }
 
 # The waiter's body. It waits for the whole process to exit rather than for the
 # lock to go, since Chromium may drop the lock before its last Preferences write.
 # A Vivaldi relaunched within the poll interval already read the old file, so
-# the wait moves on to that instance.
+# the wait moves on to that instance. A theme staged during the install is
+# installed on the next pass.
 #
 # A logout or reboot sends SIGTERM to Vivaldi and to this at once. Vivaldi takes
 # a moment to write and exit, so the TERM is answered with a bounded wait rather
-# than by dying first.
+# than by dying first. A failure leaves the theme staged, which the next apply
+# reports.
 vivaldi_install_after_exit() {
   local dir="$1"
+  local claimed="$VIVALDI_STATE_DIR/installing-theme.json"
 
-  mkdir -p "$(dirname "$VIVALDI_WAITER_PID_FILE")"
+  mkdir -p "$VIVALDI_STATE_DIR"
   echo "$$" >"$VIVALDI_WAITER_PID_FILE"
   trap 'rm -f "$VIVALDI_WAITER_PID_FILE"' EXIT
 
@@ -110,16 +162,23 @@ vivaldi_install_after_exit() {
   trap 'deadline=$((SECONDS + 15))' TERM HUP
 
   local pid
-  while pid=$(vivaldi_running_pid "$dir"); do
-    while kill -0 "$pid" 2>/dev/null; do
-      if [[ -n "$deadline" ]] && ((SECONDS >= deadline)); then
-        return 1
-      fi
-      sleep 1
+  while [[ -f "$VIVALDI_PENDING_THEME" ]]; do
+    while pid=$(vivaldi_running_pid "$dir"); do
+      while vivaldi_pid_is_vivaldi "$pid"; do
+        if [[ -n "$deadline" ]] && ((SECONDS >= deadline)); then
+          echo "Vivaldi outlasted the session; the staged theme stays pending" >&2
+          return 1
+        fi
+        sleep 1
+      done
     done
-  done
 
-  local theme
-  theme=$(cat "$CURRENT_THEME_FILE" 2>/dev/null) || return 1
-  vivaldi_install_theme "$dir" "$THEMES_DIR/$theme/vivaldi.json"
+    mv "$VIVALDI_PENDING_THEME" "$claimed" || return 1
+    if ! vivaldi_install_theme "$dir" "$claimed"; then
+      [[ -f "$VIVALDI_PENDING_THEME" ]] || mv "$claimed" "$VIVALDI_PENDING_THEME"
+      echo "Could not install the staged theme into $dir" >&2
+      return 1
+    fi
+    rm -f "$claimed"
+  done
 }

@@ -24,12 +24,12 @@ eval "$(load_colors "$input_file")"
 UI_ACCENT="${EXTENDED_UI_ACCENT:-$BASE0D}"
 UI_SELECTION="${EXTENDED_UI_SELECTION:-$BASE02}"
 
-# Vivaldi derives every shade, hover and contrast text from these five, so the
-# palette's own intermediate slots have nowhere to go.
+# Vivaldi derives every shade, hover and contrast text from the colors below,
+# so the palette's own intermediate slots have nowhere to go.
 #
 # Vivaldi paints its accent across the whole toolbar row and the active tab, so
-# the accent takes the selection shade that firefox-based.sh gives a selected
-# tab. The loud UI accent goes to highlight, which marks focus and selection.
+# the accent takes the quiet UI selection shade. The loud UI accent goes to
+# highlight, which marks focus and selection.
 generate() {
   jq -n \
     --arg id "theme-${THEME_SLUG}" \
