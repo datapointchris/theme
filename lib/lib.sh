@@ -16,6 +16,7 @@ THEME_APP_DIR="$(cd "$THEME_LIB_DIR/.." && pwd)"
 # the other, and on Arch that silently skipped Hyprland, Waybar, ghostty, kitty
 # and the wallpaper. storage.sh also owns THEME_STATE_DIR and the history paths.
 source "$THEME_LIB_DIR/storage.sh"
+source "$THEME_LIB_DIR/vivaldi-preferences.sh"
 
 # Always production, unlike THEME_STATE_DIR: apps watch this directory, so dev
 # mode must not point them at .dev-data.
@@ -45,6 +46,7 @@ THEME_APP_ARTIFACTS=(
   "sioyek.config:sioyek"
   "userChrome.css:Firefox-based"
   "chromium.theme:Chromium"
+  "vivaldi.json:Vivaldi"
   "bordersrc:JankyBorders"
   "hyprland.lua:Hyprland"
   "hyprlock.conf:Hyprlock"
@@ -618,6 +620,30 @@ apply_firefox_based() {
   fi
 
   return 0
+}
+
+# Apply Vivaldi theme (macOS and Arch)
+# Prints "at next launch" when Vivaldi is open, and nothing when installed.
+apply_vivaldi() {
+  local theme="$1"
+  local lib_path
+  lib_path=$(get_library_path "$theme")
+
+  if [[ -z "$lib_path" ]] || [[ ! -f "$lib_path/vivaldi.json" ]]; then
+    return 1
+  fi
+
+  local dir
+  dir=$(vivaldi_user_data_dir)
+  [[ -f "$dir/Local State" ]] || return 1
+
+  if vivaldi_running_pid "$dir" >/dev/null; then
+    vivaldi_waiter_running || vivaldi_start_waiter "$dir" || return 1
+    echo "at next launch"
+    return 0
+  fi
+
+  vivaldi_install_theme "$dir" "$lib_path/vivaldi.json"
 }
 
 # Apply sioyek PDF viewer theme (all platforms)
@@ -2119,6 +2145,18 @@ apply_theme_to_apps() {
   else
     skipped+=("browsers")
     _print_app_status "browsers" "false"
+  fi
+
+  # Vivaldi (macOS and Arch)
+  if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]]; then
+    local vivaldi_status
+    if vivaldi_status=$(apply_vivaldi "$theme" 2>/dev/null); then
+      applied+=("vivaldi")
+      _print_app_status "vivaldi${vivaldi_status:+ ($vivaldi_status)}" "true"
+    else
+      skipped+=("vivaldi")
+      _print_app_status "vivaldi" "false"
+    fi
   fi
 
   # bat syntax highlighter (all platforms)

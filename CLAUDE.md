@@ -59,9 +59,13 @@ beside the others, and an exported config is self-describing.
 Nothing is pruned, deliberately. These are also the directories a user's own themes live in, and
 an installer that deletes what it does not recognize is worse than a few stale kilobytes.
 
-Four apps have no pointer at all. dunst reads `dunstrc.d/` as a directory, firefox and Windows
-Terminal have their real file rewritten, and sioyek gets a managed block spliced into its own
-config.
+These apps have no pointer at all:
+
+- dunst reads `dunstrc.d/` as a directory.
+- firefox and Windows Terminal have their real file rewritten.
+- sioyek gets a managed block spliced into its own config.
+- Vivaldi gets its theme upserted into each profile's `Preferences`, and only while Vivaldi is
+  closed.
 
 `tests/apply-install.bats` pins it, including the two migration cases off the copy-based scheme:
 a `current` left as a real file, and a `current.yazi` left as a real directory, which `ln -sfn`
@@ -350,6 +354,16 @@ CLI verbs. These generators behave unlike the rest:
 - `aerc.sh` relies on aerc.conf pinning `styleset-name = current`, so the applied filename is a contract.
 - `firefox-based.sh` writes one userChrome.css covering Firefox, Zen, Librewolf and Thunderbird.
 - `vscode.sh` is not wired into `theme apply`; run it directly when needed.
+- `vivaldi.sh` emits one entry of Vivaldi's `vivaldi.themes.user` pref, which
+  `lib/vivaldi-preferences.sh` upserts and selects. Vivaldi holds `Preferences` in memory and
+  writes all of it back on exit, so a write while it runs is lost. `apply_vivaldi` therefore
+  installs only into a closed Vivaldi. When Vivaldi is open, it leaves a detached waiter that
+  installs whatever theme is current once that Vivaldi's process exits. Nothing outside Vivaldi
+  can change an open window's theme, so the change shows at the next launch:
+  - CSS mods are linked once per window.
+  - `--remote-debugging-port` is refused on the default profile.
+  - No enterprise policy maps to a `vivaldi.*` pref. `BrowserThemeColor` tints Chromium's native
+    toolbar, which Vivaldi does not draw with.
 - `glow.sh` emits a glamour style whose code blocks reach the screen quantized to xterm-256.
   glow never sets glamour's chroma formatter, so only prose keeps true color. `apply_glow` writes
   `glow.yml`'s `style` as an absolute path, because glamour expands neither `~` nor `$HOME` and

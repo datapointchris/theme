@@ -52,6 +52,7 @@ declare -A GENERATOR_OUTPUT=(
   ["icons"]="icons.theme"
   ["hyprland-picker"]="hyprland-picker.css"
   ["chromium"]="chromium.theme"
+  ["vivaldi"]="vivaldi.json"
   ["firefox-based"]="userChrome.css"
   ["bat"]="bat.tmTheme"
   ["sioyek"]="sioyek.config"

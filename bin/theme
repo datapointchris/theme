@@ -576,7 +576,7 @@ browsers_usage() {
     print_section "Description" "blue"
     cat <<'EOF'
   Show detected browsers and their theme configuration status.
-  Supports Firefox-based browsers: Zen, Librewolf, Firefox, Thunderbird.
+  Supports Firefox-based browsers (Zen, Librewolf, Firefox, Thunderbird) and Vivaldi.
 EOF
 
     print_section "Setup Required" "blue"
@@ -600,7 +600,7 @@ Browser Theme Diagnostics
 Description
 -----------
   Show detected browsers and their theme configuration status.
-  Supports Firefox-based browsers: Zen, Librewolf, Firefox, Thunderbird.
+  Supports Firefox-based browsers (Zen, Librewolf, Firefox, Thunderbird) and Vivaldi.
 
 Setup Required
 --------------
@@ -839,6 +839,19 @@ show_browsers() {
   echo "  Enable in about:config (for each browser):"
   echo "    toolkit.legacyUserProfileCustomizations.stylesheets = true"
   echo "  Then restart the browser."
+
+  local vivaldi_dir
+  vivaldi_dir=$(vivaldi_user_data_dir)
+  if [[ -f "$vivaldi_dir/Local State" ]]; then
+    echo ""
+    echo "Vivaldi:"
+    local vivaldi_theme
+    vivaldi_theme=$(jq -r '.vivaldi.themes.current // "none"' "$vivaldi_dir/Default/Preferences" 2>/dev/null || echo "unknown")
+    echo "  Theme: $vivaldi_theme"
+    if vivaldi_waiter_running; then
+      echo "  Pending: the current theme installs when Vivaldi exits"
+    fi
+  fi
 
   # Show chromium status if chromium.theme exists
   local chromium_theme_file="$HOME/.config/chromium/chromium.theme"
