@@ -16,6 +16,7 @@ THEME_APP_DIR="$(cd "$THEME_LIB_DIR/.." && pwd)"
 # the other, and on Arch that silently skipped Hyprland, Waybar, ghostty, kitty
 # and the wallpaper. storage.sh also owns THEME_STATE_DIR and the history paths.
 source "$THEME_LIB_DIR/storage.sh"
+source "$THEME_LIB_DIR/vivaldi-preferences.sh"
 
 # Always production, unlike THEME_STATE_DIR: apps watch this directory, so dev
 # mode must not point them at .dev-data.
@@ -45,6 +46,7 @@ THEME_APP_ARTIFACTS=(
   "sioyek.config:sioyek"
   "userChrome.css:Firefox-based"
   "chromium.theme:Chromium"
+  "vivaldi.json:Vivaldi"
   "bordersrc:JankyBorders"
   "hyprland.lua:Hyprland"
   "hyprlock.conf:Hyprlock"
@@ -618,6 +620,32 @@ apply_firefox_based() {
   fi
 
   return 0
+}
+
+# Apply Vivaldi theme (macOS and Arch)
+# Prints "at next launch" when Vivaldi is open, and nothing when installed.
+apply_vivaldi() {
+  local theme="$1"
+  local lib_path
+  lib_path=$(get_library_path "$theme")
+
+  if [[ -z "$lib_path" ]] || [[ ! -f "$lib_path/vivaldi.json" ]]; then
+    return 1
+  fi
+
+  local dir
+  dir=$(vivaldi_user_data_dir)
+  [[ -f "$dir/Local State" ]] || return 1
+
+  if vivaldi_running_pid "$dir" >/dev/null; then
+    vivaldi_stage_theme "$lib_path/vivaldi.json" || return 1
+    vivaldi_waiter_running || start_detached "$THEME_LIB_DIR/vivaldi-install-after-exit.sh" "$dir"
+    echo "at next launch"
+    return 0
+  fi
+
+  vivaldi_install_theme "$dir" "$lib_path/vivaldi.json" || return 1
+  rm -f "$VIVALDI_PENDING_THEME"
 }
 
 # Apply sioyek PDF viewer theme (all platforms)
@@ -2121,6 +2149,22 @@ apply_theme_to_apps() {
     _print_app_status "browsers" "false"
   fi
 
+  # Vivaldi (macOS and Arch)
+  if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]]; then
+    local vivaldi_stranded
+    if vivaldi_stranded=$(vivaldi_stranded_theme); then
+      apply_warn "Vivaldi never got $vivaldi_stranded: it was still open when its waiter stopped. This apply replaces it."
+    fi
+    local vivaldi_status
+    if vivaldi_status=$(apply_vivaldi "$theme" 2>/dev/null); then
+      applied+=("vivaldi")
+      _print_app_status "vivaldi${vivaldi_status:+ ($vivaldi_status)}" "true"
+    else
+      skipped+=("vivaldi")
+      _print_app_status "vivaldi" "false"
+    fi
+  fi
+
   # bat syntax highlighter (all platforms)
   if apply_bat "$theme" 2>/dev/null; then
     applied+=("bat")
@@ -2405,18 +2449,28 @@ reload_dunst() {
   return 1
 }
 
-# Starts a desktop daemon outside the apply's cgroup, which systemd kills when an apply run as a
-# service ends. Hyprland's child sits where login started it. A transient scope is the fallback.
+# Starts a desktop daemon outside the apply's cgroup. Hyprland's child sits where login started
+# it, so the daemon lives as if login had started it. start_detached is the fallback.
 start_session_daemon() {
   local program="$1"
   if command -v hyprctl &>/dev/null \
     && [[ "$(hyprctl dispatch "hl.dsp.exec_cmd('$program')" 2>/dev/null)" == "ok" ]]; then
     return 0
   fi
+  start_detached "$program"
+}
+
+# Starts a command that must outlive the apply. systemd kills a scheduled apply's cgroup when the
+# oneshot exits, so where a systemd user manager runs, the command gets its own transient scope.
+# Elsewhere it gets its own session. On macOS the launchd agent sets AbandonProcessGroup
+# (lib/schedule.sh), which spares it.
+start_detached() {
   if systemctl --user show-environment &>/dev/null; then
-    systemd-run --user --scope --collect --quiet "$program" >/dev/null 2>&1 </dev/null &
+    systemd-run --user --scope --collect --quiet -- "$@" >/dev/null 2>&1 </dev/null &
+  elif command -v setsid &>/dev/null; then
+    setsid "$@" >/dev/null 2>&1 </dev/null &
   else
-    setsid "$program" >/dev/null 2>&1 </dev/null &
+    nohup "$@" >/dev/null 2>&1 </dev/null &
   fi
   disown
 }

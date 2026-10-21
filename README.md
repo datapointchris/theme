@@ -140,10 +140,15 @@ Restart the terminal to see opacity changes.
 theme browsers                # Show detected browsers and theme status
 ```
 
-Firefox-based browsers (Zen, Librewolf, Firefox, Thunderbird) and Chromium are
-themed automatically on `theme apply`. Firefox-based browsers require
+Firefox-based browsers and Vivaldi are themed automatically on `theme apply`.
+Firefox-based browsers require
 `toolkit.legacyUserProfileCustomizations.stylesheets = true` in `about:config`,
 then a restart, for `userChrome.css` to take effect.
+
+Vivaldi gets a native Vivaldi theme, selected for both its light and dark
+schedule. Vivaldi rewrites its own settings when it quits, so an apply while it
+is open waits for it to exit and installs the theme then. The theme shows at its
+next launch.
 
 ### Cross-Machine Sync
 
@@ -197,7 +202,7 @@ Both commands come from [`bashselfupdate`](https://github.com/datapointchris/bas
 - **yazi** — file manager
 - **sioyek** — PDF viewer (custom color mode)
 - **Neovim** — text editor (via colorscheme plugins or generated)
-- **Browsers** — Firefox-based (Zen, Librewolf, Firefox, Thunderbird) and Chromium
+- **Browsers** — Firefox-based (Zen, Librewolf, Firefox, Thunderbird) and Vivaldi
 - **Wallpaper** — themed desktop background, set through Finder on macOS,
   hyprpaper on Hyprland, and the Windows host on WSL
 

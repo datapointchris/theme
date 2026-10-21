@@ -17,9 +17,10 @@ generated data live at:
 ~/.local/state/theme/schedule.json   - Outcome of the last scheduled check
 ~/.cache/theme/backgrounds/          - Pre-rendered backgrounds per theme
 ~/.cache/theme/gowall/               - Per-theme gowall palettes, as JSON
+~/.cache/theme/vivaldi/              - The theme staged for an open Vivaldi, and its waiter's pid
 ```
 
-Generated state belongs in those two cache directories and nowhere else. An app config here is
+Generated state belongs in the cache directories above and nowhere else. An app config here is
 often a symlink into another repo, so writing generated state into it dirties that repo on every
 apply.
 
@@ -59,9 +60,13 @@ beside the others, and an exported config is self-describing.
 Nothing is pruned, deliberately. These are also the directories a user's own themes live in, and
 an installer that deletes what it does not recognize is worse than a few stale kilobytes.
 
-Four apps have no pointer at all. dunst reads `dunstrc.d/` as a directory, firefox and Windows
-Terminal have their real file rewritten, and sioyek gets a managed block spliced into its own
-config.
+These apps have no pointer at all:
+
+- dunst reads `dunstrc.d/` as a directory.
+- firefox and Windows Terminal have their real file rewritten.
+- sioyek gets a managed block spliced into its own config.
+- Vivaldi gets its theme upserted into each profile's `Preferences`, and only while Vivaldi is
+  closed.
 
 `tests/apply-install.bats` pins it, including the two migration cases off the copy-based scheme:
 a `current` left as a real file, and a `current.yazi` left as a real directory, which `ln -sfn`
@@ -350,6 +355,20 @@ CLI verbs. These generators behave unlike the rest:
 - `aerc.sh` relies on aerc.conf pinning `styleset-name = current`, so the applied filename is a contract.
 - `firefox-based.sh` writes one userChrome.css covering Firefox, Zen, Librewolf and Thunderbird.
 - `vscode.sh` is not wired into `theme apply`; run it directly when needed.
+- `vivaldi.sh` emits one entry of Vivaldi's `vivaldi.themes.user` pref, which
+  `lib/vivaldi-preferences.sh` upserts and selects. Vivaldi holds `Preferences` in memory and
+  writes all of it back on exit, so a write while it runs is lost. `apply_vivaldi` therefore
+  installs only into a closed Vivaldi. When Vivaldi is open, it stages the theme in
+  `~/.cache/theme/vivaldi/` and leaves a detached waiter, which installs the staged theme once
+  that Vivaldi's process exits. A staged theme with no waiter is one that never landed, and the
+  next apply warns about it. Nothing outside Vivaldi can change an open window's theme, so the
+  change shows at the next launch. Each dead end, with the command that re-checks it on Arch:
+  - CSS mods are linked once per window: `rg css-mods /opt/vivaldi/resources/vivaldi/window.html`.
+  - `--remote-debugging-port` is refused on the default profile:
+    `strings -a /opt/vivaldi/vivaldi-bin | rg 'non-default data directory'`.
+  - No enterprise policy maps to a `vivaldi.*` pref, so this prints `[]`:
+    `jq '[.policies[].path | select(startswith("vivaldi"))]' /opt/vivaldi/resources/vivaldi/policy_prefs.json`.
+    `BrowserThemeColor` tints Chromium's native toolbar, which Vivaldi does not draw with.
 - `glow.sh` emits a glamour style whose code blocks reach the screen quantized to xterm-256.
   glow never sets glamour's chroma formatter, so only prose keeps true color. `apply_glow` writes
   `glow.yml`'s `style` as an absolute path, because glamour expands neither `~` nor `$HOME` and
