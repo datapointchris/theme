@@ -49,7 +49,7 @@ EOF
   assert_output "$(utc_hour 23)"
 }
 
-@test "a due change waits while the session is idle or locked, and goes ahead while it is active" {
+@test "a due change waits while logind or the WSL terminals say you are away, and goes ahead while active" {
   export PLATFORM=arch
   add_apply_record "2026-01-01T15:10:00Z" sora schedule
   local due
@@ -67,6 +67,20 @@ EOF
   assert_output "away"
 
   stub_session IdleHint=no LockedHint=no
+  run pipeline "schedule_decide $due | cut -f1"
+  assert_output "due"
+
+  export PLATFORM=wsl
+  THEME_SCHEDULE_TERMINALS_DIR="$BATS_TEST_TMPDIR/pts"
+  mkdir -p "$THEME_SCHEDULE_TERMINALS_DIR"
+  run pipeline "schedule_decide $due | cut -f1,3"
+  assert_output $'away\tno terminal open'
+
+  touch -a -d "@$(($(date +%s) - 660))" "$THEME_SCHEDULE_TERMINALS_DIR/0"
+  run pipeline "schedule_decide $due | cut -f1"
+  assert_output "away"
+
+  touch -a "$THEME_SCHEDULE_TERMINALS_DIR/0"
   run pipeline "schedule_decide $due | cut -f1"
   assert_output "due"
 }

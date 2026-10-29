@@ -82,7 +82,7 @@ Changes the theme on a timer, so the history shows which themes you switch away
 from and which you leave on:
 
 ```bash
-theme schedule on             # Install the timer: systemd on Linux, launchd on macOS
+theme schedule on             # Install the timer: systemd on Linux and WSL, launchd on macOS
 theme schedule status         # Whether it is on, and when the next change is due
 theme schedule off            # Remove the timer
 ```
@@ -93,7 +93,8 @@ overnight never all land on your return. A theme you applied by hand holds throu
 the turns for longer. `theme schedule --help` gives the hours and the hold.
 `theme rank` counts each theme's scheduled turns as kept or switched
 away from. On Hyprland, telling idle from active needs a hypridle listener, which
-`theme schedule --help` shows. WSL is not supported.
+`theme schedule --help` shows. On WSL, the timer needs systemd enabled in
+`/etc/wsl.conf`, and presence is a recent keystroke in a WSL terminal.
 
 ### Backgrounds
 

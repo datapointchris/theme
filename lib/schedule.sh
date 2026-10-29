@@ -14,8 +14,10 @@ THEME_SCHEDULE_FIRST_TURN_HOUR=2
 THEME_SCHEDULE_WINDOW_MINUTES=60
 THEME_SCHEDULE_HOLD_HOURS=12
 THEME_SCHEDULE_CHECK_MINUTES=5
-# macOS reads input idleness itself. The hypridle listener in the help uses the same figure.
+# macOS and WSL read input idleness themselves. The hypridle listener in the help uses the same figure.
 THEME_SCHEDULE_IDLE_SECONDS=600
+# Each terminal's access time moves when it reads a keystroke, and its modify time on output.
+THEME_SCHEDULE_TERMINALS_DIR=/dev/pts
 
 # A development checkout gets a timer of its own beside the installed copy's,
 # so turning either one on or off never replaces or removes the other.
@@ -28,11 +30,15 @@ else
 fi
 THEME_SCHEDULE_STATE_FILE="$THEME_STATE_DIR/schedule.json"
 
-# The service manager that runs the timer, or nothing. WSL has no display session to read.
+# The service manager that runs the timer, or nothing. WSL reads presence from its terminals, not logind.
 schedule_supervisor() {
   case "$(detect_platform)" in
     macos) echo "launchd" ;;
-    wsl) ;;
+    wsl)
+      if [[ -d /run/systemd/system ]] && command -v systemctl &>/dev/null; then
+        echo "systemd"
+      fi
+      ;;
     *)
       if command -v systemctl &>/dev/null && command -v loginctl &>/dev/null; then
         echo "systemd"
@@ -116,13 +122,35 @@ schedule_next_turn() {
     | (($from + $offset - $first) / $turn | ceil) * $turn + $first - $offset'
 }
 
+# Seconds since any of the user's terminals read a keystroke, or nothing when none is open.
+_schedule_terminal_idle_seconds() {
+  local terminals=("$THEME_SCHEDULE_TERMINALS_DIR"/*)
+  [[ -e "${terminals[0]}" ]] || return 0
+  stat -c '%u %X' "${terminals[@]}" 2>/dev/null \
+    | awk -v uid="$(id -u)" -v now="$(date +%s)" '
+        $1 == uid && $2 > newest { newest = $2 }
+        END { if (newest) print now - newest }' || true
+}
+
 # Prints why the user counts as away and succeeds, or prints "active" and fails.
 schedule_away_reason() {
-  if [[ "$(detect_platform)" == "macos" ]]; then
-    local idle
+  local platform idle
+  platform=$(detect_platform)
+  if [[ "$platform" == "macos" ]]; then
     idle=$(ioreg -c IOHIDSystem 2>/dev/null | awk '/HIDIdleTime/ { print int($NF / 1000000000); exit }' || true)
     if [[ "${idle:-0}" -ge "$THEME_SCHEDULE_IDLE_SECONDS" ]]; then
       echo "no input for $(format_duration "$idle")"
+      return 0
+    fi
+  elif [[ "$platform" == "wsl" ]]; then
+    # Windows input is unreadable from a timer: the unit cannot start a Windows program.
+    idle=$(_schedule_terminal_idle_seconds)
+    if [[ -z "$idle" ]]; then
+      echo "no terminal open"
+      return 0
+    fi
+    if [[ "$idle" -ge "$THEME_SCHEDULE_IDLE_SECONDS" ]]; then
+      echo "no terminal input for $(format_duration "$idle")"
       return 0
     fi
   else
@@ -182,8 +210,9 @@ _schedule_record() {
 }
 
 # The user manager carries only what the session imported. Without these, the restarted bar exits.
+# macOS and WSL restart nothing that draws through a Linux display server.
 _schedule_missing_desktop_env() {
-  [[ "$(detect_platform)" == "macos" ]] && return 0
+  case "$(detect_platform)" in macos | wsl) return 0 ;; esac
   local missing=()
   [[ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]] || missing+=(WAYLAND_DISPLAY DISPLAY)
   if command -v hyprctl &>/dev/null && pgrep -u "$(id -u)" -x Hyprland &>/dev/null \
@@ -336,10 +365,12 @@ EOF
 }
 
 _schedule_unsupported() {
-  echo "Error: the schedule needs systemd and logind, or launchd on macOS" >&2
   if [[ "$(detect_platform)" == "wsl" ]]; then
-    echo "  WSL has no display session to tell whether you are present." >&2
+    echo "Error: the schedule on WSL needs systemd running as the distro's init" >&2
+    echo "  Set systemd=true under [boot] in /etc/wsl.conf, then run wsl.exe --shutdown from Windows." >&2
+    return 1
   fi
+  echo "Error: the schedule needs systemd and logind, or launchd on macOS" >&2
   return 1
 }
 
@@ -392,7 +423,7 @@ schedule_off() {
 
 # IdleSinceHint 0 means IdleHint has not changed since login, which is how an unset hint looks.
 _schedule_warn_idle_hint() {
-  [[ "$(schedule_supervisor)" == "systemd" ]] || return 0
+  [[ "$(schedule_supervisor)" == "systemd" && "$(detect_platform)" != "wsl" ]] || return 0
 
   local session since
   session=$(loginctl show-user "$(id -u)" -p Display --value 2>/dev/null || true)

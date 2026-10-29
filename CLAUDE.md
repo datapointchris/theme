@@ -234,6 +234,15 @@ id with hyphens replaced by underscores.
   in a transient `systemd-run --user --scope`. On launchd the same kill
   hits the job's process group, which the agent's `AbandonProcessGroup` turns off. For
   the same reason a scheduled apply pushes to the gist in the foreground.
+- **On WSL the schedule never calls into Windows.** A systemd unit there has no
+  `WSL_INTEROP`, so it cannot start `cmd.exe` or `powershell.exe` (microsoft/WSL#8846,
+  closed stale, not fixed). Presence is therefore the newest access time on the user's
+  `/dev/pts` terminals, which moves when a terminal reads a keystroke and not when it is
+  written to. `windows_terminal_settings_file` globs `/mnt/c/Users` for the same reason
+  rather than asking `cmd.exe` for the username. Do not reach for Windows' own idle time
+  through PowerShell either. Endpoint monitoring on a managed laptop reads a Linux process
+  starting Windows ones on a fixed interval as a pattern rather than an event. The
+  wallpaper still needs `powershell.exe`, so a scheduled change on WSL cannot set it.
 - **`theme random` weights by recency, and every eligible theme stays reachable.**
   `compute_theme_weights` scores each candidate from days since its last apply, and
   `weighted_random_choice` samples that distribution. Apply count is the wrong axis: narrowing the

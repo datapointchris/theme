@@ -49,6 +49,8 @@ isolate_theme_state() {
 source_theme_libs() {
   source "$THEME_ROOT/lib/lib.sh"
   source "$THEME_ROOT/lib/storage.sh"
+  # On WSL the real one holds the developer's Windows Terminal settings.
+  WINDOWS_USERS_DIR="$BATS_TEST_TMPDIR/windows-users"
 }
 
 # Redirects theme lookup at a sandbox directory. THEMES_DIR is computed from

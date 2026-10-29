@@ -865,20 +865,31 @@ set_windows_terminal_opacity() {
   _apply_windows_terminal_opacity "$pct"
 }
 
+# Every Windows profile's folder, where WSL mounts the C: drive.
+WINDOWS_USERS_DIR="/mnt/c/Users"
+
+# Globbed rather than asked of cmd.exe, which a systemd unit on WSL has no WSL_INTEROP to start.
+# A non-elevated process cannot list another profile's folder, so only the user's own matches.
+windows_terminal_settings_file() {
+  local settings
+  for settings in \
+    "$WINDOWS_USERS_DIR"/*/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json \
+    "$WINDOWS_USERS_DIR"/*/AppData/Local/Packages/Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe/LocalState/settings.json \
+    "$WINDOWS_USERS_DIR"/*/AppData/Local/Microsoft/"Windows Terminal"/settings.json; do
+    if [[ -w "$settings" ]]; then
+      echo "$settings"
+      return 0
+    fi
+  done
+  return 1
+}
+
 # Apply opacity directly to Windows Terminal settings.json
 _apply_windows_terminal_opacity() {
   local opacity_pct="$1"
 
-  local windows_user wt_settings=""
-  windows_user=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r\n')
-  [[ -z "$windows_user" ]] && return 1
-
-  for path in "/mnt/c/Users/$windows_user/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json" \
-    "/mnt/c/Users/$windows_user/AppData/Local/Packages/Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe/LocalState/settings.json" \
-    "/mnt/c/Users/$windows_user/AppData/Local/Microsoft/Windows Terminal/settings.json"; do
-    [[ -f "$path" ]] && wt_settings="$path" && break
-  done
-  [[ -z "$wt_settings" ]] && return 1
+  local wt_settings
+  wt_settings=$(windows_terminal_settings_file) || return 1
 
   cp "$wt_settings" "${wt_settings}.backup"
 
@@ -1948,27 +1959,8 @@ apply_windows_terminal() {
     return 1
   fi
 
-  # Get Windows username from WSL
-  local windows_user
-  windows_user=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r\n')
-  [[ -z "$windows_user" ]] && return 1
-
-  # Find Windows Terminal settings.json
-  local wt_settings=""
-  local paths=(
-    "/mnt/c/Users/$windows_user/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json"
-    "/mnt/c/Users/$windows_user/AppData/Local/Packages/Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe/LocalState/settings.json"
-    "/mnt/c/Users/$windows_user/AppData/Local/Microsoft/Windows Terminal/settings.json"
-  )
-
-  for path in "${paths[@]}"; do
-    if [[ -f "$path" ]]; then
-      wt_settings="$path"
-      break
-    fi
-  done
-
-  [[ -z "$wt_settings" ]] && return 1
+  local wt_settings
+  wt_settings=$(windows_terminal_settings_file) || return 1
 
   # Read theme JSON and merge into settings
   local theme_json

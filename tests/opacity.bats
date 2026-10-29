@@ -16,9 +16,8 @@ setup() {
   isolate_theme_state
   source_theme_libs
 
-  stub_command tmux 1    # "no server running", so nothing is sourced into one
-  stub_command pgrep 1   # waybar not running, so it is never restarted
-  stub_command cmd.exe 1 # not WSL, so the Windows Terminal write is skipped
+  stub_command tmux 1  # "no server running", so nothing is sourced into one
+  stub_command pgrep 1 # waybar not running, so it is never restarted
 }
 
 @test "opacity reads as fully opaque before anything is set" {
@@ -103,9 +102,9 @@ setup() {
 }
 
 @test "set_opacity leaves windows-terminal out of the applied list off WSL" {
-  # The list names what actually changed. _apply_windows_terminal_opacity needs a
-  # Windows user from cmd.exe and a settings.json under /mnt/c, so it reports
-  # failure everywhere else and the caller drops it.
+  # The list names what actually changed. The sandbox's Windows users directory
+  # holds no settings.json, so _apply_windows_terminal_opacity fails and the
+  # caller drops it.
   run set_opacity 85
   assert_output --partial "ghostty"
   assert_output --partial "kitty"

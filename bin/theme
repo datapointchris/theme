@@ -527,6 +527,12 @@ schedule_usage_rules() {
     systemctl --user import-environment WAYLAND_DISPLAY DISPLAY HYPRLAND_INSTANCE_SIGNATURE
 
   theme schedule status reports a check blocked without them.
+
+  On WSL the timer needs systemd=true under [boot] in /etc/wsl.conf. Away means
+  no keystroke in any of your WSL terminals for $idle_minutes minutes, or none open.
+  A systemd unit there cannot start Windows programs, so a scheduled change
+  leaves the Windows wallpaper as it is. WSL stops an idle distro, and the timer
+  with it, once its last terminal closes.
 EOF
 }
 
