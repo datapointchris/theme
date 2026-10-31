@@ -6,7 +6,8 @@
 # to parse and rewrite a file the user also edits.
 #
 # The reload paths are stubbed. Unstubbed, set_opacity reaches the developer's
-# live tmux server and waybar — a test may not restyle the machine it runs on.
+# live tmux server, waybar, ghostty and kitty — a test may not restyle the
+# machine it runs on.
 
 load "$HOME/.local/lib/bats-support/load.bash"
 load "$HOME/.local/lib/bats-assert/load.bash"
@@ -17,7 +18,8 @@ setup() {
   source_theme_libs
 
   stub_command tmux 1  # "no server running", so nothing is sourced into one
-  stub_command pgrep 1 # waybar not running, so it is never restarted
+  stub_command pgrep 1 # waybar and ghostty not running, so neither is restarted or reloaded
+  stub_command pkill 0 # kitty's reload signal goes nowhere
 }
 
 @test "opacity reads as fully opaque before anything is set" {

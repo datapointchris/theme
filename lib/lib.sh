@@ -820,11 +820,12 @@ get_ghostty_opacity() {
   fi
 }
 
-# Set ghostty opacity
+# Open windows keep their opacity until ghostty reloads. On macOS only a full restart applies it.
 set_ghostty_opacity() {
   local opacity="$1"
   mkdir -p "$GHOSTTY_OPACITY_DIR"
   echo "background-opacity = $opacity" >"$GHOSTTY_OPACITY_FILE"
+  reload_ghostty || true
 }
 
 # Get current opacity from kitty opacity config
@@ -836,11 +837,12 @@ get_kitty_opacity() {
   fi
 }
 
-# Set kitty opacity
+# A reload applies it only where kitty.conf set dynamic_background_opacity before kitty started.
 set_kitty_opacity() {
   local opacity="$1"
   mkdir -p "$KITTY_OPACITY_DIR"
   echo "background_opacity $opacity" >"$KITTY_OPACITY_FILE"
+  reload_kitty || true
 }
 
 # Get current opacity from windows terminal opacity config

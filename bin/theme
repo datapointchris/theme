@@ -394,6 +394,15 @@ EOF
   fi
 }
 
+# Ghostty on macOS reads background-opacity only at launch, so a reload cannot reach it.
+print_opacity_result() {
+  echo "Opacity: $1"
+  if [[ "$(detect_platform)" == "macos" ]] && pgrep -x ghostty &>/dev/null; then
+    echo ""
+    echo "Restart Ghostty to see the change."
+  fi
+}
+
 opacity_usage() {
   if command -v print_section &>/dev/null; then
     print_section "Opacity Management" "yellow"
@@ -407,7 +416,7 @@ opacity_usage() {
 EOF
 
     print_section "Notes" "blue"
-    echo "  Restart terminal to see changes."
+    echo "  Open terminals change at once. Ghostty on macOS needs a restart."
     echo "  Value 100 = fully opaque, 0 = fully transparent."
 
     print_section "Examples" "yellow"
@@ -430,7 +439,7 @@ Commands
 
 Notes
 -----
-  Restart terminal to see changes.
+  Open terminals change at once. Ghostty on macOS needs a restart.
   Value 100 = fully opaque, 0 = fully transparent.
 
 Examples
@@ -1777,16 +1786,12 @@ main() {
           ;;
         up)
           if result=$(change_opacity 0.05); then
-            echo "Opacity: $result"
-            echo ""
-            echo "Restart terminal to see changes."
+            print_opacity_result "$result"
           fi
           ;;
         down)
           if result=$(change_opacity -0.05); then
-            echo "Opacity: $result"
-            echo ""
-            echo "Restart terminal to see changes."
+            print_opacity_result "$result"
           fi
           ;;
         set)
@@ -1796,9 +1801,7 @@ main() {
             exit 1
           fi
           if result=$(set_opacity "$3"); then
-            echo "Opacity: $result"
-            echo ""
-            echo "Restart terminal to see changes."
+            print_opacity_result "$result"
           fi
           ;;
         *)
