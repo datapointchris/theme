@@ -80,9 +80,9 @@ theme_id=$(yq '.meta.id // "custom"' "$theme_file" 2>/dev/null || echo "custom")
 
 # gowall's -t takes a path to a JSON theme as well as a name from its config, so
 # each palette is written to the cache instead of appended to
-# ~/.config/gowall/config.yml. That file is a tracked dotfile, so appending to it
-# meant every theme apply dirtied the dotfiles repo, and entries accumulated
-# forever — it was still carrying themes deleted months ago.
+# ~/.config/gowall/config.yml. That file is often tracked in a config repo, so
+# appending to it would dirty that repo on every apply, and its entries would
+# accumulate with no owner to remove the ones for deleted themes.
 palette_dir="$HOME/.cache/theme/gowall"
 mkdir -p "$palette_dir"
 

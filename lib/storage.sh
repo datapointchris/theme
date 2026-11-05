@@ -11,7 +11,7 @@ _THEME_STORAGE_SOURCED=1
 
 _STORAGE_APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-# Dev mode: use THEME_ENV=development (set via direnv in ~/tools/theme/.envrc)
+# Dev mode: THEME_ENV=development, which the checkout's .envrc sets through direnv
 if [[ "${THEME_ENV:-}" == "development" ]]; then
   THEME_STATE_DIR="$_STORAGE_APP_DIR/.dev-data"
 else
@@ -54,8 +54,8 @@ JQ
     # "platform-host" format (strip a known platform prefix) and the current bare
     # host format alike, lowercasing so "Macmini" and "macmini" merge. When the
     # host was recorded as "unknown" (hostname detection failed), fall back to the
-    # platform — the Arch box is the only archlinux machine, so its "unknown"
-    # records merge with its named ones instead of collapsing to a shared bucket.
+    # platform, so a machine that is the only one on its platform has its
+    # "unknown" records merge with its named ones instead of a shared bucket.
     def normalize_machine:
       ascii_downcase as $m
       | if ($m | test("^(macos|archlinux|arch|wsl|linux|unknown)-")) then

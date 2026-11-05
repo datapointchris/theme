@@ -1,15 +1,11 @@
 #!/usr/bin/env bats
 # Platform detection, and the label contract between detection and dispatch.
 #
-# This file exists because the two halves disagreed. lib.sh and storage.sh each
-# defined detect_platform; storage.sh emitted "arch" for the Arch box and lib.sh
-# emitted "archlinux", so whichever was sourced last decided what every platform
-# comparison in lib.sh was compared against. bin/theme sourced storage.sh second
-# and took "arch", while scripts/test-all-themes.sh sources only lib.sh and took
-# the other — and on Arch that meant apply_theme_to_apps silently skipped
-# Hyprland, Waybar, Hyprlock, Dunst, Rofi, ghostty, kitty and the wallpaper, with
-# no error and nothing in the skipped list. macOS returns "macos" from both
-# definitions, which is why it survived for months on the machine it was used on.
+# Every platform comparison in lib.sh compares against detect_platform's label.
+# When detection and dispatch disagree on a spelling, apply_theme_to_apps on
+# Arch silently skips Hyprland, Waybar, Hyprlock, Dunst, Rofi, ghostty, kitty and
+# the wallpaper, with no error and nothing in the skipped list. macOS gives
+# "macos" under every spelling, so only a test on the label catches it there.
 
 load "$HOME/.local/lib/bats-support/load.bash"
 load "$HOME/.local/lib/bats-assert/load.bash"
@@ -30,13 +26,10 @@ setup() {
 }
 
 @test "a drifted PLATFORM label is canonicalized before dispatch" {
-  # The other half of the same bug, and the half that survived the first fix.
-  # Agreeing on "arch" inside this repo settled nothing, because the value does
-  # not originate here: dotfiles writes `export PLATFORM=archlinux` into ~/.env
-  # from the archlinux-personal-workstation manifest, and that short-circuits
-  # detection on every real Arch shell. Passing it through raw made every
-  # `== "arch"` guard in lib.sh false while the unguarded apps kept applying, so
-  # the machine came out half-themed with an empty skipped list.
+  # The label need not originate here: an environment may export
+  # PLATFORM=archlinux, which short-circuits detection. Passed through raw, it
+  # makes every `== "arch"` guard in lib.sh false while the unguarded apps keep
+  # applying, so the machine comes out half-themed with an empty skipped list.
   PLATFORM=archlinux run detect_platform
   assert_success
   assert_output "arch"
@@ -131,8 +124,8 @@ setup() {
 }
 
 @test "the machine id falls back to unknown when the hostname is empty" {
-  # Not hypothetical: the Arch box recorded an empty hostname for a while, which
-  # is why the history normalizer has an "unknown" branch to merge back.
+  # A machine can report an empty hostname, which is why the history normalizer
+  # has an "unknown" branch to merge back.
   stub_command_with_output uname ""
   run _storage_get_machine_id
   assert_success

@@ -100,7 +100,7 @@ setup() {
   # Four spellings of two machines. The legacy format was platform-host, so the
   # platform prefix is stripped; case is folded because the hostname was recorded
   # as both Macmini and macmini; and a host recorded as empty or "unknown" falls
-  # back to the platform, since the Arch box is the only Arch machine.
+  # back to the platform, which here has one machine on it.
   add_history_record "2025-01-01T00:00:00Z" gruvbox apply "" macos "macos-Macmini"
   add_history_record "2025-01-02T00:00:00Z" gruvbox apply "" macos "Macmini"
   add_history_record "2025-01-03T00:00:00Z" gruvbox apply "" arch "arch-"

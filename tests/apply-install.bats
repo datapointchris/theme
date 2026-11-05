@@ -7,8 +7,8 @@
 #
 # The pointer keeps its name because an app that can only `source` a path needs one
 # that does not move, and because the apps resolving a theme *by name* read their
-# config from a symlink into the dotfiles repo — writing the name there would write
-# through into that checkout, which is how the gowall palettes dirtied it for months.
+# config from a symlink into another repo — writing the name there would write
+# through into that checkout and dirty it on every apply.
 #
 # The install half is testable even though the apply path as a whole is not: what
 # reaches the live machine is the *reload* (hyprctl, pkill borders, tmux
@@ -124,8 +124,8 @@ give_artifact() {
 }
 
 @test "a symlinked theme.toml is never written through" {
-  # That path was dotfiles-managed until dotfiles stopped shipping it. A machine on
-  # an older checkout still has the link, and writing through it edits the repo.
+  # A theme.toml that is a link belongs to a config repo, and writing through it
+  # edits that repo.
   give_artifact alpha-dark flavor.toml
   mkdir -p "$HOME/.config/yazi"
   echo "owned elsewhere" >"$BATS_TEST_TMPDIR/managed.toml"

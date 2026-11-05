@@ -16,8 +16,6 @@ THEME_APP_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 # Source formatting library for colorized help
 if [[ -f "$HOME/.local/shell/formatting.sh" ]]; then
   source "$HOME/.local/shell/formatting.sh"
-elif [[ -f "$HOME/dotfiles/platforms/common/.local/shell/formatting.sh" ]]; then
-  source "$HOME/dotfiles/platforms/common/.local/shell/formatting.sh"
 fi
 
 source "$THEME_APP_DIR/lib/lib.sh"

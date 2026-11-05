@@ -95,7 +95,7 @@ setup() {
   # Must not shortcut on `[[ -d "$THEMES_DIR/$input" ]]`: macOS is
   # case-insensitive, so that test says yes for any spelling and the user's
   # spelling then reaches the state file and the gist-synced history under an id
-  # the Arch box cannot resolve. Passes trivially on Linux; on macOS it is the
+  # a case-sensitive machine cannot resolve. Passes trivially on Linux; on macOS it is the
   # whole reason resolution matches against the listing instead.
   run theme_name_to_canonical oceanicnext
   assert_success

@@ -69,7 +69,7 @@ done
 # doing one job, which flattens the spacing so proximity carries no information
 # and the line only looks busier. Gestalt proximity groups on relative distance,
 # so the gap between entries being wider than the gap inside a name is the whole
-# mechanism — see docs/architecture/tmux-sessions.md in dotfiles.
+# mechanism.
 SESSION_GAP="  "
 
 # Conditionals wrap whole #[...] blocks rather than sitting inside one (no

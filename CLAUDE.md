@@ -6,7 +6,7 @@ Unified theme generation that creates consistent color configurations across ter
 desktop applications from a single `theme.yml` per theme. Each theme in `themes/` provides app
 configs that match a corresponding Neovim colorscheme.
 
-Dev source is `~/tools/theme`. The installed copy everything actually reads is
+Dev source is this checkout. The installed copy everything actually reads is
 `~/.local/share/theme` (see Neovim Integration for why that distinction bites). State and
 generated data live at:
 
@@ -52,8 +52,8 @@ exception, because a flavor is a directory rather than a file.
 
 Both halves are load-bearing. The pointer keeps the name `current` because the apps that can only
 `source`/`@import`/`include` a **path** need one that does not move. The apps that resolve a theme
-*by name* (ghostty, btop, abtop, bat, aerc, rofi) read their config from a symlink into the dotfiles
-repo, so writing the name there would write through the link into that checkout. The payload
+*by name* (ghostty, btop, abtop, bat, aerc, rofi) often read their config from a symlink into
+another repo, so writing the name there would write through the link into that checkout. The payload
 carries the id so a machine says which theme it is running, every applied theme stays installed
 beside the others, and an exported config is self-describing.
 
@@ -74,7 +74,7 @@ would otherwise link *inside*.
 
 ## Creating a New Theme
 
-Run from the repo root (`~/tools/theme`). Writing `theme.yml` is the whole job; every app config
+Run from the repo root. Writing `theme.yml` is the whole job; every app config
 is derived from it. `themes/*/theme.yml` shows the format.
 
 1. **Write `themes/{id}/theme.yml`** — meta, base16, ansi, special, extended. Mapping a palette
@@ -251,7 +251,8 @@ id with hyphens replaced by underscores.
 
 ## Neovim Integration
 
-Lives in `~/dotfiles/configs/common/.config/nvim/lua/plugins/colorscheme-manager.lua`.
+Lives in the Neovim config, as a colorscheme manager plugin spec
+(`lua/plugins/colorscheme-manager.lua`).
 
 **The coupling is two state files and nothing else.** This tool never knows
 Neovim exists — it writes state, and Neovim pulls:

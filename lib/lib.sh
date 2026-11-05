@@ -8,13 +8,11 @@ THEME_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 THEME_APP_DIR="$(cd "$THEME_LIB_DIR/.." && pwd)"
 
 # Sourced here rather than left to the caller, so this file is self-sufficient
-# and there is one definition of detect_platform in play. Both files used to
-# define it and they disagreed about Arch's label — storage.sh emits "arch",
-# this file emitted "archlinux" — so whichever was sourced last decided what
-# every platform comparison below compared against. bin/theme took storage.sh's
-# answer while scripts/test-all-themes.sh, which sources only this file, took
-# the other, and on Arch that silently skipped Hyprland, Waybar, ghostty, kitty
-# and the wallpaper. storage.sh also owns THEME_STATE_DIR and the history paths.
+# and there is one definition of detect_platform in play. Every platform
+# comparison below compares against its label, and a second definition that
+# spelled a platform differently would decide the label by source order. On Arch
+# a mismatch silently skips Hyprland, Waybar, ghostty, kitty and the wallpaper.
+# storage.sh also owns THEME_STATE_DIR and the history paths.
 source "$THEME_LIB_DIR/storage.sh"
 source "$THEME_LIB_DIR/vivaldi-preferences.sh"
 
@@ -121,9 +119,10 @@ theme_name_to_canonical() {
   # Exact match against the listing, not `[[ -d "$THEMES_DIR/$input" ]]`. macOS
   # is case-insensitive, so the -d test accepted "Gruvbox-Dark-Hard" as already
   # canonical and returned the user's spelling — which then reached the state
-  # file and history.jsonl. History is gist-synced, so the Arch box received
-  # entries under an id it cannot resolve, and stats split one theme across two
-  # names. That is the damage normalize_theme in storage.sh exists to undo.
+  # file and history.jsonl. History is synced between machines, so a
+  # case-sensitive machine receives entries under an id it cannot resolve, and
+  # stats split one theme across two names. normalize_theme in storage.sh undoes
+  # that damage in existing history.
   for dir in "$THEMES_DIR"/*/; do
     local exact_name
     exact_name=$(basename "$dir")
@@ -282,10 +281,9 @@ get_library_path() {
 #
 # `current` stays the name every consumer holds, for two reasons that pull the same
 # way. An app that can only `source` or `@import` a path needs one that does not
-# move. And an app that resolves a theme *by name* reads its config from a symlink
-# into the dotfiles repo, so writing the name there would write through the link
-# into the checkout — which is exactly how the gowall palettes dirtied dotfiles for
-# months. The link reconciles both: the payload carries the theme id, so a machine
+# move. And an app that resolves a theme *by name* often reads its config from a
+# symlink into another repo, so writing the name there would write through the
+# link and dirty that repo on every apply. The link reconciles both: the payload carries the theme id, so a machine
 # says which theme it is running, and every theme ever applied stays beside the
 # others instead of overwriting one file forever.
 #
@@ -555,9 +553,9 @@ apply_yazi() {
   # with no theme.toml falls back to yazi's built-in theme and starts clean, which
   # is what makes a fresh install work.
   #
-  # Never through a symlink: that path was dotfiles-managed until dotfiles stopped
-  # shipping it, and writing through one is how the gowall palettes dirtied that
-  # repo for months. An old checkout still declaring it keeps its own file.
+  # Never through a symlink: a theme.toml that is a link points into a config
+  # repo that ships its own, and writing through it would dirty that repo. That
+  # repo's file is left as it is.
   if [[ ! -L "$yazi_dir/theme.toml" ]]; then
     printf '[flavor]\ndark = "current"\nlight = "current"\n' >"$yazi_dir/theme.toml" || return 1
   fi
@@ -988,11 +986,11 @@ BACKGROUND_CACHE_DIR="${BACKGROUND_CACHE_DIR:-$HOME/.cache/theme/backgrounds}"
 
 # Where the wallpaper handed to the compositor is rendered. Regenerable and
 # deleted a minute later — the timestamp in the name exists only to defeat
-# macOS's wallpaper cache — so it is cache, not data. It used to be written to
-# ~/.local/share/theme, which is the installed git checkout, so every apply left
-# an untracked PNG in that repo's `git status`. The stable
-# ~/.local/share/theme/background.png is deliberate and stays: hyprpaper.conf in
-# dotfiles names that exact path for its restart fallback.
+# macOS's wallpaper cache — so it is cache, not data. It stays out of
+# ~/.local/share/theme, the installed git checkout, where each render would be
+# an untracked file in that checkout's `git status`. The stable
+# ~/.local/share/theme/background.png is the one exception: a hyprpaper.conf can
+# name that exact path as its restart fallback.
 BACKGROUND_RENDER_DIR="${BACKGROUND_RENDER_DIR:-$HOME/.cache/theme/current}"
 
 # Background sources config file (path references, not copies)
