@@ -895,14 +895,16 @@ apply_theme() {
   local trigger="${2:-manual}"
 
   if [[ -z "$theme_input" ]]; then
-    echo "Error: Theme name required"
-    echo "Usage: theme apply <theme-name>"
-    echo ""
-    echo "Available themes ($(count_themes)):"
-    list_themes
-    echo ""
-    echo "Pick one with a preview: theme change"
-    exit 1
+    {
+      echo "Error: Theme name required"
+      echo "Usage: theme apply <theme-name>"
+      echo ""
+      echo "Available themes ($(count_themes)):"
+      list_themes
+      echo ""
+      echo "Pick one with a preview: theme change"
+    } >&2
+    exit 2
   fi
 
   local canonical
@@ -913,10 +915,14 @@ apply_theme() {
   lib_path=$(get_library_path "$canonical")
 
   if [[ -z "$lib_path" ]]; then
-    echo "Error: Theme not found: $theme_input"
-    echo ""
-    echo "Available themes:"
-    list_themes_with_status
+    {
+      echo "Error: Theme not found: $theme_input"
+      echo ""
+      echo "Available themes:"
+      list_themes_with_status
+      echo ""
+      echo "Apply one by its id: theme apply <theme-id>"
+    } >&2
     exit 1
   fi
 
@@ -963,7 +969,8 @@ apply_random() {
   mapfile -t candidates < <(list_themes_not_rejected)
 
   if [[ ${#candidates[@]} -eq 0 ]]; then
-    echo "Error: No themes found"
+    echo "Error: No themes found that are not rejected" >&2
+    echo "See what is rejected with: theme list --status rejected, and restore one with: theme unreject" >&2
     exit 1
   fi
 
@@ -985,7 +992,8 @@ apply_random() {
   random_theme=$(printf '%s\n' "${candidates[@]}" | compute_theme_weights | weighted_random_choice)
 
   if [[ -z "$random_theme" ]]; then
-    echo "Error: Could not select a theme"
+    echo "Error: Could not select a theme" >&2
+    echo "Apply one directly: theme apply <theme-id>, with ids from theme list" >&2
     exit 1
   fi
 
@@ -999,7 +1007,7 @@ apply_random() {
 
 change_theme() {
   if ! command -v fzf &>/dev/null; then
-    echo "Error: fzf not found. Install with: brew install fzf"
+    echo "Error: fzf not found. Install it with your package manager, for example: brew install fzf" >&2
     exit 1
   fi
 
@@ -1053,7 +1061,8 @@ mark_liked() {
   theme=$(get_current_theme)
 
   if [[ -z "$theme" ]]; then
-    echo "Error: No theme currently applied"
+    echo "Error: No theme currently applied" >&2
+    echo "Apply one first: theme apply <theme-id>, or theme random" >&2
     exit 1
   fi
 
@@ -1072,7 +1081,8 @@ mark_disliked() {
   theme=$(get_current_theme)
 
   if [[ -z "$theme" ]]; then
-    echo "Error: No theme currently applied"
+    echo "Error: No theme currently applied" >&2
+    echo "Apply one first: theme apply <theme-id>, or theme random" >&2
     exit 1
   fi
 
@@ -1091,14 +1101,15 @@ add_note() {
   theme=$(get_current_theme)
 
   if [[ -z "$theme" ]]; then
-    echo "Error: No theme currently applied"
+    echo "Error: No theme currently applied" >&2
+    echo "Apply one first: theme apply <theme-id>, or theme random" >&2
     exit 1
   fi
 
   if [[ -z "$message" ]]; then
-    echo "Error: Note message required"
-    echo "Usage: theme note <message>"
-    exit 1
+    echo "Error: Note message required" >&2
+    echo "Usage: theme note <message>" >&2
+    exit 2
   fi
 
   local display_info
@@ -1116,14 +1127,15 @@ mark_rejected() {
   theme=$(get_current_theme)
 
   if [[ -z "$theme" ]]; then
-    echo "Error: No theme currently applied"
+    echo "Error: No theme currently applied" >&2
+    echo "Apply one first: theme apply <theme-id>, or theme random" >&2
     exit 1
   fi
 
   if [[ -z "$reason" ]]; then
-    echo "Error: Rejection reason required"
-    echo "Usage: theme reject <message>"
-    exit 1
+    echo "Error: Rejection reason required" >&2
+    echo "Usage: theme reject <message>" >&2
+    exit 2
   fi
 
   local display_info
@@ -1139,7 +1151,7 @@ mark_rejected() {
 
 unreject_theme_interactive() {
   if ! command -v fzf &>/dev/null; then
-    echo "Error: fzf not found. Install with: brew install fzf"
+    echo "Error: fzf not found. Install it with your package manager, for example: brew install fzf" >&2
     exit 1
   fi
 
@@ -1457,8 +1469,8 @@ show_info() {
   # If no argument, show fzf picker
   if [[ -z "$theme_input" ]]; then
     if ! command -v fzf &>/dev/null; then
-      echo "Error: fzf not found. Install with: brew install fzf"
-      echo "Or provide a theme name: theme info <theme-name>"
+      echo "Error: fzf not found. Install it with your package manager, for example: brew install fzf" >&2
+      echo "Or provide a theme name: theme info <theme-name>" >&2
       exit 1
     fi
 
@@ -1512,12 +1524,14 @@ PREVIEW_EOF
   theme_data=$(get_theme_by_name "$canonical")
 
   if [[ -z "$theme_data" ]] || [[ "$theme_data" == "null" ]]; then
-    echo "Theme not found: $theme_input"
-    echo ""
-    echo "Available themes ($(count_themes)):"
-    list_themes
-    echo ""
-    echo "Pick one with a preview: theme change"
+    {
+      echo "Error: Theme not found: $theme_input"
+      echo ""
+      echo "Available themes ($(count_themes)):"
+      list_themes
+      echo ""
+      echo "Pick one with a preview: theme change"
+    } >&2
     exit 1
   fi
 
@@ -1594,7 +1608,7 @@ generate_all_backgrounds() {
   echo ""
 
   if ! command -v convert &>/dev/null; then
-    echo "Error: ImageMagick not found. Install with: brew install imagemagick"
+    echo "Error: ImageMagick not found. Install it with your package manager, for example: brew install imagemagick" >&2
     exit 1
   fi
 
@@ -2040,6 +2054,7 @@ main() {
 
           if [[ -z "$background_id" ]]; then
             echo "Error: No background currently set" >&2
+            echo "Set one with: theme background rotate" >&2
             exit 1
           fi
 
@@ -2064,6 +2079,7 @@ main() {
 
           if [[ -z "$background_id" ]]; then
             echo "Error: No background currently set" >&2
+            echo "Set one with: theme background rotate" >&2
             exit 1
           fi
 
@@ -2088,6 +2104,7 @@ main() {
 
           if [[ -z "$background_id" ]]; then
             echo "Error: No background currently set" >&2
+            echo "Set one with: theme background rotate" >&2
             exit 1
           fi
 
