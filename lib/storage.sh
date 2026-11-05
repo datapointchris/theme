@@ -19,6 +19,26 @@ else
 fi
 THEME_HISTORY_FILE="$THEME_STATE_DIR/history.jsonl"
 
+# Every other spelling of a platform label, mapped to the one every platform
+# guard in lib.sh compares against. A PLATFORM exported by the environment
+# short-circuits detect_platform, and an environment may spell Arch "archlinux".
+# Returned raw, that label makes each `== "arch"` guard false, and `theme apply`
+# skips ghostty, kitty, Hyprland, Waybar and the wallpaper with no error while
+# the unguarded apps (tmux, btop, bat) apply: a half-themed machine that looks
+# like a sync failure. History rows carry the same spellings, so the jq
+# normalizer reads this table too.
+declare -gA THEME_PLATFORM_ALIASES=(
+  [archlinux]=arch
+)
+
+_jq_platform_aliases() {
+  local alias pairs=""
+  for alias in "${!THEME_PLATFORM_ALIASES[@]}"; do
+    pairs+="${pairs:+,}\"$alias\":\"${THEME_PLATFORM_ALIASES[$alias]}\""
+  done
+  echo "{$pairs}"
+}
+
 _jq_normalize_history() {
   cat <<'JQ'
     def normalize_theme:
@@ -27,12 +47,9 @@ _jq_normalize_history() {
       elif . == "Retrobox" then "retrobox"
       else .
       end;
-    # The platform label drifted for the Arch box (arch -> archlinux). Collapse to
-    # "arch", which is what detect_platform emits going forward. Same mapping as
-    # _canonicalize_platform below, restated because jq cannot call into shell —
-    # change one and change the other.
-    def normalize_platform:
-      if . == "archlinux" then "arch" else . end;
+JQ
+  printf '    def normalize_platform: (%s)[.] // .;\n' "$(_jq_platform_aliases)"
+  cat <<'JQ'
     # Canonicalize .machine to one label per physical machine. Handles the legacy
     # "platform-host" format (strip a known platform prefix) and the current bare
     # host format alike, lowercasing so "Macmini" and "macmini" merge. When the
@@ -54,19 +71,14 @@ _jq_normalize_history() {
 JQ
 }
 
-# The vocabulary every platform guard in lib.sh compares against. dotfiles owns
-# the other end of this contract and spells the Arch box "archlinux" — it exports
-# PLATFORM from ~/.env, which short-circuits the detection below, so that label
-# arrives here on every real Arch shell. Returning it raw made each `== "arch"`
-# guard false and `theme apply` skipped ghostty, kitty, Hyprland, Waybar and the
-# wallpaper with no error, while the unguarded apps (tmux, btop, bat) applied —
-# a half-themed machine that looks like a sync failure. Normalize at the single
-# point that produces the label rather than teaching two repos one vocabulary.
+# Normalize at the single point that produces the label, so no caller has to
+# know an environment's spelling.
 _canonicalize_platform() {
-  case "$1" in
-    archlinux) echo "arch" ;;
-    *) echo "$1" ;;
-  esac
+  local label="$1"
+  if [[ -n "$label" && -n "${THEME_PLATFORM_ALIASES[$label]:-}" ]]; then
+    label="${THEME_PLATFORM_ALIASES[$label]}"
+  fi
+  echo "$label"
 }
 
 detect_platform() {

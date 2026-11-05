@@ -96,7 +96,6 @@ parse_default_profile() {
 
   local current_section=""
   local current_path=""
-  local current_is_relative=""
   local current_is_default=""
 
   while IFS= read -r line || [[ -n "$line" ]]; do
@@ -118,7 +117,6 @@ parse_default_profile() {
       # shellcheck disable=SC2034  # current_section tracked for context
       current_section="${BASH_REMATCH[1]}"
       current_path=""
-      current_is_relative=""
       current_is_default=""
       continue
     fi
@@ -128,10 +126,8 @@ parse_default_profile() {
       local key="${BASH_REMATCH[1]}"
       local value="${BASH_REMATCH[2]}"
 
-      # shellcheck disable=SC2034  # current_is_relative may be used in future
       case "$key" in
         Path) current_path="$value" ;;
-        IsRelative) current_is_relative="$value" ;;
         Default) current_is_default="$value" ;;
       esac
     fi
