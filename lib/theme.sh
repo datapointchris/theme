@@ -233,11 +233,10 @@ load_colors() {
   load_theme "$1"
 }
 
-# The syntax roles every terminal code renderer draws with.
+# The syntax roles bat draws with.
 #
-# bat and glow both highlight code, and the same snippet has to read the same in
-# either, so the fallbacks live here once rather than in each generator. They
-# prefer extended.syntax_* from theme.yml, which carries the Neovim colors.
+# A snippet has to read the same in bat as in Neovim. These prefer
+# extended.syntax_* from theme.yml, which carries the Neovim colors.
 # Call after `eval "$(load_colors ...)"`, whose names the fallbacks read.
 resolve_syntax_colors() {
   SYNTAX_COMMENT="${EXTENDED_SYNTAX_COMMENT:-$BASE03}"

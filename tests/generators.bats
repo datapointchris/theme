@@ -397,14 +397,3 @@ count_theme_artifacts() {
       || fail "generate-all.sh produces '$artifact', which THEME_APP_ARTIFACTS does not list"
   done
 }
-
-@test "every glow color is a theme hex, never an xterm-256 index" {
-  # glamour's built-in styles use indices 16-255, which no terminal palette
-  # reaches, so glow looked the same under every theme. An empty value is the
-  # other failure: glamour reads it as "no color" and falls back without a word.
-  run jq -r '.. | objects | (.color?, .background_color?) | select(. != null)
-             | select(test("^#[0-9a-fA-F]{6}$") | not) | "\(input_filename): \(.)"' \
-    "$THEME_ROOT"/themes/*/glow.json
-  assert_success
-  assert_output ""
-}

@@ -378,7 +378,3 @@ CLI verbs. These generators behave unlike the rest:
   - No enterprise policy maps to a `vivaldi.*` pref, so this prints `[]`:
     `jq '[.policies[].path | select(startswith("vivaldi"))]' /opt/vivaldi/resources/vivaldi/policy_prefs.json`.
     `BrowserThemeColor` tints Chromium's native toolbar, which Vivaldi does not draw with.
-- `glow.sh` emits a glamour style whose code blocks reach the screen quantized to xterm-256.
-  glow never sets glamour's chroma formatter, so only prose keeps true color. `apply_glow` writes
-  `glow.yml`'s `style` as an absolute path, because glamour expands neither `~` nor `$HOME` and
-  glow exits 1 when the file is missing.
