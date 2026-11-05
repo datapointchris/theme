@@ -87,18 +87,17 @@ count_listed() {
 
 @test "a state is not a verb" {
   run "$THEME_ROOT/bin/theme" rejected
-  assert_failure
-  assert_output --partial "Commands"
+  assert_failure 2
 }
 
 @test "--status refuses a value outside the enum" {
   run "$THEME_ROOT/bin/theme" list --status closed
-  assert_failure
+  assert_failure 2
   assert_output --partial "unknown status: closed"
 }
 
 @test "list refuses an option it does not have" {
   run "$THEME_ROOT/bin/theme" list --all
-  assert_failure
+  assert_failure 2
   assert_output --partial "unknown option: --all"
 }

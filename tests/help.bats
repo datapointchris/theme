@@ -100,6 +100,11 @@ assert_no_history() {
   assert_output --partial "Theme Management"
 }
 
+@test "bare theme is a request for help, not a usage error" {
+  run "$THEME_ROOT/bin/theme"
+  assert_success
+}
+
 @test "theme help still renders both sections and the examples" {
   run "$THEME_ROOT/bin/theme" help
   assert_success

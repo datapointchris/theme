@@ -552,6 +552,9 @@ schedule_status() {
     quiet=$((now - last_seen))
     if [[ "$quiet" -gt "$window" ]]; then
       _schedule_explain_quiet "$quiet" "$((now - window))"
+      # A timer that is on but records no check needs a person, so this is the
+      # check verbs' issue code rather than a failure of the status command.
+      return 3
     fi
   fi
 

@@ -59,6 +59,15 @@ theme info [theme]            # Browse themes and view detailed history
 theme verify                  # Check the theme system is healthy
 ```
 
+### Exit codes
+
+| Code | Meaning |
+| --- | --- |
+| 0 | Success. For `verify` and `schedule status`, nothing needs attention |
+| 1 | The command ran and failed |
+| 2 | Usage error: an unknown command, a bad option, or a missing argument |
+| 3 | `verify` found an error, or `schedule status` found a timer that is on but records no check |
+
 ### Rating Themes
 
 ```bash
