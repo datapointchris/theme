@@ -85,9 +85,9 @@ is derived from it. `themes/*/theme.yml` shows the format.
    only thing guaranteed to leave a new theme with the same file set as every existing one:
 
    ```bash
-   lib/generate-all.sh --themes {id}      # one theme, every generator
-   lib/generate-all.sh --generators bat   # one generator, every theme
-   lib/generate-all.sh --help             # lists the generators it knows about
+   task generate -- --themes {id}         # one theme, every generator
+   task generate -- --generators bat      # one generator, every theme
+   task generate -- --help                # lists the generators it knows about
    ```
 
    A generator that is not in that script's `GENERATOR_OUTPUT` map is invisible to it, so adding
@@ -322,7 +322,8 @@ When it flags something, read the upstream palette, fix `theme.yml`, then run
 
 ## Tests
 
-`bats tests/` runs the suite; the pre-commit hook and CI run `tests/*.bats` flat.
+`task test` runs the suite (`bats tests/`); the pre-commit hook and CI run `tests/*.bats` flat.
+`task --list` shows the rest: `setup`, `lint`, `format`, `install` and `generate`.
 `tests/helpers.bash` is shared.
 
 **Every test must isolate before sourcing anything.** `isolate_theme_state`

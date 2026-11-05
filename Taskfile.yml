@@ -1,0 +1,54 @@
+version: '3'
+
+tasks:
+  default:
+    desc: List the tasks
+    silent: true
+    cmds:
+      - task --list
+
+  setup:
+    desc: Check the tools the suite needs, then install the git hooks
+    preconditions:
+      - sh: command -v bats
+        msg: bats is not installed; install bats-core with your package manager
+      - sh: test -f "$HOME/.local/lib/bats-support/load.bash" && test -f "$HOME/.local/lib/bats-assert/load.bash"
+        msg: bats-support and bats-assert must be cloned into ~/.local/lib
+      - sh: command -v jq
+        msg: jq is not installed
+      - sh: command -v yq
+        msg: yq is not installed
+      - sh: command -v pre-commit
+        msg: pre-commit is not installed
+    cmds:
+      - pre-commit install --hook-type pre-commit --hook-type commit-msg
+
+  test:
+    desc: Run the bats suite
+    cmds:
+      - bats tests/
+
+  lint:
+    desc: Run the read-only checks, shellcheck and codespell, over every file
+    cmds:
+      - pre-commit run shellcheck --all-files
+      - pre-commit run codespell --all-files
+
+  format:
+    desc: Rewrite files with shfmt, markdownlint's fixes and the whitespace fixers
+    cmds:
+      - pre-commit run shfmt --all-files
+      - pre-commit run markdownlint --all-files
+      - pre-commit run end-of-file-fixer --all-files
+      - pre-commit run trailing-whitespace --all-files
+
+  install:
+    desc: Link this checkout's bin/theme where the installer links the release
+    cmds:
+      - mkdir -p "${THEME_BIN_DIR:-$HOME/.local/bin}"
+      - ln -sf "{{.ROOT_DIR}}/bin/theme" "${THEME_BIN_DIR:-$HOME/.local/bin}/theme"
+
+  generate:
+    desc: Regenerate app configs; arguments after -- go to lib/generate-all.sh
+    cmds:
+      - lib/generate-all.sh {{.CLI_ARGS}}
