@@ -10,11 +10,11 @@ _THEME_SCHEDULE_SOURCED=1
 # timer on the desktop can keep its changes between them.
 THEME_SCHEDULE_TURN_HOURS=4
 THEME_SCHEDULE_FIRST_TURN_HOUR=2
-# A turn caught up later would land at the user's return, beside every change that waited too.
+# A turn not taken within this window is skipped, so turns missed while away never pile up on return.
 THEME_SCHEDULE_WINDOW_MINUTES=60
 THEME_SCHEDULE_HOLD_HOURS=12
 THEME_SCHEDULE_CHECK_MINUTES=5
-# macOS and WSL read input idleness themselves. The hypridle listener in the help uses the same figure.
+# macOS and WSL read idleness directly; on Hyprland the hypridle listener in `theme schedule --help` must use this same timeout.
 THEME_SCHEDULE_IDLE_SECONDS=600
 # Each terminal's access time moves when it reads a keystroke, and its modify time on output.
 THEME_SCHEDULE_TERMINALS_DIR=/dev/pts
@@ -63,7 +63,6 @@ _schedule_definition_file() {
   esac
 }
 
-# On means the timer's definition is installed.
 schedule_is_on() {
   local definition
   definition=$(_schedule_definition_file) && [[ -f "$definition" ]]
@@ -222,7 +221,6 @@ _schedule_missing_desktop_env() {
   echo "${missing[*]}"
 }
 
-# One check, which is what the timer runs.
 schedule_run() {
   local verdict due reason
   IFS=$'\t' read -r verdict due reason < <(schedule_decide "$(date +%s)")
@@ -250,7 +248,7 @@ schedule_run() {
     return 1
   fi
 
-  # The draw weighs every machine's applies.
+  # Pull first so the weighted random draw counts other machines' recent applies.
   sync_pull &>/dev/null || true
 
   local started status=0

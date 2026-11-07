@@ -39,8 +39,8 @@ generate() {
 -- Generated from theme.yml
 -- Author: ${THEME_AUTHOR}
 --
--- Applied as ~/.config/hypr/themes/current.lua, which a Hyprland config loads
--- with require('themes.current') after its own colors so these win.
+-- Applied as ~/.config/hypr/themes/current.lua. A Hyprland config loads it with
+-- pcall(require, 'themes.current') after its own colors, so these win.
 
 local palette = {
   -- Base16
