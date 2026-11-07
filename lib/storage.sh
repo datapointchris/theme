@@ -11,11 +11,13 @@ _THEME_STORAGE_SOURCED=1
 
 _STORAGE_APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+THEME_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}/theme"
+
 # Dev mode: THEME_ENV=development, which the checkout's .envrc sets through direnv
 if [[ "${THEME_ENV:-}" == "development" ]]; then
   THEME_STATE_DIR="$_STORAGE_APP_DIR/.dev-data"
 else
-  THEME_STATE_DIR="$HOME/.local/state/theme"
+  THEME_STATE_DIR="$THEME_STATE_HOME"
 fi
 THEME_HISTORY_FILE="$THEME_STATE_DIR/history.jsonl"
 

@@ -195,6 +195,24 @@ setup() {
   assert_line --index 1 "$THEME_ROOT/.dev-data"
 }
 
+@test "every path the tool owns follows the XDG variables" {
+  local x="$BATS_TEST_TMPDIR/xdg"
+  run env HOME="$HOME" XDG_STATE_HOME="$x/state" XDG_CACHE_HOME="$x/cache" XDG_CONFIG_HOME="$x/config" \
+    bash -c "source '$THEME_ROOT/lib/lib.sh'; source '$THEME_ROOT/lib/sync.sh'
+      printf '%s\n' \"\$THEME_STATE_DIR\" \"\$CURRENT_THEME_FILE\" \"\$THEME_SYNC_STATE_FILE\" \
+        \"\$BACKGROUND_CACHE_DIR\" \"\$BACKGROUND_RENDER_DIR\" \"\$VIVALDI_STATE_DIR\" \
+        \"\$BACKGROUND_SOURCES_FILE\" \"\$BACKGROUND_MODE_FILE\""
+  assert_success
+  assert_output "$x/state/theme
+$x/state/theme/current
+$x/state/theme/sync-state.json
+$x/cache/theme/backgrounds
+$x/cache/theme/current
+$x/cache/theme/vivaldi
+$x/config/theme/background-sources.conf
+$x/config/theme/background-mode"
+}
+
 @test "list_themes_with_status marks the current theme" {
   set_current_theme beta-light
   run list_themes_with_status

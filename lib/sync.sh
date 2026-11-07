@@ -7,7 +7,7 @@ set -euo pipefail
 _SYNC_APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Sync state file (alongside history)
-THEME_SYNC_STATE_FILE="${THEME_STATE_DIR:-$HOME/.local/state/theme}/sync-state.json"
+THEME_SYNC_STATE_FILE="${THEME_STATE_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/theme}/sync-state.json"
 THEME_GIST_DESCRIPTION="theme-preferences"
 
 _sync_check_gh() {

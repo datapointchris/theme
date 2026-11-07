@@ -18,7 +18,10 @@ source "$THEME_LIB_DIR/vivaldi-preferences.sh"
 
 # Always production, unlike THEME_STATE_DIR: apps watch this directory, so dev
 # mode must not point them at .dev-data.
-THEME_LIVE_DIR="$HOME/.local/state/theme"
+THEME_LIVE_DIR="$THEME_STATE_HOME"
+
+THEME_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}/theme"
+THEME_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/theme"
 
 # Configuration - themes/ is the single source of truth
 THEMES_DIR="$THEME_APP_DIR/themes"
@@ -982,26 +985,24 @@ set_opacity() {
 }
 
 # Background cache directory
-BACKGROUND_CACHE_DIR="${BACKGROUND_CACHE_DIR:-$HOME/.cache/theme/backgrounds}"
+BACKGROUND_CACHE_DIR="${BACKGROUND_CACHE_DIR:-$THEME_CACHE_HOME/backgrounds}"
 
 # Where the wallpaper handed to the compositor is rendered. Regenerable and
 # deleted a minute later — the timestamp in the name exists only to defeat
-# macOS's wallpaper cache — so it is cache, not data. It stays out of
-# ~/.local/share/theme, the installed git checkout, where each render would be
-# an untracked file in that checkout's `git status`. The stable
-# ~/.local/share/theme/background.png is the one exception: a hyprpaper.conf can
-# name that exact path as its restart fallback.
-BACKGROUND_RENDER_DIR="${BACKGROUND_RENDER_DIR:-$HOME/.cache/theme/current}"
+# macOS's wallpaper cache — so it is cache, not data. It stays out of the
+# installed git checkout, where each render would be an untracked file in that
+# checkout's `git status`.
+BACKGROUND_RENDER_DIR="${BACKGROUND_RENDER_DIR:-$THEME_CACHE_HOME/current}"
 
 # Background sources config file (path references, not copies)
-BACKGROUND_SOURCES_FILE="${BACKGROUND_SOURCES_FILE:-$HOME/.config/theme/background-sources.conf}"
+BACKGROUND_SOURCES_FILE="${BACKGROUND_SOURCES_FILE:-$THEME_CONFIG_HOME/background-sources.conf}"
 
 # Current background tracking - always in production so background actually changes
 BACKGROUND_CURRENT_FILE="$THEME_LIVE_DIR/background-current"
 
 # Which background types rotate, one per line. "all" enables every type and
 # "none" turns backgrounds off, so an apply leaves the desktop picture alone.
-BACKGROUND_MODE_FILE="${BACKGROUND_MODE_FILE:-$HOME/.config/theme/background-mode}"
+BACKGROUND_MODE_FILE="${BACKGROUND_MODE_FILE:-$THEME_CONFIG_HOME/background-mode}"
 
 # Default background resolution
 BACKGROUND_WIDTH=3840
@@ -1523,8 +1524,10 @@ set_desktop_wallpaper_hyprland() {
   # Format: [monitor],[path],[fit_mode] - empty monitor = all monitors
   hyprctl hyprpaper wallpaper ",$background_file" 2>/dev/null || return 1
 
-  # Also update stable path for hyprpaper config fallback on restart
-  local stable_path="$HOME/.local/share/theme/background.png"
+  # A stable copy, which a hyprpaper.conf can name as its wallpaper so a
+  # restarted hyprpaper comes back on the current background.
+  local stable_path="$THEME_LIVE_DIR/background.png"
+  mkdir -p "$THEME_LIVE_DIR"
   cp "$background_file" "$stable_path" 2>/dev/null || true
 }
 

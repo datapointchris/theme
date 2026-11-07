@@ -83,7 +83,7 @@ theme_id=$(yq '.meta.id // "custom"' "$theme_file" 2>/dev/null || echo "custom")
 # ~/.config/gowall/config.yml. That file is often tracked in a config repo, so
 # appending to it would dirty that repo on every apply, and its entries would
 # accumulate with no owner to remove the ones for deleted themes.
-palette_dir="$HOME/.cache/theme/gowall"
+palette_dir="${XDG_CACHE_HOME:-$HOME/.cache}/theme/gowall"
 mkdir -p "$palette_dir"
 
 # Build color list from theme

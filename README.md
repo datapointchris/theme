@@ -263,14 +263,17 @@ yq -r '[.meta.display_name, .meta.neovim_colorscheme_source, (.meta.plugin // "-
 
 ## Data Storage
 
-Data and configuration live in XDG-compliant locations:
+Data and configuration live in the XDG base directories. The paths below are
+the defaults, used when `XDG_STATE_HOME`, `XDG_CONFIG_HOME` and `XDG_CACHE_HOME`
+are unset:
 
 ```text
 ~/.local/state/theme/
 ├── history.jsonl      # Usage/rating history (synced)
 ├── current            # Current theme ID
 ├── schedule.json      # Outcome of the last scheduled check
-└── sync-state.json    # Sync configuration
+├── sync-state.json    # Sync configuration
+└── background.png     # Current wallpaper, for a hyprpaper.conf to name
 
 ~/.config/theme/
 ├── background-mode          # Enabled background modes

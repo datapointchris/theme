@@ -9,7 +9,7 @@
 #
 # The waiter sources only this file, so nothing here reads lib.sh.
 
-VIVALDI_STATE_DIR="$HOME/.cache/theme/vivaldi"
+VIVALDI_STATE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/theme/vivaldi"
 VIVALDI_PENDING_THEME="$VIVALDI_STATE_DIR/pending-theme.json"
 VIVALDI_WAITER_PID_FILE="$VIVALDI_STATE_DIR/waiter.pid"
 
