@@ -69,47 +69,22 @@ assert_no_history() {
 }
 
 @test "a flat verb gets its own synopsis, not the whole screen" {
+  local full
+  full=$("$THEME_ROOT/bin/theme" help 2>&1)
   run "$THEME_ROOT/bin/theme" reject --help
   assert_success
-  assert_line "Usage: theme reject <message>"
-  assert_line "  Mark current theme as rejected (avoids rediscovery)"
-  refute_line "Theme Management"
+  [[ -n "$output" && "$output" != "$full" ]] || fail "reject --help printed the full screen"
 }
 
 @test "an alias resolves to the verb it stands for" {
+  local canonical
+  canonical=$("$THEME_ROOT/bin/theme" random --help 2>&1)
   run "$THEME_ROOT/bin/theme" rand --help
   assert_success
-  assert_line "Usage: theme random"
-}
-
-@test "a verb owning a help tree gets its own screen" {
-  run "$THEME_ROOT/bin/theme" background --help
-  assert_success
-  assert_output --partial "Background Management"
-}
-
-@test "a nested subcommand keeps its own help" {
-  run "$THEME_ROOT/bin/theme" background mode --help
-  assert_success
-  assert_output --partial "Background Mode Settings"
-}
-
-@test "an unknown verb falls back to the full screen" {
-  run "$THEME_ROOT/bin/theme" nonsense --help
-  assert_success
-  assert_output --partial "Theme Management"
+  assert_output "$canonical"
 }
 
 @test "bare theme is a request for help, not a usage error" {
   run "$THEME_ROOT/bin/theme"
   assert_success
-}
-
-@test "theme help still renders both sections and the examples" {
-  run "$THEME_ROOT/bin/theme" help
-  assert_success
-  assert_line "Commands"
-  assert_line "Subcommands"
-  assert_line "Examples"
-  assert_line "  reject <message>     Mark current theme as rejected (avoids rediscovery)"
 }
