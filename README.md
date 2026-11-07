@@ -320,9 +320,12 @@ special:
    lib/generate-all.sh --themes my-theme
    ```
 
-   Then `theme apply my-theme`. Plugin themes also need a lazy.nvim entry in
-   `colorscheme-manager.lua` — `CLAUDE.md` covers the Neovim side and how to map
-   an upstream palette into the base16 slots.
+   Then `theme apply my-theme`. A plugin theme also needs the Neovim plugin
+   named in its `meta.plugin` installed, for example as a lazy.nvim spec. A
+   Neovim config can build those specs by reading `meta.plugin` from each
+   `themes/*/theme.yml`, so a new theme needs no editor-side edit. `CLAUDE.md`
+   covers how Neovim follows the applied theme and how to map an upstream
+   palette into the base16 slots.
 
 ## License
 
