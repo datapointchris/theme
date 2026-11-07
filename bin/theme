@@ -83,7 +83,7 @@ commands_table() {
   log                  View complete history
   info [theme]         Browse themes and view detailed history
   reject <message>     Mark current theme as rejected (avoids rediscovery)
-  unreject             Restore a rejected theme (fzf picker with history)
+  unreject [theme]     Restore a rejected theme (fzf picker with history when none is named)
   verify               Check theme system is working
   browsers             Show browser theme status and setup
   update               Update theme to latest release
@@ -101,7 +101,9 @@ root_guide() {
   it out of list, random and the picker until theme unreject. When only the
   wallpaper is wrong, theme background rotate keeps the theme.
 
-  Every command answers --help.
+  Every command answers --help. change, and info and unreject without a
+  theme, open a picker. Without a terminal, or with --no-input, they exit 2
+  and name the command that takes the theme instead.
 EOF
 }
 
@@ -1003,7 +1005,28 @@ apply_random() {
   apply_theme "$random_theme" "$trigger"
 }
 
+# Set by --no-input, which main strips from the arguments before dispatch.
+THEME_NO_INPUT=0
+
+# A picker runs only when a person can answer it. Without a terminal on stdin,
+# or under --no-input, the verb refuses at once and names the form that takes
+# the answer as an argument, so a script fails with a reason rather than
+# waiting on a prompt nobody sees.
+require_interactive() {
+  local non_interactive_form="$1"
+
+  if [[ "$THEME_NO_INPUT" == 1 ]] || [[ ! -t 0 ]]; then
+    {
+      echo "Error: this command opens a picker, which needs a terminal"
+      echo "Without one, run: $non_interactive_form"
+    } >&2
+    exit 2
+  fi
+}
+
 change_theme() {
+  require_interactive "theme apply <theme>"
+
   if ! command -v fzf &>/dev/null; then
     echo "Error: fzf not found. Install it with your package manager, for example: brew install fzf" >&2
     exit 1
@@ -1147,7 +1170,28 @@ mark_rejected() {
   echo "This theme will be tracked to avoid rediscovery."
 }
 
+unreject_by_name() {
+  local theme_input="$1"
+
+  local canonical
+  canonical=$(theme_name_to_canonical "$theme_input")
+
+  if ! is_theme_rejected "$canonical"; then
+    {
+      echo "Error: not a rejected theme: $theme_input"
+      echo "See what is rejected with: theme list --status rejected"
+    } >&2
+    exit 1
+  fi
+
+  unreject_theme "$canonical"
+  sync_after_action
+  echo "Unrejected: $(get_theme_display_info "$canonical")"
+}
+
 unreject_theme_interactive() {
+  require_interactive "theme unreject <theme>"
+
   if ! command -v fzf &>/dev/null; then
     echo "Error: fzf not found. Install it with your package manager, for example: brew install fzf" >&2
     exit 1
@@ -1466,6 +1510,8 @@ show_info() {
 
   # If no argument, show fzf picker
   if [[ -z "$theme_input" ]]; then
+    require_interactive "theme info <theme>"
+
     if ! command -v fzf &>/dev/null; then
       echo "Error: fzf not found. Install it with your package manager, for example: brew install fzf" >&2
       echo "Or provide a theme name: theme info <theme-name>" >&2
@@ -1679,6 +1725,19 @@ clear_background_cache() {
 #==============================================================================
 
 main() {
+  # --no-input is accepted anywhere on the line, so a script can add it to any
+  # command without knowing which ones open a picker.
+  local arg
+  local -a args=()
+  for arg in "$@"; do
+    if [[ "$arg" == "--no-input" ]]; then
+      THEME_NO_INPUT=1
+    else
+      args+=("$arg")
+    fi
+  done
+  set -- "${args[@]+"${args[@]}"}"
+
   # Prints inline to stderr before the command runs, which is the call site the
   # library documents, and the same one font uses so the two bash tools behave
   # identically. Never fails and never prints an error; `theme update` is where
@@ -1739,7 +1798,11 @@ main() {
       mark_rejected "${@:2}"
       ;;
     unreject)
-      unreject_theme_interactive
+      if [[ -n "${2:-}" ]]; then
+        unreject_by_name "$2"
+      else
+        unreject_theme_interactive
+      fi
       ;;
     verify)
       verify_system

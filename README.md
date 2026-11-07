@@ -76,7 +76,12 @@ theme dislike "too dim"       # Mark as disliked
 theme note "good for coding"  # Add a freeform note
 theme reject "hurts my eyes"  # Remove from rotation (hidden from list)
 theme unreject                # Restore a rejected theme (interactive picker)
+theme unreject <theme-id>     # Restore one by its id, with no picker
 ```
+
+`change`, and `info` and `unreject` without a theme, open a picker. Without a
+terminal on stdin, or with `--no-input` anywhere on the line, they exit 2 and
+name the command that takes the theme as an argument instead.
 
 ### Rankings and History
 
