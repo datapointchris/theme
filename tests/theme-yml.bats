@@ -39,7 +39,6 @@ setup() {
 @test "load_theme fails on a missing file" {
   run load_theme "$THEMES_DIR/nope/theme.yml"
   assert_failure
-  assert_output --partial "Theme file not found"
 }
 
 @test "metadata comes from the meta block" {

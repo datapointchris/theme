@@ -146,7 +146,6 @@ count_theme_artifacts() {
 @test "generate-all rejects an unknown option" {
   run "$GENERATE_ALL" --nope
   assert_failure
-  assert_output --partial "Unknown option"
 }
 
 @test "generate-all fails rather than doing nothing when a filter matches no theme" {

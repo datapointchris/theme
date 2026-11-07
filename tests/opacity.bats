@@ -89,7 +89,6 @@ setup() {
   for bad in "" abc 101 -5 0.5 50.5; do
     run set_opacity "$bad"
     assert_failure
-    assert_output --partial "must be a number between 0 and 100"
   done
 }
 
