@@ -41,6 +41,19 @@ Optional:
 - `gowall` — the `recolor` background
 - `ascii-image-converter` — the `ascii` background
 
+## First run
+
+1. Install, as above, and make sure `~/.local/bin` is on your `PATH`.
+2. `theme verify` checks that the theme library and `yq` are in place, and
+   shows the current theme once one is applied.
+3. `theme change` opens a picker with a live color preview. `theme list` then
+   `theme apply <theme-id>` does the same without one. The apply writes each
+   supported app's config and reloads the apps that can reload in place.
+4. Optional: `theme sync init` creates a secret GitHub Gist through `gh`, so
+   your ratings and history follow you to other machines.
+5. Optional: `theme schedule on` changes the theme on a timer while you are at
+   the machine, so `theme rank` learns which themes you keep.
+
 ## Usage
 
 Running `theme` with no arguments prints the full help.
