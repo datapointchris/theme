@@ -11,6 +11,8 @@
 load "$HOME/.local/lib/bats-support/load.bash"
 load "$HOME/.local/lib/bats-assert/load.bash"
 
+bats_require_minimum_version 1.5.0
+
 setup() {
   load "$BATS_TEST_DIRNAME/helpers.bash"
   isolate_theme_state
@@ -148,9 +150,10 @@ count_theme_artifacts() {
 }
 
 @test "generate-all fails rather than doing nothing when a filter matches no theme" {
-  run "$GENERATE_ALL" --themes "no-such-theme-*"
+  run --separate-stderr "$GENERATE_ALL" --themes "no-such-theme-*"
   assert_failure
-  assert_output --partial "No matching themes or generators found."
+  assert_output ""
+  [[ -n "$stderr" ]] || fail "the refusal printed nothing to stderr"
 }
 
 #==============================================================================

@@ -17,8 +17,8 @@ THEMES_DIR="$THEME_DIR/themes"
 
 # Check for GNU parallel
 if ! command -v parallel &>/dev/null; then
-  echo "Error: GNU parallel is required but not installed."
-  echo "Install with: brew install parallel"
+  echo "Error: GNU parallel is required but not installed." >&2
+  echo "Install with: brew install parallel" >&2
   exit 1
 fi
 
@@ -130,7 +130,7 @@ total_generators=${#generators[@]}
 total_jobs=$((total_themes * total_generators))
 
 if [[ $total_jobs -eq 0 ]]; then
-  echo "No matching themes or generators found."
+  echo "No matching themes or generators found." >&2
   exit 1
 fi
 
