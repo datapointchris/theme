@@ -312,6 +312,33 @@ count_theme_artifacts() {
   assert_output "-- hand written"
 }
 
+@test "every TUI theme writes the roles its schema declares" {
+  # The schema belongs to gotermstyle, which reads the file, and tui-theme.py types
+  # its keys out again. A role added there and missed here draws in the reader's
+  # 16-color default in every theme, and a role it does not declare fails an
+  # editor's validation. The schema is the one the files name, so a test with no
+  # network skips rather than checks a stale copy.
+  local files=("$THEME_ROOT"/themes/*/tui-theme.json)
+  local url schema="$BATS_TEST_TMPDIR/schema.json"
+  url=$(jq -r '."$schema"' "${files[0]}")
+  curl -fsSL --max-time 10 "$url" -o "$schema" || skip "no schema at $url"
+
+  local group file declared
+  for group in ui markdown; do
+    declared=$(jq -r --arg g "$group" '.properties[$g].properties | keys[]' "$schema")
+    for file in "${files[@]}"; do
+      run jq -r --arg g "$group" '.[$g] | keys[]' "$file"
+      assert_output "$declared"
+    done
+  done
+
+  declared=$(jq -r '.properties.syntax.properties | keys[]' "$schema")
+  for file in "${files[@]}"; do
+    run bash -c 'LC_ALL=C comm -23 <(printf "%s\n" "$1") <(jq -r ".syntax | keys[]" "$2")' _ "$declared" "$file"
+    assert_output ""
+  done
+}
+
 #==============================================================================
 # REPO-WIDE ARTIFACT UNIFORMITY
 #==============================================================================
