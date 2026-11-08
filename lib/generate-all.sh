@@ -58,10 +58,13 @@ declare -A GENERATOR_OUTPUT=(
   ["sioyek"]="sioyek.config"
   ["yazi"]="flavor.toml"
   ["aerc"]="aerc.styleset"
-  # The one generator whose output is a directory rather than a file, and the
-  # one written in Python. Both are incidental to the job runner, which only
+  # The one generator whose output is a directory rather than a file, and one
+  # of two written in Python. Both are incidental to the job runner, which only
   # ever passes this through as the second argument.
   ["neovim"]="neovim"
+  # The file terminal programs on gotermstyle read their colors from. Its
+  # markdown and syntax share neovim's highlight table, lib/neovim_highlights.py.
+  ["tui-theme"]="tui-theme.json"
   # delta resolves its syntax theme through bat's cache, but the config fragment
   # itself is generated from theme.yml alone — no ordering constraint here.
   ["delta"]="delta.conf"

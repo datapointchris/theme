@@ -50,8 +50,9 @@ map_keys() {
   printf '%s\n' "${!MAP_ARTIFACT[@]}"
 }
 
-# Generators are bash except neovim, which is Python because it writes a Lua tree
-# rather than a config file. Resolution order matches generate-all.sh's.
+# Generators are bash except neovim and tui-theme, which are Python because they
+# read the highlight table in lib/neovim_highlights.py. Resolution order matches
+# generate-all.sh's.
 generator_script() {
   local name="$1" candidate
   for candidate in "$GENERATORS_DIR/$name.sh" "$GENERATORS_DIR/$name.py"; do

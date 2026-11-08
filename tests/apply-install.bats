@@ -91,6 +91,17 @@ give_artifact() {
   assert_output "beta-light.conf"
 }
 
+@test "the TUI theme lands at the path gotermstyle reads with none given" {
+  # tuitheme.DefaultPath is $XDG_CONFIG_HOME/tui-theme/current.json. Installed
+  # anywhere else, every reader stays on its built-in 16 colors with no error.
+  give_artifact alpha-dark tui-theme.json
+
+  run apply_tui_theme alpha-dark
+  assert_success
+  run cat "$XDG_CONFIG_HOME/tui-theme/current.json"
+  assert_output "generated for alpha-dark"
+}
+
 @test "yazi installs a flavor directory and links current.yazi at it" {
   give_artifact alpha-dark flavor.toml
 
