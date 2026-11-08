@@ -503,9 +503,10 @@ apply_abtop() {
   install_themed_artifact "$lib_path/abtop.theme" "$abtop_theme_dir" "$theme.theme" "current.theme"
 }
 
-# tui-theme/current.json is where gotermstyle's tuitheme looks with no path
-# given, so no reader's config needs a line for it. The directory holds only
-# theme files, so each theme sits beside the pointer rather than in a themes/.
+# tui-theme/current.json is where gotermstyle's tuitheme looks unless
+# TUI_THEME_FILE names another file, so no reader's config needs a line for it.
+# The directory holds only theme files, so each theme sits beside the pointer
+# rather than in a themes/.
 apply_tui_theme() {
   local theme="$1"
   local lib_path
@@ -515,8 +516,11 @@ apply_tui_theme() {
     return 1
   fi
 
-  local tui_theme_dir="${XDG_CONFIG_HOME:-$HOME/.config}/tui-theme"
-  install_themed_artifact "$lib_path/tui-theme.json" "$tui_theme_dir" "$theme.json" "current.json"
+  # The reader ignores a relative XDG_CONFIG_HOME, as the XDG spec asks, so the
+  # install does too, or the two would name different files.
+  local config_home="${XDG_CONFIG_HOME:-}"
+  [[ $config_home == /* ]] || config_home="$HOME/.config"
+  install_themed_artifact "$lib_path/tui-theme.json" "$config_home/tui-theme" "$theme.json" "current.json"
 }
 
 # Apply JankyBorders theme (macOS)
