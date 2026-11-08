@@ -2368,7 +2368,7 @@ reload_abtop() { _signal_reload abtop _abtop_handles_usr2; }
 
 # The programs that read tui-theme/current.json through gotermstyle, by process
 # name.
-TUI_THEME_READERS=(fleet slate psyche projects)
+TUI_THEME_READERS=(fleet slate psyche projects prs read-markdown)
 
 # The Go runtime catches SIGUSR2 and ignores it in a program that never asked
 # for it, so an older build, a CLI run and a daemon all survive the signal. A
