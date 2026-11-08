@@ -1,5 +1,6 @@
 .envrc
 .dev-data/
+__pycache__/
 
 # The installer clones this repo to ~/.local/share/theme, and set_desktop_wallpaper
 # writes the hyprpaper restart fallback to ~/.local/share/theme/background.png —
