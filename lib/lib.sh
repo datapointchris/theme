@@ -39,6 +39,7 @@ THEME_APP_ARTIFACTS=(
   "tmux.conf:tmux"
   "btop.theme:btop"
   "abtop.theme:abtop"
+  "tui-theme.json:tui-theme"
   "bat.tmTheme:bat"
   "delta.conf:delta"
   "flavor.toml:yazi"
@@ -500,6 +501,26 @@ apply_abtop() {
 
   local abtop_theme_dir="${XDG_CONFIG_HOME:-$HOME/.config}/abtop/themes"
   install_themed_artifact "$lib_path/abtop.theme" "$abtop_theme_dir" "$theme.theme" "current.theme"
+}
+
+# tui-theme/current.json is where gotermstyle's tuitheme looks unless
+# TUI_THEME_FILE names another file, so no reader's config needs a line for it.
+# The directory holds only theme files, so each theme sits beside the pointer
+# rather than in a themes/.
+apply_tui_theme() {
+  local theme="$1"
+  local lib_path
+  lib_path=$(get_library_path "$theme")
+
+  if [[ -z "$lib_path" ]] || [[ ! -f "$lib_path/tui-theme.json" ]]; then
+    return 1
+  fi
+
+  # The reader ignores a relative XDG_CONFIG_HOME, as the XDG spec asks, so the
+  # install does too, or the two would name different files.
+  local config_home="${XDG_CONFIG_HOME:-}"
+  [[ $config_home == /* ]] || config_home="$HOME/.config"
+  install_themed_artifact "$lib_path/tui-theme.json" "$config_home/tui-theme" "$theme.json" "current.json"
 }
 
 # Apply JankyBorders theme (macOS)
@@ -2069,6 +2090,15 @@ apply_theme_to_apps() {
     _print_app_status "abtop" "false"
   fi
 
+  # The TUI theme file (all platforms)
+  if apply_tui_theme "$theme" 2>/dev/null; then
+    applied+=("tui-theme")
+    _print_app_status "tui-theme" "true"
+  else
+    skipped+=("tui-theme")
+    _print_app_status "tui-theme" "false"
+  fi
+
   # Yazi (all platforms)
   if apply_yazi "$theme" 2>/dev/null; then
     applied+=("yazi")
@@ -2299,14 +2329,14 @@ reload_tmux() {
 
 # SIGUSR2 terminates a process with no handler for it. On Linux each process's
 # caught-signal mask (bit 11 is SIGUSR2) says whether it has one. Elsewhere the
-# binary on PATH is asked instead, through the check named by $2.
+# binary on PATH is asked instead, through the check named by $2, given $1.
 _signal_reload() {
   local name="$1" binary_handles_usr2="$2"
   local pids pid mask
   pids=$(pgrep -x "$name") || return 1
 
   if [[ ! -d /proc/self ]]; then
-    "$binary_handles_usr2" || return 1
+    "$binary_handles_usr2" "$name" || return 1
     pkill -USR2 -x "$name" 2>/dev/null || true
     return 0
   fi
@@ -2335,6 +2365,27 @@ _abtop_handles_usr2() {
 
 reload_btop() { _signal_reload btop _btop_handles_usr2; }
 reload_abtop() { _signal_reload abtop _abtop_handles_usr2; }
+
+# The programs that read tui-theme/current.json through gotermstyle, by process
+# name.
+TUI_THEME_READERS=(fleet slate psyche projects)
+
+# The Go runtime catches SIGUSR2 and ignores it in a program that never asked
+# for it, so an older build, a CLI run and a daemon all survive the signal. A
+# same-named program in another language may not, so off Linux the binary on
+# PATH has to carry Go's build-info marker.
+_go_binary_on_path() {
+  local binary
+  binary=$(command -v "$1") || return 1
+  LC_ALL=C grep -qa 'Go buildinf:' "$binary"
+}
+
+reload_tui_theme() {
+  local reader
+  for reader in "${TUI_THEME_READERS[@]}"; do
+    _signal_reload "$reader" _go_binary_on_path || true
+  done
+}
 
 reload_kitty() {
   if command -v pkill &>/dev/null; then
@@ -2421,17 +2472,18 @@ reload_apps() {
   local applied_apps=" ${1:-} "
 
   # rofi loads its theme on next launch, hyprlock on next lock.
-  local reloadable=(tmux btop abtop)
+  local reloadable=(tmux btop abtop tui-theme)
   if [[ "$platform" == "arch" ]]; then
     reloadable+=(kitty ghostty hyprland waybar dunst)
   fi
 
   # A reload returns 1 when its app is not running, which errexit would turn
-  # into an aborted apply.
+  # into an aborted apply. An app's name may hold a hyphen, which its reload
+  # function spells as an underscore.
   local app
   for app in "${reloadable[@]}"; do
     if [[ "$applied_apps" == *" $app "* ]]; then
-      "reload_$app" || true
+      "reload_${app//-/_}" || true
     fi
   done
 }

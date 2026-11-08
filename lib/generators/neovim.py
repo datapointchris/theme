@@ -17,6 +17,14 @@ from pathlib import Path
 
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from neovim_highlights import (
+    SEMANTIC_COLORS,
+    TREESITTER_GROUPS,
+    UI_SLOTS,
+    VIM_SYNTAX_GROUPS,
+)
+
 
 def load_theme(theme_path: Path) -> dict:
     """Load theme.yml file."""
@@ -48,11 +56,48 @@ def colorscheme_name_for(meta: dict, slug: str) -> str:
     return slug
 
 
-def get_color(extended: dict, extended_key: str, base16_fallback: str) -> str:
+def get_color(extended: dict, extended_key: str | None, base16_fallback: str) -> str:
     """Get color preferring extended palette, falling back to base16."""
     if extended_key in extended:
         return f"M.palette.{extended_key}"
     return f"M.palette.{base16_fallback}"
+
+
+def semantic_lua(extended: dict, group: str) -> list[str]:
+    """One M.theme block's lines, from the shared table."""
+    return [
+        f"    {name} = {get_color(extended, key, fallback)},"
+        for name, key, fallback in SEMANTIC_COLORS[group]
+    ]
+
+
+def lua_spec(spec: dict) -> str:
+    """A highlight spec from the shared table, as a Lua table over M.theme."""
+    parts = []
+    for key, value in spec.items():
+        if key == "link":
+            parts.append(f'link = "{value}"')
+        elif value is True:
+            parts.append(f"{key} = true")
+        elif value == "NONE":
+            parts.append(f'{key} = "NONE"')
+        else:
+            parts.append(f"{key} = theme.{value}")
+    return "{ " + ", ".join(parts) + " }"
+
+
+def lua_groups(runs: list) -> str:
+    """Runs of highlight groups as the entries of a Lua return table."""
+    lines = []
+    for i, (title, groups) in enumerate(runs):
+        if i:
+            lines.append("")
+        if title:
+            lines.append(f"    -- {title}")
+        for name, spec in groups:
+            key = f'["{name}"]' if name.startswith("@") else name
+            lines.append(f"    {key} = {lua_spec(spec)},")
+    return "\n".join(lines)
 
 
 def resolve_color(base16: dict, extended: dict, extended_key: str, base16_fallback: str) -> str:
@@ -225,11 +270,11 @@ def generate_palette_lua(theme: dict) -> str:
         f'    bg_search = M.palette.base0A,',
         f'    fg_search = "{text_on(search, text, background)}",',
         f'    fg_substitute = "{text_on(vcs_removed, text, background)}",',
-        f'    fg = M.palette.base05,',
-        f'    fg_dim = M.palette.base04,',
-        f'    fg_reverse = M.palette.base00,',
+        f'    fg = M.palette.{UI_SLOTS["fg"]},',
+        f'    fg_dim = M.palette.{UI_SLOTS["fg_dim"]},',
+        f'    fg_reverse = M.palette.{UI_SLOTS["fg_reverse"]},',
         f'    special = M.palette.base0C,',
-        f'    nontext = M.palette.base03,',
+        f'    nontext = M.palette.{UI_SLOTS["nontext"]},',
         f'    whitespace = M.palette.base02,',
         "    float = {",
         f'      fg = M.palette.base05,',
@@ -247,36 +292,13 @@ def generate_palette_lua(theme: dict) -> str:
         "    },",
         "  },",
         "  syn = {",
-        f'    comment = {get_color(extended, "syntax_comment", "base03")},',
-        f'    string = {get_color(extended, "syntax_string", "base0B")},',
-        f'    number = {get_color(extended, "syntax_number", "base0E")},',
-        f'    constant = {get_color(extended, "syntax_constant", "base0E")},',
-        f'    identifier = {get_color(extended, "syntax_identifier", "base0D")},',
-        f'    parameter = {get_color(extended, "syntax_parameter", "base0D")},',
-        f'    fun = {get_color(extended, "syntax_function", "base0B")},',
-        f'    statement = {get_color(extended, "syntax_statement", "base08")},',
-        f'    keyword = {get_color(extended, "syntax_keyword", "base08")},',
-        f'    operator = {get_color(extended, "syntax_operator", "base09")},',
-        f'    preproc = {get_color(extended, "syntax_preproc", "base0C")},',
-        f'    type = {get_color(extended, "syntax_type", "base0A")},',
-        f'    special1 = {get_color(extended, "syntax_special1", "base09")},',
-        f'    special2 = {get_color(extended, "syntax_special2", "base08")},',
-        f'    special3 = {get_color(extended, "syntax_special3", "base0C")},',
-        f'    punct = {get_color(extended, "syntax_punctuation", "base04")},',
-        f'    regex = {get_color(extended, "syntax_regex", "base0C")},',
-        f'    deprecated = M.palette.base03,',
+        *semantic_lua(extended, "syn"),
         "  },",
         "  diag = {",
-        f'    error = {get_color(extended, "diagnostic_error", "base08")},',
-        f'    warning = {get_color(extended, "diagnostic_warning", "base09")},',
-        f'    info = {get_color(extended, "diagnostic_info", "base0D")},',
-        f'    hint = {get_color(extended, "diagnostic_hint", "base0C")},',
-        f'    ok = {get_color(extended, "diagnostic_ok", "base0B")},',
+        *semantic_lua(extended, "diag"),
         "  },",
         "  vcs = {",
-        f'    added = {get_color(extended, "git_add", "base0B")},',
-        f'    changed = {get_color(extended, "git_change", "base0A")},',
-        f'    removed = {get_color(extended, "git_delete", "base08")},',
+        *semantic_lua(extended, "vcs"),
         "  },",
         # Literals rather than palette references: a band is a solved value, not
         # a slot. Solved against base00 because that is what Normal's background
@@ -461,65 +483,14 @@ return M
 
 def generate_syntax_lua() -> str:
     """Generate syntax.lua with traditional Vim syntax groups."""
-    return '''-- Auto-generated syntax highlights
-local M = {}
+    return f'''-- Auto-generated syntax highlights
+local M = {{}}
 
 function M.setup(colors)
   local theme = colors.theme
-  return {
-    Comment = { fg = theme.syn.comment },
-
-    Constant = { fg = theme.syn.constant },
-    String = { fg = theme.syn.string },
-    Character = { link = "String" },
-    Number = { fg = theme.syn.number },
-    Boolean = { fg = theme.syn.constant, bold = true },
-    Float = { link = "Number" },
-
-    Identifier = { fg = theme.syn.identifier },
-    Function = { fg = theme.syn.fun },
-
-    Statement = { fg = theme.syn.statement },
-    Conditional = { link = "Statement" },
-    Repeat = { link = "Statement" },
-    Label = { link = "Statement" },
-    Operator = { fg = theme.syn.operator },
-    Keyword = { fg = theme.syn.keyword },
-    Exception = { fg = theme.syn.special2 },
-
-    PreProc = { fg = theme.syn.preproc },
-    Include = { link = "PreProc" },
-    Define = { link = "PreProc" },
-    Macro = { link = "PreProc" },
-    PreCondit = { link = "PreProc" },
-
-    Type = { fg = theme.syn.type },
-    StorageClass = { link = "Type" },
-    Structure = { link = "Type" },
-    Typedef = { link = "Type" },
-
-    Special = { fg = theme.syn.special1 },
-    SpecialChar = { link = "Special" },
-    Tag = { fg = theme.syn.special3 },
-    Delimiter = { fg = theme.syn.punct },
-    SpecialComment = { link = "Special" },
-    Debug = { fg = theme.diag.warning },
-
-    Underlined = { fg = theme.syn.special1, underline = true },
-    Bold = { bold = true },
-    Italic = { italic = true },
-
-    Ignore = { link = "NonText" },
-    Error = { fg = theme.diag.error },
-    Todo = { fg = theme.ui.fg_reverse, bg = theme.diag.info, bold = true },
-
-    qfLineNr = { link = "LineNr" },
-    qfFileName = { link = "Directory" },
-
-    markdownCode = { fg = theme.syn.string },
-    markdownCodeBlock = { fg = theme.syn.string },
-    markdownEscape = { fg = "NONE" },
-  }
+  return {{
+{lua_groups(VIM_SYNTAX_GROUPS)}
+  }}
 end
 
 return M
@@ -528,131 +499,14 @@ return M
 
 def generate_treesitter_lua() -> str:
     """Generate treesitter.lua with @capture groups."""
-    return '''-- Auto-generated treesitter highlights
-local M = {}
+    return f'''-- Auto-generated treesitter highlights
+local M = {{}}
 
 function M.setup(colors)
   local theme = colors.theme
-  return {
-    -- Variables
-    ["@variable"] = { fg = theme.ui.fg },
-    ["@variable.builtin"] = { fg = theme.syn.special2, italic = true },
-    ["@variable.parameter"] = { fg = theme.syn.parameter },
-    ["@variable.member"] = { fg = theme.syn.identifier },
-
-    -- Constants
-    ["@constant"] = { link = "Constant" },
-    ["@constant.builtin"] = { fg = theme.syn.constant, bold = true },
-    ["@constant.macro"] = { link = "Macro" },
-
-    -- Modules
-    ["@module"] = { link = "Structure" },
-    ["@module.builtin"] = { fg = theme.syn.special1 },
-    ["@label"] = { link = "Label" },
-
-    -- Strings
-    ["@string"] = { link = "String" },
-    ["@string.documentation"] = { fg = theme.syn.string, italic = true },
-    ["@string.regexp"] = { fg = theme.syn.regex },
-    ["@string.escape"] = { fg = theme.syn.regex, bold = true },
-    ["@string.special"] = { link = "Special" },
-    ["@string.special.symbol"] = { fg = theme.syn.identifier },
-    ["@string.special.path"] = { link = "Directory" },
-    ["@string.special.url"] = { fg = theme.syn.special1, undercurl = true },
-
-    -- Characters
-    ["@character"] = { link = "Character" },
-    ["@character.special"] = { link = "SpecialChar" },
-
-    -- Booleans and numbers
-    ["@boolean"] = { link = "Boolean" },
-    ["@number"] = { link = "Number" },
-    ["@number.float"] = { link = "Float" },
-
-    -- Types
-    ["@type"] = { link = "Type" },
-    ["@type.builtin"] = { fg = theme.syn.type, italic = true },
-    ["@type.definition"] = { link = "Type" },
-
-    -- Attributes
-    ["@attribute"] = { link = "Constant" },
-    ["@attribute.builtin"] = { fg = theme.syn.special1 },
-    ["@property"] = { fg = theme.syn.identifier },
-
-    -- Functions
-    ["@function"] = { link = "Function" },
-    ["@function.builtin"] = { fg = theme.syn.fun, italic = true },
-    ["@function.call"] = { link = "Function" },
-    ["@function.macro"] = { link = "Macro" },
-    ["@function.method"] = { link = "Function" },
-    ["@function.method.call"] = { link = "Function" },
-
-    -- Constructors
-    ["@constructor"] = { fg = theme.syn.special1 },
-    ["@constructor.lua"] = { fg = theme.syn.keyword },
-
-    -- Operators
-    ["@operator"] = { link = "Operator" },
-
-    -- Keywords
-    ["@keyword"] = { link = "Keyword" },
-    ["@keyword.coroutine"] = { fg = theme.syn.keyword, italic = true },
-    ["@keyword.function"] = { fg = theme.syn.keyword },
-    ["@keyword.operator"] = { fg = theme.syn.operator, bold = true },
-    ["@keyword.import"] = { link = "PreProc" },
-    ["@keyword.type"] = { link = "Type" },
-    ["@keyword.modifier"] = { link = "StorageClass" },
-    ["@keyword.repeat"] = { link = "Repeat" },
-    ["@keyword.return"] = { fg = theme.syn.special3 },
-    ["@keyword.debug"] = { link = "Debug" },
-    ["@keyword.exception"] = { fg = theme.syn.special3 },
-    ["@keyword.conditional"] = { link = "Conditional" },
-    ["@keyword.conditional.ternary"] = { link = "Operator" },
-    ["@keyword.directive"] = { link = "PreProc" },
-    ["@keyword.directive.define"] = { link = "Define" },
-
-    -- Punctuation
-    ["@punctuation.delimiter"] = { fg = theme.syn.punct },
-    ["@punctuation.bracket"] = { fg = theme.syn.punct },
-    ["@punctuation.special"] = { fg = theme.syn.special1 },
-
-    -- Comments
-    ["@comment"] = { link = "Comment" },
-    ["@comment.documentation"] = { fg = theme.syn.comment },
-    ["@comment.error"] = { fg = theme.ui.fg, bg = theme.diag.error, bold = true },
-    ["@comment.warning"] = { fg = theme.ui.fg_reverse, bg = theme.diag.warning, bold = true },
-    ["@comment.todo"] = { fg = theme.ui.fg_reverse, bg = theme.diag.hint, bold = true },
-    ["@comment.note"] = { fg = theme.ui.fg_reverse, bg = theme.diag.info, bold = true },
-
-    -- Markup
-    ["@markup.strong"] = { bold = true },
-    ["@markup.italic"] = { italic = true },
-    ["@markup.strikethrough"] = { strikethrough = true },
-    ["@markup.underline"] = { underline = true },
-    ["@markup.heading"] = { link = "Function" },
-    ["@markup.quote"] = { fg = theme.syn.parameter, italic = true },
-    ["@markup.math"] = { link = "Constant" },
-    ["@markup.environment"] = { link = "Keyword" },
-    ["@markup.link"] = { fg = theme.syn.special1 },
-    ["@markup.link.label"] = { link = "Special" },
-    ["@markup.link.url"] = { fg = theme.syn.special1, undercurl = true },
-    ["@markup.raw"] = { link = "String" },
-    ["@markup.raw.block"] = { fg = theme.syn.string },
-    ["@markup.list"] = { fg = theme.syn.punct },
-    ["@markup.list.checked"] = { fg = theme.diag.ok },
-    ["@markup.list.unchecked"] = { fg = theme.ui.nontext },
-
-    -- Diff
-    ["@diff.plus"] = { fg = theme.vcs.added },
-    ["@diff.minus"] = { fg = theme.vcs.removed },
-    ["@diff.delta"] = { fg = theme.vcs.changed },
-
-    -- Tags (HTML/XML)
-    ["@tag"] = { link = "Tag" },
-    ["@tag.builtin"] = { fg = theme.syn.special3 },
-    ["@tag.attribute"] = { fg = theme.syn.identifier },
-    ["@tag.delimiter"] = { fg = theme.syn.punct },
-  }
+  return {{
+{lua_groups(TREESITTER_GROUPS)}
+  }}
 end
 
 return M

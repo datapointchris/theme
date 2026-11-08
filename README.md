@@ -223,6 +223,10 @@ Both commands come from [`bashselfupdate`](https://github.com/datapointchris/bas
 - **abtop** — AI agent monitor. Needs [the fork](https://github.com/datapointchris/abtop)
   that reads theme files and reloads in place, with `theme = "current"` in
   `~/.config/abtop/config.toml`
+- **TUIs on [gotermstyle](https://github.com/datapointchris/gotermstyle)** — the
+  theme's selection, accent, markdown and syntax colors, in
+  `~/.config/tui-theme/current.json`. A running program rereads it on SIGUSR2,
+  which `theme apply` sends to each reader it names in `TUI_THEME_READERS`
 - **bat** — syntax highlighter / pager
 - **delta** — git diff pager (requires bat; include
   `~/.config/delta/current.gitconfig` from your gitconfig)

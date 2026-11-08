@@ -1,0 +1,176 @@
+{
+  "$schema": "https://raw.githubusercontent.com/datapointchris/gotermstyle/main/tuitheme/schema/v1.json",
+  "ui": {
+    "text": "#cdcecf",
+    "muted": "#71839b",
+    "accent": "#719cd6",
+    "selection": {
+      "fg": "#cdcecf",
+      "bg": "#2b3b51"
+    },
+    "match": "#dbc074",
+    "border": "#39506d",
+    "panel": {
+      "bg": "#131a24"
+    },
+    "error": "#c94f6d",
+    "warning": "#dbc074",
+    "info": "#719cd6",
+    "success": "#81b29a"
+  },
+  "markdown": {
+    "strong": {
+      "bold": true
+    },
+    "italic": {
+      "italic": true
+    },
+    "strikethrough": {
+      "strikethrough": true
+    },
+    "underline": {
+      "underline": true
+    },
+    "heading": "#86abdc",
+    "heading.1": "#86abdc",
+    "heading.2": "#86abdc",
+    "heading.3": "#86abdc",
+    "heading.4": "#86abdc",
+    "heading.5": "#86abdc",
+    "heading.6": "#86abdc",
+    "quote": {
+      "fg": "#7ad5d6",
+      "italic": true
+    },
+    "math": "#f6b079",
+    "link": "#f4a261",
+    "link.label": "#f4a261",
+    "link.url": {
+      "fg": "#f4a261",
+      "underline": true
+    },
+    "raw": "#81b29a",
+    "raw.block": "#81b29a",
+    "list": "#aeafb0",
+    "list.checked": "#81b29a",
+    "list.unchecked": "#738091"
+  },
+  "syntax": {
+    "comment": "#738091",
+    "string": "#81b29a",
+    "number": "#f4a261",
+    "constant": "#f6b079",
+    "parameter": "#7ad5d6",
+    "function": "#86abdc",
+    "keyword": "#9d79d6",
+    "type": "#dbc074",
+    "operator": "#aeafb0",
+    "punctuation": "#aeafb0",
+    "attribute": "#f6b079",
+    "variable": "#cdcecf",
+    "tag": "#63cdcf",
+    "variable.builtin": {
+      "fg": "#c94f6d",
+      "italic": true
+    },
+    "variable.parameter": "#7ad5d6",
+    "variable.member": "#719cd6",
+    "constant.builtin": {
+      "fg": "#f6b079",
+      "bold": true
+    },
+    "constant.macro": "#dc8ed9",
+    "module": "#dbc074",
+    "module.builtin": "#f4a261",
+    "label": "#c94f6d",
+    "string.documentation": {
+      "fg": "#81b29a",
+      "italic": true
+    },
+    "string.regexp": "#e0c988",
+    "string.escape": {
+      "fg": "#e0c988",
+      "bold": true
+    },
+    "string.special": "#f4a261",
+    "string.special.symbol": "#719cd6",
+    "string.special.url": {
+      "fg": "#f4a261",
+      "underline": true
+    },
+    "character": "#81b29a",
+    "character.special": "#f4a261",
+    "boolean": {
+      "fg": "#f6b079",
+      "bold": true
+    },
+    "number.float": "#f4a261",
+    "type.builtin": {
+      "fg": "#dbc074",
+      "italic": true
+    },
+    "type.definition": "#dbc074",
+    "attribute.builtin": "#f4a261",
+    "property": "#719cd6",
+    "function.builtin": {
+      "fg": "#86abdc",
+      "italic": true
+    },
+    "function.call": "#86abdc",
+    "function.macro": "#dc8ed9",
+    "function.method": "#86abdc",
+    "function.method.call": "#86abdc",
+    "constructor": "#f4a261",
+    "constructor.lua": "#9d79d6",
+    "keyword.coroutine": {
+      "fg": "#9d79d6",
+      "italic": true
+    },
+    "keyword.function": "#9d79d6",
+    "keyword.operator": {
+      "fg": "#aeafb0",
+      "bold": true
+    },
+    "keyword.import": "#dc8ed9",
+    "keyword.type": "#dbc074",
+    "keyword.modifier": "#dbc074",
+    "keyword.repeat": "#c94f6d",
+    "keyword.return": "#63cdcf",
+    "keyword.debug": "#dbc074",
+    "keyword.exception": "#63cdcf",
+    "keyword.conditional": "#c94f6d",
+    "keyword.conditional.ternary": "#aeafb0",
+    "keyword.directive": "#dc8ed9",
+    "keyword.directive.define": "#dc8ed9",
+    "punctuation.delimiter": "#aeafb0",
+    "punctuation.bracket": "#aeafb0",
+    "punctuation.special": "#f4a261",
+    "comment.documentation": "#738091",
+    "comment.error": {
+      "fg": "#cdcecf",
+      "bg": "#c94f6d",
+      "bold": true
+    },
+    "comment.warning": {
+      "fg": "#192330",
+      "bg": "#dbc074",
+      "bold": true
+    },
+    "comment.todo": {
+      "fg": "#192330",
+      "bg": "#81b29a",
+      "bold": true
+    },
+    "comment.note": {
+      "fg": "#192330",
+      "bg": "#719cd6",
+      "bold": true
+    },
+    "diff.plus": "#81b29a",
+    "diff.minus": "#c94f6d",
+    "diff.delta": "#dbc074",
+    "tag.builtin": "#63cdcf",
+    "tag.attribute": "#719cd6",
+    "tag.delimiter": "#aeafb0"
+  }
+}

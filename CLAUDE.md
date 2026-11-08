@@ -131,10 +131,16 @@ same output file, so a role-based mapping puts a green in the slot a generator d
 ### The Generated Neovim Colorscheme
 
 Every theme has one, and `generate-all.sh` produces it like any other artifact:
-`lib/generators/neovim.py`, mapped under `["neovim"]="neovim"`. It is the only generator written
-in Python and the only one whose second argument is a directory. The job runner cares about
-neither: it passes the mapped value through as `$2`. The PEP 723 header makes it directly
+`lib/generators/neovim.py`, mapped under `["neovim"]="neovim"`. It is one of two generators
+written in Python, and the only one whose second argument is a directory. The job runner cares
+about neither: it passes the mapped value through as `$2`. The PEP 723 header makes it directly
 executable, so it needs no `uv run` wrapper at the call site.
+
+**Its syntax and tree-sitter groups live in `lib/neovim_highlights.py`, not in the Lua text.**
+`tui-theme.py` resolves the same table to hex, so a note or a snippet in a terminal program
+wears the style it has in Neovim. A highlight changed in the Lua template alone drifts from
+every terminal program. The table sits outside `lib/generators/` because the map check reads
+every script there as a generator.
 
 **The name it emits depends on where the theme's colors come from**, and this is the constraint
 to preserve:
