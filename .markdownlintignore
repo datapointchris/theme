@@ -3,6 +3,12 @@
 # is undone on the next release and returns as a conflict.
 CHANGELOG.md
 
+# Reports the analysis/experiments scripts write. A regeneration overwrites any
+# lint fix, and MD060 table-column-style findings cannot be fixed by --fix.
+analysis/experiments/canonical-comparison-results.md
+analysis/experiments/canonical-ml-experiment.md
+analysis/experiments/neovim-comparison-results.md
+
 # Auto-generated noise directories (gitignored)
 debug/**
 file-history/**
