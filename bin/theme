@@ -1045,6 +1045,7 @@ change_theme() {
   local preview_script="/tmp/theme-change-preview-$$.sh"
   cat >"$preview_script" <<PREVIEW_EOF
 #!/usr/bin/env bash
+set -euo pipefail
 source "$THEME_APP_DIR/lib/lib.sh"
 source "$THEME_APP_DIR/lib/storage.sh"
 theme_id="\$1"
@@ -1220,6 +1221,7 @@ unreject_theme_interactive() {
   local preview_script="/tmp/theme-unreject-preview-$$.sh"
   cat >"$preview_script" <<'PREVIEW_EOF'
 #!/bin/bash
+set -euo pipefail
 theme="$1"
 THEME_APP_DIR="$2"
 
@@ -1519,6 +1521,7 @@ show_info() {
     local preview_script="/tmp/theme-info-preview-$$.sh"
     cat >"$preview_script" <<PREVIEW_EOF
 #!/bin/bash
+set -euo pipefail
 source "$THEME_APP_DIR/lib/lib.sh"
 source "$THEME_APP_DIR/lib/storage.sh"
 # Extract theme ID from tab-separated input (display_name\ttheme_id)

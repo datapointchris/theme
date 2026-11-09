@@ -33,6 +33,7 @@ for app in "${APPS[@]}"; do
   start_time=$(date +%s.%N)
 
   if timeout "$TIMEOUT_SECS" bash -c "
+    set -euo pipefail
     source '$THEME_APP_DIR/lib/lib.sh'
     apply_$app '$THEME'
   " 2>/dev/null; then
@@ -55,6 +56,7 @@ echo ""
 echo "Testing reload_tmux..."
 printf "  %-12s " "reload_tmux"
 if timeout 5 bash -c "
+  set -euo pipefail
   source '$THEME_APP_DIR/lib/lib.sh'
   reload_tmux
 " 2>/dev/null; then
@@ -67,6 +69,7 @@ echo ""
 echo "Testing log_action..."
 printf "  %-12s " "log_action"
 if timeout 5 bash -c "
+  set -euo pipefail
   source '$THEME_APP_DIR/lib/storage.sh'
   log_action 'test' 'test-theme' 'test message'
 " 2>/dev/null; then

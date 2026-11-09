@@ -38,6 +38,7 @@ for i in "${!THEMES[@]}"; do
   start_time=$(date +%s.%N)
 
   if timeout "$TIMEOUT_SECS" bash -c "
+    set -euo pipefail
     source '$THEME_APP_DIR/lib/lib.sh'
     source '$THEME_APP_DIR/lib/storage.sh'
     apply_theme_to_apps '$theme' >/dev/null 2>&1

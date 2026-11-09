@@ -2,8 +2,6 @@
 # Theme library - core functions for theme management
 # Applies themes directly from themes/ directory
 
-set -euo pipefail
-
 THEME_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 THEME_APP_DIR="$(cd "$THEME_LIB_DIR/.." && pwd)"
 

@@ -2,8 +2,6 @@
 # Theme storage layer - unified JSONL history with machine context
 # Single history file synced across machines via gist
 
-set -euo pipefail
-
 # lib.sh sources this file, and every entry point sources both — so without a
 # guard the tail of this file re-runs init_storage on each source.
 [[ -n "${_THEME_STORAGE_SOURCED:-}" ]] && return 0

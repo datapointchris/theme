@@ -2,8 +2,6 @@
 # browser-profiles.sh - Profile discovery for Firefox-based browsers
 # Finds default profiles for Zen, Librewolf, Firefox, and Thunderbird
 
-set -euo pipefail
-
 #==============================================================================
 # PROFILE LOCATIONS BY PLATFORM
 #==============================================================================

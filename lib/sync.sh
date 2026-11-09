@@ -2,8 +2,6 @@
 # Theme sync layer - transparent GitHub Gist synchronization
 # Keeps history synced across machines without user intervention
 
-set -euo pipefail
-
 _SYNC_APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Sync state file (alongside history)

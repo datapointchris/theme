@@ -2,8 +2,6 @@
 # theme.sh - Functions for reading theme.yml files
 # Sources theme colors into shell variables for use by generators
 
-set -euo pipefail
-
 # The variable contract every generator consumes after
 # `eval "$(load_colors ...)"`. Named, never assigned: `export` on its own leaves
 # a name unset, so `set -u` still catches a generator that runs without the

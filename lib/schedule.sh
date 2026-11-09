@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # A timer that changes the theme while the user is present, one schedule per machine.
 
-set -euo pipefail
-
 [[ -n "${_THEME_SCHEDULE_SOURCED:-}" ]] && return 0
 _THEME_SCHEDULE_SOURCED=1
 
