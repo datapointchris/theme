@@ -76,14 +76,6 @@ assert_no_history() {
   [[ -n "$output" && "$output" != "$full" ]] || fail "reject --help printed the full screen"
 }
 
-@test "an alias resolves to the verb it stands for" {
-  local canonical
-  canonical=$("$THEME_ROOT/bin/theme" random --help 2>&1)
-  run "$THEME_ROOT/bin/theme" rand --help
-  assert_success
-  assert_output "$canonical"
-}
-
 @test "bare theme is a request for help, not a usage error" {
   run "$THEME_ROOT/bin/theme"
   assert_success

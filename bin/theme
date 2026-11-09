@@ -179,10 +179,6 @@ verb_usage() {
     schedule) schedule_usage && return ;;
     sync) sync_usage && return ;;
     browsers) browsers_usage && return ;;
-    ls) verb="list" ;;
-    rand) verb="random" ;;
-    ranks | ranking) verb="rank" ;;
-    history) verb="log" ;;
   esac
 
   local synopsis
@@ -1767,13 +1763,13 @@ main() {
     current)
       show_current
       ;;
-    list | ls)
+    list)
       show_list "${@:2}"
       ;;
     apply)
       apply_theme "${2:-}"
       ;;
-    random | rand)
+    random)
       apply_random
       ;;
     like)
@@ -1785,10 +1781,10 @@ main() {
     note)
       add_note "${@:2}"
       ;;
-    rank | ranks | ranking)
+    rank)
       show_rankings
       ;;
-    log | history)
+    log)
       show_log
       ;;
     info)
