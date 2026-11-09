@@ -8,7 +8,7 @@ set -euo pipefail
 # Source the library (handle symlinks)
 SCRIPT_PATH="${BASH_SOURCE[0]:-$0}"
 if [[ -L "$SCRIPT_PATH" ]]; then
-  SCRIPT_PATH="$(python3 -c "import os; print(os.path.realpath('$SCRIPT_PATH'))")"
+  SCRIPT_PATH="$(python3 -c 'import os, sys; print(os.path.realpath(sys.argv[1]))' "$SCRIPT_PATH")"
 fi
 SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 THEME_APP_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
