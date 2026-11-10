@@ -41,7 +41,6 @@ THEME_APP_ARTIFACTS=(
   "bat.tmTheme:bat"
   "delta.conf:delta"
   "flavor.toml:yazi"
-  "aerc.styleset:aerc"
   "sioyek.config:sioyek"
   "userChrome.css:Firefox-based"
   "chromium.theme:Chromium"
@@ -581,24 +580,6 @@ apply_yazi() {
   if [[ ! -L "$yazi_dir/theme.toml" ]]; then
     printf '[flavor]\ndark = "current"\nlight = "current"\n' >"$yazi_dir/theme.toml" || return 1
   fi
-
-  return 0
-}
-
-# Apply aerc email client theme (all platforms)
-# aerc.conf pins styleset-name to "current", so the filename is the contract
-apply_aerc() {
-  local theme="$1"
-  local lib_path
-  lib_path=$(get_library_path "$theme")
-
-  if [[ -z "$lib_path" ]] || [[ ! -f "$lib_path/aerc.styleset" ]]; then
-    return 1
-  fi
-
-  local aerc_styleset_dir="$HOME/.config/aerc/stylesets"
-
-  install_themed_artifact "$lib_path/aerc.styleset" "$aerc_styleset_dir" "$theme" "current" || return 1
 
   return 0
 }
@@ -2104,15 +2085,6 @@ apply_theme_to_apps() {
   else
     skipped+=("yazi")
     _print_app_status "yazi" "false"
-  fi
-
-  # aerc email client (all platforms)
-  if apply_aerc "$theme" 2>/dev/null; then
-    applied+=("aerc")
-    _print_app_status "aerc" "true"
-  else
-    skipped+=("aerc")
-    _print_app_status "aerc" "false"
   fi
 
   # Firefox-based browsers (all platforms)

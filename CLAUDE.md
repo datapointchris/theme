@@ -52,7 +52,7 @@ exception, because a flavor is a directory rather than a file.
 
 Both halves are load-bearing. The pointer keeps the name `current` because the apps that can only
 `source`/`@import`/`include` a **path** need one that does not move. The apps that resolve a theme
-*by name* (ghostty, btop, abtop, bat, aerc, rofi) often read their config from a symlink into
+*by name* (ghostty, btop, abtop, bat, rofi) often read their config from a symlink into
 another repo, so writing the name there would write through the link into that checkout. The payload
 carries the id so a machine says which theme it is running, every applied theme stays installed
 beside the others, and an exported config is self-describing.
@@ -369,7 +369,6 @@ or a generator is not deterministic.
 CLI verbs. These generators behave unlike the rest:
 
 - `sioyek.sh` emits a managed block spliced into the user's config, not a whole file.
-- `aerc.sh` relies on aerc.conf pinning `styleset-name = current`, so the applied filename is a contract.
 - `firefox-based.sh` writes one userChrome.css covering Firefox, Zen, Librewolf and Thunderbird.
 - `vscode.sh` is not wired into `theme apply`; run it directly when needed.
 - `vivaldi.sh` emits one entry of Vivaldi's `vivaldi.themes.user` pref, which

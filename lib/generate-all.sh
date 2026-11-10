@@ -57,7 +57,6 @@ declare -A GENERATOR_OUTPUT=(
   ["bat"]="bat.tmTheme"
   ["sioyek"]="sioyek.config"
   ["yazi"]="flavor.toml"
-  ["aerc"]="aerc.styleset"
   # The one generator whose output is a directory rather than a file, and one
   # of two written in Python. Both are incidental to the job runner, which only
   # ever passes this through as the second argument.
