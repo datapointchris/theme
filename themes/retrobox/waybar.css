@@ -35,12 +35,12 @@
 /* Backgrounds */
 @define-color bg #1c1c1c;
 @define-color bg-dark #3c3836;
-@define-color bg-highlight #504945;
+@define-color bg-highlight #3c3735;  /* Pill: base02, held near bg */
 @define-color bg-selection #504945;
 
-/* Foregrounds */
+/* Foregrounds, each at 4.5:1 or more on bg-highlight */
 @define-color fg #ebdbb2;
-@define-color fg-dark #a89984;
+@define-color fg-dark #ad9f8b;
 @define-color fg-muted #928374;
 @define-color fg-bright #d5c4a1;
 
@@ -50,13 +50,13 @@
 @define-color error #fb4934;
 @define-color info #83a598;
 
-/* Named accent colors */
-@define-color red #cc241d;
-@define-color green #98971a;
-@define-color yellow #d79921;
-@define-color blue #458588;
-@define-color magenta #b16286;
-@define-color cyan #689d6a;
+/* Named accent colors, each at 4.5:1 or more on bg-highlight */
+@define-color red #fc7c6d;
+@define-color green #b8bb26;
+@define-color yellow #fabd2f;
+@define-color blue #88a99c;
+@define-color magenta #d68da1;
+@define-color cyan #8ec07c;
 @define-color orange #fe8019;
 
 /* Bright variants */

@@ -195,6 +195,25 @@ count_theme_artifacts() {
   done
 }
 
+@test "every theme's waybar pill text reads at 4.5:1 or more" {
+  # Every waybar module draws fg or an accent on bg-highlight, a pair no upstream
+  # palette tuned, so the generator solves both colors. This reads what ships:
+  # the committed waybar.css of every theme.
+  local failures
+  failures=$(awk '
+      function chan(h, i) { return strtonum("0x" substr(h, i + 1, 2)) }
+      function lin(v,  c) { c = v / 255; return (c <= 0.03928) ? c / 12.92 : ((c + 0.055) / 1.055) ^ 2.4 }
+      function lum(h) { return 0.2126 * lin(chan(h, 1)) + 0.7152 * lin(chan(h, 3)) + 0.0722 * lin(chan(h, 5)) }
+      function ratio(a, b,  x, y) { x = lum(a); y = lum(b); return (x > y) ? (x + 0.05) / (y + 0.05) : (y + 0.05) / (x + 0.05) }
+      match($0, /^@define-color ([a-z-]+) (#[0-9a-fA-F]{6});/, m) { color[FILENAME, m[1]] = m[2]; files[FILENAME] = 1 }
+      END {
+        n = split("fg fg-dark red green yellow blue magenta cyan orange", text, " ")
+        for (f in files) for (i = 1; i <= n; i++)
+          if (ratio(color[f, text[i]], color[f, "bg-highlight"]) < 4.5) print f, text[i]
+      }' "$THEME_ROOT"/themes/*/waybar.css)
+  assert_equal "$failures" ""
+}
+
 @test "the bat theme's uuid is derived from the theme, not minted per run" {
   # It was `uuidgen`, which is unique per *run* — the property bat does not need
   # and the one that made all 25 committed tmTheme files churn on every

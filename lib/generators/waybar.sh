@@ -11,6 +11,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../theme.sh"
+source "$SCRIPT_DIR/../contrast.sh"
 
 if [[ $# -lt 1 ]]; then
   echo "Usage: $0 <theme.yml> [output-file]"
@@ -29,6 +30,35 @@ DIAG_WARNING="${EXTENDED_DIAGNOSTIC_WARNING:-$BASE09}"
 DIAG_INFO="${EXTENDED_DIAGNOSTIC_INFO:-$BASE0D}"
 DIAG_OK="${EXTENDED_DIAGNOSTIC_OK:-$BASE0B}"
 UI_BORDER="${EXTENDED_UI_BORDER:-$SPECIAL_BORDER}"
+
+# Every waybar module is a pill on bg-highlight with fg or an accent as its text.
+# base02 is tuned as a selection under the theme's text, not under its accents,
+# and some palettes put it near mid-grey, where no saturated red reaches 4.5:1.
+# So the pill keeps base02 up to 1.45:1 over bg, the median across the themes,
+# and is blended toward bg beyond it. Each color drawn on it is then solved.
+PILL="$(band "$BASE02" "$SPECIAL_BG" 1.45 1)"
+
+# Starts from whichever variant already reads higher on the pill, so the push
+# toward white is the smallest the palette allows.
+pill_text() {
+  local start="$1" other
+  for other in "${@:2}"; do
+    if awk -v a="$(contrast_ratio "$other" "$PILL")" -v b="$(contrast_ratio "$start" "$PILL")" 'BEGIN { exit !(a > b) }'; then
+      start="$other"
+    fi
+  done
+  legible "$start" "$PILL" 4.5
+}
+
+PILL_FG="$(pill_text "$SPECIAL_FG")"
+PILL_FG_DARK="$(pill_text "$BASE04")"
+PILL_RED="$(pill_text "$ANSI_RED" "$ANSI_BRIGHT_RED")"
+PILL_GREEN="$(pill_text "$ANSI_GREEN" "$ANSI_BRIGHT_GREEN")"
+PILL_YELLOW="$(pill_text "$ANSI_YELLOW" "$ANSI_BRIGHT_YELLOW")"
+PILL_BLUE="$(pill_text "$ANSI_BLUE" "$ANSI_BRIGHT_BLUE")"
+PILL_MAGENTA="$(pill_text "$ANSI_MAGENTA" "$ANSI_BRIGHT_MAGENTA")"
+PILL_CYAN="$(pill_text "$ANSI_CYAN" "$ANSI_BRIGHT_CYAN")"
+PILL_ORANGE="$(pill_text "$BASE09")"
 
 generate() {
   cat <<EOF
@@ -69,12 +99,12 @@ generate() {
 /* Backgrounds */
 @define-color bg ${SPECIAL_BG};
 @define-color bg-dark ${BASE01};
-@define-color bg-highlight ${BASE02};
+@define-color bg-highlight ${PILL};  /* Pill: base02, held near bg */
 @define-color bg-selection ${SPECIAL_SELECTION_BG};
 
-/* Foregrounds */
-@define-color fg ${SPECIAL_FG};
-@define-color fg-dark ${BASE04};
+/* Foregrounds, each at 4.5:1 or more on bg-highlight */
+@define-color fg ${PILL_FG};
+@define-color fg-dark ${PILL_FG_DARK};
 @define-color fg-muted ${BASE03};
 @define-color fg-bright ${BASE06};
 
@@ -84,14 +114,14 @@ generate() {
 @define-color error ${DIAG_ERROR};
 @define-color info ${DIAG_INFO};
 
-/* Named accent colors */
-@define-color red ${ANSI_RED};
-@define-color green ${ANSI_GREEN};
-@define-color yellow ${ANSI_YELLOW};
-@define-color blue ${ANSI_BLUE};
-@define-color magenta ${ANSI_MAGENTA};
-@define-color cyan ${ANSI_CYAN};
-@define-color orange ${BASE09};
+/* Named accent colors, each at 4.5:1 or more on bg-highlight */
+@define-color red ${PILL_RED};
+@define-color green ${PILL_GREEN};
+@define-color yellow ${PILL_YELLOW};
+@define-color blue ${PILL_BLUE};
+@define-color magenta ${PILL_MAGENTA};
+@define-color cyan ${PILL_CYAN};
+@define-color orange ${PILL_ORANGE};
 
 /* Bright variants */
 @define-color bright-red ${ANSI_BRIGHT_RED};

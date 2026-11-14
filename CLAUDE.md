@@ -216,9 +216,13 @@ id with hyphens replaced by underscores.
   1.8 and the CI runner runs 1.7, so this shape passes locally and breaks in CI —
   and broke `get_theme_stats()` in `lib/storage.sh`, which `theme info` reaches,
   on any machine still on 1.7. `jq --version` before believing a jq program works.
-- **Change-signal colors are solved, not blended by a fixed fraction.** A fixed fraction lands at
-  a different perceived strength on every palette. `delta.sh` searches for the blend that hits a
-  target contrast ratio against that theme's own background.
+- **A color pair upstream never tuned is solved, not blended by a fixed fraction.** A fixed
+  fraction lands at a different perceived strength on every palette. `band` and `legible` in
+  `lib/contrast.sh` search for the blend that hits a target contrast ratio against that theme's
+  own surface. delta solves its change bands with them. waybar holds its pill near `bg` and
+  solves every text color drawn on it to 4.5:1, because some palettes put `base02` near
+  mid-grey, where no saturated red reaches that. Both blend in gamma sRGB, which loses chroma
+  toward white.
 - **`theme schedule` reads only this machine's apply rows.** Each apply row carries a
   `trigger`, `schedule` or `manual`, and a row without one predates the schedule and was
   applied by hand. Turns start at fixed local hours, `THEME_SCHEDULE_FIRST_TURN_HOUR` and
