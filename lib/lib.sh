@@ -273,7 +273,8 @@ get_theme_path() {
   fi
 }
 
-# Alias for backward compatibility
+# A second name for get_theme_path, and the one the app handlers below and
+# bin/theme call. Both names are live and resolve the same directory.
 get_library_path() {
   get_theme_path "$@"
 }
