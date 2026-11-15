@@ -357,9 +357,13 @@ developer's live tmux server and restyles their panes from the sandbox file.
 on a pipeline use `run pipeline "foo | jq ..."`, never `run bash -c "source ../lib/lib.sh; ..."`,
 which respawns a shell and re-sources the libraries for every assertion.
 
-Coverage is the pure library functions, one file per concern. The apply path itself is not
-covered: it mutates the live machine, which is what `scripts/test-all-themes.sh` and
-`scripts/test-theme-apps.sh` are for, and why neither can run in CI.
+Coverage is the library functions, one file per concern. `tests/apply-theme-to-apps.bats` runs
+a whole `apply_theme_to_apps` in the sandbox, once as plain Linux and once as Arch. It asserts
+which apps each platform themes and that none is skipped. It needs no reload stubs, because the
+reloads that reach a live session are in `reload_apps`, which the CLI calls separately. Only
+`bat` and `delta` are stubbed, so the result does not depend on the machine having them. What no
+test reaches is a running app picking up its new config. `scripts/test-all-themes.sh` and
+`scripts/test-theme-apps.sh` check that by hand on a real session, and neither can run in CI.
 
 `tests/generators.bats` carries the repo-wide invariants: every generator is in `generate-all.sh`'s
 map and vice versa, no map subscript contains a space, every theme carries the identical artifact
