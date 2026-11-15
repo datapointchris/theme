@@ -9,6 +9,10 @@
 #
 # The verb list is read out of the help screen rather than written here, so a
 # command added to the table is covered without a new test.
+#
+# The same screens are the command tree that every command a hint, an error or
+# an example prints is walked against, so renaming a command fails here rather
+# than sending a reader to "unknown command".
 
 load "$HOME/.local/lib/bats-support/load.bash"
 load "$HOME/.local/lib/bats-assert/load.bash"
@@ -79,4 +83,72 @@ assert_no_history() {
 @test "bare theme is a request for help, not a usage error" {
   run "$THEME_ROOT/bin/theme"
   assert_success
+}
+
+# Prints "<command path>|leaf" or "<command path>|node" for every command under
+# the path given, read from that path's help screen. A screen lists what runs
+# under Commands and what has a screen of its own under Subcommands. Only a
+# Subcommands entry is asked for its help, because a leaf below the first word
+# takes --help as an argument and runs.
+command_tree() {
+  local prefix="$1" name kind
+  local -a words=()
+  [[ -n "$prefix" ]] && read -ra words <<<"$prefix"
+  while read -r name kind; do
+    echo "${prefix:+$prefix }$name|$kind"
+    if [[ "$kind" == node ]]; then
+      command_tree "${prefix:+$prefix }$name"
+    fi
+  done < <(
+    "$THEME_ROOT/bin/theme" ${words[@]+"${words[@]}"} --help \
+      | awk '/^[A-Z]/ { section = $0; next }
+             /^  [a-z]/ && section == "Commands" { print $1, "leaf" }
+             /^  [a-z]/ && section == "Subcommands" { print $1, "node" }'
+  )
+}
+
+# Every `theme ...` the source prints for a person to run, as
+# "<file>:<line> <words>". Prose says "the theme name" and "with theme colors",
+# so a command is recognized by what leads into it: a label ending in a colon,
+# "see" or "or", an opening single quote, print_cyan, or an example line's indent.
+printed_commands() {
+  local re='(Usage: |Run: |[^A-Za-z][a-z]+: |print_cyan "|'"'"'|[^a-z]see |[^a-z]or |^[[:space:]]+|echo "[[:space:]]+)theme(( [a-z][a-z-]*)+)'
+  local line file rest lineno text
+  while IFS= read -r line; do
+    file=${line%%:*}
+    rest=${line#*:}
+    lineno=${rest%%:*}
+    text=${rest#*:}
+    [[ "$text" =~ ^[[:space:]]*# ]] && continue
+    while [[ "$text" =~ $re ]]; do
+      echo "${file#"$THEME_ROOT"/}:$lineno${BASH_REMATCH[2]}"
+      text=${text#*"${BASH_REMATCH[0]}"}
+    done
+  done < <(grep -HnE 'theme [a-z]' "$THEME_ROOT/bin/theme" "$THEME_ROOT"/lib/*.sh \
+    "$THEME_ROOT"/lib/generators/*.sh "$THEME_ROOT"/scripts/*.sh)
+}
+
+@test "every command a hint or help screen prints is in the command tree" {
+  # help is the one verb no screen lists, because it is the screen.
+  local tree
+  tree=$'\nhelp|leaf\n'"$(command_tree "")"$'\n'
+
+  local location words path word walked=0 missing=""
+  local -a parts
+  while read -r location words; do
+    walked=$((walked + 1))
+    read -ra parts <<<"$words"
+    path=""
+    for word in "${parts[@]}"; do
+      path="${path:+$path }$word"
+      [[ "$tree" == *$'\n'"$path|leaf"$'\n'* ]] && break
+      if [[ "$tree" != *$'\n'"$path|node"$'\n'* ]]; then
+        missing+="$location: theme $words"$'\n'
+        break
+      fi
+    done
+  done < <(printed_commands)
+
+  [[ -z "$missing" ]] || fail "printed commands missing from the command tree:"$'\n'"$missing"
+  ((walked > 40)) || fail "found only $walked printed commands; the markers stopped matching"
 }
