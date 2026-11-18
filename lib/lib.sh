@@ -60,6 +60,34 @@ THEME_APP_ARTIFACTS=(
   "neovim:Neovim(generated)"
 )
 
+# name:platforms rows, one per step of `theme apply`, in the order they run.
+# platforms is "all" or a comma list of detect_platform values. The name is what
+# APPLIED and SKIPPED report and what reload_apps matches, and the step calls
+# apply_<name>, a hyphen spelled as an underscore. apply_theme_to_apps names
+# the steps that differ from that. delta follows bat, whose theme cache it reads.
+THEME_APPLY_STEPS=(
+  "ghostty:macos,arch"
+  "kitty:macos,arch"
+  "borders:macos"
+  "background:macos,arch,wsl"
+  "tmux:all"
+  "btop:all"
+  "abtop:all"
+  "tui-theme:all"
+  "yazi:all"
+  "browsers:all"
+  "vivaldi:macos,arch"
+  "bat:all"
+  "delta:all"
+  "sioyek:all"
+  "hyprland:arch"
+  "waybar:arch"
+  "hyprlock:arch"
+  "dunst:arch"
+  "rofi:arch"
+  "windows-terminal:wsl"
+)
+
 #==============================================================================
 # THEME ACCESS - scans themes/ directory
 #==============================================================================
@@ -1957,7 +1985,73 @@ apply_windows_terminal() {
 # MAIN APPLY FUNCTION
 #==============================================================================
 
-# Apply theme to all available apps on current platform
+_print_app_status() {
+  local app="$1"
+  local success="$2"
+  if [[ "$success" == "true" ]]; then
+    echo "  ✓ $app" >&2
+  else
+    echo "  ✗ $app (error)" >&2
+  fi
+}
+
+# The steps below run inside apply_theme_to_apps and record their outcome in
+# its applied and skipped arrays, which bash's dynamic scope makes theirs.
+
+# Usage: _apply_step <theme> <name> <apply function>
+_apply_step() {
+  local theme="$1" name="$2" apply_function="$3"
+  if "$apply_function" "$theme" 2>/dev/null; then
+    applied+=("$name")
+    _print_app_status "$name" "true"
+  else
+    skipped+=("$name")
+    _print_app_status "$name" "false"
+  fi
+}
+
+# Sets apply_theme_to_apps' background_id to the background it installed.
+_apply_background_step() {
+  local theme="$1"
+  if background_is_off; then
+    echo "  - background (skipped: background mode is none)" >&2
+    return 0
+  fi
+  # stderr goes to a file rather than /dev/null so a failure can say why. The
+  # style name is this call's stdout, so the reason cannot share it.
+  local background_style background_error reason
+  background_error=$(mktemp)
+  if background_style=$(apply_background "$theme" 2>"$background_error"); then
+    applied+=("background")
+    _print_app_status "background ($background_style)" "true"
+    background_id=$(get_current_background)
+  else
+    skipped+=("background")
+    _print_app_status "background" "false"
+    reason=$(paste -sd ' ' "$background_error")
+    apply_warn "Background not changed: ${reason:-no reason given}"
+  fi
+  rm -f "$background_error"
+}
+
+_apply_vivaldi_step() {
+  local theme="$1"
+  local vivaldi_stranded
+  if vivaldi_stranded=$(vivaldi_stranded_theme); then
+    apply_warn "Vivaldi never got $vivaldi_stranded: it was still open when its waiter stopped. This apply replaces it."
+  fi
+  local vivaldi_status
+  if vivaldi_status=$(apply_vivaldi "$theme" 2>/dev/null); then
+    applied+=("vivaldi")
+    _print_app_status "vivaldi${vivaldi_status:+ ($vivaldi_status)}" "true"
+  else
+    skipped+=("vivaldi")
+    _print_app_status "vivaldi" "false"
+  fi
+}
+
+# Apply theme to all available apps on current platform, one THEME_APPLY_STEPS
+# row at a time.
 apply_theme_to_apps() {
   local theme="$1"
   local platform
@@ -1965,18 +2059,9 @@ apply_theme_to_apps() {
 
   local applied=()
   local skipped=()
+  local background_id=""
 
   APPLY_WARNINGS=()
-
-  _print_app_status() {
-    local app="$1"
-    local success="$2"
-    if [[ "$success" == "true" ]]; then
-      echo "  ✓ $app" >&2
-    else
-      echo "  ✗ $app (error)" >&2
-    fi
-  }
 
   # Check if theme exists in library
   local lib_path
@@ -1986,213 +2071,19 @@ apply_theme_to_apps() {
     echo "Warning: Theme '$theme' not in library, limited app support" >&2
   fi
 
-  # Ghostty (macOS and Arch)
-  if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]]; then
-    if apply_ghostty "$theme" 2>/dev/null; then
-      applied+=("ghostty")
-      _print_app_status "ghostty" "true"
-    else
-      skipped+=("ghostty")
-      _print_app_status "ghostty" "false"
-    fi
-  fi
-
-  # Kitty (macOS and Arch)
-  if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]]; then
-    if apply_kitty "$theme" 2>/dev/null; then
-      applied+=("kitty")
-      _print_app_status "kitty" "true"
-    else
-      skipped+=("kitty")
-      _print_app_status "kitty" "false"
-    fi
-  fi
-
-  # JankyBorders (macOS only)
-  if [[ "$platform" == "macos" ]]; then
-    if apply_borders "$theme" 2>/dev/null; then
-      applied+=("borders")
-      _print_app_status "borders" "true"
-    else
-      skipped+=("borders")
-      _print_app_status "borders" "false"
-    fi
-  fi
-
-  # Background (macOS, Arch, WSL)
-  local background_id=""
-  if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]] || [[ "$platform" == "wsl" ]]; then
-    if background_is_off; then
-      echo "  - background (skipped: background mode is none)" >&2
-    else
-      # stderr goes to a file rather than /dev/null so a failure can say why. The
-      # style name is this call's stdout, so the reason cannot share it.
-      local background_style background_error reason
-      background_error=$(mktemp)
-      if background_style=$(apply_background "$theme" 2>"$background_error"); then
-        applied+=("background")
-        _print_app_status "background ($background_style)" "true"
-        background_id=$(get_current_background)
-      else
-        skipped+=("background")
-        _print_app_status "background" "false"
-        reason=$(paste -sd ' ' "$background_error")
-        apply_warn "Background not changed: ${reason:-no reason given}"
-      fi
-      rm -f "$background_error"
-    fi
-  fi
-
-  # Tmux (all platforms)
-  if apply_tmux "$theme" 2>/dev/null; then
-    applied+=("tmux")
-    _print_app_status "tmux" "true"
-  else
-    skipped+=("tmux")
-    _print_app_status "tmux" "false"
-  fi
-
-  # Btop (all platforms)
-  if apply_btop "$theme" 2>/dev/null; then
-    applied+=("btop")
-    _print_app_status "btop" "true"
-  else
-    skipped+=("btop")
-    _print_app_status "btop" "false"
-  fi
-
-  # abtop (all platforms)
-  if apply_abtop "$theme" 2>/dev/null; then
-    applied+=("abtop")
-    _print_app_status "abtop" "true"
-  else
-    skipped+=("abtop")
-    _print_app_status "abtop" "false"
-  fi
-
-  # The TUI theme file (all platforms)
-  if apply_tui_theme "$theme" 2>/dev/null; then
-    applied+=("tui-theme")
-    _print_app_status "tui-theme" "true"
-  else
-    skipped+=("tui-theme")
-    _print_app_status "tui-theme" "false"
-  fi
-
-  # Yazi (all platforms)
-  if apply_yazi "$theme" 2>/dev/null; then
-    applied+=("yazi")
-    _print_app_status "yazi" "true"
-  else
-    skipped+=("yazi")
-    _print_app_status "yazi" "false"
-  fi
-
-  # Firefox-based browsers (all platforms)
-  if apply_firefox_based "$theme" 2>/dev/null; then
-    applied+=("browsers")
-    _print_app_status "browsers" "true"
-  else
-    skipped+=("browsers")
-    _print_app_status "browsers" "false"
-  fi
-
-  # Vivaldi (macOS and Arch)
-  if [[ "$platform" == "macos" ]] || [[ "$platform" == "arch" ]]; then
-    local vivaldi_stranded
-    if vivaldi_stranded=$(vivaldi_stranded_theme); then
-      apply_warn "Vivaldi never got $vivaldi_stranded: it was still open when its waiter stopped. This apply replaces it."
-    fi
-    local vivaldi_status
-    if vivaldi_status=$(apply_vivaldi "$theme" 2>/dev/null); then
-      applied+=("vivaldi")
-      _print_app_status "vivaldi${vivaldi_status:+ ($vivaldi_status)}" "true"
-    else
-      skipped+=("vivaldi")
-      _print_app_status "vivaldi" "false"
-    fi
-  fi
-
-  # bat syntax highlighter (all platforms)
-  if apply_bat "$theme" 2>/dev/null; then
-    applied+=("bat")
-    _print_app_status "bat" "true"
-  else
-    skipped+=("bat")
-    _print_app_status "bat" "false"
-  fi
-
-  # delta git pager (all platforms) — must follow bat, whose cache it reads
-  if apply_delta "$theme" 2>/dev/null; then
-    applied+=("delta")
-    _print_app_status "delta" "true"
-  else
-    skipped+=("delta")
-    _print_app_status "delta" "false"
-  fi
-
-  # sioyek PDF viewer (all platforms)
-  if apply_sioyek "$theme" 2>/dev/null; then
-    applied+=("sioyek")
-    _print_app_status "sioyek" "true"
-  else
-    skipped+=("sioyek")
-    _print_app_status "sioyek" "false"
-  fi
-
-  # Hyprland (Arch only)
-  if [[ "$platform" == "arch" ]]; then
-    if apply_hyprland "$theme" 2>/dev/null; then
-      applied+=("hyprland")
-      _print_app_status "hyprland" "true"
-    else
-      skipped+=("hyprland")
-      _print_app_status "hyprland" "false"
-    fi
-
-    if apply_waybar "$theme" 2>/dev/null; then
-      applied+=("waybar")
-      _print_app_status "waybar" "true"
-    else
-      skipped+=("waybar")
-      _print_app_status "waybar" "false"
-    fi
-
-    if apply_hyprlock "$theme" 2>/dev/null; then
-      applied+=("hyprlock")
-      _print_app_status "hyprlock" "true"
-    else
-      skipped+=("hyprlock")
-      _print_app_status "hyprlock" "false"
-    fi
-
-    if apply_dunst "$theme" 2>/dev/null; then
-      applied+=("dunst")
-      _print_app_status "dunst" "true"
-    else
-      skipped+=("dunst")
-      _print_app_status "dunst" "false"
-    fi
-
-    if apply_rofi "$theme" 2>/dev/null; then
-      applied+=("rofi")
-      _print_app_status "rofi" "true"
-    else
-      skipped+=("rofi")
-      _print_app_status "rofi" "false"
-    fi
-  fi
-
-  # Windows Terminal (WSL only)
-  if [[ "$platform" == "wsl" ]]; then
-    if apply_windows_terminal "$theme" 2>/dev/null; then
-      applied+=("windows-terminal")
-      _print_app_status "windows-terminal" "true"
-    else
-      skipped+=("windows-terminal")
-      _print_app_status "windows-terminal" "false"
-    fi
-  fi
+  local step name platforms
+  for step in "${THEME_APPLY_STEPS[@]}"; do
+    name="${step%%:*}"
+    platforms=",${step#*:},"
+    [[ "$platforms" == ",all," || "$platforms" == *",$platform,"* ]] || continue
+    case "$name" in
+      background) _apply_background_step "$theme" ;;
+      vivaldi) _apply_vivaldi_step "$theme" ;;
+      # One userChrome.css covers every Firefox-based browser.
+      browsers) _apply_step "$theme" browsers apply_firefox_based ;;
+      *) _apply_step "$theme" "$name" "apply_${name//-/_}" ;;
+    esac
+  done
 
   check_neovim_colorscheme "$theme"
 

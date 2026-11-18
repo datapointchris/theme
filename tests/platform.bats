@@ -75,10 +75,10 @@ setup() {
 @test "every platform label lib.sh compares against is one detect_platform can emit" {
   # A label detect_platform never produces is a dead branch, and every branch
   # here guards an app being applied — so a dead one is an app that silently
-  # stops being themed. Both comparison forms are checked: `"$platform" == "x"`
-  # and the case arms in set_desktop_wallpaper.
+  # stops being themed. Every form is checked: `"$platform" == "x"`, the case
+  # arms in set_desktop_wallpaper, and the platforms of each THEME_APPLY_STEPS row.
   local emitted=" macos wsl arch linux unknown "
-  local label found=0
+  local label found=0 step
 
   while read -r label; do
     [[ -n "$label" ]] || continue
@@ -89,6 +89,9 @@ setup() {
     {
       grep -oE 'platform" == "[a-z]+"' "$THEME_ROOT/lib/lib.sh" | grep -oE '[a-z]+"$'
       grep -oE '^    [a-z]+\)$' "$THEME_ROOT/lib/lib.sh" | tr -d ' '
+      for step in "${THEME_APPLY_STEPS[@]}"; do
+        tr ',' '\n' <<<"${step#*:}" | grep -vx all
+      done
     } | tr -d '")' | sort -u
   )
 
