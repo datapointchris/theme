@@ -76,7 +76,19 @@ SESSION_GAP="  "
 # "fg=#{?...}") — tmux resolves a style at draw time and does not expand formats
 # within it. Same idiom as pane-border-style below. Alert mirrors the window
 # bell style: inverted rather than merely recoloured.
-SESSION_ENTRY="#[range=session|#{session_id}]#{?session_alert,#[fg=${BASE00}]#[bg=${DIAG_ERROR}]#[bold],#[fg=${BASE04}]#[bg=${BASE00}]} #{session_name} #[nobold]#[norange]#[default]${SESSION_GAP}"
+ALERT_STYLE="#[fg=${BASE00}]#[bg=${DIAG_ERROR}]#[bold]"
+
+# A session, a window or the status line also draws in the alert style when a
+# pane in it needs the user. The tmux config decides what that means by setting
+# four user options, each a format this file expands with E: in the entry's own
+# context. An unset one expands empty, so a config that sets none draws nothing.
+#   @session_needs_you       non-empty in a session holding such a pane
+#   @window_needs_you        non-empty in a window holding one
+#   @window_needs_you_style  style attributes added to that window, such as blink
+#   @needs_you_status        text opening status-right, such as "2 need you"
+# The current session and window keep their own style, as the current session
+# does for an alert, so the line still says where the client is.
+SESSION_ENTRY="#[range=session|#{session_id}]#{?#{||:#{session_alert},#{E:@session_needs_you}},${ALERT_STYLE},#[fg=${BASE04}]#[bg=${BASE00}]} #{session_name} #[nobold]#[norange]#[default]${SESSION_GAP}"
 SESSION_ENTRY_CURRENT="#[range=session|#{session_id} list=focus]#[fg=${GIT_ADD}]#[bg=${BASE00}]#[bold] #{session_name} #[nobold]#[norange]#[list=on]#[default]${SESSION_GAP}"
 
 generate() {
@@ -214,12 +226,12 @@ set-option -g status-left ""
 # as one bar. Separation is whitespace only; the current window is told apart by
 # colour and weight, which is preattentive and needs no reading.
 set-window-option -g window-status-separator "${SESSION_GAP}"
-set-window-option -g window-status-format " #W "
+set-window-option -g window-status-format "#{?#{E:@window_needs_you},${ALERT_STYLE}#[#{E:@window_needs_you_style}],} #W "
 set-window-option -g window-status-current-format " #W "
 
-# Status right: clock and date
-# base04 for muted clock/date text
-set-option -g status-right "#[fg=${BASE04}]%I:%M%p  %m.%d.%Y "
+# Status right: how many panes need the user, drawn only when some do, then the
+# clock and date in base04
+set-option -g status-right "#{?#{E:@needs_you_status},${ALERT_STYLE} #{E:@needs_you_status} #[default]${SESSION_GAP},}#[fg=${BASE04}]%I:%M%p  %m.%d.%Y "
 
 # Session list, drawn on the first status line above the window row. list=focus
 # on the current session keeps it scrolled into view once the list outgrows the
