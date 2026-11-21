@@ -74,21 +74,24 @@ SESSION_GAP="  "
 
 # Conditionals wrap whole #[...] blocks rather than sitting inside one (no
 # "fg=#{?...}") — tmux resolves a style at draw time and does not expand formats
-# within it. Same idiom as pane-border-style below. Alert mirrors the window
-# bell style: inverted rather than merely recoloured.
+# within it. Same idiom as pane-border-style below. A session bell alert mirrors
+# the window bell style: inverted rather than merely recoloured.
 ALERT_STYLE="#[fg=${BASE00}]#[bg=${DIAG_ERROR}]#[bold]"
 
-# A session, a window or the status line also draws in the alert style when a
-# pane in it needs the user. The tmux config decides what that means by setting
-# four user options, each a format this file expands with E: in the entry's own
-# context. An unset one expands empty, so a config that sets none draws nothing.
+# A session or window holding a pane that needs the user gets a dot in the error
+# color before its name, and the status line opens with a count in that color.
+# All three stay on the bar's own background. A filled background reads as a
+# selected tab, so it would make a flagged entry look like the current one.
+# The tmux config decides what needing the user means by setting four user
+# options, each a format this file expands with E: in the entry's own context.
+# An unset one expands empty, so a config that sets none draws nothing.
 #   @session_needs_you       non-empty in a session holding such a pane
 #   @window_needs_you        non-empty in a window holding one
-#   @window_needs_you_style  style attributes added to that window, such as blink
+#   @window_needs_you_style  style attributes added to that window's dot, such as blink
 #   @needs_you_status        text opening status-right, such as "2 need you"
-# The current session and window keep their own style, as the current session
-# does for an alert, so the line still says where the client is.
-SESSION_ENTRY="#[range=session|#{session_id}]#{?#{||:#{session_alert},#{E:@session_needs_you}},${ALERT_STYLE},#[fg=${BASE04}]#[bg=${BASE00}]} #{session_name} #[nobold]#[norange]#[default]${SESSION_GAP}"
+# The current session and window carry no dot: the client is already there.
+NEEDS_YOU_MARK="#[fg=${DIAG_ERROR}] ●"
+SESSION_ENTRY="#[range=session|#{session_id}]#{?#{session_alert},${ALERT_STYLE},#[fg=${BASE04}]#[bg=${BASE00}]#{?#{E:@session_needs_you},${NEEDS_YOU_MARK}#[fg=${BASE04}],}} #{session_name} #[nobold]#[norange]#[default]${SESSION_GAP}"
 SESSION_ENTRY_CURRENT="#[range=session|#{session_id} list=focus]#[fg=${GIT_ADD}]#[bg=${BASE00}]#[bold] #{session_name} #[nobold]#[norange]#[list=on]#[default]${SESSION_GAP}"
 
 generate() {
@@ -226,12 +229,12 @@ set-option -g status-left ""
 # as one bar. Separation is whitespace only; the current window is told apart by
 # colour and weight, which is preattentive and needs no reading.
 set-window-option -g window-status-separator "${SESSION_GAP}"
-set-window-option -g window-status-format "#{?#{E:@window_needs_you},${ALERT_STYLE}#[#{E:@window_needs_you_style}],} #W "
+set-window-option -g window-status-format "#{?#{E:@window_needs_you},#[#{E:@window_needs_you_style}]${NEEDS_YOU_MARK}#[default],} #W "
 set-window-option -g window-status-current-format " #W "
 
-# Status right: how many panes need the user, drawn only when some do, then the
-# clock and date in base04
-set-option -g status-right "#{?#{E:@needs_you_status},${ALERT_STYLE} #{E:@needs_you_status} #[default]${SESSION_GAP},}#[fg=${BASE04}]%I:%M%p  %m.%d.%Y "
+# Status right: how many panes need the user, drawn only when some do, as bold
+# error-colored text on the bar's background, then the clock and date in base04
+set-option -g status-right "#{?#{E:@needs_you_status},#[fg=${DIAG_ERROR}]#[bold]#{E:@needs_you_status}#[default]${SESSION_GAP},}#[fg=${BASE04}]%I:%M%p  %m.%d.%Y "
 
 # Session list, drawn on the first status line above the window row. list=focus
 # on the current session keeps it scrolled into view once the list outgrows the
