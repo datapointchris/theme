@@ -87,12 +87,15 @@ ALERT_STYLE="#[fg=${BASE00}]#[bg=${DIAG_ERROR}]#[bold]"
 # An unset one expands empty, so a config that sets none draws nothing.
 #   @session_needs_you       non-empty in a session holding such a pane
 #   @window_needs_you        non-empty in a window holding one
-#   @window_needs_you_style  style attributes added to that window's dot, such as blink
+#   @window_needs_you_style  style attributes added to a window's dot, such as blink
 #   @needs_you_status        text opening status-right, such as "2 need you"
-# The current session and window carry no dot: the client is already there.
+# The current session and window carry the dot too. Without it a flag raised
+# while the client is there shows up only after the client leaves. The current
+# window's dot leaves out @window_needs_you_style, since blink would pull the eye
+# to where it already is.
 NEEDS_YOU_MARK="#[fg=${DIAG_ERROR}] ●"
 SESSION_ENTRY="#[range=session|#{session_id}]#{?#{session_alert},${ALERT_STYLE},#[fg=${BASE04}]#[bg=${BASE00}]#{?#{E:@session_needs_you},${NEEDS_YOU_MARK}#[fg=${BASE04}],}} #{session_name} #[nobold]#[norange]#[default]${SESSION_GAP}"
-SESSION_ENTRY_CURRENT="#[range=session|#{session_id} list=focus]#[fg=${GIT_ADD}]#[bg=${BASE00}]#[bold] #{session_name} #[nobold]#[norange]#[list=on]#[default]${SESSION_GAP}"
+SESSION_ENTRY_CURRENT="#[range=session|#{session_id} list=focus]#[fg=${GIT_ADD}]#[bg=${BASE00}]#[bold]#{?#{E:@session_needs_you},${NEEDS_YOU_MARK}#[fg=${GIT_ADD}],} #{session_name} #[nobold]#[norange]#[list=on]#[default]${SESSION_GAP}"
 
 generate() {
   cat <<EOF
@@ -230,7 +233,7 @@ set-option -g status-left ""
 # colour and weight, which is preattentive and needs no reading.
 set-window-option -g window-status-separator "${SESSION_GAP}"
 set-window-option -g window-status-format "#{?#{E:@window_needs_you},#[#{E:@window_needs_you_style}]${NEEDS_YOU_MARK}#[default],} #W "
-set-window-option -g window-status-current-format " #W "
+set-window-option -g window-status-current-format "#{?#{E:@window_needs_you},${NEEDS_YOU_MARK}#[default],} #W "
 
 # Status right: how many panes need the user, drawn only when some do, as bold
 # error-colored text on the bar's background, then the clock and date in base04
