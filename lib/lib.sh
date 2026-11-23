@@ -283,6 +283,26 @@ set_current_theme() {
   echo "$theme" >"$CURRENT_THEME_FILE"
 }
 
+# The current theme as schemas/current-show.schema.json describes it. It reads
+# the current file and that theme's theme.yml and nothing else, so it never
+# syncs and answers offline. The file holds the canonical id that apply wrote,
+# so the theme.yml path is built from it directly rather than through
+# theme_name_to_canonical, which forks once per theme directory.
+current_theme_record_json() {
+  local id theme_file
+  id=$(get_current_theme)
+  theme_file="$THEMES_DIR/$id/theme.yml"
+
+  if [[ -z "$id" ]]; then
+    jq -n '{schema_version: 1, id: null, display_name: null, neovim_colorscheme_name: null}'
+  elif [[ -f "$theme_file" ]]; then
+    yq -o=json '.meta | {"display_name": .display_name, "neovim_colorscheme_name": .neovim_colorscheme_name}' "$theme_file" \
+      | jq --arg id "$id" '{schema_version: 1, id: $id} + .'
+  else
+    jq -n --arg id "$id" '{schema_version: 1, id: $id, display_name: null, neovim_colorscheme_name: null}'
+  fi
+}
+
 #==============================================================================
 # APP HANDLERS - Direct application from themes/ directory
 #==============================================================================

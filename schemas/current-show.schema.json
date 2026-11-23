@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/datapointchris/theme/schemas/current-show.schema.json",
+  "title": "The theme applied on this machine",
+  "description": "What `theme current show --json` prints: the theme applied on this machine, read from the current file in theme's state directory and that theme's theme.yml, with no sync and no network. Every field but schema_version is null when no theme is applied. display_name and neovim_colorscheme_name are null when the applied theme's theme.yml is not installed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "display_name", "neovim_colorscheme_name"],
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "description": "The version of this shape."
+    },
+    "id": {
+      "type": ["string", "null"],
+      "description": "The theme's id: its directory under themes/, and meta.id in its theme.yml."
+    },
+    "display_name": {
+      "type": ["string", "null"],
+      "description": "meta.display_name from the theme's theme.yml, the name a person reads."
+    },
+    "neovim_colorscheme_name": {
+      "type": ["string", "null"],
+      "description": "meta.neovim_colorscheme_name from the theme's theme.yml, the name Neovim's :colorscheme is called with. It may differ from the id, as OceanicNext does for oceanic-next."
+    }
+  }
+}

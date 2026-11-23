@@ -67,10 +67,17 @@ theme list --status all       # List both
 theme change                  # Interactive picker with color preview
 theme apply <theme-id>        # Apply a specific theme
 theme current                 # Show current theme and stats
+theme current show --json     # Print its id, name and Neovim colorscheme as JSON
 theme random                  # Apply a random theme, weighted by time since last use
 theme info [theme]            # Browse themes and view detailed history
 theme verify                  # Check the theme system is healthy
 ```
+
+`theme current` syncs with the gist before it prints, when sync is on.
+`theme current show` reads only the local current-theme file and that theme's
+`theme.yml`, so it answers offline and fast enough for another program to call.
+With `--json` it prints the shape `schemas/current-show.schema.json` describes.
+With no theme applied, every field but `schema_version` is `null`, and it exits 0.
 
 ### Exit codes
 

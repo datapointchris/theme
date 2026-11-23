@@ -73,7 +73,8 @@ commands_table() {
   cat <<'EOF'
   change               Interactive theme picker with color preview
   current              Show currently active theme
-  list [--status S]    List themes; S is available, rejected or all (default available)
+  current show         Print the current theme from local state, with no sync (--json for JSON)
+  list [--status S]   List themes; S is available, rejected or all (default available)
   apply <theme>        Apply theme across all platform apps
   random               Apply a random theme, weighted by time since last use
   like [message]       Like current theme with optional reason
@@ -175,6 +176,7 @@ verb_usage() {
 
   case "$verb" in
     background) background_usage && return ;;
+    current) current_usage && return ;;
     opacity) opacity_usage && return ;;
     schedule) schedule_usage && return ;;
     sync) sync_usage && return ;;
@@ -448,6 +450,47 @@ EOF
   fi
 }
 
+current_usage() {
+  if command -v print_section &>/dev/null; then
+    print_section "Current Theme" "yellow"
+    echo "  The theme applied on this machine. theme apply and theme random set it."
+
+    print_section "Commands" "blue"
+    cat <<'EOF'
+  current              Show the current theme and its history, after a sync
+  current show         Print its id, name and Neovim colorscheme from local state, with no sync
+EOF
+
+    print_section "Options" "blue"
+    echo "  --json               With show, print JSON as schemas/current-show.schema.json describes"
+
+    print_section "Examples" "yellow"
+    echo "  $(print_cyan "theme current")                # Show the current theme and its history"
+    echo "  $(print_cyan "theme current show --json")    # Print it as JSON, offline"
+
+  else
+    cat <<'EOF'
+Current Theme
+=============
+  The theme applied on this machine. theme apply and theme random set it.
+
+Commands
+--------
+  current              Show the current theme and its history, after a sync
+  current show         Print its id, name and Neovim colorscheme from local state, with no sync
+
+Options
+-------
+  --json               With show, print JSON as schemas/current-show.schema.json describes
+
+Examples
+--------
+  theme current                # Show the current theme and its history
+  theme current show --json    # Print it as JSON, offline
+EOF
+  fi
+}
+
 sync_usage() {
   if command -v print_section &>/dev/null; then
     print_section "Sync Management" "yellow"
@@ -640,6 +683,45 @@ show_current() {
   fi
 
   display_theme_details "$current" "full"
+}
+
+_current_usage_error() {
+  echo "Error: theme current: $1" >&2
+  echo "Usage: theme current [show [--json]]" >&2
+  exit 2
+}
+
+# A read that another program can call under a deadline, so it touches no
+# network: no sync, and main skips the update notice for it.
+show_current_from_local_state() {
+  local as_json=false
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --json)
+        as_json=true
+        shift
+        ;;
+      --help | -h)
+        current_usage
+        return
+        ;;
+      *)
+        _current_usage_error "unknown option: $1"
+        ;;
+    esac
+  done
+
+  local record
+  record=$(current_theme_record_json)
+
+  if [[ "$as_json" == true ]]; then
+    echo "$record"
+    return
+  fi
+
+  jq -r 'if .id == null then "No theme currently applied"
+         else "\(.display_name // .id) (\(.id))\nNeovim colorscheme: \(.neovim_colorscheme_name // "unknown")" end' <<<"$record"
 }
 
 _list_usage_error() {
@@ -1743,7 +1825,7 @@ main() {
   # update failures surface.
   if declare -F bashselfupdate_notify &>/dev/null; then
     case "${1:-} ${2:-}" in
-      "update "* | "--version "* | "-v "* | "schedule run") ;;
+      "update "* | "--version "* | "-v "* | "schedule run" | "current show") ;;
       *) bashselfupdate_notify theme "$THEME_APP_DIR" ;;
     esac
   fi
@@ -1764,7 +1846,11 @@ main() {
       change_theme
       ;;
     current)
-      show_current
+      case "${2:-}" in
+        "") show_current ;;
+        show) show_current_from_local_state "${@:3}" ;;
+        *) _current_usage_error "unknown command: $2" ;;
+      esac
       ;;
     list)
       show_list "${@:2}"
