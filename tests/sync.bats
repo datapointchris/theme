@@ -109,12 +109,16 @@ $(record 2025-01-01T00:00:00Z macmini nord apply)"
 
 @test "the pre-split history.jsonl is not one of the per-machine files" {
   # A machine on an older release still writes the whole merged set to that name.
-  # Reading it back would restore the union this replaces.
-  run grep -E '^history-.+\.jsonl$' <<<"history.jsonl"
-  assert_failure
+  # Reading it back would restore the union merge that per-machine files avoid.
+  stub_command_with_output gh "history.jsonl
+history-desktop.jsonl
+history-laptop.jsonl"
 
-  run grep -E '^history-.+\.jsonl$' <<<"history-archlinux.jsonl"
+  run _sync_remote_files some-gist-id
   assert_success
+  assert_equal "${#lines[@]}" 2
+  assert_line --index 0 "history-desktop.jsonl"
+  assert_line --index 1 "history-laptop.jsonl"
 }
 
 @test "the filename carries this machine's id" {
